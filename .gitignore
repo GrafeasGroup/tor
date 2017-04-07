@@ -1,3 +1,4 @@
 praw.ini
 *.pyc
 .idea/*
+transcribersofreddit.log
