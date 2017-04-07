@@ -1,0 +1,58 @@
+[04/07/2017 12:50:54 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:50:54 AM] - [INFO] - [log_header] - Starting!
+[04/07/2017 12:50:54 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:50:55 AM] - [INFO] - [initialize] - Domains loaded.
+[04/07/2017 12:50:56 AM] - [INFO] - [initialize] - Subreddits loaded.
+[04/07/2017 12:51:16 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:51:16 AM] - [INFO] - [log_header] - Starting!
+[04/07/2017 12:51:16 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:51:17 AM] - [INFO] - [initialize] - Domains loaded.
+[04/07/2017 12:51:18 AM] - [INFO] - [initialize] - Subreddits loaded.
+[04/07/2017 12:51:21 AM] - [INFO] - [initialize] - Formatting loaded.
+[04/07/2017 12:51:24 AM] - [INFO] - [process_post] - We've already handled ID t3_63xw2p! Skipping!
+[04/07/2017 12:51:24 AM] - [INFO] - [process_post] - We've already handled ID t3_633klq! Skipping!
+[04/07/2017 12:51:24 AM] - [INFO] - [process_post] - We've already handled ID t3_62m5u3! Skipping!
+[04/07/2017 12:51:24 AM] - [INFO] - [process_post] - We've already handled ID t3_6231oz! Skipping!
+[04/07/2017 12:51:24 AM] - [INFO] - [process_post] - We've already handled ID t3_61tsbu! Skipping!
+[04/07/2017 12:51:24 AM] - [INFO] - [process_post] - We've already handled ID t3_61i4lr! Skipping!
+[04/07/2017 12:51:24 AM] - [INFO] - [process_post] - We've already handled ID t3_619rb8! Skipping!
+[04/07/2017 12:51:36 AM] - [INFO] - [<module>] - Sleeping!
+[04/07/2017 12:51:38 AM] - [ERROR] - [<module>] - User triggered shutdown. Shutting down.
+[04/07/2017 12:52:35 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:52:35 AM] - [INFO] - [log_header] - Starting!
+[04/07/2017 12:52:35 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:52:36 AM] - [INFO] - [initialize] - Domains loaded.
+[04/07/2017 12:52:37 AM] - [INFO] - [initialize] - Subreddits loaded.
+[04/07/2017 12:52:39 AM] - [INFO] - [initialize] - Formatting loaded.
+[04/07/2017 12:52:47 AM] - [INFO] - [process_post] - We've already handled ID t3_63xw2p! Skipping!
+[04/07/2017 12:52:47 AM] - [INFO] - [process_post] - We've already handled ID t3_633klq! Skipping!
+[04/07/2017 12:52:47 AM] - [INFO] - [process_post] - We've already handled ID t3_62m5u3! Skipping!
+[04/07/2017 12:52:47 AM] - [INFO] - [process_post] - We've already handled ID t3_6231oz! Skipping!
+[04/07/2017 12:52:47 AM] - [INFO] - [process_post] - We've already handled ID t3_61tsbu! Skipping!
+[04/07/2017 12:52:47 AM] - [INFO] - [process_post] - We've already handled ID t3_61i4lr! Skipping!
+[04/07/2017 12:52:47 AM] - [INFO] - [process_post] - We've already handled ID t3_619rb8! Skipping!
+[04/07/2017 12:52:57 AM] - [INFO] - [<module>] - Sleeping!
+[04/07/2017 12:52:58 AM] - [ERROR] - [<module>] - User triggered shutdown. Shutting down.
+[04/07/2017 12:54:27 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:54:27 AM] - [INFO] - [log_header] - Starting!
+[04/07/2017 12:54:27 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:54:28 AM] - [INFO] - [initialize] - Domains loaded.
+[04/07/2017 12:54:29 AM] - [INFO] - [initialize] - Subreddits loaded.
+[04/07/2017 12:54:31 AM] - [INFO] - [initialize] - Formatting loaded.
+[04/07/2017 12:56:25 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:56:25 AM] - [INFO] - [log_header] - Starting!
+[04/07/2017 12:56:25 AM] - [INFO] - [log_header] - **************************************************
+[04/07/2017 12:56:26 AM] - [INFO] - [initialize] - Domains loaded.
+[04/07/2017 12:56:27 AM] - [INFO] - [initialize] - Subreddits loaded.
+[04/07/2017 12:56:28 AM] - [INFO] - [initialize] - Formatting loaded.
+[04/07/2017 12:56:37 AM] - [INFO] - [update_user_flair] - Setting flair for Itsthejoker
+[04/07/2017 12:56:37 AM] - [INFO] - [process_done] - Post t3_634kvn completed by Itsthejoker!
+[04/07/2017 12:56:39 AM] - [INFO] - [process_post] - We've already handled ID t3_63xw2p! Skipping!
+[04/07/2017 12:56:39 AM] - [INFO] - [process_post] - We've already handled ID t3_633klq! Skipping!
+[04/07/2017 12:56:39 AM] - [INFO] - [process_post] - We've already handled ID t3_62m5u3! Skipping!
+[04/07/2017 12:56:39 AM] - [INFO] - [process_post] - We've already handled ID t3_6231oz! Skipping!
+[04/07/2017 12:56:39 AM] - [INFO] - [process_post] - We've already handled ID t3_61tsbu! Skipping!
+[04/07/2017 12:56:39 AM] - [INFO] - [process_post] - We've already handled ID t3_61i4lr! Skipping!
+[04/07/2017 12:56:39 AM] - [INFO] - [process_post] - We've already handled ID t3_619rb8! Skipping!
+[04/07/2017 12:56:45 AM] - [INFO] - [<module>] - Sleeping!
+[04/07/2017 12:56:45 AM] - [ERROR] - [<module>] - User triggered shutdown. Shutting down.
