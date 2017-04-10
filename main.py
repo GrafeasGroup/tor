@@ -19,8 +19,6 @@ from processing import process_mention
 from processing import process_post
 from strings import id_already_handled_in_db
 
-__version__ = 0.2
-
 
 class Context(object):
     """
