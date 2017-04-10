@@ -16,12 +16,10 @@ from helpers import log_header
 from processing import process_claim
 from processing import process_done
 from processing import process_mention
-from strings import discovered_submit_title
+from processing import process_post
 from strings import id_already_handled_in_db
-from strings import reddit_url
-from strings import rules_comment
 
-__version__ = 0.1
+__version__ = 0.2
 
 
 class Context(object):
@@ -121,73 +119,6 @@ def respond_to_thanks(mention):
     mention.reply(_('You\'re very welcome! I\'m just doing my job!'))
 
 
-def process_post(new_post):
-    """
-    After a valid post has been discovered, this handles the formatting
-    and posting of those calls as workable jobs to ToR.
-    
-    :param new_post: Submission object that needs to be posted.
-    :return: None.
-    """
-    if not is_valid(new_post.fullname, redis_server):
-        logging.info(id_already_handled_in_db.format(new_post.fullname))
-        return
-
-    logging.info(
-        'Posting call for transcription on ID {} posted by {}'.format(
-            new_post.fullname, new_post.author.name
-        )
-    )
-
-    if new_post.domain in Context.image_domains:
-        content_type = 'image'
-        content_format = Context.image_formatting
-    elif new_post.domain in Context.audio_domains:
-        content_type = 'audio'
-        content_format = Context.audio_formatting
-    elif new_post.domain in Context.video_domains:
-        content_type = 'video'
-        content_format = Context.video_formatting
-    else:
-        # how could we get here without fulfilling one of the above
-        # criteria? Just remember: the users will find a way.
-        content_type = 'Unknown'
-        content_format = 'Formatting? I think something went wrong here...'
-
-    # noinspection PyBroadException
-    try:
-        result = tor.submit(
-            title=discovered_submit_title.format(
-                sub=new_post.subreddit.display_name,
-                type=content_type.title(),
-                title=new_post.title
-            ),
-            url=reddit_url.format(new_post.permalink)
-        )
-        result.reply(
-            _(
-                rules_comment.format(
-                    post_type=content_type, formatting=content_format
-                )
-            )
-        )
-        flair_post(result, flair.unclaimed)
-
-    # I need to figure out what errors can happen here
-    except Exception as e:
-        logging.error(e)
-        logging.error(
-            'Something went wrong; unable to post content.\n'
-            'ID: {id}\n'
-            'Title: {title}\n'
-            'Subreddit: {sub}'.format(
-                id=new_post.fullname,
-                title=new_post.title,
-                sub=new_post.subreddit.display_name
-            )
-        )
-
-
 def check_inbox():
     """
     Goes through all the unread messages in the inbox. It has two
@@ -219,7 +150,7 @@ def check_inbox():
             logging.info(id_already_handled_in_db.format(mention.parent_id))
             continue
 
-        process_mention(mention, r, tor)
+        process_mention(mention, r, tor, redis_server)
 
     # comment replies
     replies = []
@@ -254,7 +185,7 @@ def check_submissions(subreddit):
             post.domain in Context.audio_domains or
             post.domain in Context.video_domains
         ):
-            process_post(post)
+            process_post(post, tor, redis_server, Context)
 
 
 def set_meta_flair_on_other_posts(transcribersofreddit):

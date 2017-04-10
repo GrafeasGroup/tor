@@ -44,8 +44,9 @@ rules_comment_unknown_format = (
 )
 
 bot_footer = (
-    "{}\n\n---\nv. {version} | This message was posted by a bot. "
+    "{}\n\n---\nv{version} | This message was posted by a bot. "
     "| [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) "
+    "| [Source](https://github.com/itsthejoker/TranscribersOfReddit) "
     "| Questions? [Message the mods!](https://www.reddit.com/message/"
     "compose?to=%2Fr%2FTranscribersOfReddit&subject=Bot%20Question"
     "&message=)"

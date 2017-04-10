@@ -1,23 +1,97 @@
 import logging
 
 from helpers import _
+from helpers import add_complete_post_id
 from helpers import clean_id
 from helpers import flair
 from helpers import flair_post
 from helpers import get_parent_post_id
+from helpers import is_valid
 from helpers import update_user_flair
 from strings import already_claimed
 from strings import claim_already_complete
 from strings import claim_success
+from strings import discovered_submit_title
 from strings import done_cannot_find_transcript
 from strings import done_completed_transcript
 from strings import done_still_unclaimed
+from strings import id_already_handled_in_db
 from strings import reddit_url
+from strings import rules_comment
 from strings import rules_comment_unknown_format
 from strings import summoned_submit_title
 
 
-def process_mention(mention, r, tor):
+def process_post(new_post, tor, redis_server, Context):
+    """
+    After a valid post has been discovered, this handles the formatting
+    and posting of those calls as workable jobs to ToR.
+
+    :param new_post: Submission object that needs to be posted.
+    :return: None.
+    """
+    if not is_valid(new_post.fullname, redis_server):
+        logging.info(id_already_handled_in_db.format(new_post.fullname))
+        return
+
+    logging.info(
+        'Posting call for transcription on ID {} posted by {}'.format(
+            new_post.fullname, new_post.author.name
+        )
+    )
+
+    if new_post.domain in Context.image_domains:
+        content_type = 'image'
+        content_format = Context.image_formatting
+    elif new_post.domain in Context.audio_domains:
+        content_type = 'audio'
+        content_format = Context.audio_formatting
+    elif new_post.domain in Context.video_domains:
+        content_type = 'video'
+        content_format = Context.video_formatting
+    else:
+        # how could we get here without fulfilling one of the above
+        # criteria? Just remember: the users will find a way.
+        content_type = 'Unknown'
+        content_format = 'Formatting? I think something went wrong here...'
+
+    # noinspection PyBroadException
+    try:
+        result = tor.submit(
+            title=discovered_submit_title.format(
+                sub=new_post.subreddit.display_name,
+                type=content_type.title(),
+                title=new_post.title
+            ),
+            url=reddit_url.format(new_post.permalink)
+        )
+        result.reply(
+            _(
+                rules_comment.format(
+                    post_type=content_type, formatting=content_format
+                )
+            )
+        )
+        flair_post(result, flair.unclaimed)
+
+        add_complete_post_id(new_post.fullname, redis_server)
+
+    # I need to figure out what errors can happen here
+    except Exception as e:
+        logging.error(e)
+        logging.error(
+            'Something went wrong; unable to post content.\n'
+            'ID: {id}\n'
+            'Title: {title}\n'
+            'Subreddit: {sub}'.format(
+                id=new_post.fullname,
+                title=new_post.title,
+                sub=new_post.subreddit.display_name
+            )
+        )
+
+
+def process_mention(mention, r, tor, redis_server):
     """
     Handles username mentions and handles the formatting and posting of
     those calls as workable jobs to ToR.
@@ -47,36 +121,41 @@ def process_mention(mention, r, tor):
         'Posting call for transcription on ID {}'.format(mention.parent_id)
     )
 
-    # noinspection PyBroadException
-    try:
-        result = tor.submit(
-            title=summoned_submit_title.format(
-                sub=mention.subreddit.display_name,
-                commentorpost=parent.__class__.__name__.lower(),
-                title=parent.title
-            ),
-            url=reddit_url.format(parent_permalink)
-        )
-        result.reply(_(rules_comment_unknown_format))
-        flair_post(result, flair.summoned_unclaimed)
-        logging.info(
-            'Posting success message in response to caller, u/{}'.format(mention.author)
-        )
-        mention.reply(_(
-            'The transcribers have been summoned! Please be patient '
-            'and we\'ll be along as quickly as we can.')
-        )
-    # I need to figure out what errors can happen here
-    except Exception as e:
-        logging.error(e)
-        logging.error(
-            'Posting failure message in response to caller, u/{}'.format(mention.author)
-        )
-        mention.reply(_(
-            'Something appears to have gone wrong. Please message the '
-            'moderators of r/TranscribersOfReddit to have them look at '
-            'this. Thanks!')
-        )
+    if is_valid(parent.fullname, redis_server):
+        # we're only doing this if we haven't seen this one before.
+
+        # noinspection PyBroadException
+        try:
+            result = tor.submit(
+                title=summoned_submit_title.format(
+                    sub=mention.subreddit.display_name,
+                    commentorpost=parent.__class__.__name__.lower(),
+                    title=parent.title
+                ),
+                url=reddit_url.format(parent_permalink)
+            )
+            result.reply(_(rules_comment_unknown_format))
+            flair_post(result, flair.summoned_unclaimed)
+            logging.info(
+                'Posting success message in response to caller, u/{}'.format(mention.author)
+            )
+            mention.reply(_(
+                'The transcribers have been summoned! Please be patient '
+                'and we\'ll be along as quickly as we can.')
+            )
+            add_complete_post_id(parent.fullname, redis_server)
+
+        # I need to figure out what errors can happen here
+        except Exception as e:
+            logging.error(e)
+            logging.error(
+                'Posting failure message in response to caller, u/{}'.format(mention.author)
+            )
+            mention.reply(_(
+                'Something appears to have gone wrong. Please message the '
+                'moderators of r/TranscribersOfReddit to have them look at '
+                'this. Thanks!')
+            )
 
 
 def process_claim(post, r):
