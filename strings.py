@@ -81,3 +81,17 @@ done_cannot_find_transcript = (
     'Sorry; I can\'t find your transcript post on the link. Please message the '
     'mods to have them look at this.'
 )
+
+summoned_by_comment = (
+    'We were summoned by a comment to look at the above content. When you\'re '
+    'done with the post, please post it as a reply to the poster who requested '
+    'our services; [their comment can be found here.]({})\n\n'
+    'This post will not be counted as `Done` if you reply to the main post; you '
+    '*must* reply to the post which summoned us.'
+)
+
+something_went_wrong = (
+    'Something appears to have gone wrong. Please message the '
+    'moderators of r/TranscribersOfReddit to have them look at '
+    'this. Thanks!'
+)

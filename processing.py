@@ -1,4 +1,5 @@
 import logging
+import re
 
 from helpers import _
 from helpers import add_complete_post_id
@@ -19,6 +20,8 @@ from strings import id_already_handled_in_db
 from strings import reddit_url
 from strings import rules_comment
 from strings import rules_comment_unknown_format
+from strings import something_went_wrong
+from strings import summoned_by_comment
 from strings import summoned_submit_title
 
 
@@ -99,6 +102,7 @@ def process_mention(mention, r, tor, redis_server):
     :param mention: the Comment object containing the username mention.
     :param r: Active Reddit instance.
     :param tor: A shortcut; the Subreddit instance for ToR.
+    :param redis_server: Active redis instance.
     :return: None.
     """
     # We have to do this entire parent / parent_permalink thing twice because
@@ -135,6 +139,15 @@ def process_mention(mention, r, tor, redis_server):
                 url=reddit_url.format(parent_permalink)
             )
             result.reply(_(rules_comment_unknown_format))
+            result.reply(_(
+                summoned_by_comment.format(
+                    reddit_url.format(
+                        r.comment(
+                            clean_id(mention.fullname)
+                        ).permalink()
+                    )
+                )
+            ))
             flair_post(result, flair.summoned_unclaimed)
             logging.info(
                 'Posting success message in response to caller, u/{}'.format(mention.author)
@@ -151,11 +164,7 @@ def process_mention(mention, r, tor, redis_server):
             logging.error(
                 'Posting failure message in response to caller, u/{}'.format(mention.author)
             )
-            mention.reply(_(
-                'Something appears to have gone wrong. Please message the '
-                'moderators of r/TranscribersOfReddit to have them look at '
-                'this. Thanks!')
-            )
+            mention.reply(_(something_went_wrong))
 
 
 def process_claim(post, r):
@@ -199,6 +208,43 @@ def verified_posted_transcript(post, r):
     :return: True if a post is found, False if not.
     """
     top_parent = get_parent_post_id(post, r)
+
+    # First we need to check to see if this is something we were
+    # summoned for or not.
+    for comment in top_parent.comments:
+        if summoned_by_comment[:40] in comment.body and \
+                        comment.author.name == 'transcribersofreddit':
+
+            url_regex = re.compile(
+                'their comment can be found here\.\]\((?P<url>.*)\)'
+            )
+            comment_url = re.search(url_regex, comment.body).group('url')
+
+            # I don't like this because it's a costly operation on top
+            # of all the other costly operations we need to make, but
+            # if you just ask for the comment itself Reddit doesn't send
+            # you the replies. That means you have to ask for the entire
+            # thing (but really just the comment you want) and *then*
+            # Reddit will send the replies. *headdesk*
+
+            original_comment = ''  # stop pycharm from yelling at me
+
+            # get all the comments (replies included) in a handy list
+            original_comments = r.submission(url=comment_url).comments.list()
+            for thingy in original_comments:
+                if thingy.id in comment_url:
+                    # thingy is the comment object we want! That's our parent!
+                    original_comment = thingy
+                    break
+            # noinspection PyBroadException
+            try:
+                for reply in original_comment.replies:
+                    if reply.author == post.author:
+                        return True
+            except Exception:
+                # I don't care what the exception is, just don't break.
+                return False
+
     # get source link, check all comments, look for root level comment
     # by the author of the post. Return True if found, False if not.
     linked_resource = r.submission(top_parent.id_from_url(top_parent.url))
@@ -220,6 +266,7 @@ def process_done(post, r, tor):
     :param tor: Shortcut; a Subreddit object for ToR.
     :return: None.
     """
+
     top_parent = get_parent_post_id(post, r)
 
     if flair.unclaimed in top_parent.link_flair_text:
