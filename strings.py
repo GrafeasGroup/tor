@@ -20,6 +20,8 @@ rules_comment = (
     'will be marked as completed.'
     '\n\nThis is a(n) {post_type} post, so please use the following formatting:'
     '\n\n---\n\n{formatting}\n\n---'
+    '\n\nHeader\n---\n\nWhen you\'re done, please put the following header at the top of your '
+    'post:\n\n---\n\n    {header}\n\n---'
     '\n\nIf you have any questions, feel free to [message the mods!]'
     '(https://www.reddit.com/message/'
     'compose?to=%2Fr%2FTranscribersOfReddit&subject=General%20Question'
@@ -37,6 +39,8 @@ rules_comment_unknown_format = (
     '\n\nWe do not know what type of formatting the above post has, but if '
     'one of the mods finds it we will update this comment. Otherwise please '
     'refer to the sidebar for further information.\n\n---'
+    '\n\nHeader\n---\n\nWhen you\'re done, please put the following header at the top of your '
+    'post:\n\n---\n\n    {header}\n\n---'
     '\n\nIf you have any questions, feel free to [message the mods.]'
     '(https://www.reddit.com/message/'
     'compose?to=%2Fr%2FTranscribersOfReddit&subject=General%20Question'
@@ -79,7 +83,8 @@ done_completed_transcript = (
 
 done_cannot_find_transcript = (
     'Sorry; I can\'t find your transcript post on the link. Please message the '
-    'mods to have them look at this.'
+    'mods to have them look at this.\n\nAlternatively, did you remember to put the '
+    'header in your comment?'
 )
 
 summoned_by_comment = (
@@ -95,3 +100,5 @@ something_went_wrong = (
     'moderators of r/TranscribersOfReddit to have them look at '
     'this. Thanks!'
 )
+
+ToR_link = 'www.reddit.com/r/TranscribersOfReddit'

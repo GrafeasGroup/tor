@@ -175,7 +175,7 @@ def update_user_flair(post, tor, reddit):
         # weird.
         user_flair = reddit.comment(id=clean_id(post.fullname)).author_flair_text
     except AttributeError:
-        user_flair = '0 Γ'
+        user_flair = '0 Γ - Beta Tester'
 
     if 'Γ' in user_flair:
         # take their current flair and add one to it
@@ -185,7 +185,7 @@ def update_user_flair(post, tor, reddit):
         user_flair = '{} Γ'.format(new_flair_count + 1)
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
-        tor.flair.set(post.author, text=user_flair, css_class='grafeas')
+        tor.flair.set(post.author, text=user_flair, css_class='grafeas-beta')
         logging.info('Setting flair for {}'.format(post.author))
     else:
         # they're bot or a mod and have custom flair. Leave it alone.

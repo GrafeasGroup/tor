@@ -9,6 +9,7 @@ from helpers import flair_post
 from helpers import get_parent_post_id
 from helpers import is_valid
 from helpers import update_user_flair
+from strings import ToR_link
 from strings import already_claimed
 from strings import claim_already_complete
 from strings import claim_success
@@ -31,10 +32,13 @@ def process_post(new_post, tor, redis_server, Context):
     and posting of those calls as workable jobs to ToR.
 
     :param new_post: Submission object that needs to be posted.
+    :param tor: TranscribersOfReddit subreddit instance.
+    :param redis_server: Active Redis instance.
+    :param Context: the Context object.
     :return: None.
     """
     if not is_valid(new_post.fullname, redis_server):
-        logging.info(id_already_handled_in_db.format(new_post.fullname))
+        logging.debug(id_already_handled_in_db.format(new_post.fullname))
         return
 
     logging.info(
@@ -71,7 +75,9 @@ def process_post(new_post, tor, redis_server, Context):
         result.reply(
             _(
                 rules_comment.format(
-                    post_type=content_type, formatting=content_format
+                    post_type=content_type,
+                    formatting=content_format,
+                    header=Context.header
                 )
             )
         )
@@ -94,7 +100,7 @@ def process_post(new_post, tor, redis_server, Context):
         )
 
 
-def process_mention(mention, r, tor, redis_server):
+def process_mention(mention, r, tor, redis_server, Context):
     """
     Handles username mentions and handles the formatting and posting of
     those calls as workable jobs to ToR.
@@ -138,7 +144,7 @@ def process_mention(mention, r, tor, redis_server):
                 ),
                 url=reddit_url.format(parent_permalink)
             )
-            result.reply(_(rules_comment_unknown_format))
+            result.reply(_(rules_comment_unknown_format.format(header=Context.header)))
             result.reply(_(
                 summoned_by_comment.format(
                     reddit_url.format(
@@ -149,7 +155,7 @@ def process_mention(mention, r, tor, redis_server):
                 )
             ))
             flair_post(result, flair.summoned_unclaimed)
-            logging.info(
+            logging.debug(
                 'Posting success message in response to caller, u/{}'.format(mention.author)
             )
             mention.reply(_(
@@ -178,6 +184,11 @@ def process_claim(post, r):
     """
     top_parent = get_parent_post_id(post, r)
 
+    # WAIT! Do we actually own this post?
+    if top_parent.author.name != 'transcribersofreddit':
+        logging.debug('Received `claim` on post we do not own. Ignoring.')
+        return
+
     if 'Unclaimed' in top_parent.link_flair_text:
         # need to get that "Summoned - Unclaimed" in there too
         post.reply(_(claim_success))
@@ -194,7 +205,20 @@ def process_claim(post, r):
         post.reply(_(claim_already_complete))
 
 
-def verified_posted_transcript(post, r):
+def _author_check(original_post, claimant_post):
+    return original_post.author == claimant_post.author
+
+
+def _header_check(reply, Context, tor_link=ToR_link):
+    if Context.perform_header_check:
+        return tor_link in reply.body
+    else:
+        # If we don't want the check to take place, we'll just return
+        # true to negate it.
+        return True
+
+
+def verified_posted_transcript(post, r, Context):
     """
     Because we're using basic gamification, we need to put in at least
     a few things to make it difficult to game the system. When a user
@@ -239,9 +263,10 @@ def verified_posted_transcript(post, r):
             # noinspection PyBroadException
             try:
                 for reply in original_comment.replies:
-                    if reply.author == post.author:
+                    if _author_check(reply, post) and _header_check(reply, Context):
                         return True
-            except Exception:
+            except Exception as e:
+                logging.error(e)
                 # I don't care what the exception is, just don't break.
                 return False
 
@@ -254,7 +279,7 @@ def verified_posted_transcript(post, r):
     return False
 
 
-def process_done(post, r, tor):
+def process_done(post, r, tor, Context):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -269,10 +294,15 @@ def process_done(post, r, tor):
 
     top_parent = get_parent_post_id(post, r)
 
+    # WAIT! Do we actually own this post?
+    if top_parent.author.name != 'transcribersofreddit':
+        logging.debug('Received `done` on post we do not own. Ignoring.')
+        return
+
     if flair.unclaimed in top_parent.link_flair_text:
         post.reply(_(done_still_unclaimed))
     elif top_parent.link_flair_text == flair.in_progress:
-        if verified_posted_transcript(post, r):
+        if verified_posted_transcript(post, r, Context):
             # we need to double-check these things to keep people
             # from gaming the system
             post.reply(_(done_completed_transcript))

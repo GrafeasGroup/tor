@@ -32,8 +32,26 @@ class Context(object):
     video_formatting = ''
     audio_formatting = ''
     image_formatting = ''
+    header = ''
 
     subreddits_to_check = []
+
+    perform_header_check = False
+    debug_sleep = False
+
+
+def populate_header():
+    result = get_wiki_page('format/header', tor=tor)
+    result = result.split('\r\n')
+    temp = []
+    for part in result:
+        part = part.lstrip().rstrip()
+        if part == '':
+            continue
+        if part == '---':
+            continue
+        temp.append(part)
+    Context.header = ' '.join(temp)
 
 
 def populate_formatting():
@@ -148,7 +166,7 @@ def check_inbox():
             logging.info(id_already_handled_in_db.format(mention.parent_id))
             continue
 
-        process_mention(mention, r, tor, redis_server)
+        process_mention(mention, r, tor, redis_server, Context)
 
     # comment replies
     replies = []
@@ -158,13 +176,13 @@ def check_inbox():
             item.mark_read()
 
     for reply in replies:
-        if 'thank' in reply.body.lower():
-            respond_to_thanks(reply)
-            continue
-        if 'claim' in reply.body:
+        # if 'thank' in reply.body.lower():
+        #     respond_to_thanks(reply)
+        #     continue
+        if 'claim' in reply.body.lower():
             process_claim(reply, r)
-        if 'done' in reply.body:
-            process_done(reply, r, tor)
+        if 'done' in reply.body.lower():
+            process_done(reply, r, tor, Context)
 
 
 def check_submissions(subreddit):
@@ -217,6 +235,10 @@ def initialize():
     logging.info('Subreddits loaded.')
     populate_formatting()
     logging.info('Formatting loaded.')
+    populate_header()
+    logging.info('Header loaded.')
+
+    logging.info('Initialization complete.')
 
 
 if __name__ == '__main__':
@@ -238,8 +260,9 @@ if __name__ == '__main__':
             for sub in Context.subreddits_to_check:
                 check_submissions(sub)
             set_meta_flair_on_other_posts(tor)
-            logging.info('Sleeping!')
-            time.sleep(60)
+            logging.debug('Looping!')
+            if Context.debug_sleep:
+                time.sleep(60)
 
     except KeyboardInterrupt:
         logging.error('User triggered shutdown. Shutting down.')
