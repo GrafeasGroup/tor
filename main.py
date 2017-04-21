@@ -291,6 +291,7 @@ if __name__ == '__main__':
     initialize()
 
     try:
+        number_of_loops = 0
         # primary loop
         while True:
             check_inbox()
@@ -298,6 +299,10 @@ if __name__ == '__main__':
                 check_submissions(sub, Context)
             set_meta_flair_on_other_posts(tor)
             logging.debug('Looping!')
+            number_of_loops += 1
+            if number_of_loops > 5:
+                # reload configuration every five loops
+                initialize()
             if Context.debug_sleep:
                 time.sleep(60)
 
