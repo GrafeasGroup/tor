@@ -167,6 +167,8 @@ def update_user_flair(post, tor, reddit):
     :param reddit: Active Reddit instance.
     :return: None.
     """
+    flair_text = '0 Γ - Beta Tester'
+
     try:
         # The post object is technically an inbox mention, even though it's
         # a Comment object. In order to get the flair, we have to take the
@@ -175,7 +177,10 @@ def update_user_flair(post, tor, reddit):
         # weird.
         user_flair = reddit.comment(id=clean_id(post.fullname)).author_flair_text
     except AttributeError:
-        user_flair = '0 Γ - Beta Tester'
+        user_flair = flair_text
+
+    if user_flair is None:
+        user_flair = flair_text
 
     if 'Γ' in user_flair:
         # take their current flair and add one to it

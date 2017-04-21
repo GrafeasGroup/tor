@@ -105,7 +105,7 @@ def populate_subreddit_list():
 
 def configure_logging():
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format='[%(asctime)s] - [%(levelname)s] - [%(funcName)s] - %(message)s',
         datefmt='%m/%d/%Y %I:%M:%S %p',
         filename='transcribersofreddit.log'
