@@ -84,6 +84,7 @@ def get_wiki_page(pagename, tor):
     Return the contents of a given wiki page.
     
     :param pagename: String. The name of the page to be requested.
+    :param tor: Active ToR instance.
     :return: String or None. The content of the requested page if
         present else None.
     """
@@ -92,6 +93,19 @@ def get_wiki_page(pagename, tor):
         return tor.wiki[pagename].content_md
     except prawcore.exceptions.NotFound:
         return None
+
+
+def update_wiki_page(pagename, content, tor):
+    """
+    Sends new content to the requested wiki page.
+    
+    :param pagename: String. The name of the page to be edited.
+    :param content: String. New content for the wiki page.
+    :param tor: Active ToR instance.
+    :return: None.
+    """
+    logging.debug('Updating wiki page {}'.format(pagename))
+    return tor.wiki[pagename].edit()
 
 
 def log_header(message):

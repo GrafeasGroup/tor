@@ -13,6 +13,7 @@ from helpers import flair_post
 from helpers import get_wiki_page
 from helpers import is_valid
 from helpers import log_header
+from helpers import update_wiki_page
 from processing import process_claim
 from processing import process_done
 from processing import process_mention
@@ -35,12 +36,17 @@ class Context(object):
     header = ''
 
     subreddits_to_check = []
+    # subreddits that we're only getting 100 posts at a time from
+    # instead of jump-starting it with 500
+    subreddit_members = []
 
     perform_header_check = False
     debug_sleep = False
 
 
 def populate_header():
+    Context.header = ''
+
     result = get_wiki_page('format/header', tor=tor)
     result = result.split('\r\n')
     temp = []
@@ -61,6 +67,11 @@ def populate_formatting():
     
     :return: None.
     """
+    # zero out everything so we can reinitialize later
+    Context.audio_formatting = ''
+    Context.video_formatting = ''
+    Context.image_formatting = ''
+
     Context.audio_formatting = get_wiki_page('format/audio', tor=tor)
     Context.video_formatting = get_wiki_page('format/video', tor=tor)
     Context.image_formatting = get_wiki_page('format/images', tor=tor)
@@ -73,6 +84,11 @@ def populate_domain_lists():
     
     :return: None.
     """
+
+    Context.video_domains = []
+    Context.image_domains = []
+    Context.audio_domains = []
+
     domains = get_wiki_page('domains', tor=tor)
     domains = ''.join(domains.splitlines()).split('---')
 
@@ -89,16 +105,26 @@ def populate_domain_lists():
         logging.debug('Domain list populated: {}'.format(current_domain_list))
 
 
-def populate_subreddit_list():
+def populate_subreddit_lists():
     """
     Gets the list of subreddits to monitor and loads it into memory.
     
     :return: None.
     """
+
+    Context.subreddits_to_check = []
+    Context.subreddit_members = []
+
     Context.subreddits_to_check = get_wiki_page('subreddits', tor=tor).split('\r\n')
     logging.debug(
         'Created list of subreddits from wiki: {}'.format(
             Context.subreddits_to_check
+        )
+    )
+    Context.subreddit_members = get_wiki_page('subreddits/members', tor=tor).split('\r\n')
+    logging.debug(
+        'Created list of subreddits from wiki: {}'.format(
+            Context.subreddit_members
         )
     )
 
@@ -185,7 +211,7 @@ def check_inbox():
             process_done(reply, r, tor, Context)
 
 
-def check_submissions(subreddit):
+def check_submissions(subreddit, Context):
     """
     Loops through all of the subreddits that have opted in and pulls
     the 100 newest submissions. It checks the domain of the submission
@@ -193,9 +219,20 @@ def check_submissions(subreddit):
     for formatting and posting on ToR.
     
     :param subreddit: String. A valid subreddit name.
+    :param Context: the Context object.
     :return: None.
     """
-    for post in r.subreddit(subreddit).new(limit=100):
+    if subreddit in Context.subreddit_members:
+        sr = r.subreddit(subreddit).new(limit=100)
+    else:
+        sr = r.subreddit(subreddit).new(limit=500)
+        Context.subreddit_members.append(subreddit)
+        update_wiki_page(
+            'subreddits/members',
+            '\r\n'.join(Context.subreddit_members),
+            tor)
+
+    for post in sr:
         if (
             post.domain in Context.image_domains or
             post.domain in Context.audio_domains or
@@ -231,7 +268,7 @@ def set_meta_flair_on_other_posts(transcribersofreddit):
 def initialize():
     populate_domain_lists()
     logging.info('Domains loaded.')
-    populate_subreddit_list()
+    populate_subreddit_lists()
     logging.info('Subreddits loaded.')
     populate_formatting()
     logging.info('Formatting loaded.')
@@ -258,7 +295,7 @@ if __name__ == '__main__':
         while True:
             check_inbox()
             for sub in Context.subreddits_to_check:
-                check_submissions(sub)
+                check_submissions(sub, Context)
             set_meta_flair_on_other_posts(tor)
             logging.debug('Looping!')
             if Context.debug_sleep:
