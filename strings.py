@@ -48,7 +48,9 @@ rules_comment_unknown_format = (
 )
 
 bot_footer = (
-    "{}\n\n---\nv{version} | This message was posted by a bot. "
+    "{}\n\n---\n---\n\nI'm a very overworked little bot. Please give me "
+    "1-2 minutes to respond to your post. Thanks for your patience!\n\n---\n\n"
+    "v{version} | This message was posted by a bot. "
     "| [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) "
     "| [Source](https://github.com/itsthejoker/TranscribersOfReddit) "
     "| Questions? [Message the mods!](https://www.reddit.com/message/"
