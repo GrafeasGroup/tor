@@ -105,7 +105,7 @@ def update_wiki_page(pagename, content, tor):
     :return: None.
     """
     logging.debug('Updating wiki page {}'.format(pagename))
-    return tor.wiki[pagename].edit()
+    return tor.wiki[pagename].edit(content)
 
 
 def log_header(message):
