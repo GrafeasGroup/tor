@@ -303,6 +303,7 @@ if __name__ == '__main__':
             if number_of_loops > 5:
                 # reload configuration every five loops
                 initialize()
+                number_of_loops = 0
             if Context.debug_sleep:
                 time.sleep(60)
 
