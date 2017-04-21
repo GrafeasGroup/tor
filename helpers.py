@@ -185,7 +185,7 @@ def update_user_flair(post, tor, reddit):
         user_flair = '{} Γ'.format(new_flair_count + 1)
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
-        tor.flair.set(post.author, text=user_flair, css_class='grafeas-beta')
+        tor.flair.set(post.author, text=user_flair, css_class='grafeas')
         logging.info('Setting flair for {}'.format(post.author))
     else:
         # they're bot or a mod and have custom flair. Leave it alone.
