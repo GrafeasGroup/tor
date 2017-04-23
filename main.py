@@ -271,7 +271,8 @@ def set_meta_flair_on_other_posts(transcribersofreddit, Context):
 
         if (
             post.author != r.redditor('transcribersofreddit') and
-            post.author not in Context.tor_mods
+            post.author not in Context.tor_mods and
+            post.link_flair_text != flair.meta
         ):
             logging.info(
                 'Flairing post {} by author {} with Meta.'.format(
