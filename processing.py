@@ -47,11 +47,18 @@ def process_post(new_post, tor, redis_server, Context):
     if new_post.archived:
         return
 
-    logging.info(
-        'Posting call for transcription on ID {} posted by {}'.format(
-            new_post.fullname, new_post.author.name
+    if new_post.author is None:
+        logging.info(
+            'Posting call for transcription on ID {} by deleted author'.format(
+                new_post.fullname
+            )
         )
-    )
+    else:
+        logging.info(
+            'Posting call for transcription on ID {} posted by {}'.format(
+                new_post.fullname, new_post.author.name
+            )
+        )
 
     if new_post.domain in Context.image_domains:
         content_type = 'image'
