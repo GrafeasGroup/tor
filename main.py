@@ -4,6 +4,7 @@ import time
 
 # noinspection PyUnresolvedReferences
 import better_exceptions
+import prawcore
 import redis
 from praw import Reddit
 
@@ -19,6 +20,7 @@ from processing import process_done
 from processing import process_mention
 from processing import process_post
 from strings import id_already_handled_in_db
+
 
 # This program is dedicated to Aramanthe and Icon For Hire, whose music
 # served as the soundtrack for much of its development.
@@ -284,15 +286,15 @@ def set_meta_flair_on_other_posts(transcribersofreddit, Context):
 
 def initialize(tor):
     populate_domain_lists()
-    logging.info('Domains loaded.')
+    logging.debug('Domains loaded.')
     populate_subreddit_lists()
-    logging.info('Subreddits loaded.')
+    logging.debug('Subreddits loaded.')
     populate_formatting()
-    logging.info('Formatting loaded.')
+    logging.debug('Formatting loaded.')
     populate_header()
-    logging.info('Header loaded.')
+    logging.debug('Header loaded.')
     populate_moderators(tor)
-    logging.info('Mod list loaded.')
+    logging.debug('Mod list loaded.')
 
     logging.info('Initialization complete.')
 
@@ -310,21 +312,31 @@ if __name__ == '__main__':
     initialize(tor)
 
     try:
-        number_of_loops = 0
-        # primary loop
-        while True:
-            check_inbox()
-            for sub in Context.subreddits_to_check:
-                check_submissions(sub, Context)
-            set_meta_flair_on_other_posts(tor, Context)
-            logging.debug('Looping!')
-            number_of_loops += 1
-            if number_of_loops > 9:
-                # reload configuration every ten loops
-                initialize(tor)
-                number_of_loops = 0
-            if Context.debug_sleep:
-                time.sleep(60)
+        try:
+            number_of_loops = 0
+            # primary loop
+            while True:
+                check_inbox()
+                for sub in Context.subreddits_to_check:
+                    check_submissions(sub, Context)
+                set_meta_flair_on_other_posts(tor, Context)
+                logging.info('Looping!')
+                number_of_loops += 1
+                if number_of_loops > 9:
+                    # reload configuration every ten loops
+                    initialize(tor)
+                    number_of_loops = 0
+                if Context.debug_sleep:
+                    time.sleep(60)
+        except prawcore.exceptions.RequestException as e:
+            logging.error(e)
+            logging.error(
+                'PRAW encountered an error communicating with Reddit.'
+            )
+            logging.error(
+                'Sleeping for 60 seconds and trying program loop again.'
+            )
+            time.sleep(60)
 
     except KeyboardInterrupt:
         logging.error('User triggered shutdown. Shutting down.')
