@@ -20,6 +20,9 @@ from processing import process_mention
 from processing import process_post
 from strings import id_already_handled_in_db
 
+# This program is dedicated to Aramanthe and Icon For Hire, whose music
+# served as the soundtrack for much of its development.
+
 
 class Context(object):
     """
@@ -39,6 +42,7 @@ class Context(object):
     # subreddits that we're only getting 100 posts at a time from
     # instead of jump-starting it with 500
     subreddit_members = []
+    tor_mods = []
 
     perform_header_check = False
     debug_sleep = False
@@ -103,6 +107,18 @@ def populate_domain_lists():
             current_domain_list = Context.image_domains
         [current_domain_list.append(x) for x in domain_list]
         logging.debug('Domain list populated: {}'.format(current_domain_list))
+
+
+def populate_moderators(tor):
+    # Praw doesn't cache this information, so it requests it every damn time
+    # we ask about the moderators. Let's cache this so we can drastically cut
+    # down on the number of calls for the mod list.
+
+    # nuke the existing list
+    Context.tor_mods = []
+
+    # this call returns a full list rather than a generator. Praw is weird.
+    Context.tor_mods = tor.moderator()
 
 
 def populate_subreddit_lists():
@@ -223,9 +239,9 @@ def check_submissions(subreddit, Context):
     :return: None.
     """
     if subreddit in Context.subreddit_members:
-        sr = r.subreddit(subreddit).new(limit=100)
+        sr = r.subreddit(subreddit).new(limit=10)
     else:
-        sr = r.subreddit(subreddit).new(limit=500)
+        sr = r.subreddit(subreddit).new(limit=50)
         Context.subreddit_members.append(subreddit)
         update_wiki_page(
             'subreddits/members',
@@ -241,21 +257,21 @@ def check_submissions(subreddit, Context):
             process_post(post, tor, redis_server, Context)
 
 
-def set_meta_flair_on_other_posts(transcribersofreddit):
+def set_meta_flair_on_other_posts(transcribersofreddit, Context):
     """
     Loops through the 25 newest posts on ToR and sets the flair to
     'Meta' for any post that is not authored by the bot or any of
     the moderators.
     
     :param transcribersofreddit: The Subreddit object for ToR.
+    :param Context: the active context object.
     :return: None.
     """
-    for post in transcribersofreddit.new(limit=25):
-        # this one returns a full list rather than a generator. It's weird.
-        moderators = transcribersofreddit.moderator()
+    for post in transcribersofreddit.new(limit=10):
+
         if (
             post.author != r.redditor('transcribersofreddit') and
-            post.author not in moderators
+            post.author not in Context.tor_mods
         ):
             logging.info(
                 'Flairing post {} by author {} with Meta.'.format(
@@ -265,7 +281,7 @@ def set_meta_flair_on_other_posts(transcribersofreddit):
             flair_post(post, flair.meta)
 
 
-def initialize():
+def initialize(tor):
     populate_domain_lists()
     logging.info('Domains loaded.')
     populate_subreddit_lists()
@@ -274,6 +290,8 @@ def initialize():
     logging.info('Formatting loaded.')
     populate_header()
     logging.info('Header loaded.')
+    populate_moderators(tor)
+    logging.info('Mod list loaded.')
 
     logging.info('Initialization complete.')
 
@@ -288,7 +306,7 @@ if __name__ == '__main__':
         logging.error("Redis server is not running! Exiting!")
         sys.exit(1)
     tor = r.subreddit('transcribersofreddit')
-    initialize()
+    initialize(tor)
 
     try:
         number_of_loops = 0
@@ -297,12 +315,12 @@ if __name__ == '__main__':
             check_inbox()
             for sub in Context.subreddits_to_check:
                 check_submissions(sub, Context)
-            set_meta_flair_on_other_posts(tor)
+            set_meta_flair_on_other_posts(tor, Context)
             logging.debug('Looping!')
             number_of_loops += 1
-            if number_of_loops > 5:
-                # reload configuration every five loops
-                initialize()
+            if number_of_loops > 9:
+                # reload configuration every ten loops
+                initialize(tor)
                 number_of_loops = 0
             if Context.debug_sleep:
                 time.sleep(60)

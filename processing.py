@@ -7,8 +7,10 @@ from helpers import clean_id
 from helpers import flair
 from helpers import flair_post
 from helpers import get_parent_post_id
+from helpers import get_yt_transcript
 from helpers import is_valid
 from helpers import update_user_flair
+from helpers import valid_youtube_video
 from strings import ToR_link
 from strings import already_claimed
 from strings import claim_already_complete
@@ -24,6 +26,7 @@ from strings import rules_comment_unknown_format
 from strings import something_went_wrong
 from strings import summoned_by_comment
 from strings import summoned_submit_title
+from strings import yt_already_has_transcripts
 
 
 def process_post(new_post, tor, redis_server, Context):
@@ -41,6 +44,9 @@ def process_post(new_post, tor, redis_server, Context):
         logging.debug(id_already_handled_in_db.format(new_post.fullname))
         return
 
+    if new_post.archived:
+        return
+
     logging.info(
         'Posting call for transcription on ID {} posted by {}'.format(
             new_post.fullname, new_post.author.name
@@ -54,6 +60,15 @@ def process_post(new_post, tor, redis_server, Context):
         content_type = 'audio'
         content_format = Context.audio_formatting
     elif new_post.domain in Context.video_domains:
+        if 'youtu' in new_post.domain:
+            if not valid_youtube_video(new_post.domain):
+                return
+            if get_yt_transcript(new_post.domain) != '':
+                new_post.reply(_(
+                    yt_already_has_transcripts
+                ))
+                add_complete_post_id(new_post.fullname, redis_server)
+                return
         content_type = 'video'
         content_format = Context.video_formatting
     else:

@@ -1,5 +1,7 @@
 reddit_url = 'https://reddit.com{}'
 
+yt_transcript_url = 'http://video.google.com/timedtext?lang=en&v={}'
+
 summoned_submit_title = (
     '{sub} | {title} | We\'ve been summoned for a {commentorpost}!'
 )
@@ -104,3 +106,9 @@ something_went_wrong = (
 )
 
 ToR_link = 'www.reddit.com/r/TranscribersOfReddit'
+
+yt_already_has_transcripts = (
+    'Hi! For those who need it, it appears that this video already has transcripts '
+    'provided by the uploader. If this is untrue, please use the "Message the mods" '
+    'link below to let us know.'
+)
