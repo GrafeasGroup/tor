@@ -56,9 +56,7 @@ def get_yt_video_id(url):
 def get_yt_transcript(url, yt_transcript_url=yt_transcript_url):
     return requests.get(
         yt_transcript_url.format(
-            get_yt_video_id(
-                'https://www.youtube.com/watch?v=LwApjDJ2sqo'
-            )
+            get_yt_video_id(url)
         )
     ).text
 

@@ -211,6 +211,7 @@ def process_claim(post, r):
         logging.debug('Received `claim` on post we do not own. Ignoring.')
         return
 
+    # TODO: can we change this out for flair.unclaimed?
     if 'Unclaimed' in top_parent.link_flair_text:
         # need to get that "Summoned - Unclaimed" in there too
         post.reply(_(claim_success))
