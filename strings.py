@@ -45,13 +45,12 @@ rules_comment_unknown_format = (
     'post:\n\n---\n\n    {header}\n\n---'
     '\n\nIf you have any questions, feel free to [message the mods.]'
     '(https://www.reddit.com/message/'
-    'compose?to=%2Fr%2FTranscribersOfReddit&subject=General%20Question'
+    'compose?to=%2Fr%2FTranscribersOfReddit&Ssubject=General%20Question'
     '&message=)'
 )
 
 bot_footer = (
-    "{}\n\n---\n---\n\nI'm a very overworked little bot. Please give me "
-    "1-2 minutes to respond to your post. Thanks for your patience!\n\n---\n\n"
+    "{}\n\n---\n\n"
     "v{version} | This message was posted by a bot. "
     "| [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) "
     "| [Source](https://github.com/itsthejoker/TranscribersOfReddit) "
