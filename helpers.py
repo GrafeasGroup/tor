@@ -1,4 +1,5 @@
 import logging
+import traceback
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
 
@@ -54,11 +55,33 @@ def get_yt_video_id(url):
 
 
 def get_yt_transcript(url, yt_transcript_url=yt_transcript_url):
-    return requests.get(
-        yt_transcript_url.format(
-            get_yt_video_id(url)
+    """
+    Takes a url, formats it, and sends it off to Google to request the
+    uploader-provided transcripts. If we get them, we return them;
+    if we get nothing or an error, it returns None.
+    
+    :param url: the YouTube video URL
+    :param yt_transcript_url: the unformatted url to get the transcripts
+    :return: string; the transcript if we get it, None if we don't or
+        if there's an error.
+    """
+    try:
+        result = requests.get(
+            yt_transcript_url.format(
+                get_yt_video_id(url)
+            )
         )
-    ).text
+        result.raise_for_status()
+        if not result.text.startswith(
+                '<?xml version="1.0" encoding="utf-8" ?><transcript><text'
+        ):
+            return None
+        else:
+            return result
+    except requests.exceptions.HTTPError as e:
+        logging.error('Cannot retrieve transcript for {}'.format(url))
+        logging.error(traceback.format_exc())
+        return None
 
 
 def valid_youtube_video(url):
@@ -66,7 +89,7 @@ def valid_youtube_video(url):
     We don't want to process channels or user accounts, so we'll filter
     those out here.
     
-    :param post: a Reddit submission object.
+    :param url: the YouTube URL we need to check.
     :return: True if it's a video; false if it's a channel or
     user, or playlist.
     """

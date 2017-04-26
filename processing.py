@@ -71,7 +71,7 @@ def process_post(new_post, tor, redis_server, Context):
         if 'youtu' in new_post.domain:
             if not valid_youtube_video(new_post.domain):
                 return
-            if get_yt_transcript(new_post.domain) != '':
+            if get_yt_transcript(new_post.domain):
                 new_post.reply(_(
                     yt_already_has_transcripts
                 ))
