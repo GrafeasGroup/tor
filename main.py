@@ -335,7 +335,6 @@ if __name__ == '__main__':
                 for sub in Context.subreddits_to_check:
                     check_submissions(sub, Context)
                 set_meta_flair_on_other_posts(tor, Context)
-                logging.info('Looping!')
                 number_of_loops += 1
                 if number_of_loops > 9:
                     # reload configuration every ten loops
