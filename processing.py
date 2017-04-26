@@ -1,5 +1,6 @@
 import logging
 import re
+import random
 
 from helpers import _
 from helpers import add_complete_post_id
@@ -195,6 +196,36 @@ def process_mention(mention, r, tor, redis_server, Context):
             mention.reply(_(something_went_wrong))
 
 
+def process_override(reply, r, tor, Context):
+    """
+    This process is for moderators of ToR to force u/transcribersofreddit
+    to mark a post as complete and award flair when the bot refutes a
+    `done` claim. The comment containing "!override" must be in response to
+    the bot's comment saying that it cannot find the transcript.
+    
+    :param reply: the comment reply object from the moderator
+    :param r: the active Reddit instance
+    :param Context: the global Context object
+    :return: None
+    """
+    # first we verify that this comment comes from a moderator and that
+    # we can work on it.
+    if reply.author not in Context.tor_mods:
+        reply.reply(_(random.choice(Context.no_gifs)))
+        return
+    # okay, so the parent of the reply should be the bot's comment saying
+    # it can't find it. In that case, we need the parent's parent. That should
+    # be the comment with the `done` call in it.
+    reply_parent = r.comment(id=clean_id(reply.parent_id))
+    parents_parent = r.comment(id=clean_id(reply_parent.parent_id))
+    if 'done' in parents_parent.body.lower():
+        logging.info(
+            'Starting validation override for post {}, approved by'
+            '{}'.format(parents_parent.fullname, reply.author.name)
+        )
+        process_done(parents_parent, r, tor, Context, override=True)
+
+
 def process_claim(post, r):
     """
     Handles comment replies containing the word 'claim' and routes
@@ -302,7 +333,7 @@ def verified_posted_transcript(post, r, Context):
     return False
 
 
-def process_done(post, r, tor, Context):
+def process_done(post, r, tor, Context, override=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -312,6 +343,8 @@ def process_done(post, r, tor, Context):
     :param post: the Comment object which contains the string 'done'.
     :param r: Active Reddit object.
     :param tor: Shortcut; a Subreddit object for ToR.
+    :param override: A parameter that can only come from process_override()
+        and skips the validation check.
     :return: None.
     """
 
@@ -325,22 +358,31 @@ def process_done(post, r, tor, Context):
     if flair.unclaimed in top_parent.link_flair_text:
         post.reply(_(done_still_unclaimed))
     elif top_parent.link_flair_text == flair.in_progress:
-        if verified_posted_transcript(post, r, Context):
-            # we need to double-check these things to keep people
-            # from gaming the system
-            post.reply(_(done_completed_transcript))
-            flair_post(top_parent, flair.completed)
-            update_user_flair(post, tor, r)
-            logging.info(
-                'Post {} completed by {}!'.format(
-                    top_parent.fullname, post.author
+        if not override:
+            if not verified_posted_transcript(post, r, Context):
+                # we need to double-check these things to keep people
+                # from gaming the system
+                logging.info(
+                    'Post {} does not appear to have a post by claimant {}. '
+                    'Hrm...'.format(
+                        top_parent.fullname, post.author
+                    )
                 )
+                post.reply(_(done_cannot_find_transcript))
+                return
+        # Control flow:
+        # If we have an override, we end up here to complete.
+        # If there is no override, we go into the validation.
+        # If the validation fails, post the apology and return.
+        # If the validation succeeds, come down here.
+        post.reply(_(done_completed_transcript))
+        flair_post(top_parent, flair.completed)
+        update_user_flair(post, tor, r)
+        if override:
+            logging.info('Moderator override triggered!')
+        logging.info(
+            'Post {} completed by {}!'.format(
+                top_parent.fullname, post.author
             )
-        else:
-            logging.info(
-                'Post {} does not appear to have a post by claimant {}. '
-                'Hrm...'.format(
-                    top_parent.fullname, post.author
-                )
-            )
-            post.reply(_(done_cannot_find_transcript))
+        )
+

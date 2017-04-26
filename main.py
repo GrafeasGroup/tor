@@ -1,6 +1,7 @@
 import logging
 import sys
 import time
+import traceback
 
 # noinspection PyUnresolvedReferences
 import better_exceptions
@@ -19,6 +20,7 @@ from processing import process_claim
 from processing import process_done
 from processing import process_mention
 from processing import process_post
+from processing import process_override
 from strings import id_already_handled_in_db
 
 
@@ -46,8 +48,11 @@ class Context(object):
     subreddit_members = []
     tor_mods = []
 
-    perform_header_check = False
+    perform_header_check = True
     debug_sleep = False
+
+    # section for gifs
+    no_gifs = []
 
 
 def populate_header():
@@ -147,6 +152,12 @@ def populate_subreddit_lists():
     )
 
 
+def populate_gifs():
+    # zero it out so we can load more
+    Context.no_gifs = []
+    Context.no_gifs = get_wiki_page('usefulgifs/no', tor=tor).split('\r\n')
+
+
 def configure_logging():
     logging.basicConfig(
         level=logging.INFO,
@@ -227,6 +238,8 @@ def check_inbox():
             process_claim(reply, r)
         if 'done' in reply.body.lower():
             process_done(reply, r, tor, Context)
+        if '!override' in reply.body.lower():
+            process_override(reply, r, tor, Context)
 
 
 def check_submissions(subreddit, Context):
@@ -295,6 +308,8 @@ def initialize(tor):
     logging.debug('Header loaded.')
     populate_moderators(tor)
     logging.debug('Mod list loaded.')
+    populate_gifs()
+    logging.debug('Gifs loaded.')
 
     logging.info('Initialization complete.')
 
@@ -340,3 +355,10 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         logging.error('User triggered shutdown. Shutting down.')
+        sys.exit(0)
+
+    except Exception as e:
+        # try to raise one last flag as it goes down
+        tor.message('I BROKE', traceback.format_exc())
+        logging.error(traceback.format_exc())
+        sys.exit(1)
