@@ -12,6 +12,7 @@ from helpers import get_yt_transcript
 from helpers import is_valid
 from helpers import update_user_flair
 from helpers import valid_youtube_video
+from helpers import get_yt_video_id
 from strings import ToR_link
 from strings import already_claimed
 from strings import claim_already_complete
@@ -69,13 +70,19 @@ def process_post(new_post, tor, redis_server, Context):
         content_format = Context.audio_formatting
     elif new_post.domain in Context.video_domains:
         if 'youtu' in new_post.domain:
-            if not valid_youtube_video(new_post.domain):
+            if not valid_youtube_video(new_post.url):
                 return
-            if get_yt_transcript(new_post.domain):
+            if get_yt_transcript(new_post.url):
                 new_post.reply(_(
                     yt_already_has_transcripts
                 ))
                 add_complete_post_id(new_post.fullname, redis_server)
+                logging.info(
+                    'Found YouTube video, {}, with good transcripts.'
+                    ''.format(
+                        get_yt_video_id(new_post.url)
+                    )
+                )
                 return
         content_type = 'video'
         content_format = Context.video_formatting

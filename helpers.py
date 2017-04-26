@@ -72,14 +72,15 @@ def get_yt_transcript(url, yt_transcript_url=yt_transcript_url):
             )
         )
         result.raise_for_status()
-        if not result.text.startswith(
+        if result.text.startswith(
                 '<?xml version="1.0" encoding="utf-8" ?><transcript><text'
         ):
-            return None
-        else:
             return result
+        else:
+            return None
     except requests.exceptions.HTTPError as e:
         logging.error('Cannot retrieve transcript for {}'.format(url))
+        logging.error(e)
         logging.error(traceback.format_exc())
         return None
 
