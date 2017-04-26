@@ -219,7 +219,7 @@ def process_override(reply, r, tor, Context):
     # okay, so the parent of the reply should be the bot's comment saying
     # it can't find it. In that case, we need the parent's parent. That should
     # be the comment with the `done` call in it.
-    reply_parent = r.comment(id=clean_id(reply.parent_id))s
+    reply_parent = r.comment(id=clean_id(reply.parent_id))
     parents_parent = r.comment(id=clean_id(reply_parent.parent_id))
     if 'done' in parents_parent.body.lower():
         logging.info(
