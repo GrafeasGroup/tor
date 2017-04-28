@@ -167,20 +167,24 @@ def _(message):
     return bot_footer.format(message, version=__version__)
 
 
-def get_wiki_page(pagename, tor):
+def get_wiki_page(pagename, tor, return_on_fail=None):
     """
     Return the contents of a given wiki page.
     
     :param pagename: String. The name of the page to be requested.
     :param tor: Active ToR instance.
+    :param return_on_fail: Any value to return when nothing is found
+        at the requested page. This allows us to specify returns for
+        easier work in debug mode.
     :return: String or None. The content of the requested page if
         present else None.
     """
     logging.debug('Retrieving wiki page {}'.format(pagename))
     try:
-        return tor.wiki[pagename].content_md
+        result = tor.wiki[pagename].content_md
+        return result if result != '' else return_on_fail
     except prawcore.exceptions.NotFound:
-        return None
+        return return_on_fail
 
 
 def update_wiki_page(pagename, content, tor):
@@ -193,7 +197,15 @@ def update_wiki_page(pagename, content, tor):
     :return: None.
     """
     logging.debug('Updating wiki page {}'.format(pagename))
-    return tor.wiki[pagename].edit(content)
+    try:
+        return tor.wiki[pagename].edit(content)
+    except prawcore.exceptions.NotFound as e:
+        logging.error(
+            'Requested wiki page {} not found. Cannot '
+            'update.'.format(pagename)
+        )
+        logging.error(e)
+        logging.error(traceback.format_exc())
 
 
 def log_header(message):
@@ -237,6 +249,11 @@ def flair_post(post, text):
         if choice['flair_text'] == text:
             post.flair.select(
                 flair_template_id=choice['flair_template_id']
+            )
+        else:
+            logging.error(
+                'Cannot find requested flair {}. Not flairing.'
+                ''.format(text)
             )
 
 

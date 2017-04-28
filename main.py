@@ -49,7 +49,7 @@ class Context(object):
     tor_mods = []
 
     perform_header_check = True
-    debug_sleep = False
+    debug_mode = False
 
     # section for gifs
     no_gifs = []
@@ -323,7 +323,11 @@ if __name__ == '__main__':
     except redis.exceptions.ConnectionError:
         logging.error("Redis server is not running! Exiting!")
         sys.exit(1)
-    tor = r.subreddit('transcribersofreddit')
+    if Context.debug_mode:
+        tor = r.subreddit('ModsOfToR')
+    else:
+        # normal operation, our primary subreddit
+        tor = r.subreddit('transcribersofreddit')
     initialize(tor)
 
     try:
@@ -340,9 +344,12 @@ if __name__ == '__main__':
                     # reload configuration every ten loops
                     initialize(tor)
                     number_of_loops = 0
-                if Context.debug_sleep:
+                if Context.debug_mode:
                     time.sleep(60)
-        except prawcore.exceptions.RequestException as e:
+        except (
+                prawcore.exceptions.RequestException,
+                prawcore.exceptions.ServerError
+        ) as e:
             logging.error(e)
             logging.error(
                 'PRAW encountered an error communicating with Reddit.'
