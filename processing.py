@@ -198,22 +198,26 @@ def process_mention(mention, r, tor, redis_server, Context):
         except Exception as e:
             logging.error(e)
             logging.error(
-                'Posting failure message in response to caller, u/{}'.format(mention.author)
+                'Posting failure message in response to caller, u/{}'.format(
+                    mention.author
+                )
             )
             mention.reply(_(something_went_wrong))
 
 
-def process_override(reply, r, tor, Context):
+def process_override(reply, r, tor, redis_server, Context):
     """
     This process is for moderators of ToR to force u/transcribersofreddit
     to mark a post as complete and award flair when the bot refutes a
     `done` claim. The comment containing "!override" must be in response to
     the bot's comment saying that it cannot find the transcript.
     
-    :param reply: the comment reply object from the moderator
-    :param r: the active Reddit instance
-    :param Context: the global Context object
-    :return: None
+    :param reply: the comment reply object from the moderator.
+    :param r: the active Reddit instance.
+    :param tor: the TranscribersOfReddit subreddit object.
+    :param redis_server: Active Redis object.
+    :param Context: the global Context object.
+    :return: None.
     """
     # first we verify that this comment comes from a moderator and that
     # we can work on it.
@@ -223,9 +227,9 @@ def process_override(reply, r, tor, Context):
             '{} just tried to override. Lolno.'.format(reply.author.name)
         )
         return
-    # okay, so the parent of the reply should be the bot's comment saying
-    # it can't find it. In that case, we need the parent's parent. That should
-    # be the comment with the `done` call in it.
+    # okay, so the parent of the reply should be the bot's comment
+    # saying it can't find it. In that case, we need the parent's
+    # parent. That should be the comment with the `done` call in it.
     reply_parent = r.comment(id=clean_id(reply.parent_id))
     parents_parent = r.comment(id=clean_id(reply_parent.parent_id))
     if 'done' in parents_parent.body.lower():
@@ -233,7 +237,9 @@ def process_override(reply, r, tor, Context):
             'Starting validation override for post {}, approved by'
             '{}'.format(parents_parent.fullname, reply.author.name)
         )
-        process_done(parents_parent, r, tor, Context, override=True)
+        process_done(
+            parents_parent, r, tor, redis_server, Context, override=True
+        )
 
 
 def process_claim(post, r):
@@ -252,8 +258,7 @@ def process_claim(post, r):
         logging.debug('Received `claim` on post we do not own. Ignoring.')
         return
 
-    # TODO: can we change this out for flair.unclaimed?
-    if 'Unclaimed' in top_parent.link_flair_text:
+    if flair.unclaimed in top_parent.link_flair_text:
         # need to get that "Summoned - Unclaimed" in there too
         post.reply(_(claim_success))
         flair_post(top_parent, flair.in_progress)
@@ -293,6 +298,7 @@ def verified_posted_transcript(post, r, Context):
 
     :param post: The Comment object that contains the string 'done'.
     :param r: Active Reddit object.
+    :param Context: the global Context object.
     :return: True if a post is found, False if not.
     """
     top_parent = get_parent_post_id(post, r)
@@ -343,7 +349,7 @@ def verified_posted_transcript(post, r, Context):
     return False
 
 
-def process_done(post, r, tor, Context, override=False):
+def process_done(post, r, tor, redis_server, Context, override=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -353,6 +359,8 @@ def process_done(post, r, tor, Context, override=False):
     :param post: the Comment object which contains the string 'done'.
     :param r: Active Reddit object.
     :param tor: Shortcut; a Subreddit object for ToR.
+    :param redis_server: Active Redis instance.
+    :param Context: the global Context object.
     :param override: A parameter that can only come from process_override()
         and skips the validation check.
     :return: None.
@@ -382,7 +390,7 @@ def process_done(post, r, tor, Context, override=False):
                 return
         # Control flow:
         # If we have an override, we end up here to complete.
-        # If there is no override, we go into the validation.
+        # If there is no override, we go into the validation above.
         # If the validation fails, post the apology and return.
         # If the validation succeeds, come down here.
         post.reply(_(done_completed_transcript))

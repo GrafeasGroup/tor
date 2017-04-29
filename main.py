@@ -237,9 +237,9 @@ def check_inbox():
         if 'claim' in reply.body.lower():
             process_claim(reply, r)
         if 'done' in reply.body.lower():
-            process_done(reply, r, tor, Context)
+            process_done(reply, r, tor, redis_server, Context)
         if '!override' in reply.body.lower():
-            process_override(reply, r, tor, Context)
+            process_override(reply, r, tor, redis_server, Context)
 
 
 def check_submissions(subreddit, Context):
