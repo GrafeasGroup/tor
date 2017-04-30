@@ -1,4 +1,4 @@
 praw.ini
 *.pyc
 .idea/*
-transcribersofreddit.log
+tor/transcribersofreddit.log
