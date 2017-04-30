@@ -17,5 +17,7 @@ The ToR bot is designed to be as light on local resources as it can possibly be,
 
 This bot is in rapid development while bugs are being ironed out.
 
+Run with `python -m tor.main`.
+
 ### Other
 This code is, for right now, copyright Joe Kaufeld, all rights reserved.
