@@ -33,33 +33,39 @@ if __name__ == '__main__':
     initialize(tor, context)
     logging.info('Initialization complete.')
 
+    number_of_loops = 0
+
     try:
-        try:
-            number_of_loops = 0
-            while True:
+        while True:
+            try:
                 check_inbox(r, tor, redis_server, context)
+
                 for sub in context.subreddits_to_check:
                     check_submissions(sub, r, tor, redis_server, context)
+
                 set_meta_flair_on_other_posts(r, tor, context)
                 number_of_loops += 1
+
                 if number_of_loops > 9:
                     # reload configuration every ten loops
                     initialize(tor, context)
                     number_of_loops = 0
+
                 if context.debug_mode:
                     time.sleep(60)
-        except (
-                prawcore.exceptions.RequestException,
-                prawcore.exceptions.ServerError
-        ) as e:
-            logging.error(e)
-            logging.error(
-                'PRAW encountered an error communicating with Reddit.'
-            )
-            logging.error(
-                'Sleeping for 60 seconds and trying program loop again.'
-            )
-            time.sleep(60)
+
+            except (
+                    prawcore.exceptions.RequestException,
+                    prawcore.exceptions.ServerError
+            ) as e:
+                logging.error(e)
+                logging.error(
+                    'PRAW encountered an error communicating with Reddit.'
+                )
+                logging.error(
+                    'Sleeping for 60 seconds and trying program loop again.'
+                )
+                time.sleep(60)
 
     except KeyboardInterrupt:
         logging.error('User triggered shutdown. Shutting down.')
