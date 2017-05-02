@@ -84,9 +84,13 @@ def process_post(new_post, tor, redis_server, context):
     if new_post.domain in context.image_domains:
         content_type = 'image'
         content_format = context.image_formatting
+        # hook for ocr attempt
+        redis_server.rpush('ocr_ids', new_post.fullname)
+
     elif new_post.domain in context.audio_domains:
         content_type = 'audio'
         content_format = context.audio_formatting
+
     elif new_post.domain in context.video_domains:
         if 'youtu' in new_post.domain:
             if not valid_youtube_video(new_post.url):

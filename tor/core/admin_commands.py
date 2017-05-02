@@ -3,6 +3,7 @@ import logging
 import random
 from tor.helpers.reddit_ids import clean_id
 from tor.helpers.misc import _
+from tor.core.user_interaction import process_done
 
 
 def process_override(reply, r, tor, redis_server, Context):
