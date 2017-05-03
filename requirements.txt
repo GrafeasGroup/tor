@@ -3,3 +3,5 @@ redis<3.0.0
 hiredis
 better_exceptions
 addict
+cython
+tesserocr

@@ -23,3 +23,7 @@ class context(object):
 
     # section for gifs
     no_gifs = []
+
+    # global flag to enable / disable placing the triggers
+    # for the OCR bot
+    OCR = True

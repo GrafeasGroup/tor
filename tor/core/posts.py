@@ -84,8 +84,6 @@ def process_post(new_post, tor, redis_server, context):
     if new_post.domain in context.image_domains:
         content_type = 'image'
         content_format = context.image_formatting
-        # hook for ocr attempt
-        redis_server.rpush('ocr_ids', new_post.fullname)
 
     elif new_post.domain in context.audio_domains:
         content_type = 'audio'
@@ -138,6 +136,13 @@ def process_post(new_post, tor, redis_server, context):
 
         add_complete_post_id(new_post.fullname, redis_server)
         redis_server.incr('total_posted', amount=1)
+
+        if context.OCR and content_type == 'image':
+            # hook for OCR bot; in order to avoid race conditions, we add the
+            # key / value pair that the bot isn't looking for before adding
+            # to the set that it's monitoring.
+            redis_server.set(new_post.fullname, result.fullname)
+            redis_server.rpush('ocr_ids', new_post.fullname)
 
     # I need to figure out what errors can happen here
     except Exception as e:
