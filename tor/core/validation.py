@@ -75,7 +75,9 @@ def verified_posted_transcript(post, r, Context):
     # get source link, check all comments, look for root level comment
     # by the author of the post. Return True if found, False if not.
     linked_resource = r.submission(top_parent.id_from_url(top_parent.url))
-    for top_level_comment in linked_resource.comments:
+    # get rid of the "See More Comments" crap
+    linked_resource.comments.replace_more(limit=0)
+    for top_level_comment in linked_resource.comments.list():
         if post.author == top_level_comment.author:
             return True
     return False
