@@ -84,7 +84,7 @@ def main(context, redis_server):
     while True:
         try:
             time.sleep(context.ocr_delay)
-            new_post = redis_server.lpop('ocr_ids')
+            new_post = redis_server.lpop('ocr_ids').decode('utf-8')
             if new_post is None:
                 # nothing new in the queue. Wait and try again.
                 continue
@@ -105,16 +105,16 @@ def main(context, redis_server):
 
             tor_post = r.submission(
                 id=clean_id(
-                    redis_server.get(new_post)
+                    redis_server.get(new_post).decode('utf-8')
                 )
             )
 
-            thing_to_reply_to = tor_post
-            for chunk in chunks(result,9000):
+            thing_to_reply_to = tor_post.reply(_(base_comment))
+            for chunk in chunks(result, 9000):
                 # end goal: if something is over 9000 characters long, we
                 # should post a top level comment, then keep replying to
                 # the comments we make until we run out of chunks.
-                thing_to_reply_to = thing_to_reply_to.reply(_(chunk))
+                thing_to_reply_to = thing_to_reply_to.reply(_(base_comment.format(chunk)))
 
             redis_server.delete(new_post)
 
