@@ -44,6 +44,9 @@ def check_inbox(r, tor, redis_server, context):
     # comment replies
     replies = []
     for item in r.inbox.unread(limit=None):
+        if item.author.name == 'transcribot':
+            item.mark_read()
+            continue
         if item.subject == 'comment reply':
             replies.append(item)
 

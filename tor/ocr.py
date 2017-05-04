@@ -84,24 +84,37 @@ def main(context, redis_server):
     while True:
         try:
             time.sleep(context.ocr_delay)
-            new_post = redis_server.lpop('ocr_ids').decode('utf-8')
+            new_post = redis_server.lpop('ocr_ids')
             if new_post is None:
                 # nothing new in the queue. Wait and try again.
                 continue
 
             # We got something!
+            new_post = new_post.decode('utf-8')
+            logging.info(
+                'Found a new post, ID {}'.format(new_post)
+            )
             image_post = r.submission(id=clean_id(new_post))
 
             # download image for processing
             filename = wget.download(image_post.url)
             result = process_image(filename)
+            logging.info('result: {}'.format(result))
+
             # delete the image; we don't want to clutter up the hdd
             os.remove(filename)
 
             if not result:
+                logging.info('Result was none! Skipping!')
                 # we don't want orphan entries
                 redis_server.delete(new_post)
                 continue
+
+            logging.info(
+                'posting transcription attempt for {} on {}'.format(
+                    new_post, redis_server.get(new_post).decode('utf-8')
+                )
+            )
 
             tor_post = r.submission(
                 id=clean_id(
@@ -114,7 +127,7 @@ def main(context, redis_server):
                 # end goal: if something is over 9000 characters long, we
                 # should post a top level comment, then keep replying to
                 # the comments we make until we run out of chunks.
-                thing_to_reply_to = thing_to_reply_to.reply(_(base_comment.format(chunk)))
+                thing_to_reply_to = thing_to_reply_to.reply(_(chunk))
 
             redis_server.delete(new_post)
 
