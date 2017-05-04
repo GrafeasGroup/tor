@@ -56,8 +56,8 @@ def process_image(local_file):
         text = api.GetUTF8Text()
 
         confidences = api.AllWordConfidences()
-        logging.info(confidences)
-        logging.info('Average of confidences: {}'.format(
+        logging.debug(confidences)
+        logging.debug('Average of confidences: {}'.format(
             sum(confidences) / len(confidences))
         )
 
@@ -86,6 +86,7 @@ def main(context, redis_server):
             time.sleep(context.ocr_delay)
             new_post = redis_server.lpop('ocr_ids')
             if new_post is None:
+                logging.debug('No post found. Sleeping.')
                 # nothing new in the queue. Wait and try again.
                 continue
 
@@ -99,7 +100,7 @@ def main(context, redis_server):
             # download image for processing
             filename = wget.download(image_post.url)
             result = process_image(filename)
-            logging.info('result: {}'.format(result))
+            logging.debug('result: {}'.format(result))
 
             # delete the image; we don't want to clutter up the hdd
             os.remove(filename)
@@ -110,17 +111,15 @@ def main(context, redis_server):
                 redis_server.delete(new_post)
                 continue
 
+            tor_post_id = redis_server.get(new_post).decode('utf-8')
+
             logging.info(
                 'posting transcription attempt for {} on {}'.format(
-                    new_post, redis_server.get(new_post).decode('utf-8')
+                    new_post, tor_post_id
                 )
             )
 
-            tor_post = r.submission(
-                id=clean_id(
-                    redis_server.get(new_post).decode('utf-8')
-                )
-            )
+            tor_post = r.submission(id=clean_id(tor_post_id))
 
             thing_to_reply_to = tor_post.reply(_(base_comment))
             for chunk in chunks(result, 9000):
@@ -148,6 +147,9 @@ def main(context, redis_server):
 if __name__ == '__main__':
     r = Reddit('bot_ocr')  # loaded from local praw.ini config file
     configure_logging()
+    logging.basicConfig(
+        filename='ocr.log'
+    )
 
     redis_server = configure_redis()
 
@@ -156,6 +158,11 @@ if __name__ == '__main__':
 
     try:
         main(context, redis_server)
+
+    except KeyboardInterrupt:
+        logging.info('Received keyboard interrupt! Shutting down!')
+        sys.exit(0)
+
     except Exception as e:
         # try to raise one last flag as it goes down
         tor.message('OCR Exploded :(', traceback.format_exc())
