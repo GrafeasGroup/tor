@@ -1,6 +1,6 @@
 # TranscribersOfReddit
 
-This is the source code for the set of bots that run under the usernames listed below. Together, they all assist in the running or r/TranscribersOfReddit, which is priviledged to have the incredibly important job of organizing crowd-sourced transcriptions of images, video, and audio. 
+This is the source code for the set of bots that run under the usernames listed below. Together, they all assist in the running or r/TranscribersOfReddit, which is privileged to have the incredibly important job of organizing crowd-sourced transcriptions of images, video, and audio. 
 
 * u/transcribersofreddit: the automated owner and warden of r/TranscribersOfReddit.
 * u/transcribot: a companion bot that monitors a Redis queue, downloads, and attempts to OCR images to assist the human transcribers.
@@ -11,7 +11,7 @@ The ToR bots are designed to be as light on local resources as they can possibly
 * Tesseract (OCR solution used by u/transcribot)
 
 ### Note:
-This code is not complete. The praw.ini file is required to run the bot and contains such information as the useragent and various secrets. It is built for Python 3.6.
+This code is not complete. The praw.ini file is required to run the bots and contains such information as the useragents and various secrets. It is built for Python 3.6.
 
 # Process
 Current functionality overview:
