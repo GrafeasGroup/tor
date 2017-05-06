@@ -1,6 +1,7 @@
 import logging
 
 from tor.core.admin_commands import process_override
+from tor.core.admin_commands import reload_config
 from tor.core.mentions import process_mention
 from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_done
@@ -20,13 +21,22 @@ def check_inbox(r, tor, redis_server, context):
         and 'done'. 
     :return: None.
     """
-    # first we do mentions, then comment replies
+    # Sort inbox, then act on it
     mentions = []
+    replies = []
     # grab all of our messages and filter
     for item in r.inbox.unread(limit=None):
+        if item.author.name == 'transcribot':
+            item.mark_read()
+            continue
         if item.subject == 'username mention':
             mentions.append(item)
             item.mark_read()
+        if item.subject == 'comment reply':
+            replies.append(item)
+            # we don't mark as read here so that any comments that are not
+            # ones we're looking for will eventually get emailed to me as
+            # things I need to look at
 
     # sort them and create posts where necessary
     for mention in mentions:
@@ -42,19 +52,9 @@ def check_inbox(r, tor, redis_server, context):
         process_mention(mention, r, tor, redis_server, context)
 
     # comment replies
-    replies = []
-    for item in r.inbox.unread(limit=None):
-        if item.author.name == 'transcribot':
-            item.mark_read()
-            continue
-        if item.subject == 'comment reply':
-            replies.append(item)
-
     for reply in replies:
-        # if 'thank' in reply.body.lower():
-        #     respond_to_thanks(reply)
-        #     reply.mark_read()
-        #     continue
+        if 'reload' in reply.subject.lower():
+            reload_config(reply, tor, context)
         if 'claim' in reply.body.lower():
             process_claim(reply, r)
             reply.mark_read()

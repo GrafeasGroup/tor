@@ -19,7 +19,7 @@ from tor.strings.urls import reddit_url
 def check_submissions(subreddit, r, tor, redis_server, context):
     """
     Loops through all of the subreddits that have opted in and pulls
-    the 100 newest submissions. It checks the domain of the submission
+    the 10 newest submissions. It checks the domain of the submission
     against the domain lists and hands off the post to process_post()
     for formatting and posting on ToR.
 
@@ -27,19 +27,11 @@ def check_submissions(subreddit, r, tor, redis_server, context):
     :param r: the Reddit object.
     :param tor: the ToR Subreddit object.
     :param redis_server: the active Redis server connection.
-    :param Context: the context object.
+    :param context: the context object.
     :return: None.
     """
-    if subreddit in context.subreddit_members:
-        sr = r.subreddit(subreddit).new(limit=10)
-    else:
-        sr = r.subreddit(subreddit).new(limit=50)
-        context.subreddit_members.append(subreddit)
-        update_wiki_page(
-            'subreddits/members',
-            '\r\n'.join(context.subreddit_members),
-            tor
-        )
+
+    sr = r.subreddit(subreddit).new(limit=10)
 
     for post in sr:
         if (
@@ -58,7 +50,7 @@ def process_post(new_post, tor, redis_server, context):
     :param new_post: Submission object that needs to be posted.
     :param tor: TranscribersOfReddit subreddit instance.
     :param redis_server: Active Redis instance.
-    :param Context: the context object.
+    :param context: the context object.
     :return: None.
     """
     if not is_valid(new_post.fullname, redis_server):

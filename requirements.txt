@@ -5,3 +5,4 @@ better_exceptions
 addict
 cython
 tesserocr
+imgurpython

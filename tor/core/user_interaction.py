@@ -101,19 +101,3 @@ def process_done(post, r, tor, redis_server, Context, override=False):
             )
         )
         redis_server.incr('total_completed', amount=1)
-
-
-def respond_to_thanks(mention):
-    """
-    An easter egg; it posts a reply to anything that includes the word
-    'thank'. It's very rudimentary but should be a little nugget of fun.
-    This is not currently in use, but I'd like to deploy it once we get
-    some of the more serious kinks worked out.
-
-    :param mention: The Comment object.
-    :return: None.
-    """
-    logging.info(
-        'Responding to a Thank You comment, ID {}'.format(mention)
-    )
-    mention.reply(_('You\'re very welcome! I\'m just doing my job!'))

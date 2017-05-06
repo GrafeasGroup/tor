@@ -18,8 +18,8 @@ from tor.core.posts import check_submissions
 from tor.helpers.misc import set_meta_flair_on_other_posts
 
 # This program is dedicated to Aramanthe and Icon For Hire, whose music
-# served as the soundtrack for much of its development.
-
+# has served as the soundtrack for much of its continued development.
+# praw.exceptions.APIException
 
 if __name__ == '__main__':
     r = Reddit('bot')  # loaded from local praw.ini config file
@@ -33,8 +33,6 @@ if __name__ == '__main__':
     initialize(tor, context)
     logging.info('Initialization complete.')
 
-    number_of_loops = 0
-
     try:
         while True:
             try:
@@ -44,12 +42,6 @@ if __name__ == '__main__':
                     check_submissions(sub, r, tor, redis_server, context)
 
                 set_meta_flair_on_other_posts(r, tor, context)
-                number_of_loops += 1
-
-                if number_of_loops > 9:
-                    # reload configuration every ten loops
-                    initialize(tor, context)
-                    number_of_loops = 0
 
                 if context.debug_mode:
                     time.sleep(60)

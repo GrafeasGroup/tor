@@ -143,18 +143,11 @@ def populate_subreddit_lists(tor, context):
     """
 
     context.subreddits_to_check = []
-    context.subreddit_members = []
 
     context.subreddits_to_check = get_wiki_page('subreddits', tor=tor).split('\r\n')
     logging.debug(
         'Created list of subreddits from wiki: {}'.format(
             context.subreddits_to_check
-        )
-    )
-    context.subreddit_members = get_wiki_page('subreddits/members', tor=tor).split('\r\n')
-    logging.debug(
-        'Created list of subreddits from wiki: {}'.format(
-            context.subreddit_members
         )
     )
 

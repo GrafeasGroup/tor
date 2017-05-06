@@ -42,6 +42,7 @@ Bot:
     u_tor_post_id.reply(ocr_magic)
 """
 
+
 class context(base_context):
     """
     OCR dependent configuration items. Inherits from the regular bot context
@@ -99,7 +100,16 @@ def main(context, redis_server):
 
             # download image for processing
             filename = wget.download(image_post.url)
-            result = process_image(filename)
+
+            try:
+                result = process_image(filename)
+            except RuntimeError:
+                logging.error(
+                    'Either we hit an imgur album or no text was returned.'
+                )
+                os.remove(filename)
+                continue
+
             logging.debug('result: {}'.format(result))
 
             # delete the image; we don't want to clutter up the hdd
