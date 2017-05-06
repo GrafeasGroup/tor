@@ -37,6 +37,9 @@ def check_inbox(r, tor, redis_server, context):
             # we don't mark as read here so that any comments that are not
             # ones we're looking for will eventually get emailed to me as
             # things I need to look at
+        if 'reload' in item.subject.lower():
+            reload_config(item, tor, context)
+            item.mark_read()
 
     # sort them and create posts where necessary
     for mention in mentions:
@@ -53,19 +56,12 @@ def check_inbox(r, tor, redis_server, context):
 
     # comment replies
     for reply in replies:
-        if 'reload' in reply.subject.lower():
-            reload_config(reply, tor, context)
-            reply.mark_read()
-            continue
         if 'claim' in reply.body.lower():
             process_claim(reply, r)
             reply.mark_read()
-            continue
         if 'done' in reply.body.lower():
             process_done(reply, r, tor, redis_server, context)
             reply.mark_read()
-            continue
         if '!override' in reply.body.lower():
             process_override(reply, r, tor, redis_server, context)
             reply.mark_read()
-            continue
