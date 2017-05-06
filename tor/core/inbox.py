@@ -55,12 +55,17 @@ def check_inbox(r, tor, redis_server, context):
     for reply in replies:
         if 'reload' in reply.subject.lower():
             reload_config(reply, tor, context)
+            reply.mark_read()
+            continue
         if 'claim' in reply.body.lower():
             process_claim(reply, r)
             reply.mark_read()
+            continue
         if 'done' in reply.body.lower():
             process_done(reply, r, tor, redis_server, context)
             reply.mark_read()
+            continue
         if '!override' in reply.body.lower():
             process_override(reply, r, tor, redis_server, context)
             reply.mark_read()
+            continue

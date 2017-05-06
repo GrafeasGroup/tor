@@ -1,3 +1,6 @@
+__version__ = '2.3.0'
+
+
 class context(object):
     """
     Support object for the bot -- holds data that doesn't have

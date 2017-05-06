@@ -1,8 +1,8 @@
 import logging
 
+from tor import __version__
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
-from tor.setup import __version__
 from tor.strings.responses import bot_footer
 
 
