@@ -42,6 +42,3 @@ Run with `python -m tor.ocr`.
 
 
 This package is in rapid development while bugs are being ironed out.
-
-### Other
-This code is, for right now, copyright Joe Kaufeld, all rights reserved.
