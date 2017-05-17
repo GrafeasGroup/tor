@@ -6,21 +6,21 @@ from tor.helpers.flair import flair_post
 from tor.strings.responses import bot_footer
 
 
-def set_meta_flair_on_other_posts(r, tor, context):
+def set_meta_flair_on_other_posts(r, tor, config):
     """
     Loops through the 10 newest posts on ToR and sets the flair to
     'Meta' for any post that is not authored by the bot or any of
     the moderators.
 
     :param transcribersofreddit: The Subreddit object for ToR.
-    :param Context: the active context object.
+    :param config: the active config object.
     :return: None.
     """
     for post in tor.new(limit=10):
 
         if (
             post.author != r.redditor('transcribersofreddit') and
-            post.author not in context.tor_mods and
+            post.author not in config.tor_mods and
             post.link_flair_text != flair.meta
         ):
             logging.info(

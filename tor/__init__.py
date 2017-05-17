@@ -1,32 +1,28 @@
-__version__ = '2.4.1'
+from addict import Dict
 
+__version__ = '2.4.2'
 
-class context(object):
-    """
-    Support object for the bot -- holds data that doesn't have
-    anywhere else to go.
-    """
-    video_domains = []
-    audio_domains = []
-    image_domains = []
+config = Dict()
 
-    video_formatting = ''
-    audio_formatting = ''
-    image_formatting = ''
-    header = ''
+config.video_domains = []
+config.audio_domains = []
+config.image_domains = []
 
-    subreddits_to_check = []
-    # subreddits that we're only getting 100 posts at a time from
-    # instead of jump-starting it with 500
-    subreddit_members = []
-    tor_mods = []
+config.video_formatting = ''
+config.audio_formatting = ''
+config.image_formatting = ''
+config.header = ''
 
-    perform_header_check = True
-    debug_mode = False
+config.subreddits_to_check = []
 
-    # section for gifs
-    no_gifs = []
+config.tor_mods = []
 
-    # global flag to enable / disable placing the triggers
-    # for the OCR bot
-    OCR = True
+config.perform_header_check = True
+config.debug_mode = False
+
+# section for gifs
+config.no_gifs = []
+
+# global flag to enable / disable placing the triggers
+# for the OCR bot
+config.OCR = True

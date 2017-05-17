@@ -13,7 +13,7 @@ from tor.strings.responses import something_went_wrong
 from tor.strings.urls import reddit_url
 
 
-def process_mention(mention, r, tor, redis_server, Context):
+def process_mention(mention, r, tor, redis_server, config):
     """
     Handles username mentions and handles the formatting and posting of
     those calls as workable jobs to ToR.
@@ -57,7 +57,7 @@ def process_mention(mention, r, tor, redis_server, Context):
                 ),
                 url=reddit_url.format(parent_permalink)
             )
-            result.reply(_(rules_comment_unknown_format.format(header=Context.header)))
+            result.reply(_(rules_comment_unknown_format.format(header=config.header)))
             result.reply(_(
                 summoned_by_comment.format(
                     reddit_url.format(

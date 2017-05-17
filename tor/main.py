@@ -8,7 +8,7 @@ import better_exceptions
 import prawcore
 from praw import Reddit
 
-from tor import context
+from tor import config
 from tor.core.inbox import check_inbox
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_redis
@@ -28,23 +28,23 @@ if __name__ == '__main__':
     redis_server = configure_redis()
 
     # the subreddit object shortcut for TranscribersOfReddit
-    tor = configure_tor(r, context)
+    tor = configure_tor(r, config)
 
-    initialize(tor, context)
+    initialize(tor, config)
     logging.info('Initialization complete.')
 
     try:
         while True:
             try:
-                check_inbox(r, tor, redis_server, context)
+                check_inbox(r, tor, redis_server, config)
 
-                for sub in context.subreddits_to_check:
-                    check_submissions(sub, r, tor, redis_server, context)
+                for sub in config.subreddits_to_check:
+                    check_submissions(sub, r, tor, redis_server, config)
                     pass
 
-                set_meta_flair_on_other_posts(r, tor, context)
+                set_meta_flair_on_other_posts(r, tor, config)
 
-                if context.debug_mode:
+                if config.debug_mode:
                     time.sleep(60)
 
             except (

@@ -7,7 +7,7 @@ from tor.helpers.misc import log_header
 from tor.helpers.wiki import get_wiki_page
 
 
-def configure_tor(r, context):
+def configure_tor(r, config):
     """
     Assembles the tor object based on whether or not we've enabled debug mode
     and returns it. There's really no reason to put together a Subreddit
@@ -15,10 +15,10 @@ def configure_tor(r, context):
     a little easier to type.
     
     :param r: the active Reddit object.
-    :param context: the global context object.
+    :param config: the global config object.
     :return: the Subreddit object for the chosen subreddit.
     """
-    if context.debug_mode:
+    if config.debug_mode:
         tor = r.subreddit('ModsOfToR')
     else:
         # normal operation, our primary subreddit
@@ -62,8 +62,8 @@ def configure_logging():
     log_header('Starting!')
 
 
-def populate_header(tor, context):
-    context.header = ''
+def populate_header(tor, config):
+    config.header = ''
 
     result = get_wiki_page('format/header', tor=tor)
     result = result.split('\r\n')
@@ -75,37 +75,37 @@ def populate_header(tor, context):
         if part == '---':
             continue
         temp.append(part)
-    context.header = ' '.join(temp)
+    config.header = ' '.join(temp)
 
 
-def populate_formatting(tor, context):
+def populate_formatting(tor, config):
     """
     Grabs the contents of the three wiki pages that contain the
-    formatting examples and stores them in the context object.
+    formatting examples and stores them in the config object.
 
     :return: None.
     """
     # zero out everything so we can reinitialize later
-    context.audio_formatting = ''
-    context.video_formatting = ''
-    context.image_formatting = ''
+    config.audio_formatting = ''
+    config.video_formatting = ''
+    config.image_formatting = ''
 
-    context.audio_formatting = get_wiki_page('format/audio', tor=tor)
-    context.video_formatting = get_wiki_page('format/video', tor=tor)
-    context.image_formatting = get_wiki_page('format/images', tor=tor)
+    config.audio_formatting = get_wiki_page('format/audio', tor=tor)
+    config.video_formatting = get_wiki_page('format/video', tor=tor)
+    config.image_formatting = get_wiki_page('format/images', tor=tor)
 
 
-def populate_domain_lists(tor, context):
+def populate_domain_lists(tor, config):
     """
-    Loads the approved content domains into the context object from the
+    Loads the approved content domains into the config object from the
     wiki page.
 
     :return: None.
     """
 
-    context.video_domains = []
-    context.image_domains = []
-    context.audio_domains = []
+    config.video_domains = []
+    config.image_domains = []
+    config.audio_domains = []
 
     domains = get_wiki_page('domains', tor=tor)
     domains = ''.join(domains.splitlines()).split('---')
@@ -114,60 +114,60 @@ def populate_domain_lists(tor, context):
         domain_list = domainset[domainset.index('['):].strip('[]').split(', ')
         current_domain_list = []
         if domainset.startswith('video'):
-            current_domain_list = context.video_domains
+            current_domain_list = config.video_domains
         elif domainset.startswith('audio'):
-            current_domain_list = context.audio_domains
+            current_domain_list = config.audio_domains
         elif domainset.startswith('images'):
-            current_domain_list = context.image_domains
+            current_domain_list = config.image_domains
         [current_domain_list.append(x) for x in domain_list]
         logging.debug('Domain list populated: {}'.format(current_domain_list))
 
 
-def populate_moderators(tor, context):
+def populate_moderators(tor, config):
     # Praw doesn't cache this information, so it requests it every damn time
     # we ask about the moderators. Let's cache this so we can drastically cut
     # down on the number of calls for the mod list.
 
     # nuke the existing list
-    context.tor_mods = []
+    config.tor_mods = []
 
     # this call returns a full list rather than a generator. Praw is weird.
-    context.tor_mods = tor.moderator()
+    config.tor_mods = tor.moderator()
 
 
-def populate_subreddit_lists(tor, context):
+def populate_subreddit_lists(tor, config):
     """
     Gets the list of subreddits to monitor and loads it into memory.
 
     :return: None.
     """
 
-    context.subreddits_to_check = []
+    config.subreddits_to_check = []
 
-    context.subreddits_to_check = get_wiki_page('subreddits', tor=tor).split('\r\n')
+    config.subreddits_to_check = get_wiki_page('subreddits', tor=tor).split('\r\n')
     logging.debug(
         'Created list of subreddits from wiki: {}'.format(
-            context.subreddits_to_check
+            config.subreddits_to_check
         )
     )
 
 
-def populate_gifs(tor, context):
+def populate_gifs(tor, config):
     # zero it out so we can load more
-    context.no_gifs = []
-    context.no_gifs = get_wiki_page('usefulgifs/no', tor=tor).split('\r\n')
+    config.no_gifs = []
+    config.no_gifs = get_wiki_page('usefulgifs/no', tor=tor).split('\r\n')
 
 
-def initialize(tor, context):
-    populate_domain_lists(tor, context)
+def initialize(tor, config):
+    populate_domain_lists(tor, config)
     logging.debug('Domains loaded.')
-    populate_subreddit_lists(tor, context)
+    populate_subreddit_lists(tor, config)
     logging.debug('Subreddits loaded.')
-    populate_formatting(tor, context)
+    populate_formatting(tor, config)
     logging.debug('Formatting loaded.')
-    populate_header(tor, context)
+    populate_header(tor, config)
     logging.debug('Header loaded.')
-    populate_moderators(tor, context)
+    populate_moderators(tor, config)
     logging.debug('Mod list loaded.')
-    populate_gifs(tor, context)
+    populate_gifs(tor, config)
     logging.debug('Gifs loaded.')

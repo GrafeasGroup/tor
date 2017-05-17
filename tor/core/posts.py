@@ -16,7 +16,7 @@ from tor.strings.posts import yt_already_has_transcripts
 from tor.strings.urls import reddit_url
 
 
-def check_submissions(subreddit, r, tor, redis_server, context):
+def check_submissions(subreddit, r, tor, redis_server, config):
     """
     Loops through all of the subreddits that have opted in and pulls
     the 10 newest submissions. It checks the domain of the submission
@@ -27,7 +27,7 @@ def check_submissions(subreddit, r, tor, redis_server, context):
     :param r: the Reddit object.
     :param tor: the ToR Subreddit object.
     :param redis_server: the active Redis server connection.
-    :param context: the context object.
+    :param config: the config object.
     :return: None.
     """
 
@@ -35,14 +35,14 @@ def check_submissions(subreddit, r, tor, redis_server, context):
 
     for post in sr:
         if (
-            post.domain in context.image_domains or
-            post.domain in context.audio_domains or
-            post.domain in context.video_domains
+            post.domain in config.image_domains or
+            post.domain in config.audio_domains or
+            post.domain in config.video_domains
         ):
-            process_post(post, tor, redis_server, context)
+            process_post(post, tor, redis_server, config)
 
 
-def process_post(new_post, tor, redis_server, context):
+def process_post(new_post, tor, redis_server, config):
     """
     After a valid post has been discovered, this handles the formatting
     and posting of those calls as workable jobs to ToR.
@@ -50,7 +50,7 @@ def process_post(new_post, tor, redis_server, context):
     :param new_post: Submission object that needs to be posted.
     :param tor: TranscribersOfReddit subreddit instance.
     :param redis_server: Active Redis instance.
-    :param context: the context object.
+    :param config: the config object.
     :return: None.
     """
     if not is_valid(new_post.fullname, redis_server):
@@ -73,15 +73,15 @@ def process_post(new_post, tor, redis_server, context):
             )
         )
 
-    if new_post.domain in context.image_domains:
+    if new_post.domain in config.image_domains:
         content_type = 'image'
-        content_format = context.image_formatting
+        content_format = config.image_formatting
 
-    elif new_post.domain in context.audio_domains:
+    elif new_post.domain in config.audio_domains:
         content_type = 'audio'
-        content_format = context.audio_formatting
+        content_format = config.audio_formatting
 
-    elif new_post.domain in context.video_domains:
+    elif new_post.domain in config.video_domains:
         if 'youtu' in new_post.domain:
             if not valid_youtube_video(new_post.url):
                 return
@@ -98,7 +98,7 @@ def process_post(new_post, tor, redis_server, context):
                 )
                 return
         content_type = 'video'
-        content_format = context.video_formatting
+        content_format = config.video_formatting
     else:
         # how could we get here without fulfilling one of the above
         # criteria? Just remember: the users will find a way.
@@ -120,7 +120,7 @@ def process_post(new_post, tor, redis_server, context):
                 rules_comment.format(
                     post_type=content_type,
                     formatting=content_format,
-                    header=context.header
+                    header=config.header
                 )
             )
         )
@@ -129,7 +129,7 @@ def process_post(new_post, tor, redis_server, context):
         add_complete_post_id(new_post.fullname, redis_server)
         redis_server.incr('total_posted', amount=1)
 
-        if context.OCR and content_type == 'image':
+        if config.OCR and content_type == 'image':
             # hook for OCR bot; in order to avoid race conditions, we add the
             # key / value pair that the bot isn't looking for before adding
             # to the set that it's monitoring.

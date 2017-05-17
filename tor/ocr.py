@@ -9,7 +9,7 @@ import wget
 from praw import Reddit
 from tesserocr import PyTessBaseAPI
 
-from tor import context as base_context
+from tor import config
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_redis
 from tor.core.initialize import configure_tor
@@ -42,13 +42,7 @@ Bot:
     u_tor_post_id.reply(ocr_magic)
 """
 
-
-class context(base_context):
-    """
-    OCR dependent configuration items. Inherits from the regular bot context
-    object.
-    """
-    ocr_delay = 10
+config.ocr_delay = 10
 
 
 def process_image(local_file):
@@ -81,10 +75,10 @@ def chunks(s, n):
         yield s[start:start+n]
 
 
-def main(context, redis_server):
+def main(config, redis_server):
     while True:
         try:
-            time.sleep(context.ocr_delay)
+            time.sleep(config.ocr_delay)
             new_post = redis_server.lpop('ocr_ids')
             if new_post is None:
                 logging.debug('No post found. Sleeping.')
@@ -164,10 +158,10 @@ if __name__ == '__main__':
     redis_server = configure_redis()
 
     # the subreddit object shortcut for TranscribersOfReddit
-    tor = configure_tor(r, context)
+    tor = configure_tor(r, config)
 
     try:
-        main(context, redis_server)
+        main(config, redis_server)
 
     except KeyboardInterrupt:
         logging.info('Received keyboard interrupt! Shutting down!')

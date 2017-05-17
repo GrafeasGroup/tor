@@ -10,8 +10,8 @@ def _author_check(original_post, claimant_post):
     return original_post.author == claimant_post.author
 
 
-def _header_check(reply, Context, tor_link=ToR_link):
-    if Context.perform_header_check:
+def _header_check(reply, config, tor_link=ToR_link):
+    if config.perform_header_check:
         return tor_link in reply.body
     else:
         # If we don't want the check to take place, we'll just return
@@ -19,7 +19,7 @@ def _header_check(reply, Context, tor_link=ToR_link):
         return True
 
 
-def verified_posted_transcript(post, r, Context):
+def verified_posted_transcript(post, r, config):
     """
     Because we're using basic gamification, we need to put in at least
     a few things to make it difficult to game the system. When a user
@@ -30,7 +30,7 @@ def verified_posted_transcript(post, r, Context):
 
     :param post: The Comment object that contains the string 'done'.
     :param r: Active Reddit object.
-    :param Context: the global context object.
+    :param config: the global config object.
     :return: True if a post is found, False if not.
     """
     top_parent = get_parent_post_id(post, r)
@@ -65,7 +65,7 @@ def verified_posted_transcript(post, r, Context):
             # noinspection PyBroadException
             try:
                 for reply in original_comment.replies:
-                    if _author_check(reply, post) and _header_check(reply, Context):
+                    if _author_check(reply, post) and _header_check(reply, config):
                         return True
             except Exception as e:
                 logging.error(e)

@@ -10,7 +10,7 @@ from tor.strings.debug import id_already_handled_in_db
 from tor.core.user_interaction import process_coc
 
 
-def check_inbox(r, tor, redis_server, context):
+def check_inbox(r, tor, redis_server, config):
     """
     Goes through all the unread messages in the inbox. It has two
     loops within this section, each one dealing with a different type
@@ -39,7 +39,7 @@ def check_inbox(r, tor, redis_server, context):
             # ones we're looking for will eventually get emailed to me as
             # things I need to look at
         if 'reload' in item.subject.lower():
-            reload_config(item, tor, context)
+            reload_config(item, tor, config)
             item.mark_read()
             item.reply(
                 'Config reloaded!'
@@ -56,7 +56,7 @@ def check_inbox(r, tor, redis_server, context):
             logging.info(id_already_handled_in_db.format(mention.parent_id))
             continue
 
-        process_mention(mention, r, tor, redis_server, context)
+        process_mention(mention, r, tor, redis_server, config)
 
     # comment replies
     for reply in replies:
@@ -74,10 +74,10 @@ def check_inbox(r, tor, redis_server, context):
             process_claim(reply, r, tor, redis_server)
             reply.mark_read()
         if 'done' in reply.body.lower():
-            process_done(reply, r, tor, redis_server, context)
+            process_done(reply, r, tor, redis_server, config)
             reply.mark_read()
 
         if '!override' in reply.body.lower():
-            process_override(reply, r, tor, redis_server, context)
+            process_override(reply, r, tor, redis_server, config)
             reply.mark_read()
             return

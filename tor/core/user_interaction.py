@@ -84,7 +84,7 @@ def process_claim(post, r, tor, redis_server):
         post.reply(_(claim_already_complete))
 
 
-def process_done(post, r, tor, redis_server, Context, override=False):
+def process_done(post, r, tor, redis_server, config, override=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -95,7 +95,7 @@ def process_done(post, r, tor, redis_server, Context, override=False):
     :param r: Active Reddit object.
     :param tor: Shortcut; a Subreddit object for ToR.
     :param redis_server: Active Redis instance.
-    :param Context: the global context object.
+    :param config: the global config object.
     :param override: A parameter that can only come from process_override()
         and skips the validation check.
     :return: None.
@@ -112,7 +112,7 @@ def process_done(post, r, tor, redis_server, Context, override=False):
         post.reply(_(done_still_unclaimed))
     elif top_parent.link_flair_text == flair.in_progress:
         if not override:
-            if not verified_posted_transcript(post, r, Context):
+            if not verified_posted_transcript(post, r, config):
                 # we need to double-check these things to keep people
                 # from gaming the system
                 logging.info(
