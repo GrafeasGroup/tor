@@ -41,6 +41,9 @@ def check_inbox(r, tor, redis_server, context):
         if 'reload' in item.subject.lower():
             reload_config(item, tor, context)
             item.mark_read()
+            item.reply(
+                'Config reloaded!'
+            )
 
     # sort them and create posts where necessary
     for mention in mentions:
