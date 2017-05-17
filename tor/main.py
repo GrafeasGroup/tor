@@ -39,7 +39,8 @@ if __name__ == '__main__':
                 check_inbox(r, tor, redis_server, context)
 
                 for sub in context.subreddits_to_check:
-                    check_submissions(sub, r, tor, redis_server, context)
+                    # check_submissions(sub, r, tor, redis_server, context)
+                    pass
 
                 set_meta_flair_on_other_posts(r, tor, context)
 

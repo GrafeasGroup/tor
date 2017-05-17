@@ -7,6 +7,7 @@ from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_done
 from tor.helpers.reddit_ids import is_valid
 from tor.strings.debug import id_already_handled_in_db
+from tor.core.user_interaction import process_coc
 
 
 def check_inbox(r, tor, redis_server, context):
@@ -56,12 +57,24 @@ def check_inbox(r, tor, redis_server, context):
 
     # comment replies
     for reply in replies:
+        if 'i accept' in reply.body.lower():
+            process_coc(reply, r, tor, redis_server)
+            reply.mark_read()
+            return
+
+        # The current implementation allows for a comment reading "claim done"
+        # to process the entire thing in one go.
+        # This is an abuse of the decision tree and something I didn't catch
+        # until it was too late, but since it's useful in certain circumstances
+        # we'll let it slide.
         if 'claim' in reply.body.lower():
-            process_claim(reply, r)
+            process_claim(reply, r, tor, redis_server)
             reply.mark_read()
         if 'done' in reply.body.lower():
             process_done(reply, r, tor, redis_server, context)
             reply.mark_read()
+
         if '!override' in reply.body.lower():
             process_override(reply, r, tor, redis_server, context)
             reply.mark_read()
+            return

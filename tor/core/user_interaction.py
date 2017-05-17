@@ -5,6 +5,7 @@ from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
 from tor.helpers.misc import _
+from tor.helpers.wiki import get_wiki_page
 from tor.helpers.reddit_ids import get_parent_post_id
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
@@ -12,15 +13,45 @@ from tor.strings.responses import claim_success
 from tor.strings.responses import done_cannot_find_transcript
 from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
+from tor.strings.responses import please_accept_coc
 
 
-def process_claim(post, r):
+def coc_accepted(post, redis_server):
+    """
+    Verifies that the user is in the Redis set "accepted_CoC".
+    
+    :param post: the Comment object containing the claim.
+    :param redis_server: the Redis connection.
+    :return: True if the user has accepted the Code of Conduct, False if they
+        haven't.
+    """
+    return redis_server.sismember('accepted_CoC', post.author.name) == 1
+
+
+def process_coc(post, r, tor, redis_server):
+    """
+    Adds the username of the redditor to the db as accepting the code of
+    conduct.
+    
+    :param post: The Comment object containing the claim.
+    :param r: Active Reddit object.
+    :param tor: the TranscribersOfReddit Subreddit helper object.
+    :param redis_server: the Redis connection.
+    :return: None.
+    """
+    redis_server.sadd('accepted_CoC', post.author.name)
+    process_claim(post, r, tor, redis_server)
+
+
+def process_claim(post, r, tor, redis_server):
     """
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
 
     :param post: The Comment object containing the claim.
     :param r: Active Reddit object.
+    :param tor: the TranscribersOfReddit Subreddit helper object.
+    :param redis_server: the Redis connection.
     :return: None.
     """
     top_parent = get_parent_post_id(post, r)
@@ -28,6 +59,13 @@ def process_claim(post, r):
     # WAIT! Do we actually own this post?
     if top_parent.author.name != 'transcribersofreddit':
         logging.debug('Received `claim` on post we do not own. Ignoring.')
+        return
+
+    if not coc_accepted(post, redis_server):
+        # do not cache this page. We want to get it every time.
+        post.reply(_(
+            please_accept_coc.format(get_wiki_page('codeofconduct', tor))
+        ))
         return
 
     if flair.unclaimed in top_parent.link_flair_text:

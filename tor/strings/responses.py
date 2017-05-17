@@ -44,3 +44,11 @@ something_went_wrong = (
     'moderators of r/TranscribersOfReddit to have them look at '
     'this. Thanks!'
 )
+
+please_accept_coc = (
+    'Hi there! Please read and accept our Code of Conduct so that we can get '
+    'you started with transcribing. Please read the Code of Conduct below, '
+    'then respond to this comment with `I accept`.\n\nAfter you respond, I\'ll '
+    'process your claim as normal.'
+    '\n\n---\n\n{}'
+)
