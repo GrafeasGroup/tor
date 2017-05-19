@@ -40,7 +40,6 @@ if __name__ == '__main__':
 
                 for sub in config.subreddits_to_check:
                     check_submissions(sub, r, tor, redis_server, config)
-                    pass
 
                 set_meta_flair_on_other_posts(r, tor, config)
 
