@@ -3,11 +3,12 @@ import os
 import sys
 import time
 import traceback
+import urllib
+from tesserocr import PyTessBaseAPI
 
 import prawcore
 import wget
 from praw import Reddit
-from tesserocr import PyTessBaseAPI
 
 from tor import config
 from tor.core.initialize import configure_logging
@@ -26,7 +27,8 @@ u/transcribersofreddit identifies an image
   redis_server.rpush('ocr_ids', 'ocr::{}'.format(post.fullname))
   redis_server.set('ocr::{}'.format(post.fullname), result.fullname)
   
-...where result.fullname is the post that u/transcribersofreddit makes about the image.
+...where result.fullname is the post that u/transcribersofreddit makes about
+the image.
 
 Bot:
   every interval (variable):
@@ -93,7 +95,11 @@ def main(config, redis_server):
             image_post = r.submission(id=clean_id(new_post))
 
             # download image for processing
-            filename = wget.download(image_post.url)
+            try:
+                filename = wget.download(image_post.url)
+            except urllib.error.HTTPError:
+                # what if the post has been deleted? Ignore it and continue.
+                continue
 
             try:
                 result = process_image(filename)
