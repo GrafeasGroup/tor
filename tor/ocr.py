@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 import time
-import traceback
 
 import prawcore
 import wget
@@ -98,7 +97,7 @@ def main(config, redis_server):
             try:
                 result = process_image(filename)
             except RuntimeError:
-                logging.error(
+                logging.warning(
                     'Either we hit an imgur album or no text was returned.'
                 )
                 os.remove(filename)
@@ -138,12 +137,9 @@ def main(config, redis_server):
             prawcore.exceptions.RequestException,
             prawcore.exceptions.ServerError
         ) as e:
-            logging.error(e)
             logging.error(
-                'PRAW encountered an error communicating with Reddit.'
-            )
-            logging.error(
-                'Sleeping for 60 seconds and trying program loop again.'
+                '{} - Issue communicating with Reddit. Sleeping for 60s!'
+                ''.format(e), exc_info=1
             )
             time.sleep(60)
 
@@ -169,6 +165,6 @@ if __name__ == '__main__':
 
     except Exception as e:
         # try to raise one last flag as it goes down
-        tor.message('OCR Exploded :(', traceback.format_exc())
-        logging.error(traceback.format_exc())
+        tor.message('{} - OCR Exploded :('.format(e), exc_info=1)
+        logging.error(e, exc_info=1)
         sys.exit(1)
