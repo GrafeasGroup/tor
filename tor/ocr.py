@@ -2,11 +2,11 @@ import logging
 import os
 import sys
 import time
+from tesserocr import PyTessBaseAPI
 
 import prawcore
 import wget
 from praw import Reddit
-from tesserocr import PyTessBaseAPI
 
 from tor import config
 from tor.core.initialize import configure_logging
@@ -25,7 +25,8 @@ u/transcribersofreddit identifies an image
   redis_server.rpush('ocr_ids', 'ocr::{}'.format(post.fullname))
   redis_server.set('ocr::{}'.format(post.fullname), result.fullname)
   
-...where result.fullname is the post that u/transcribersofreddit makes about the image.
+...where result.fullname is the post that u/transcribersofreddit makes about
+the image.
 
 Bot:
   every interval (variable):
@@ -50,14 +51,18 @@ def process_image(local_file):
         text = api.GetUTF8Text()
 
         confidences = api.AllWordConfidences()
-        logging.debug(confidences)
+        if not confidences or len(confidences) == 0:
+            # we have an image, but it *really* couldn't find anything, not
+            # even false positives.
+            return None
+
         logging.debug('Average of confidences: {}'.format(
             sum(confidences) / len(confidences))
         )
 
-        # If you feed it a regular image with no text, you'll get newlines
-        # and spaces back. We strip those out to see if we actually got
-        # anything of substance.
+        # If you feed it a regular image with no text, more often than not
+        # you'll get newlines and spaces back. We strip those out to see if
+        # we actually got anything of substance.
         if text.strip() != '':
             return text
         else:
@@ -92,7 +97,11 @@ def main(config, redis_server):
             image_post = r.submission(id=clean_id(new_post))
 
             # download image for processing
-            filename = wget.download(image_post.url)
+            try:
+                filename = wget.download(image_post.url)
+            except urllib.error.HTTPError:
+                # what if the post has been deleted? Ignore it and continue.
+                continue
 
             try:
                 result = process_image(filename)
