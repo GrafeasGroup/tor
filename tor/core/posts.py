@@ -16,7 +16,7 @@ from tor.strings.posts import yt_already_has_transcripts
 from tor.strings.urls import reddit_url
 
 
-def check_submissions(subreddit, r, tor, redis_server, config):
+def check_submissions(subreddit, r, tor, config):
     """
     Loops through all of the subreddits that have opted in and pulls
     the 10 newest submissions. It checks the domain of the submission
@@ -26,7 +26,6 @@ def check_submissions(subreddit, r, tor, redis_server, config):
     :param subreddit: String. A valid subreddit name.
     :param r: the Reddit object.
     :param tor: the ToR Subreddit object.
-    :param redis_server: the active Redis server connection.
     :param config: the config object.
     :return: None.
     """
@@ -39,21 +38,20 @@ def check_submissions(subreddit, r, tor, redis_server, config):
             post.domain in config.audio_domains or
             post.domain in config.video_domains
         ):
-            process_post(post, tor, redis_server, config)
+            process_post(post, tor, config)
 
 
-def process_post(new_post, tor, redis_server, config):
+def process_post(new_post, tor, config):
     """
     After a valid post has been discovered, this handles the formatting
     and posting of those calls as workable jobs to ToR.
 
     :param new_post: Submission object that needs to be posted.
     :param tor: TranscribersOfReddit subreddit instance.
-    :param redis_server: Active Redis instance.
     :param config: the config object.
     :return: None.
     """
-    if not is_valid(new_post.fullname, redis_server):
+    if not is_valid(new_post.fullname, config):
         logging.debug(id_already_handled_in_db.format(new_post.fullname))
         return
 
@@ -89,7 +87,7 @@ def process_post(new_post, tor, redis_server, config):
                 new_post.reply(_(
                     yt_already_has_transcripts
                 ))
-                add_complete_post_id(new_post.fullname, redis_server)
+                add_complete_post_id(new_post.fullname, config)
                 logging.info(
                     'Found YouTube video, {}, with good transcripts.'
                     ''.format(
@@ -126,15 +124,15 @@ def process_post(new_post, tor, redis_server, config):
         )
         flair_post(result, flair.unclaimed)
 
-        add_complete_post_id(new_post.fullname, redis_server)
-        redis_server.incr('total_posted', amount=1)
+        add_complete_post_id(new_post.fullname, config)
+        config.redis.incr('total_posted', amount=1)
 
         if config.OCR and content_type == 'image':
             # hook for OCR bot; in order to avoid race conditions, we add the
             # key / value pair that the bot isn't looking for before adding
             # to the set that it's monitoring.
-            redis_server.set(new_post.fullname, result.fullname)
-            redis_server.rpush('ocr_ids', new_post.fullname)
+            config.redis.set(new_post.fullname, result.fullname)
+            config.redis.rpush('ocr_ids', new_post.fullname)
 
     # I need to figure out what errors can happen here
     except Exception as e:

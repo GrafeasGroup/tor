@@ -16,19 +16,19 @@ from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
 
 
-def coc_accepted(post, redis_server):
+def coc_accepted(post, config):
     """
     Verifies that the user is in the Redis set "accepted_CoC".
     
     :param post: the Comment object containing the claim.
-    :param redis_server: the Redis connection.
+    :param config: the global config dict.
     :return: True if the user has accepted the Code of Conduct, False if they
         haven't.
     """
-    return redis_server.sismember('accepted_CoC', post.author.name) == 1
+    return config.redis.sismember('accepted_CoC', post.author.name) == 1
 
 
-def process_coc(post, r, tor, redis_server):
+def process_coc(post, r, tor, config):
     """
     Adds the username of the redditor to the db as accepting the code of
     conduct.
@@ -36,14 +36,14 @@ def process_coc(post, r, tor, redis_server):
     :param post: The Comment object containing the claim.
     :param r: Active Reddit object.
     :param tor: the TranscribersOfReddit Subreddit helper object.
-    :param redis_server: the Redis connection.
+    :param config: the global config dict.
     :return: None.
     """
-    redis_server.sadd('accepted_CoC', post.author.name)
-    process_claim(post, r, tor, redis_server)
+    config.redis.sadd('accepted_CoC', post.author.name)
+    process_claim(post, r, tor, config)
 
 
-def process_claim(post, r, tor, redis_server):
+def process_claim(post, r, tor, config):
     """
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
@@ -51,7 +51,7 @@ def process_claim(post, r, tor, redis_server):
     :param post: The Comment object containing the claim.
     :param r: Active Reddit object.
     :param tor: the TranscribersOfReddit Subreddit helper object.
-    :param redis_server: the Redis connection.
+    :param config: the global config dict.
     :return: None.
     """
     top_parent = get_parent_post_id(post, r)
@@ -61,7 +61,7 @@ def process_claim(post, r, tor, redis_server):
         logging.debug('Received `claim` on post we do not own. Ignoring.')
         return
 
-    if not coc_accepted(post, redis_server):
+    if not coc_accepted(post, config):
         # do not cache this page. We want to get it every time.
         post.reply(_(
             please_accept_coc.format(get_wiki_page('codeofconduct', tor))
@@ -84,7 +84,7 @@ def process_claim(post, r, tor, redis_server):
         post.reply(_(claim_already_complete))
 
 
-def process_done(post, r, tor, redis_server, config, override=False):
+def process_done(post, r, tor, config, override=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -94,7 +94,6 @@ def process_done(post, r, tor, redis_server, config, override=False):
     :param post: the Comment object which contains the string 'done'.
     :param r: Active Reddit object.
     :param tor: Shortcut; a Subreddit object for ToR.
-    :param redis_server: Active Redis instance.
     :param config: the global config object.
     :param override: A parameter that can only come from process_override()
         and skips the validation check.
@@ -138,4 +137,4 @@ def process_done(post, r, tor, redis_server, config, override=False):
                 top_parent.fullname, post.author
             )
         )
-        redis_server.incr('total_completed', amount=1)
+        config.redis.incr('total_completed', amount=1)

@@ -7,7 +7,7 @@ from tor.core.user_interaction import process_done
 from tor.core.initialize import initialize
 
 
-def process_override(reply, r, tor, redis_server, config):
+def process_override(reply, r, tor, config):
     """
     This process is for moderators of ToR to force u/transcribersofreddit
     to mark a post as complete and award flair when the bot refutes a
@@ -17,7 +17,6 @@ def process_override(reply, r, tor, redis_server, config):
     :param reply: the comment reply object from the moderator.
     :param r: the active Reddit instance.
     :param tor: the TranscribersOfReddit subreddit object.
-    :param redis_server: Active Redis object.
     :param config: the global config object.
     :return: None.
     """
@@ -40,7 +39,7 @@ def process_override(reply, r, tor, redis_server, config):
             '{}'.format(parents_parent.fullname, reply.author.name)
         )
         process_done(
-            parents_parent, r, tor, redis_server, config, override=True
+            parents_parent, r, tor, config, override=True
         )
 
 

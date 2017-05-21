@@ -25,7 +25,7 @@ if __name__ == '__main__':
     r = Reddit('bot')  # loaded from local praw.ini config file
     configure_logging()
 
-    redis_server = configure_redis()
+    config.redis = configure_redis()
 
     # the subreddit object shortcut for TranscribersOfReddit
     tor = configure_tor(r, config)
@@ -36,10 +36,10 @@ if __name__ == '__main__':
     try:
         while True:
             try:
-                check_inbox(r, tor, redis_server, config)
+                check_inbox(r, tor, config)
 
                 for sub in config.subreddits_to_check:
-                    check_submissions(sub, r, tor, redis_server, config)
+                    check_submissions(sub, r, tor, config)
 
                 set_meta_flair_on_other_posts(r, tor, config)
 
