@@ -138,14 +138,14 @@ def process_post(new_post, tor, redis_server, config):
 
     # I need to figure out what errors can happen here
     except Exception as e:
-        logging.error(e)
         logging.error(
-            'Something went wrong; unable to post content.\n'
+            '{} - unable to post content.\n'
             'ID: {id}\n'
             'Title: {title}\n'
             'Subreddit: {sub}'.format(
+                e,
                 id=new_post.fullname,
                 title=new_post.title,
                 sub=new_post.subreddit.display_name
-            )
+            ), exc_info=1
         )

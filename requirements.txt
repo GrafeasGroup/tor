@@ -6,4 +6,5 @@ addict
 cython
 tesserocr
 imgurpython
+bugsnag
 wget

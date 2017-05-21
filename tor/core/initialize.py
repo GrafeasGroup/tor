@@ -2,6 +2,7 @@ import logging
 import sys
 
 import redis
+from bugsnag.handlers import BugsnagHandler
 
 from tor.helpers.misc import log_header
 from tor.helpers.wiki import get_wiki_page
@@ -38,7 +39,7 @@ def configure_redis():
         redis_server = redis.StrictRedis(host='localhost', port=6379, db=0)
         redis_server.ping()
     except redis.exceptions.ConnectionError:
-        logging.error("Redis server is not running! Exiting!")
+        logging.fatal("Redis server is not running! Exiting!")
         sys.exit(1)
 
     return redis_server
@@ -56,8 +57,11 @@ def configure_logging():
     formatter = logging.Formatter('[%(asctime)s] - [%(funcName)s] - %(message)s')
     # tell the handler to use this format
     console.setFormatter(formatter)
-    # add the handler to the root logger
+
+    # add the handlers to the root logger
     logging.getLogger('').addHandler(console)
+    # will intercept anything error level or above
+    logging.getLogger('').addHandler(BugsnagHandler())
 
     log_header('Starting!')
 

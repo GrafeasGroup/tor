@@ -1,5 +1,4 @@
 import logging
-import traceback
 
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
@@ -69,9 +68,9 @@ def get_yt_transcript(url, yt_transcript_url=yt_transcript_url):
         else:
             return None
     except requests.exceptions.HTTPError as e:
-        logging.error('Cannot retrieve transcript for {}'.format(url))
-        logging.error(e)
-        logging.error(traceback.format_exc())
+        logging.error(
+            f'{e} - Cannot retrieve transcript for {url}', exc_info=1
+        )
         return None
 
 
