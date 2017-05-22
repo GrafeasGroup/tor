@@ -25,7 +25,7 @@ def process_mention(mention, r, tor, redis_server, config):
     :return: None.
     """
 
-    submission = r.submission(id=clean_id(mention.parent_id))
+    submission = r.submission(id=clean_id(mention.link_id))
 
     # We have to do this entire parent / parent_permalink thing twice because
     # the method for calling a permalink changes for each object. Laaaame.
