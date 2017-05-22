@@ -25,6 +25,7 @@ def process_mention(mention, r, tor, redis_server, config):
     :return: None.
     """
 
+    # The submission the current mention was made in
     submission = r.submission(id=clean_id(mention.link_id))
 
     # We have to do this entire parent / parent_permalink thing twice because
@@ -44,7 +45,7 @@ def process_mention(mention, r, tor, redis_server, config):
         parent.title = '"' + parent.title + '"'
 
     # Ignore requests made by the OP of content or the OP of the submission
-    if mention.author == parent.author or mention.author == submission.author:
+    if mention.author == submission.author:
         logging.info(
             'Ignoring mention by OP u/{} on ID {}'.format(mention.author,
                                                           mention.parent_id)
