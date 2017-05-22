@@ -44,8 +44,7 @@ def process_mention(mention, r, tor, redis_server, config):
         parent.title = '"' + parent.title + '"'
 
     # Ignore requests made by the OP of content or the OP of the submission
-    if mention.author.id == parent.author.id or \
-            mention.author.id == submission.author.id:
+    if mention.author == parent.author or mention.author == submission.author:
         logging.info(
             'Ignoring mention by OP u/{} on ID {}'.format(mention.author,
                                                           mention.parent_id)
