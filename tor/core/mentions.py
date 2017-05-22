@@ -26,6 +26,8 @@ def process_mention(mention, r, tor, redis_server, config):
     """
 
     submission = r.submission(id=clean_id(mention.link_id))
+    # Ignore requests made by the OP of the submission
+    ignore = mention.author == submission.author
 
     # We have to do this entire parent / parent_permalink thing twice because
     # the method for calling a permalink changes for each object. Laaaame.
@@ -36,6 +38,17 @@ def process_mention(mention, r, tor, redis_server, config):
         # a comment does not have a title attribute. Let's fake one by giving
         # it something to work with.
         parent.title = 'Unknown Content'
+
+        # If we aren't ignoring already, trace back the comment chain to see
+        # if user has commented before.
+        # If so, we will also ignore the mention.
+        if not ignore:
+            comment = parent
+            while not comment.is_root:
+                comment = r.comment(id=clean_id(comment.parent_id))
+                if comment.author == mention.author:
+                    ignore = True
+                    break
     else:
         # this is a post.
         parent = submission
@@ -43,8 +56,7 @@ def process_mention(mention, r, tor, redis_server, config):
         # format that sucker so it looks right in the template.
         parent.title = '"' + parent.title + '"'
 
-    # Ignore requests made by the OP of content or the OP of the submission
-    if mention.author == parent.author or mention.author == submission.author:
+    if ignore:
         logging.info(
             'Ignoring mention by OP u/{} on ID {}'.format(mention.author,
                                                           mention.parent_id)
