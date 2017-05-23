@@ -28,7 +28,6 @@ def run(r, tor, config):
     
     :param r: Active Reddit connection. 
     :param tor: ToR subreddit object.
-    :param redis_server: Active Redis connection.
     :param config: Global config dict.
     :return: None.
     """

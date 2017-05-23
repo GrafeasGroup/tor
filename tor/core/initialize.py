@@ -64,18 +64,7 @@ def configure_logging():
 
 def populate_header(tor, config):
     config.header = ''
-
-    result = get_wiki_page('format/header', tor=tor)
-    result = result.split('\r\n')
-    temp = []
-    for part in result:
-        part = part.lstrip().rstrip()
-        if part == '':
-            continue
-        if part == '---':
-            continue
-        temp.append(part)
-    config.header = ' '.join(temp)
+    config.header = get_wiki_page('format/header', tor=tor)
 
 
 def populate_formatting(tor, config):
