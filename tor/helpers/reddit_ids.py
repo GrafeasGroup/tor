@@ -33,7 +33,7 @@ def get_parent_post_id(post, r):
             return r.submission(id=clean_id(post.parent_id))
 
 
-def add_complete_post_id(post_id, redis_server):
+def add_complete_post_id(post_id, config):
     """
     Adds the post id to the complete_post_ids set in Redis. This is used
     to make sure that we didn't break halfway through working on this post.
@@ -43,13 +43,13 @@ def add_complete_post_id(post_id, redis_server):
     to actually creating the post with the "Unclaimed" tag.
 
     :param post_id: string. The comment / post ID.
-    :param redis_server: The active Redis instance.
+    :param config: the global config dict.
     :return: None.
     """
-    redis_server.sadd('complete_post_ids', post_id)
+    config.redis.sadd('complete_post_ids', post_id)
 
 
-def is_valid(post_id, redis_server):
+def is_valid(post_id, config):
     """
     Returns true or false based on whether the parent id is in a set of IDs.
     It determines this by attempting to insert the value into the DB and
@@ -59,11 +59,11 @@ def is_valid(post_id, redis_server):
     something went horribly wrong and we try again.
 
     :param post_id: string. The comment / post ID.
-    :param redis_server: The active Redis instance.
+    :param config: the global config object.
     :return: True if the ID is successfully inserted into the set; False if
         it's already there.
     """
-    result = redis_server.sadd('post_ids', post_id)
+    result = config.redis.sadd('post_ids', post_id)
 
     if result == 1:
         # the post id was submitted successfully and it's good to work on.
@@ -72,7 +72,7 @@ def is_valid(post_id, redis_server):
     else:
         # The post is already in post_ids, which is triggered when we start
         # the process. Let's see if we ever completed it.
-        member = redis_server.sismember('complete_post_ids', post_id)
+        member = config.redis.sismember('complete_post_ids', post_id)
         if member != 1:
             # It's in post_ids, which means we started it, but it's not
             # in complete_post_ids, which means we never finished it for

@@ -1,13 +1,21 @@
 import logging
 
+import sh
+
 import random
+import os
+import sys
 from tor.helpers.reddit_ids import clean_id
 from tor.helpers.misc import _
 from tor.core.user_interaction import process_done
 from tor.core.initialize import initialize
 
 
-def process_override(reply, r, tor, redis_server, config):
+def from_moderator(reply, config):
+    return reply.author in config.tor_mods
+
+
+def process_override(reply, r, tor, config):
     """
     This process is for moderators of ToR to force u/transcribersofreddit
     to mark a post as complete and award flair when the bot refutes a
@@ -17,16 +25,15 @@ def process_override(reply, r, tor, redis_server, config):
     :param reply: the comment reply object from the moderator.
     :param r: the active Reddit instance.
     :param tor: the TranscribersOfReddit subreddit object.
-    :param redis_server: Active Redis object.
     :param config: the global config object.
     :return: None.
     """
     # first we verify that this comment comes from a moderator and that
     # we can work on it.
-    if reply.author not in config.tor_mods:
+    if not from_moderator(reply, config):
         reply.reply(_(random.choice(config.no_gifs)))
         logging.info(
-            '{} just tried to override. Lolno.'.format(reply.author.name)
+            f'{reply.author.name} just tried to override. Lolno.'
         )
         return
     # okay, so the parent of the reply should be the bot's comment
@@ -36,23 +43,36 @@ def process_override(reply, r, tor, redis_server, config):
     parents_parent = r.comment(id=clean_id(reply_parent.parent_id))
     if 'done' in parents_parent.body.lower():
         logging.info(
-            'Starting validation override for post {}, approved by'
-            '{}'.format(parents_parent.fullname, reply.author.name)
+            f'Starting validation override for post {parents_parent.fullname}'
+            f', approved by {reply.author.name}'
         )
         process_done(
-            parents_parent, r, tor, redis_server, config, override=True
+            parents_parent, r, tor, config, override=True
         )
 
 
 def reload_config(reply, tor, config):
-    if reply.author not in config.tor_mods:
+    if not from_moderator(reply, config):
         reply.reply(_(random.choice(config.no_gifs)))
         logging.info(
-            '{} just issued a reload command. No.'.format(reply.author.name)
+            f'{reply.author.name} just issued a reload command. No.'
         )
     else:
         logging.info(
-            'Reloading configs at the request of {}'.format(reply.author.name)
+            f'Reloading configs at the request of {reply.author.name}'
         )
         initialize(tor, config)
         logging.info('Reload complete.')
+
+
+def update_and_restart(reply, config):
+    if not from_moderator(reply, config):
+        reply.reply(_(random.choice(config.no_gifs)))
+        logging.info(
+            f'{reply.author.name} just issued update. No.'
+        )
+    else:
+        # update from repo
+        sh.git.pull("origin", "master")
+        # restart own process
+        os.execl(sys.executable, sys.executable, *sys.argv)

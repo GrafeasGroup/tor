@@ -1,6 +1,9 @@
+import os
+
+import bugsnag
 from addict import Dict
 
-__version__ = '2.5.2'
+__version__ = '2.6.0'
 
 config = Dict()
 
@@ -26,3 +29,12 @@ config.no_gifs = []
 # global flag to enable / disable placing the triggers
 # for the OCR bot
 config.OCR = True
+
+# configure bugsnag logging
+bs_api_key = os.environ.get('BUGSNAG_API_KEY')
+
+if bs_api_key:
+    bugsnag.configure(
+        api_key=bs_api_key,
+        project_root=os.getcwd(),
+    )
