@@ -78,10 +78,8 @@ def process_mention(mention, r, tor, config):
 
             # I need to figure out what errors can happen here
         except Exception as e:
-            logging.error(e)
             logging.error(
-                'Posting failure message in response to caller, u/{}'.format(
-                    mention.author
-                )
+                f'{e} - Posting failure message in response to caller, '
+                f'u/{mention.author}', exc_info=1
             )
             mention.reply(_(something_went_wrong))
