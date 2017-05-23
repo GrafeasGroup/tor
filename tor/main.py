@@ -21,6 +21,42 @@ from tor.helpers.misc import set_meta_flair_on_other_posts
 # has served as the soundtrack for much of its continued development.
 # praw.exceptions.APIException
 
+
+def run(r, tor, redis_server, config):
+    """
+    Primary routine.
+    
+    :param r: Active Reddit connection. 
+    :param tor: ToR subreddit object.
+    :param redis_server: Active Redis connection.
+    :param config: Global config dict.
+    :return: None.
+    """
+    try:
+        check_inbox(r, tor, redis_server, config)
+
+        for sub in config.subreddits_to_check:
+            check_submissions(sub, r, tor, redis_server, config)
+
+        set_meta_flair_on_other_posts(r, tor, config)
+
+        if config.debug_mode:
+            time.sleep(60)
+
+    except (
+            prawcore.exceptions.RequestException,
+            prawcore.exceptions.ServerError
+    ) as e:
+        logging.error(e)
+        logging.error(
+            'PRAW encountered an error communicating with Reddit.'
+        )
+        logging.error(
+            'Sleeping for 60 seconds and trying program loop again.'
+        )
+        time.sleep(60)
+
+
 if __name__ == '__main__':
     r = Reddit('bot')  # loaded from local praw.ini config file
     configure_logging()
@@ -35,29 +71,7 @@ if __name__ == '__main__':
 
     try:
         while True:
-            try:
-                check_inbox(r, tor, redis_server, config)
-
-                for sub in config.subreddits_to_check:
-                    check_submissions(sub, r, tor, redis_server, config)
-
-                set_meta_flair_on_other_posts(r, tor, config)
-
-                if config.debug_mode:
-                    time.sleep(60)
-
-            except (
-                    prawcore.exceptions.RequestException,
-                    prawcore.exceptions.ServerError
-            ) as e:
-                logging.error(e)
-                logging.error(
-                    'PRAW encountered an error communicating with Reddit.'
-                )
-                logging.error(
-                    'Sleeping for 60 seconds and trying program loop again.'
-                )
-                time.sleep(60)
+            run(r, tor, redis_server, config)
 
     except KeyboardInterrupt:
         logging.error('User triggered shutdown. Shutting down.')
