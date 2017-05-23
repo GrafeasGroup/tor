@@ -8,6 +8,7 @@ from tor.core.user_interaction import process_done
 from tor.helpers.reddit_ids import is_valid
 from tor.strings.debug import id_already_handled_in_db
 from tor.core.user_interaction import process_coc
+from tor.core.admin_commands import update_and_restart
 
 
 def check_inbox(r, tor, config):
@@ -39,11 +40,17 @@ def check_inbox(r, tor, config):
             # ones we're looking for will eventually get emailed to me as
             # things I need to look at
         if 'reload' in item.subject.lower():
-            reload_config(item, tor, config)
             item.mark_read()
+            reload_config(item, tor, config)
             item.reply(
                 'Config reloaded!'
             )
+            continue
+        if 'update' in item.subject.lower():
+            item.mark_read()
+            update_and_restart(item, config)
+            # there's no reason to do anything else here because the process
+            # will terminate and respawn
 
     # sort them and create posts where necessary
     for mention in mentions:
