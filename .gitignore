@@ -2,3 +2,4 @@ praw.ini
 *.pyc
 .idea/*
 tor/transcribersofreddit.log
+*.swp
