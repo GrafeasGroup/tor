@@ -38,7 +38,7 @@ def flair_post(post, text):
 
     # if the flairing is successful, we won't hit this line.
     logging.error(
-        f'Cannot find requested flair {text}. Not flairing.'
+        'Cannot find requested flair {}. Not flairing.'.format(text)
     )
 
 

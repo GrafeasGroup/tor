@@ -15,7 +15,7 @@ def get_wiki_page(pagename, tor, return_on_fail=None):
     :return: String or None. The content of the requested page if
         present else None.
     """
-    logging.debug(f'Retrieving wiki page {pagename}')
+    logging.debug('Retrieving wiki page {}'.format(pagename))
     try:
         result = tor.wiki[pagename].content_md
         return result if result != '' else return_on_fail
