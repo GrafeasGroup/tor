@@ -3,7 +3,7 @@ import os
 import bugsnag
 from addict import Dict
 
-__version__ = '2.6.1'
+__version__ = '2.6.6'
 
 config = Dict()
 
