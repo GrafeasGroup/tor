@@ -149,7 +149,7 @@ def main(config):
         ) as e:
             logging.error(
                 '{} - Issue communicating with Reddit. Sleeping for 60s!'
-                ''.format(e), exc_info=1
+                ''.format(e)
             )
             time.sleep(60)
 
@@ -176,5 +176,5 @@ if __name__ == '__main__':
     except Exception as e:
         # try to raise one last flag as it goes down
         tor.message('{} - OCR Exploded :('.format(e), exc_info=1)
-        logging.error(e, exc_info=1)
+        logging.error(e)
         sys.exit(1)

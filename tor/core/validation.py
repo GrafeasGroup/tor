@@ -68,7 +68,7 @@ def verified_posted_transcript(post, r, config):
                     if _author_check(reply, post) and _header_check(reply, config):
                         return True
             except Exception as e:
-                logging.error(e, exc_info=1)
+                logging.error(e)
                 # I don't care what the exception is, just don't break.
                 return False
 

@@ -145,5 +145,5 @@ def process_post(new_post, tor, config):
                 id=new_post.fullname,
                 title=new_post.title,
                 sub=new_post.subreddit.display_name
-            ), exc_info=1
+            )
         )

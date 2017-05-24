@@ -92,6 +92,6 @@ def process_mention(mention, r, tor, config):
         except Exception as e:
             logging.error(
                 '{} - Posting failure message in response to caller, '
-                'u/{}'.format(e, mention.author), exc_info=1
+                'u/{}'.format(e, mention.author)
             )
             mention.reply(_(something_went_wrong))

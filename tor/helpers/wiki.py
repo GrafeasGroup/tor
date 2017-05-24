@@ -40,5 +40,5 @@ def update_wiki_page(pagename, content, tor):
     except prawcore.exceptions.NotFound as e:
         logging.error(
             '{} - Requested wiki page {} not found. '
-            'Cannot update.'.format(e, pagename), exc_info=1
+            'Cannot update.'.format(e, pagename)
         )
