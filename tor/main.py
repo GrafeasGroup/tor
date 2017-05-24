@@ -57,7 +57,7 @@ def run(r, tor, config):
 
 if __name__ == '__main__':
     r = Reddit('bot')  # loaded from local praw.ini config file
-    configure_logging()
+    configure_logging(config)
 
     config.redis = configure_redis()
 

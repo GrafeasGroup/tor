@@ -31,10 +31,13 @@ config.no_gifs = []
 config.OCR = True
 
 # configure bugsnag logging
-bs_api_key = os.environ.get('BUGSNAG_API_KEY')
+try:
+    config.bs_api_key = open('bugsnag.key').readline().strip()
+except FileNotFoundError:
+    config.bs_api_key = None
 
-if bs_api_key:
+if config.bs_api_key:
     bugsnag.configure(
-        api_key=bs_api_key,
+        api_key=config.bs_api_key,
         project_root=os.getcwd(),
     )

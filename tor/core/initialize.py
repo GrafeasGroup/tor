@@ -45,7 +45,7 @@ def configure_redis():
     return redis_server
 
 
-def configure_logging():
+def configure_logging(config):
     logging.basicConfig(
         level=logging.INFO,
         format='[%(asctime)s] - [%(levelname)s] - [%(funcName)s] - %(message)s',
@@ -61,7 +61,8 @@ def configure_logging():
     # add the handlers to the root logger
     logging.getLogger('').addHandler(console)
     # will intercept anything error level or above
-    logging.getLogger('').addHandler(BugsnagHandler())
+    if config.bs_api_key:
+        logging.getLogger('').addHandler(BugsnagHandler())
 
     log_header('Starting!')
 
