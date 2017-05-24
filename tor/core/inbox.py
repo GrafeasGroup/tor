@@ -11,7 +11,7 @@ from tor.core.user_interaction import process_coc
 from tor.core.admin_commands import update_and_restart
 
 
-def check_inbox(r, tor, redis_server, config):
+def check_inbox(r, tor, config):
     """
     Goes through all the unread messages in the inbox. It has two
     loops within this section, each one dealing with a different type
@@ -56,19 +56,19 @@ def check_inbox(r, tor, redis_server, config):
     for mention in mentions:
         logging.info('Received mention! ID {}'.format(mention))
 
-        if not is_valid(mention.parent_id, redis_server):
+        if not is_valid(mention.parent_id, config):
             # Do our check here to make sure we can actually work on this one and
             # that we haven't already posted about it. We use the full ID here
             # instead of the cleaned one, just in case.
             logging.info(id_already_handled_in_db.format(mention.parent_id))
             continue
 
-        process_mention(mention, r, tor, redis_server, config)
+        process_mention(mention, r, tor, config)
 
     # comment replies
     for reply in replies:
         if 'i accept' in reply.body.lower():
-            process_coc(reply, r, tor, redis_server)
+            process_coc(reply, r, tor, config)
             reply.mark_read()
             return
 
@@ -78,13 +78,13 @@ def check_inbox(r, tor, redis_server, config):
         # until it was too late, but since it's useful in certain circumstances
         # we'll let it slide.
         if 'claim' in reply.body.lower():
-            process_claim(reply, r, tor, redis_server)
+            process_claim(reply, r, tor, config)
             reply.mark_read()
         if 'done' in reply.body.lower():
-            process_done(reply, r, tor, redis_server, config)
+            process_done(reply, r, tor, config)
             reply.mark_read()
 
         if '!override' in reply.body.lower():
-            process_override(reply, r, tor, redis_server, config)
+            process_override(reply, r, tor, config)
             reply.mark_read()
             return

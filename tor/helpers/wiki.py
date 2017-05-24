@@ -1,5 +1,4 @@
 import logging
-import traceback
 
 import prawcore
 
@@ -16,7 +15,7 @@ def get_wiki_page(pagename, tor, return_on_fail=None):
     :return: String or None. The content of the requested page if
         present else None.
     """
-    logging.debug('Retrieving wiki page {}'.format(pagename))
+    logging.debug(f'Retrieving wiki page {pagename}')
     try:
         result = tor.wiki[pagename].content_md
         return result if result != '' else return_on_fail
@@ -43,5 +42,3 @@ def update_wiki_page(pagename, content, tor):
             '{} - Requested wiki page {} not found. '
             'Cannot update.'.format(e, pagename), exc_info=1
         )
-        logging.error(e)
-        logging.error(traceback.format_exc())

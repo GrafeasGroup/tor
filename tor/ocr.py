@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 import time
-import traceback
 import urllib
 from tesserocr import PyTessBaseAPI
 
@@ -24,16 +23,16 @@ General notes for implementation.
 Process:
 
 u/transcribersofreddit identifies an image
-  redis_server.rpush('ocr_ids', 'ocr::{}'.format(post.fullname))
-  redis_server.set('ocr::{}'.format(post.fullname), result.fullname)
+  config.redis.rpush('ocr_ids', 'ocr::{}'.format(post.fullname))
+  config.redis.set('ocr::{}'.format(post.fullname), result.fullname)
   
 ...where result.fullname is the post that u/transcribersofreddit makes about
 the image.
 
 Bot:
   every interval (variable):
-    thingy = redis_server.lpop('ocr_ids')
-    u_tor_post_id = redis_server.get(thingy)
+    thingy = config.redis.lpop('ocr_ids')
+    u_tor_post_id = config.redis.get(thingy)
     
     get image from thingy
     download it
@@ -81,11 +80,11 @@ def chunks(s, n):
         yield s[start:start+n]
 
 
-def main(config, redis_server):
+def main(config):
     while True:
         try:
             time.sleep(config.ocr_delay)
-            new_post = redis_server.lpop('ocr_ids')
+            new_post = config.redis.lpop('ocr_ids')
             if new_post is None:
                 logging.debug('No post found. Sleeping.')
                 # nothing new in the queue. Wait and try again.
@@ -108,7 +107,7 @@ def main(config, redis_server):
             try:
                 result = process_image(filename)
             except RuntimeError:
-                logging.error(
+                logging.warning(
                     'Either we hit an imgur album or no text was returned.'
                 )
                 os.remove(filename)
@@ -122,10 +121,10 @@ def main(config, redis_server):
             if not result:
                 logging.info('Result was none! Skipping!')
                 # we don't want orphan entries
-                redis_server.delete(new_post)
+                config.redis.delete(new_post)
                 continue
 
-            tor_post_id = redis_server.get(new_post).decode('utf-8')
+            tor_post_id = config.redis.get(new_post).decode('utf-8')
 
             logging.info(
                 'posting transcription attempt for {} on {}'.format(
@@ -142,18 +141,15 @@ def main(config, redis_server):
                 # the comments we make until we run out of chunks.
                 thing_to_reply_to = thing_to_reply_to.reply(_(chunk))
 
-            redis_server.delete(new_post)
+            config.redis.delete(new_post)
 
         except (
             prawcore.exceptions.RequestException,
             prawcore.exceptions.ServerError
         ) as e:
-            logging.error(e)
             logging.error(
-                'PRAW encountered an error communicating with Reddit.'
-            )
-            logging.error(
-                'Sleeping for 60 seconds and trying program loop again.'
+                '{} - Issue communicating with Reddit. Sleeping for 60s!'
+                ''.format(e), exc_info=1
             )
             time.sleep(60)
 
@@ -165,13 +161,13 @@ if __name__ == '__main__':
         filename='ocr.log'
     )
 
-    redis_server = configure_redis()
+    config.redis = configure_redis()
 
     # the subreddit object shortcut for TranscribersOfReddit
     tor = configure_tor(r, config)
 
     try:
-        main(config, redis_server)
+        main(config)
 
     except KeyboardInterrupt:
         logging.info('Received keyboard interrupt! Shutting down!')
@@ -179,6 +175,6 @@ if __name__ == '__main__':
 
     except Exception as e:
         # try to raise one last flag as it goes down
-        tor.message('OCR Exploded :(', traceback.format_exc())
-        logging.error(traceback.format_exc())
+        tor.message('{} - OCR Exploded :('.format(e), exc_info=1)
+        logging.error(e, exc_info=1)
         sys.exit(1)
