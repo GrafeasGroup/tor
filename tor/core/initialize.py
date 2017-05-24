@@ -64,6 +64,11 @@ def configure_logging(config):
     if config.bs_api_key:
         logging.getLogger('').addHandler(BugsnagHandler())
 
+    if config.bs_api_key:
+        logging.info('Bugsnag enabled!')
+    else:
+        logging.info('Not running with Bugsnag!')
+
     log_header('Starting!')
 
 
