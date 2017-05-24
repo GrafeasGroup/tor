@@ -81,8 +81,7 @@ def process_mention(mention, r, tor, redis_server, config):
         except Exception as e:
             logging.error(e)
             logging.error(
-                'Posting failure message in response to caller, u/{}'.format(
-                    mention.author
-                )
+                '{} - Posting failure message in response to caller, '
+                'u/{}'.format(e, mention.author), exc_info=1
             )
             mention.reply(_(something_went_wrong))

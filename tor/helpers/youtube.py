@@ -69,9 +69,9 @@ def get_yt_transcript(url, yt_transcript_url=yt_transcript_url):
         else:
             return None
     except requests.exceptions.HTTPError as e:
-        logging.error('Cannot retrieve transcript for {}'.format(url))
-        logging.error(e)
-        logging.error(traceback.format_exc())
+        logging.error(
+            '{} - Cannot retrieve transcript for {}'.format(e, url), exc_info=1
+        )
         return None
 
 

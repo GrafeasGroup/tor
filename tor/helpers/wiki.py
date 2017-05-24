@@ -33,13 +33,15 @@ def update_wiki_page(pagename, content, tor):
     :param tor: Active ToR instance.
     :return: None.
     """
+
     logging.debug('Updating wiki page {}'.format(pagename))
+
     try:
         return tor.wiki[pagename].edit(content)
     except prawcore.exceptions.NotFound as e:
         logging.error(
-            'Requested wiki page {} not found. Cannot '
-            'update.'.format(pagename)
+            '{} - Requested wiki page {} not found. '
+            'Cannot update.'.format(e, pagename), exc_info=1
         )
         logging.error(e)
         logging.error(traceback.format_exc())
