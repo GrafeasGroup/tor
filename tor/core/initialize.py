@@ -63,7 +63,9 @@ def configure_logging(config):
     logging.getLogger('').addHandler(console)
     # will intercept anything error level or above
     if config.bs_api_key:
-        logging.getLogger('').addHandler(BugsnagHandler())
+        bs_handler = BugsnagHandler()
+        bs_handler.setLevel(logging.ERROR)
+        logging.getLogger('').addHandler(bs_handler)
 
     if config.bs_api_key:
         logging.info('Bugsnag enabled!')

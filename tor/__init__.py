@@ -4,7 +4,7 @@ import logging
 import bugsnag
 from addict import Dict
 
-__version__ = '2.6.6'
+__version__ = '2.6.7'
 
 config = Dict()
 
@@ -43,6 +43,5 @@ except FileNotFoundError:
 
 if config.bs_api_key:
     bugsnag.configure(
-        api_key=config.bs_api_key,
-        level=logging.ERROR
+        api_key=config.bs_api_key
     )
