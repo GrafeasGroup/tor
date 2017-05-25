@@ -1,4 +1,5 @@
 import os
+import logging
 
 import bugsnag
 from addict import Dict
@@ -17,6 +18,10 @@ config.image_formatting = ''
 config.header = ''
 
 config.subreddits_to_check = []
+config.upvote_filter_subs = []
+config.no_link_header_subs = []
+
+config.upvote_filter_threshold = 5
 
 config.tor_mods = []
 
@@ -39,5 +44,5 @@ except FileNotFoundError:
 if config.bs_api_key:
     bugsnag.configure(
         api_key=config.bs_api_key,
-        project_root=os.getcwd(),
+        level=logging.ERROR
     )

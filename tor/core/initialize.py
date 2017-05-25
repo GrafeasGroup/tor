@@ -5,6 +5,7 @@ import redis
 from bugsnag.handlers import BugsnagHandler
 
 from tor.helpers.misc import log_header
+from tor.helpers.misc import clean_list
 from tor.helpers.wiki import get_wiki_page
 
 
@@ -142,11 +143,34 @@ def populate_subreddit_lists(tor, config):
     """
 
     config.subreddits_to_check = []
+    config.upvote_filter_subs = []
+    config.no_link_header_subs = []
 
     config.subreddits_to_check = get_wiki_page('subreddits', tor=tor).split('\r\n')
+    config.subreddits_to_check = clean_list(config.subreddits_to_check)
     logging.debug(
         'Created list of subreddits from wiki: {}'.format(
             config.subreddits_to_check
+        )
+    )
+
+    config.upvote_filter_subs = get_wiki_page(
+        'subreddits/upvote-filtered', tor=tor
+    ).split('\r\n')
+    config.upvote_filter_subs = clean_list(config.upvote_filter_subs)
+    logging.debug(
+        'Retrieved subreddits subject to the upvote filter: {}'.format(
+            config.upvote_filter_subs
+        )
+    )
+
+    config.no_link_header_subs = get_wiki_page(
+        'subreddits/no-link-header', tor=tor
+    ).split('\r\n')
+    config.no_link_header_subs = clean_list(config.no_link_header_subs)
+    logging.debug(
+        'Retrieved subreddits subject to the upvote filter: {}'.format(
+            config.no_link_header_subs
         )
     )
 

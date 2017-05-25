@@ -51,6 +51,13 @@ def process_post(new_post, tor, config):
     :param config: the config object.
     :return: None.
     """
+
+    if new_post.subreddit.display_name in config.upvote_filter_subs:
+        # ignore posts if they don't meet the threshold for karma and the sub
+        # is in our list of upvoted filtered ones
+        if new_post.ups < config.upvote_filter_threshold:
+            return
+
     if not is_valid(new_post.fullname, config):
         logging.debug(id_already_handled_in_db.format(new_post.fullname))
         return
@@ -59,17 +66,14 @@ def process_post(new_post, tor, config):
         return
 
     if new_post.author is None:
-        logging.info(
-            'Posting call for transcription on ID {} by deleted author'.format(
-                new_post.fullname
-            )
+        # we don't want to handle deleted posts, that's just silly
+        return
+
+    logging.info(
+        'Posting call for transcription on ID {} posted by {}'.format(
+            new_post.fullname, new_post.author.name
         )
-    else:
-        logging.info(
-            'Posting call for transcription on ID {} posted by {}'.format(
-                new_post.fullname, new_post.author.name
-            )
-        )
+    )
 
     if new_post.domain in config.image_domains:
         content_type = 'image'

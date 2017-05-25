@@ -46,3 +46,18 @@ def log_header(message):
     logging.info('*' * 50)
     logging.info(message)
     logging.info('*' * 50)
+
+
+def clean_list(items):
+    """
+    Takes a list and removes entries that are only newlines.
+
+    :param items: List.
+    :return: List, sans newlines
+    """
+    cleaned = []
+    for item in items:
+        if item.strip() != '':
+            cleaned.append(item)
+
+    return cleaned
