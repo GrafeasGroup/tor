@@ -7,6 +7,7 @@ from tor.helpers.flair import update_user_flair
 from tor.helpers.misc import _
 from tor.helpers.wiki import get_wiki_page
 from tor.helpers.reddit_ids import get_parent_post_id
+from tor.helpers.misc import send_to_slack
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
@@ -40,6 +41,11 @@ def process_coc(post, r, tor, config):
     :return: None.
     """
     config.redis.sadd('accepted_CoC', post.author.name)
+    send_to_slack(
+        'u/{} has <{}|just accepted the CoC!>'.format(
+            post.author.name, post.url
+        )
+    )
     process_claim(post, r, tor, config)
 
 

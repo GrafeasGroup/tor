@@ -1,5 +1,7 @@
 import logging
 
+import requests
+
 from tor import __version__
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
@@ -61,3 +63,24 @@ def clean_list(items):
             cleaned.append(item)
 
     return cleaned
+
+
+def send_to_slack(message, config):
+    """
+    Sends a message to the ToR #general slack channel.
+
+    :param message: String; the message that is to be encoded.
+    :param config: the global config dict.
+    :return: None.
+    """
+    # if we have the api url loaded, then fire off the message.
+    # Otherwise, don't worry about it and just return.
+    if config.slack_api_url:
+        payload = {
+            'username': 'Kierra',
+            'icon_emoji': ':snoo:',
+            'text': message
+        }
+        requests.post(config.slack_api_url, json=payload)
+
+    return

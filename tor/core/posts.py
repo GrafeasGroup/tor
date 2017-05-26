@@ -5,7 +5,6 @@ from tor.helpers.flair import flair_post
 from tor.helpers.misc import _
 from tor.helpers.reddit_ids import add_complete_post_id
 from tor.helpers.reddit_ids import is_valid
-from tor.helpers.wiki import update_wiki_page
 from tor.helpers.youtube import get_yt_transcript
 from tor.helpers.youtube import get_yt_video_id
 from tor.helpers.youtube import valid_youtube_video
