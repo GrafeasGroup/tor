@@ -124,7 +124,7 @@ def process_done(post, r, tor, config, override=False):
                     'Post {} does not appear to have a post by claimant {}. '
                     'Hrm...'.format(
                         top_parent.fullname, post.author
-                    )
+                    ), config
                 )
                 post.reply(_(done_cannot_find_transcript))
                 return
