@@ -15,6 +15,7 @@ from tor.strings.responses import done_cannot_find_transcript
 from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
+from tor.strings.urls import reddit_url
 
 
 def coc_accepted(post, config):
@@ -43,7 +44,7 @@ def process_coc(post, r, tor, config):
     config.redis.sadd('accepted_CoC', post.author.name)
     send_to_slack(
         'u/{} has <{}|just accepted the CoC!>'.format(
-            post.author.name, post.url
+            post.author.name, reddit_url.format(post.permalink)
         ), config
     )
     process_claim(post, r, tor, config)
