@@ -4,7 +4,7 @@ import logging
 import bugsnag
 from addict import Dict
 
-__version__ = '2.6.8'
+__version__ = '2.6.9'
 
 config = Dict()
 

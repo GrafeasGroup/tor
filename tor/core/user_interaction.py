@@ -44,7 +44,7 @@ def process_coc(post, r, tor, config):
     config.redis.sadd('accepted_CoC', post.author.name)
     send_to_slack(
         'u/{} has <{}|just accepted the CoC!>'.format(
-            post.author.name, reddit_url.format(post.permalink)
+            post.author.name, reddit_url.format(post.permalink())
         ), config
     )
     process_claim(post, r, tor, config)
