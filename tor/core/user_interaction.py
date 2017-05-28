@@ -44,7 +44,7 @@ def process_coc(post, r, tor, config):
     send_to_slack(
         'u/{} has <{}|just accepted the CoC!>'.format(
             post.author.name, post.url
-        )
+        ), config
     )
     process_claim(post, r, tor, config)
 
@@ -124,7 +124,7 @@ def process_done(post, r, tor, config, override=False):
                     'Post {} does not appear to have a post by claimant {}. '
                     'Hrm...'.format(
                         top_parent.fullname, post.author
-                    ), config
+                    )
                 )
                 post.reply(_(done_cannot_find_transcript))
                 return
