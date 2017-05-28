@@ -76,7 +76,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     except Exception as e:
-        # try to raise one last flag as it goes down
-        tor.message('{} - I BROKE'.format(e))
         logging.error(e)
+        # try to raise one last flag as it goes down
+        tor.message('{} - I BROKE'.format(e.__class__.__name__))
         sys.exit(1)
