@@ -1,5 +1,7 @@
 import logging
 
+import praw
+
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
@@ -127,7 +129,16 @@ def process_done(post, r, tor, config, override=False):
                         top_parent.fullname, post.author
                     )
                 )
-                post.reply(_(done_cannot_find_transcript))
+                try:
+                    post.reply(_(done_cannot_find_transcript))
+                except praw.exceptions.ClientException as e:
+                    # We've run into an issue where someone has commented and
+                    # then deleted the comment between when the bot pulls mail
+                    # and when it processes comments. This should catch that.
+                    # Possibly should look into subclassing praw.Comment.reply
+                    # to include some basic error handling of this so that
+                    # we can fix it throughout the application.
+                    logging.warning(e)
                 return
         # Control flow:
         # If we have an override, we end up here to complete.

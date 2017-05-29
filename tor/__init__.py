@@ -4,7 +4,7 @@ import logging
 import bugsnag
 from addict import Dict
 
-__version__ = '2.6.9'
+__version__ = '2.6.10'
 
 config = Dict()
 
@@ -43,7 +43,8 @@ except FileNotFoundError:
 
 if config.bs_api_key:
     bugsnag.configure(
-        api_key=config.bs_api_key
+        api_key=config.bs_api_key,
+        app_version=__version__
     )
 
 # load slack API url
