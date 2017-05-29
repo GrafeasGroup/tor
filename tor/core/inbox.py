@@ -1,5 +1,7 @@
 import logging
 
+import praw
+
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import reload_config
 from tor.core.mentions import process_mention
@@ -63,7 +65,13 @@ def check_inbox(r, tor, config):
             logging.info(id_already_handled_in_db.format(mention.parent_id))
             continue
 
-        process_mention(mention, r, tor, config)
+        try:
+            process_mention(mention, r, tor, config)
+        except (AttributeError, praw.exceptions.ClientError):
+            # apparently this crashes with an AttributeError if someone calls
+            # the bot and immediately deletes their comment. This should fix
+            # that.
+            continue
 
     # comment replies
     for reply in replies:

@@ -24,9 +24,6 @@ def process_mention(mention, r, tor, config):
     :return: None.
     """
 
-    # The submission the current mention was made in
-    submission = r.submission(id=clean_id(mention.link_id))
-
     # We have to do this entire parent / parent_permalink thing twice because
     # the method for calling a permalink changes for each object. Laaaame.
     if not mention.is_root:
@@ -38,18 +35,18 @@ def process_mention(mention, r, tor, config):
         parent.title = 'Unknown Content'
     else:
         # this is a post.
-        parent = submission
+        parent = r.submission(id=clean_id(mention.link_id))
         parent_permalink = parent.permalink
         # format that sucker so it looks right in the template.
         parent.title = '"' + parent.title + '"'
 
-    # Ignore requests made by the OP of content or the OP of the submission
-    if mention.author == submission.author:
-        logging.info(
-            'Ignoring mention by OP u/{} on ID {}'.format(mention.author,
-                                                          mention.parent_id)
-        )
-        return
+        # Ignore requests made by the OP of content or the OP of the submission
+        if mention.author == parent.author:
+            logging.info(
+                'Ignoring mention by OP u/{} on ID {}'.format(mention.author,
+                                                              mention.parent_id)
+            )
+            return
 
     logging.info(
         'Posting call for transcription on ID {}'.format(mention.parent_id)
