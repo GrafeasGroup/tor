@@ -145,7 +145,7 @@ def populate_subreddit_lists(tor, config):
     """
 
     config.subreddits_to_check = []
-    config.upvote_filter_subs = []
+    config.upvote_filter_subs = {}
     config.no_link_header_subs = []
 
     config.subreddits_to_check = get_wiki_page('subreddits', tor=tor).split('\r\n')
@@ -156,10 +156,13 @@ def populate_subreddit_lists(tor, config):
         )
     )
 
-    config.upvote_filter_subs = get_wiki_page(
+    for line in get_wiki_page(
         'subreddits/upvote-filtered', tor=tor
-    ).split('\r\n')
-    config.upvote_filter_subs = clean_list(config.upvote_filter_subs)
+    ).splitlines():
+        if ',' in line:
+            sub, threshold = line.split(',')
+            config.upvote_filter_subs[sub] = int(threshold)
+
     logging.debug(
         'Retrieved subreddits subject to the upvote filter: {}'.format(
             config.upvote_filter_subs
@@ -173,15 +176,6 @@ def populate_subreddit_lists(tor, config):
     logging.debug(
         'Retrieved subreddits subject to the upvote filter: {}'.format(
             config.no_link_header_subs
-        )
-    )
-
-    config.upvote_filter_threshold = int(get_wiki_page(
-        'subreddits/upvote-filtered/filter', tor=tor
-    ))
-    logging.debug(
-        'Retrieved upvote filter number: {}'.format(
-            config.upvote_filter_threshold
         )
     )
 

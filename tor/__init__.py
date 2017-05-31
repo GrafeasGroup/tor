@@ -18,10 +18,8 @@ config.image_formatting = ''
 config.header = ''
 
 config.subreddits_to_check = []
-config.upvote_filter_subs = []
+config.upvote_filter_subs = {}
 config.no_link_header_subs = []
-
-config.upvote_filter_threshold = 1
 
 config.tor_mods = []
 
