@@ -176,9 +176,9 @@ def populate_subreddit_lists(tor, config):
         )
     )
 
-    config.upvote_filter_threshold = get_wiki_page(
+    config.upvote_filter_threshold = int(get_wiki_page(
         'subreddits/upvote-filtered/filter', tor=tor
-    )
+    ))
     logging.debug(
         'Retrieved upvote filter number: {}'.format(
             config.upvote_filter_threshold
