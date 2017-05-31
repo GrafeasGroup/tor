@@ -176,6 +176,15 @@ def populate_subreddit_lists(tor, config):
         )
     )
 
+    config.upvote_filter_threshold = get_wiki_page(
+        'subreddits/upvote-filtered/filter', tor=tor
+    )
+    logging.debug(
+        'Retrieved upvote filter number: {}'.format(
+            config.upvote_filter_threshold
+        )
+    )
+
 
 def populate_gifs(tor, config):
     # zero it out so we can load more

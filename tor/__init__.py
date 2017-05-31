@@ -4,7 +4,7 @@ import logging
 import bugsnag
 from addict import Dict
 
-__version__ = '2.6.11'
+__version__ = '2.6.12'
 
 config = Dict()
 
@@ -21,7 +21,7 @@ config.subreddits_to_check = []
 config.upvote_filter_subs = []
 config.no_link_header_subs = []
 
-config.upvote_filter_threshold = 5
+config.upvote_filter_threshold = 1
 
 config.tor_mods = []
 
