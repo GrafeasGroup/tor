@@ -98,6 +98,7 @@ def main(config):
             image_post = r.submission(id=clean_id(new_post))
 
             # download image for processing
+            # noinspection PyUnresolvedReferences
             try:
                 filename = wget.download(image_post.url)
             except urllib.error.HTTPError:

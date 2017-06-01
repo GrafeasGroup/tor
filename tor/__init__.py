@@ -1,10 +1,7 @@
-import os
-import logging
-
 import bugsnag
 from addict import Dict
 
-__version__ = '2.6.12'
+__version__ = '2.6.13'
 
 config = Dict()
 

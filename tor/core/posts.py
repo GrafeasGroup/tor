@@ -137,6 +137,8 @@ def process_post(new_post, tor, config):
             config.redis.set(new_post.fullname, result.fullname)
             config.redis.rpush('ocr_ids', new_post.fullname)
 
+        config.redis.incr('total_new', amount=1)
+
     # I need to figure out what errors can happen here
     except Exception as e:
         logging.error(

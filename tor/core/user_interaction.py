@@ -7,9 +7,9 @@ from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
 from tor.helpers.misc import _
-from tor.helpers.wiki import get_wiki_page
-from tor.helpers.reddit_ids import get_parent_post_id
 from tor.helpers.misc import send_to_slack
+from tor.helpers.reddit_ids import get_parent_post_id
+from tor.helpers.wiki import get_wiki_page
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
@@ -17,7 +17,6 @@ from tor.strings.responses import done_cannot_find_transcript
 from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
-from tor.strings.urls import reddit_url
 
 
 def coc_accepted(post, config):
@@ -43,12 +42,16 @@ def process_coc(post, r, tor, config):
     :param config: the global config dict.
     :return: None.
     """
-    config.redis.sadd('accepted_CoC', post.author.name)
-    send_to_slack(
-        'u/{} has just accepted the CoC!'.format(
-            post.author.name
-        ), config
-    )
+    result = config.redis.sadd('accepted_CoC', post.author.name)
+
+    # Have they already been added? If 0, then just act like they said `claim`
+    # instead. If they're actually new, then send a message to slack.
+    if result == 1:
+        send_to_slack(
+            'u/{} has just accepted the CoC!'.format(
+                post.author.name
+            ), config
+        )
     process_claim(post, r, tor, config)
 
 
@@ -76,6 +79,12 @@ def process_claim(post, r, tor, config):
             please_accept_coc.format(get_wiki_page('codeofconduct', tor))
         ))
         return
+
+    if top_parent.link_flair_text is None:
+        # There exists the very small possibility that the post was malformed
+        # and doesn't actually have flair on it. In that case, let's set
+        # something so the next part doesn't crash.
+        flair_post(top_parent, flair.unclaimed)
 
     if flair.unclaimed in top_parent.link_flair_text:
         # need to get that "Summoned - Unclaimed" in there too
@@ -129,6 +138,7 @@ def process_done(post, r, tor, config, override=False):
                         top_parent.fullname, post.author
                     )
                 )
+                # noinspection PyUnresolvedReferences
                 try:
                     post.reply(_(done_cannot_find_transcript))
                 except praw.exceptions.ClientException as e:
@@ -140,19 +150,30 @@ def process_done(post, r, tor, config, override=False):
                     # we can fix it throughout the application.
                     logging.warning(e)
                 return
+
         # Control flow:
         # If we have an override, we end up here to complete.
         # If there is no override, we go into the validation above.
         # If the validation fails, post the apology and return.
         # If the validation succeeds, come down here.
-        post.reply(_(done_completed_transcript))
-        flair_post(top_parent, flair.completed)
-        update_user_flair(post, tor, r)
+
         if override:
-            logging.info('Moderator override triggered!')
-        logging.info(
-            'Post {} completed by {}!'.format(
-                top_parent.fullname, post.author
+            logging.info('Moderator override starting!')
+        # noinspection PyUnresolvedReferences
+        try:
+            post.reply(_(done_completed_transcript))
+            update_user_flair(post, tor, r)
+            logging.info(
+                'Post {} completed by {}!'.format(
+                    top_parent.fullname, post.author
+                )
             )
-        )
+        except praw.exceptions.ClientException:
+            # If the butt deleted their comment and we're already this far into
+            # validation, just mark it as done. Clearly they already passed.
+            logging.info(
+                'Attempted to mark post {} as done... hit ClientException.'
+            )
+        flair_post(top_parent, flair.completed)
+
         config.redis.incr('total_completed', amount=1)

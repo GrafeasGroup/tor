@@ -21,6 +21,7 @@ def process_mention(mention, r, tor, config):
     :param mention: the Comment object containing the username mention.
     :param r: Active Reddit instance.
     :param tor: A shortcut; the Subreddit instance for ToR.
+    :param config: the global config dict
     :return: None.
     """
 

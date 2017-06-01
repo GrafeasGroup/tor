@@ -14,7 +14,8 @@ def set_meta_flair_on_other_posts(r, tor, config):
     'Meta' for any post that is not authored by the bot or any of
     the moderators.
 
-    :param transcribersofreddit: The Subreddit object for ToR.
+    :param r: Active reddit object
+    :param tor: The Subreddit object for ToR.
     :param config: the active config object.
     :return: None.
     """

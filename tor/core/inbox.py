@@ -65,9 +65,10 @@ def check_inbox(r, tor, config):
             logging.info(id_already_handled_in_db.format(mention.parent_id))
             continue
 
+        # noinspection PyUnresolvedReferences
         try:
             process_mention(mention, r, tor, config)
-        except (AttributeError, praw.exceptions.ClientError):
+        except (AttributeError, praw.exceptions.ClientException):
             # apparently this crashes with an AttributeError if someone calls
             # the bot and immediately deletes their comment. This should fix
             # that.
@@ -75,24 +76,30 @@ def check_inbox(r, tor, config):
 
     # comment replies
     for reply in replies:
-        if 'i accept' in reply.body.lower():
-            process_coc(reply, r, tor, config)
-            reply.mark_read()
-            return
+        # noinspection PyUnresolvedReferences
+        try:
+            if 'i accept' in reply.body.lower():
+                process_coc(reply, r, tor, config)
+                reply.mark_read()
+                return
 
-        # The current implementation allows for a comment reading "claim done"
-        # to process the entire thing in one go.
-        # This is an abuse of the decision tree and something I didn't catch
-        # until it was too late, but since it's useful in certain circumstances
-        # we'll let it slide.
-        if 'claim' in reply.body.lower():
-            process_claim(reply, r, tor, config)
-            reply.mark_read()
-        if 'done' in reply.body.lower():
-            process_done(reply, r, tor, config)
-            reply.mark_read()
+            if 'claim' in reply.body.lower():
+                process_claim(reply, r, tor, config)
+                reply.mark_read()
+                return
 
-        if '!override' in reply.body.lower():
-            process_override(reply, r, tor, config)
-            reply.mark_read()
-            return
+            if 'done' in reply.body.lower():
+                process_done(reply, r, tor, config)
+                reply.mark_read()
+                return
+
+            if '!override' in reply.body.lower():
+                process_override(reply, r, tor, config)
+                reply.mark_read()
+                return
+
+        except (AttributeError, praw.exceptions.ClientException):
+            # the only way we should hit this is if somebody comments and then
+            # deletes their comment before the bot finished processing. It's
+            # uncommon, but common enough that this is necessary.
+            continue

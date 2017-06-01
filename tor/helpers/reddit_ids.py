@@ -1,5 +1,6 @@
 import logging
 
+
 def clean_id(post_id):
     """
     Fixes the Reddit ID so that it can be used to get a new object.
