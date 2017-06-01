@@ -51,10 +51,12 @@ def process_post(new_post, tor, config):
     :return: None.
     """
 
-    if new_post.subreddit.display_name in config.upvote_filter_subs:
+    subreddit = new_post.subreddit
+
+    if subreddit.display_name in config.upvote_filter_subs:
         # ignore posts if they don't meet the threshold for karma and the sub
         # is in our list of upvoted filtered ones
-        if new_post.ups < config.upvote_filter_threshold:
+        if new_post.ups < config.upvote_filter_subs[subreddit.display_name]:
             return
 
     if not is_valid(new_post.fullname, config):
