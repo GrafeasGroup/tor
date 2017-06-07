@@ -1,3 +1,5 @@
+[![Stories in Ready](https://badge.waffle.io/itsthejoker/TranscribersOfReddit.png?label=ready&title=Ready)](http://waffle.io/itsthejoker/TranscribersOfReddit)
+
 # TranscribersOfReddit
 
 This is the source code for the set of bots that run under the usernames listed below. Together, they all assist in the running or r/TranscribersOfReddit, which is privileged to have the incredibly important job of organizing crowd-sourced transcriptions of images, video, and audio. 

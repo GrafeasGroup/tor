@@ -148,7 +148,7 @@ def main(config):
             prawcore.exceptions.RequestException,
             prawcore.exceptions.ServerError
         ) as e:
-            logging.error(
+            logging.warning(
                 '{} - Issue communicating with Reddit. Sleeping for 60s!'
                 ''.format(e)
             )
@@ -175,7 +175,10 @@ if __name__ == '__main__':
         sys.exit(0)
 
     except Exception as e:
-        # try to raise one last flag as it goes down
-        tor.message('{} - OCR Exploded :('.format(e), exc_info=1)
+        # try to raise a few more flags as it goes down
         logging.error(e)
+        tor.message(
+            '{} - OCR Exploded :('.format(e.__class__.__name__.upper()),
+            'Please check Bugsnag for the complete error.'
+        )
         sys.exit(1)

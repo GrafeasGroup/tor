@@ -48,7 +48,7 @@ def run(r, tor, config):
         # but for now we will treat is as an API error and try again.
         prawcore.exceptions.Forbidden
     ) as e:
-        logging.error(
+        logging.warning(
             '{} - Issue communicating with Reddit. Sleeping for 60s!'
             ''.format(e)
         )
