@@ -14,6 +14,7 @@ from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_redis
 from tor.core.initialize import configure_tor
 from tor.helpers.misc import _
+from tor.helpers.misc import explode_gracefully
 from tor.helpers.reddit_ids import clean_id
 from tor.strings.ocr import base_comment
 
@@ -175,10 +176,4 @@ if __name__ == '__main__':
         sys.exit(0)
 
     except Exception as e:
-        # try to raise a few more flags as it goes down
-        logging.error(e)
-        tor.message(
-            '{} - OCR Exploded :('.format(e.__class__.__name__.upper()),
-            'Please check Bugsnag for the complete error.'
-        )
-        sys.exit(1)
+        explode_gracefully('u/transcribot', e, tor)

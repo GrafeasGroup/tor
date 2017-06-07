@@ -14,7 +14,9 @@ from tor.core.initialize import configure_redis
 from tor.core.initialize import configure_tor
 from tor.core.initialize import initialize
 from tor.core.posts import check_submissions
+from tor.helpers.misc import explode_gracefully
 from tor.helpers.misc import set_meta_flair_on_other_posts
+
 
 # This program is dedicated to Aramanthe and Icon For Hire, whose music
 # has served as the soundtrack for much of its continued development.
@@ -76,10 +78,4 @@ if __name__ == '__main__':
         sys.exit(0)
 
     except Exception as e:
-        # try to raise a few more flags as it goes down
-        logging.error(e)
-        tor.message(
-            'I BROKE - {}'.format(e.__class__.__name__.upper()),
-            'Please check Bugsnag for the complete error.'
-        )
-        sys.exit(1)
+        explode_gracefully('u/ToR', e, tor)

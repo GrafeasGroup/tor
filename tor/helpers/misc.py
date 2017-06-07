@@ -1,4 +1,5 @@
 import logging
+import sys
 
 import requests
 
@@ -85,3 +86,21 @@ def send_to_slack(message, config):
         requests.post(config.slack_api_url, json=payload)
 
     return
+
+
+def explode_gracefully(bot_name, error, tor):
+    """
+    A last-ditch effort to try to raise a few more flags as it goes down.
+    Only call in times of dire need.
+
+    :param bot_name: string; the name of the bot calling the method.
+    :param error: an exception object.
+    :param tor: the r/ToR helper object
+    :return: Nothing. Everything dies here.
+    """
+    logging.error(error)
+    tor.message(
+        '{} BROKE - {}'.format(bot_name, error.__class__.__name__.upper()),
+        'Please check Bugsnag for the complete error.'
+    )
+    sys.exit(1)
