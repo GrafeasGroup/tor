@@ -39,7 +39,7 @@ def verified_posted_transcript(post, r, config):
     # summoned for or not.
     for comment in top_parent.comments:
         if summoned_by_comment[:40] in comment.body and \
-                        comment.author.name == 'transcribersofreddit':
+           comment.author.name == 'transcribersofreddit':
 
             url_regex = re.compile(
                 'their comment can be found here\.\]\((?P<url>.*)\)'

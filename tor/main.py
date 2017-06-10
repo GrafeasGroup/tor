@@ -2,8 +2,6 @@ import logging
 import sys
 import time
 
-# noinspection PyUnresolvedReferences
-import better_exceptions
 import prawcore
 from praw import Reddit
 
@@ -25,8 +23,8 @@ from tor.helpers.misc import set_meta_flair_on_other_posts
 def run(r, tor, config):
     """
     Primary routine.
-    
-    :param r: Active Reddit connection. 
+
+    :param r: Active Reddit connection.
     :param tor: ToR subreddit object.
     :param config: Global config dict.
     :return: None.

@@ -26,7 +26,7 @@ Process:
 u/transcribersofreddit identifies an image
   config.redis.rpush('ocr_ids', 'ocr::{}'.format(post.fullname))
   config.redis.set('ocr::{}'.format(post.fullname), result.fullname)
-  
+
 ...where result.fullname is the post that u/transcribersofreddit makes about
 the image.
 
@@ -34,13 +34,13 @@ Bot:
   every interval (variable):
     thingy = config.redis.lpop('ocr_ids')
     u_tor_post_id = config.redis.get(thingy)
-    
+
     get image from thingy
     download it
     ...OCR magic on thingy...
     save magic
     delete image
-    
+
     u_tor_post_id.reply(ocr_magic)
 """
 
@@ -78,7 +78,7 @@ def chunks(s, n):
     :param n: number of characters to cut the chunk at.
     """
     for start in range(0, len(s), n):
-        yield s[start:start+n]
+        yield s[start:(start + n)]
 
 
 def main(config):
