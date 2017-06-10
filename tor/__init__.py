@@ -1,7 +1,6 @@
 import bugsnag
 from addict import Dict
-
-__version__ = '2.6.14'
+from __meta__ import __version__
 
 config = Dict()
 
