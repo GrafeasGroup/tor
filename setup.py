@@ -42,12 +42,8 @@ setup(
     install_requires=[
         'praw==4.4.0',
         'redis<3.0.0',
-        'hiredis',
-        'better_exceptions',
         'addict',
-        'cython',
         'tesserocr',
-        'imgurpython',
         'wget',
         'sh',
         'bugsnag',
