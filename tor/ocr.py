@@ -9,7 +9,7 @@ import prawcore
 import wget
 from praw import Reddit
 
-from tor import config
+from tor.core.config import config
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_redis
 from tor.core.initialize import configure_tor

@@ -5,7 +5,7 @@ import time
 import prawcore
 from praw import Reddit
 
-from tor import config
+from tor.core.config import config
 from tor.core.inbox import check_inbox
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_redis
