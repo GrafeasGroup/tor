@@ -3,7 +3,7 @@ import sys
 
 import requests
 
-from tor.__meta__ import __version__
+from tor import __version__
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.strings.responses import bot_footer

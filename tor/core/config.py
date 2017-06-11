@@ -4,7 +4,7 @@ try:
 except ImportError:
     bugsnag = None
 
-from tor.__meta__ import __version__
+from tor import __version__
 
 
 class BaseConfig:

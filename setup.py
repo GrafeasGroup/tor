@@ -6,7 +6,7 @@ from setuptools import (
     setup,
     find_packages,
 )
-from tor.__meta__ import __version__
+from tor import __version__
 
 
 def long_description():
