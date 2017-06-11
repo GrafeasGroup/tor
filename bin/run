@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ $# -gt 0 ]; then
+  action="$1"; shift
+else
+  action="test"
+fi
+
+if [ "$action" = "test" ]; then
+  python -m unittest
+else
+  printf 'Unknown action to run: "%s"\n' "$action" >&2
+fi
