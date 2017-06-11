@@ -9,14 +9,13 @@ class ConfigTest(unittest.TestCase):
     '''
 
     def test_read_secrets_from_filesystem(self):
-        '''Confirms secret data is read from the filesystem as
-        expected.
+        '''Secret data has been read from the filesystem
         '''
         assert SITE_CONFIG.bugsnag_api_key is not None
         assert SITE_CONFIG.slack_api_url is not None
 
     def test_config_structure(self):
-        '''
+        '''Config singleton is structured as expected
         '''
         assert type(SITE_CONFIG.video_domains) is list
         assert type(SITE_CONFIG.audio_domains) is list

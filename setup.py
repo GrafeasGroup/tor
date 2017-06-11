@@ -39,6 +39,7 @@ setup(
     ],
     keywords='',
     packages=find_packages(exclude=['test*', 'bin/*']),
+    test_suite='test',
     install_requires=[
         'praw==4.4.0',
         'redis<3.0.0',
