@@ -1,3 +1,4 @@
+import sys
 import logging
 
 from praw import Reddit
@@ -23,15 +24,25 @@ def run(tor, config):
 
         # TODO retrieve max ages from config
         if seconds > 18 * 3600:
-            # TODO check flair and actually do something
             # [META] - do nothing
             # [UNCLAIMED] - remove
             # [COMPLETED] - remove and x-post to r/tor_archive
             # [IN PROGRESS] - do nothing (should discuss)
+            flair = post.link_flair_css_class
+
+            if flair not in ('unclaimed', 'completed'):
+                continue
+
             logging.info(
                 'Post "{}" is older than maximum age, removing.'.format(
                     post.title)
             )
+
+            # TODO post.mod.remove()
+
+            if flair == 'completed':
+                # TODO post to r/tor_archive
+                logging.info('Archiving completed post...')
 
 
 if __name__ == '__main__':
