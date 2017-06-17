@@ -9,6 +9,8 @@ from tor.core.initialize import configure_tor
 from tor.helpers.misc import explode_gracefully
 from tor.helpers.reddit_ids import clean_id
 
+from tor.strings.urls import reddit_url
+
 from time import sleep
 from datetime import datetime
 
@@ -22,20 +24,22 @@ def run(tor, config, archive):
     # TODO we can use .submissions(end=unixtime) apparently
 
     for post in tor.new():
+        # [META] - do nothing
+        # [UNCLAIMED] - remove
+        # [COMPLETED] - remove and x-post to r/tor_archive
+        # [IN PROGRESS] - do nothing (should discuss)
+        flair = post.link_flair_css_class
+
+        if flair not in ('unclaimed', 'completed'):
+            continue
+
+        # find the original post subreddit
+
         date = datetime.utcfromtimestamp(post.created_utc)
         seconds = (date - datetime.utcnow()).seconds
 
         # TODO retrieve max ages from config
         if seconds > 18 * 3600:
-            # [META] - do nothing
-            # [UNCLAIMED] - remove
-            # [COMPLETED] - remove and x-post to r/tor_archive
-            # [IN PROGRESS] - do nothing (should discuss)
-            flair = post.link_flair_css_class
-
-            if flair not in ('unclaimed', 'completed'):
-                continue
-
             logging.info(
                 'Post "{}" is older than maximum age, removing.'.format(
                     post.title)
@@ -47,7 +51,7 @@ def run(tor, config, archive):
                 logging.info('Archiving completed post...')
                 archive.submit(
                     post.title,
-                    url='http://redd.it/' + clean_id(post.link_id))
+                    url=reddit_url.format(post.url))
 
 
 if __name__ == '__main__':
