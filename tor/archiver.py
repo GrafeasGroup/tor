@@ -7,16 +7,19 @@ from tor import config
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_tor
 from tor.helpers.misc import explode_gracefully
+from tor.helpers.reddit_ids import clean_id
 
 from time import sleep
 from datetime import datetime
 
 
-def run(tor, config):
+def run(tor, config, archive):
     # TODO the bot will now check ALL posts on the subreddit.
     # when we remove old transcription requests, there aren't too many left.
     # but we should make it stop after a certain amount of time anyway
     # eg. if it encounters a post >36 hours old, it will break the loop
+
+    # TODO we can use .submissions(end=unixtime) apparently
 
     for post in tor.new():
         date = datetime.utcfromtimestamp(post.created_utc)
@@ -38,11 +41,13 @@ def run(tor, config):
                     post.title)
             )
 
-            # TODO post.mod.remove()
+            post.mod.remove()
 
             if flair == 'completed':
-                # TODO post to r/tor_archive
                 logging.info('Archiving completed post...')
+                archive.submit(
+                    post.title,
+                    url='http://redd.it/' + clean_id(post.link_id))
 
 
 if __name__ == '__main__':
@@ -53,15 +58,16 @@ if __name__ == '__main__':
 
     tor = configure_tor(r, config)
 
+    archive = r.subreddit('ToR_Archive')
+
     try:
         while True:
-            run(tor, config)
-            sleep(300) # 5 minutes
+            run(tor, config, archive)
+            sleep(300)  # 5 minutes
 
     except KeyboardInterrupt:
         logging.info('Received keyboard interrupt! Shutting down!')
         sys.exit(0)
 
-# TODO add this in and add bot name
-#   except Exception as e:
-#       explode_gracefully('archiver bot', e, tor)
+    except Exception as e:
+        explode_gracefully('archiver bot', e, tor)
