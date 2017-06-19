@@ -48,5 +48,6 @@ setup(
         'wget',
         'sh',
         'bugsnag',
+        'cython',  # WORKAROUND: 'tesserocr' only sometimes installs this dependency
     ]
 )
