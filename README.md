@@ -64,3 +64,7 @@ Monitoring daemon (via Redis queue):
 $ python -m tor.ocr
 # => [daemon mode + logging]
 ```
+
+# Contributing
+
+See [`CONTRIBUTING.md`](/CONTRIBUTING.md) for more.
