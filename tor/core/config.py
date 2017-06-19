@@ -73,12 +73,12 @@ class Config:
 
 try:
     Config.bugsnag_api_key = open('bugsnag.key').readline().strip()
-except FileNotFoundError:
+except OSError:
     Config.bugsnag_api_key = None
 
 try:
     Config.slack_api_url = open('slack.key').readline().strip()
-except FileNotFoundError:
+except OSError:
     Config.slack_api_url = None
 
 
@@ -112,7 +112,7 @@ config.OCR = True
 # configure bugsnag logging
 try:
     config.bs_api_key = open('bugsnag.key').readline().strip()
-except FileNotFoundError:
+except OSError:
     config.bs_api_key = None
 
 if bugsnag and config.bs_api_key:
@@ -124,5 +124,5 @@ if bugsnag and config.bs_api_key:
 # load slack API url
 try:
     config.slack_api_url = open('slack.key').readline().strip()
-except FileNotFoundError:
+except OSError:
     config.slack_api_url = None
