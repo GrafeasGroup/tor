@@ -22,7 +22,7 @@ from tor.strings.responses import please_accept_coc
 def coc_accepted(post, config):
     """
     Verifies that the user is in the Redis set "accepted_CoC".
-    
+
     :param post: the Comment object containing the claim.
     :param config: the global config dict.
     :return: True if the user has accepted the Code of Conduct, False if they
@@ -35,7 +35,7 @@ def process_coc(post, r, tor, config):
     """
     Adds the username of the redditor to the db as accepting the code of
     conduct.
-    
+
     :param post: The Comment object containing the claim.
     :param r: Active Reddit object.
     :param tor: the TranscribersOfReddit Subreddit helper object.

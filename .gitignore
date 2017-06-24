@@ -3,3 +3,5 @@ praw.ini
 .idea/*
 tor/transcribersofreddit.log
 *.swp
+*.egg-info
+.eggs

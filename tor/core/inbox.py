@@ -22,7 +22,7 @@ def check_inbox(r, tor, config):
 
     The first loop handles username mentions.
     The second loop sorts out and handles comments that include 'claim'
-        and 'done'. 
+        and 'done'.
     :return: None.
     """
     # Sort inbox, then act on it
