@@ -4,3 +4,5 @@ praw.ini
 tor/transcribersofreddit.log
 *.swp
 *.swo
+*.egg-info
+.eggs

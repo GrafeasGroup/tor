@@ -15,7 +15,7 @@ def configure_tor(r, config):
     and returns it. There's really no reason to put together a Subreddit
     object dedicated to our subreddit -- it just makes some future lines
     a little easier to type.
-    
+
     :param r: the active Reddit object.
     :param config: the global config object.
     :return: the Subreddit object for the chosen subreddit.
@@ -33,7 +33,7 @@ def configure_redis():
     """
     Creates a connection to the local Redis server, then returns the active
     connection.
-    
+
     :return: object: the active Redis object.
     """
     try:
