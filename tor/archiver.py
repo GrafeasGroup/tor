@@ -1,19 +1,17 @@
-import sys
 import logging
+import sys
+import time
+from datetime import datetime
 
 import prawcore
 from praw import Reddit
 
-from tor import config
+from tor.core.config import config
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_tor
 from tor.helpers.misc import explode_gracefully
 from tor.helpers.misc import subreddit_from_url
-
 from tor.strings.urls import reddit_url
-
-from time import sleep
-from datetime import datetime
 
 
 def run(tor, config, archive):
@@ -74,7 +72,7 @@ if __name__ == '__main__':
     try:
         while True:
             run(tor, config, archive)
-            sleep(300)  # 5 minutes
+            time.sleep(300)  # 5 minutes
 
     except KeyboardInterrupt:
         logging.info('Received keyboard interrupt! Shutting down!')
