@@ -29,7 +29,7 @@ def run(tor, config, archive):
         # [IN PROGRESS] - do nothing (should discuss)
         flair = post.link_flair_css_class
 
-        if flair not in ('unclaimed', 'completed'):
+        if flair not in ('unclaimed', 'transcriptioncomplete'):
             continue
 
         # find the original post subreddit
