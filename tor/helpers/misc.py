@@ -1,5 +1,6 @@
 import logging
 import sys
+import re
 
 import requests
 
@@ -104,3 +105,19 @@ def explode_gracefully(bot_name, error, tor):
         'Please check Bugsnag for the complete error.'
     )
     sys.exit(1)
+
+
+subreddit_regex = re.compile(
+    'reddit.com\/r\/([a-z0-9\-\_\+]+)',
+    flags=re.IGNORECASE)
+
+
+def subreddit_from_url(url):
+    """
+    Returns the subreddit a post was made in, based on its reddit URL
+    """
+    m = subreddit_regex.search(url)
+    if m is not None:
+        return m.group(1)
+    return None
+

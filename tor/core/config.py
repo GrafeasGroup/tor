@@ -152,6 +152,9 @@ config.subreddits_to_check = []
 config.upvote_filter_subs = {}
 config.no_link_header_subs = []
 
+config.archive_time_default = 0
+config.archive_time_subreddits = {}
+
 config.tor_mods = []
 
 # section for gifs
