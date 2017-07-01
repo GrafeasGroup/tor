@@ -65,7 +65,7 @@ $ python -m tor.ocr
 # => [daemon mode + logging]
 ```
 
-## Archiver Bot (no dedicated account yet)
+## Archiver Bot (`/u/ToR_archivist`)
 
 Monitoring daemon (via subreddit's /new feed):
 
