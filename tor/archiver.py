@@ -80,9 +80,9 @@ if __name__ == '__main__':
         sys.exit(0)
 
     except (
-            prawcore.exceptions.RequestException,
-            prawcore.exceptions.ServerError,
-            prawcore.exceptions.Forbidden
+        prawcore.exceptions.RequestException,
+        prawcore.exceptions.ServerError,
+        prawcore.exceptions.Forbidden
     ) as e:
         logging.warning(
             '{} - Issue communicating with Reddit. Sleeping for 60s!'
