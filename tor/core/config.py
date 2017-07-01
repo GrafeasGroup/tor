@@ -126,9 +126,9 @@ try:
 except OSError:
     Config.bugsnag_api_key = None
 
-if bugsnag and Config.bs_api_key:
+if bugsnag and Config.bugsnag_api_key:
     bugsnag.configure(
-        api_key=Config.bs_api_key,
+        api_key=Config.bugsnag_api_key,
         app_version=__version__
     )
 

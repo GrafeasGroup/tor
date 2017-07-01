@@ -40,8 +40,8 @@ class ConfigTest(unittest.TestCase):
 
         assert type(SITE_CONFIG.OCR) is bool
 
-        assert type(SITE_CONFIG.bs_api_key) is str or \
-            SITE_CONFIG.bs_api_key is None
+        assert type(SITE_CONFIG.bugsnag_api_key) is str or \
+            SITE_CONFIG.bugsnag_api_key is None
 
         assert type(SITE_CONFIG.slack_api_url) is str or \
             SITE_CONFIG.slack_api_url is None
