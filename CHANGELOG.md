@@ -11,6 +11,7 @@ means we will never make a backwards-incompatible change within a major version 
 - Adds automated testing, starting with configuration object
 - Significant rewording of `README.md` for clarity
 - Add `bin/run` as user-friendly editing for task runner (see [`.git/safe/../../bin` PATH protocol](https://twitter.com/tpope/status/165631968996900865))
+- Basics for a bot automatically removing and archiving old posts
 
 ## v2.6.14 (2017-06-07)
 

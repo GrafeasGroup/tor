@@ -65,6 +65,23 @@ $ python -m tor.ocr
 # => [daemon mode + logging]
 ```
 
+## Archiver Bot (no dedicated account yet)
+
+Monitoring daemon (via subreddit's /new feed):
+
+- For each completed or unclaimed post:
+   - Retrieve in which subreddit the original post was made
+   - If the post is older than the configured amount of time for this subreddit:
+     - Remove the post
+     - If it was completed, make the same post in the archive subreddit
+
+### Running Archiver Bot
+
+```
+$ python -m tor.archiver
+# => [daemon mode + logging]
+```
+
 # Contributing
 
 See [`CONTRIBUTING.md`](/CONTRIBUTING.md) for more.
