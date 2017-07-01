@@ -7,7 +7,6 @@ from tor import config
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_tor
 from tor.helpers.misc import explode_gracefully, subreddit_from_url
-from tor.helpers.reddit_ids import clean_id
 
 from tor.strings.urls import reddit_url
 
@@ -81,4 +80,3 @@ if __name__ == '__main__':
 
     except Exception as e:
         explode_gracefully('archiver bot', e, tor)
-
