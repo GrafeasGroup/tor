@@ -1,6 +1,7 @@
 import sys
 import logging
 
+import prawcore
 from praw import Reddit
 
 from tor import config
@@ -77,6 +78,17 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         logging.info('Received keyboard interrupt! Shutting down!')
         sys.exit(0)
+
+    except (
+            prawcore.exceptions.RequestException,
+            prawcore.exceptions.ServerError,
+            prawcore.exceptions.Forbidden
+    ) as e:
+        logging.warning(
+            '{} - Issue communicating with Reddit. Sleeping for 60s!'
+            ''.format(e)
+        )
+        time.sleep(60)
 
     except Exception as e:
         explode_gracefully('archiver bot', e, tor)
