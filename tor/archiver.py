@@ -7,7 +7,8 @@ from praw import Reddit
 from tor import config
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_tor
-from tor.helpers.misc import explode_gracefully, subreddit_from_url
+from tor.helpers.misc import explode_gracefully
+from tor.helpers.misc import subreddit_from_url
 
 from tor.strings.urls import reddit_url
 
