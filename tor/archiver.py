@@ -6,7 +6,7 @@ from praw import Reddit
 from tor import config
 from tor.core.initialize import configure_logging
 from tor.core.initialize import configure_tor
-from tor.helpers.misc import explode_gracefully
+from tor.helpers.misc import explode_gracefully, subreddit_from_url
 from tor.helpers.reddit_ids import clean_id
 
 from tor.strings.urls import reddit_url
@@ -34,12 +34,18 @@ def run(tor, config, archive):
             continue
 
         # find the original post subreddit
+        # take it in lowercase so the config is case insensitive
+        post_subreddit = subreddit_from_url(post.url).lower()
 
+        # hours until a post from this subreddit should be archived
+        hours = config.archive_time_subreddits.get(
+            post_subreddit, config.archive_time_default)
+
+        # time since this post was made
         date = datetime.utcfromtimestamp(post.created_utc)
         seconds = (date - datetime.utcnow()).seconds
 
-        # TODO retrieve max ages from config
-        if seconds > 18 * 3600:
+        if seconds > hours * 3600:
             logging.info(
                 'Post "{}" is older than maximum age, removing.'.format(
                     post.title)
@@ -75,3 +81,4 @@ if __name__ == '__main__':
 
     except Exception as e:
         explode_gracefully('archiver bot', e, tor)
+

@@ -179,6 +179,14 @@ def populate_subreddit_lists(tor, config):
         )
     )
 
+    lines = get_wiki_page('subreddits/archive-time', tor=tor).splitlines()
+    config.archive_time_default = int(lines[0])
+    config.archive_time_subreddits = {}
+    for line in lines[1:]:
+        if ',' in line:
+            sub, time = line.split(',')
+            config.archive_time_subreddits[sub.lower()] = int(time)
+
 
 def populate_gifs(tor, config):
     # zero it out so we can load more

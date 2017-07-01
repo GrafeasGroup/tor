@@ -23,6 +23,9 @@ config.tor_mods = []
 config.perform_header_check = True
 config.debug_mode = False
 
+config.archive_time_default = 0
+config.archive_time_subreddits = {}
+
 # section for gifs
 config.no_gifs = []
 
