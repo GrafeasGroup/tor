@@ -1,7 +1,9 @@
 praw.ini
 *.pyc
 .idea/*
-tor/transcribersofreddit.log
+archiver.log
+transcribersofreddit.log
+ocr.log
 *.swp
 *.swo
 *.egg-info

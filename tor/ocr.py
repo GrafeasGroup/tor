@@ -158,7 +158,7 @@ def main(config):
 
 if __name__ == '__main__':
     r = Reddit('bot_ocr')  # loaded from local praw.ini config file
-    configure_logging(config)
+    configure_logging(config, log_name='ocr.log')
     logging.basicConfig(
         filename='ocr.log'
     )
