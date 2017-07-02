@@ -84,23 +84,23 @@ if __name__ == '__main__':
 
     try:
         while True:
-            run(tor, config, archive)
-            time.sleep(300)  # 5 minutes
+            try:
+                run(tor, config, archive)
+                time.sleep(300)  # 5 minutes
+            except (
+                    prawcore.exceptions.RequestException,
+                    prawcore.exceptions.ServerError,
+                    prawcore.exceptions.Forbidden
+            ) as e:
+                logging.warning(
+                    '{} - Issue communicating with Reddit. Sleeping for 60s!'
+                    ''.format(e)
+                )
+                time.sleep(60)
 
     except KeyboardInterrupt:
         logging.info('Received keyboard interrupt! Shutting down!')
         sys.exit(0)
-
-    except (
-        prawcore.exceptions.RequestException,
-        prawcore.exceptions.ServerError,
-        prawcore.exceptions.Forbidden
-    ) as e:
-        logging.warning(
-            '{} - Issue communicating with Reddit. Sleeping for 60s!'
-            ''.format(e)
-        )
-        time.sleep(60)
 
     except Exception as e:
         explode_gracefully('ToR_archivist', e, tor)
