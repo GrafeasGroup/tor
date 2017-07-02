@@ -68,6 +68,7 @@ def run(tor, config, archive):
             archive.submit(
                 post.title,
                 url=reddit_url.format(post.permalink))
+            post.mod.remove()
             logging.info('Post archived!')
 
 
