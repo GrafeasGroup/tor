@@ -59,7 +59,7 @@ def run(tor, config, archive):
                     post.title, hours)
             )
 
-            # post.mod.remove()
+            post.mod.remove()
 
         # always process completed posts so we don't have a repeat of the
         # me_irl explosion
