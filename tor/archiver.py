@@ -64,7 +64,7 @@ def run(tor, config, archive):
         # always process completed posts so we don't have a repeat of the
         # me_irl explosion
         if flair == css_flair.completed:
-            logging.info('Archiving completed post...')
+            logging.info('Archiving completed post "{}"...'.format(post.title))
             archive.submit(
                 post.title,
                 url=reddit_url.format(post.permalink))
