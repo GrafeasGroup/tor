@@ -46,12 +46,12 @@ def configure_redis():
     return redis_server
 
 
-def configure_logging(config):
+def configure_logging(config, log_name='transcribersofreddit.log'):
     logging.basicConfig(
         level=logging.INFO,
         format='[%(asctime)s] - [%(levelname)s] - [%(funcName)s] - %(message)s',
         datefmt='%m/%d/%Y %I:%M:%S %p',
-        filename='transcribersofreddit.log'
+        filename=log_name
     )
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)

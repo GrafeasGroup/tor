@@ -16,8 +16,7 @@ from tor.helpers.misc import subreddit_from_url
 from tor.strings.urls import reddit_url
 
 
-# it all goes to the same log, so we name this something easy to identify
-def run_archivist(tor, config, archive):
+def run(tor, config, archive):
     # TODO the bot will now check ALL posts on the subreddit.
     # when we remove old transcription requests, there aren't too many left.
     # but we should make it stop after a certain amount of time anyway
@@ -60,7 +59,7 @@ def run_archivist(tor, config, archive):
                     post.title, hours)
             )
 
-            # post.mod.remove()
+            post.mod.remove()
 
             if flair == css_flair.completed:
                 logging.info('Archiving completed post...')
@@ -73,7 +72,7 @@ def run_archivist(tor, config, archive):
 if __name__ == '__main__':
     r = Reddit('bot_archiver')
 
-    configure_logging(config)
+    configure_logging(config, log_name='archiver.log')
 
     tor = configure_tor(r, config)
     initialize(tor, config)
@@ -82,7 +81,7 @@ if __name__ == '__main__':
 
     try:
         while True:
-            run_archivist(tor, config, archive)
+            run(tor, config, archive)
             time.sleep(300)  # 5 minutes
 
     except KeyboardInterrupt:
