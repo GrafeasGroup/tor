@@ -51,7 +51,7 @@ def run(tor, config, archive):
 
         # time since this post was made
         date = datetime.utcfromtimestamp(post.created_utc)
-        seconds = (datetime.utcnow() - date).seconds
+        seconds = int((datetime.utcnow() - date).total_seconds())
 
         if seconds > hours * 3600:
             logging.info(
@@ -59,7 +59,7 @@ def run(tor, config, archive):
                     post.title, hours)
             )
 
-            post.mod.remove()
+            # post.mod.remove()
 
         # always process completed posts so we don't have a repeat of the
         # me_irl explosion
