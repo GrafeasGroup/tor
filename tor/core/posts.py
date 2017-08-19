@@ -87,6 +87,7 @@ def process_post(new_post, tor, config):
     elif new_post.domain in config.video_domains:
         if 'youtu' in new_post.domain:
             if not valid_youtube_video(new_post.url):
+                add_complete_post_id(new_post.fullname, config)
                 return
             if get_yt_transcript(new_post.url):
                 new_post.reply(_(
