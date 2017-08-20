@@ -5,3 +5,4 @@ tesserocr
 wget
 sh
 bugsnag
+git+git://github.com/transcribersofreddit/tor_core.git
