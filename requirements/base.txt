@@ -5,3 +5,5 @@ tesserocr
 wget
 sh
 bugsnag
+pytest
+pytest-cov

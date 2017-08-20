@@ -8,3 +8,4 @@ ocr.log
 *.swo
 *.egg-info
 .eggs
+.coverage
