@@ -43,7 +43,7 @@ Monitoring daemon (via subreddit's /new feed):
 ### Running Moderator Bot
 
 ```
-$ python -m tor.main
+$ tor-moderator
 # => [daemon mode + logging]
 ```
 
@@ -61,7 +61,7 @@ Monitoring daemon (via Redis queue):
 ### Running Apprentice Bot
 
 ```
-$ python -m tor.ocr
+$ tor-apprentice
 # => [daemon mode + logging]
 ```
 
@@ -78,7 +78,7 @@ Monitoring daemon (via subreddit's /new feed):
 ### Running Archiver Bot
 
 ```
-$ python -m tor.archiver
+$ tor-archivist
 # => [daemon mode + logging]
 ```
 
