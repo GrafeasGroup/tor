@@ -9,3 +9,4 @@ ocr.log
 *.egg-info
 .eggs
 .coverage
+.cache
