@@ -22,6 +22,19 @@ be, though there are some external requirements.
 > contains such information as the useragents and various secrets. It is built
 > for Python 3.6.
 
+## Installation
+
+```
+$ git clone https://github.com/TranscribersOfReddit/TranscribersOfReddit.git tor
+$ pip install tor/
+```
+
+OR
+
+```
+$ pip install 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor'
+```
+
 ## Moderator Bot (`/u/transcribersofreddit`)
 
 Triggered flow (via bot inbox):
