@@ -31,14 +31,12 @@ def coc_accepted(post, config):
     return config.redis.sismember('accepted_CoC', post.author.name) == 1
 
 
-def process_coc(post, r, tor, config):
+def process_coc(post, config):
     """
     Adds the username of the redditor to the db as accepting the code of
     conduct.
 
     :param post: The Comment object containing the claim.
-    :param r: Active Reddit object.
-    :param tor: the TranscribersOfReddit Subreddit helper object.
     :param config: the global config dict.
     :return: None.
     """
@@ -52,21 +50,19 @@ def process_coc(post, r, tor, config):
                 post.author.name
             ), config
         )
-    process_claim(post, r, tor, config)
+    process_claim(post, config)
 
 
-def process_claim(post, r, tor, config):
+def process_claim(post, config):
     """
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
 
     :param post: The Comment object containing the claim.
-    :param r: Active Reddit object.
-    :param tor: the TranscribersOfReddit Subreddit helper object.
     :param config: the global config dict.
     :return: None.
     """
-    top_parent = get_parent_post_id(post, r)
+    top_parent = get_parent_post_id(post, config.r)
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name != 'transcribersofreddit':
@@ -76,7 +72,7 @@ def process_claim(post, r, tor, config):
     if not coc_accepted(post, config):
         # do not cache this page. We want to get it every time.
         post.reply(_(
-            please_accept_coc.format(get_wiki_page('codeofconduct', tor))
+            please_accept_coc.format(get_wiki_page('codeofconduct', config.tor))
         ))
         return
 
@@ -102,7 +98,7 @@ def process_claim(post, r, tor, config):
         post.reply(_(claim_already_complete))
 
 
-def process_done(post, r, tor, config, override=False):
+def process_done(post, config, override=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -110,15 +106,13 @@ def process_done(post, r, tor, config, override=False):
     transcription.
 
     :param post: the Comment object which contains the string 'done'.
-    :param r: Active Reddit object.
-    :param tor: Shortcut; a Subreddit object for ToR.
     :param config: the global config object.
     :param override: A parameter that can only come from process_override()
         and skips the validation check.
     :return: None.
     """
 
-    top_parent = get_parent_post_id(post, r)
+    top_parent = get_parent_post_id(post, config)
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name != 'transcribersofreddit':
@@ -129,7 +123,7 @@ def process_done(post, r, tor, config, override=False):
         post.reply(_(done_still_unclaimed))
     elif top_parent.link_flair_text == flair.in_progress:
         if not override:
-            if not verified_posted_transcript(post, r, config):
+            if not verified_posted_transcript(post, config):
                 # we need to double-check these things to keep people
                 # from gaming the system
                 logging.info(
@@ -162,7 +156,7 @@ def process_done(post, r, tor, config, override=False):
         # noinspection PyUnresolvedReferences
         try:
             post.reply(_(done_completed_transcript))
-            update_user_flair(post, tor, r)
+            update_user_flair(post, config)
             logging.info(
                 'Post {} completed by {}!'.format(
                     top_parent.fullname, post.author

@@ -13,7 +13,7 @@ from tor.core.user_interaction import process_coc
 from tor.core.admin_commands import update_and_restart
 
 
-def check_inbox(r, tor, config):
+def check_inbox(config):
     """
     Goes through all the unread messages in the inbox. It has two
     loops within this section, each one dealing with a different type
@@ -29,7 +29,7 @@ def check_inbox(r, tor, config):
     mentions = []
     replies = []
     # grab all of our messages and filter
-    for item in r.inbox.unread(limit=None):
+    for item in config.r.inbox.unread(limit=None):
         if item.author.name == 'transcribot':
             item.mark_read()
             continue
@@ -43,7 +43,7 @@ def check_inbox(r, tor, config):
             # things I need to look at
         if 'reload' in item.subject.lower():
             item.mark_read()
-            reload_config(item, tor, config)
+            reload_config(item, config)
             item.reply(
                 'Config reloaded!'
             )
@@ -67,7 +67,7 @@ def check_inbox(r, tor, config):
 
         # noinspection PyUnresolvedReferences
         try:
-            process_mention(mention, r, tor, config)
+            process_mention(mention, config)
         except (AttributeError, praw.exceptions.ClientException):
             # apparently this crashes with an AttributeError if someone calls
             # the bot and immediately deletes their comment. This should fix
@@ -79,22 +79,22 @@ def check_inbox(r, tor, config):
         # noinspection PyUnresolvedReferences
         try:
             if 'i accept' in reply.body.lower():
-                process_coc(reply, r, tor, config)
+                process_coc(reply, config)
                 reply.mark_read()
                 return
 
             if 'claim' in reply.body.lower():
-                process_claim(reply, r, tor, config)
+                process_claim(reply, config)
                 reply.mark_read()
                 return
 
             if 'done' in reply.body.lower():
-                process_done(reply, r, tor, config)
+                process_done(reply, config)
                 reply.mark_read()
                 return
 
             if '!override' in reply.body.lower():
-                process_override(reply, r, tor, config)
+                process_override(reply, config)
                 reply.mark_read()
                 return
 

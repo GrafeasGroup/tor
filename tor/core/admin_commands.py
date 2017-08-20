@@ -15,7 +15,7 @@ def from_moderator(reply, config):
     return reply.author in config.tor_mods
 
 
-def process_override(reply, r, tor, config):
+def process_override(reply, config):
     """
     This process is for moderators of ToR to force u/transcribersofreddit
     to mark a post as complete and award flair when the bot refutes a
@@ -23,8 +23,6 @@ def process_override(reply, r, tor, config):
     the bot's comment saying that it cannot find the transcript.
 
     :param reply: the comment reply object from the moderator.
-    :param r: the active Reddit instance.
-    :param tor: the TranscribersOfReddit subreddit object.
     :param config: the global config object.
     :return: None.
     """
@@ -39,19 +37,19 @@ def process_override(reply, r, tor, config):
     # okay, so the parent of the reply should be the bot's comment
     # saying it can't find it. In that case, we need the parent's
     # parent. That should be the comment with the `done` call in it.
-    reply_parent = r.comment(id=clean_id(reply.parent_id))
-    parents_parent = r.comment(id=clean_id(reply_parent.parent_id))
+    reply_parent = config.r.comment(id=clean_id(reply.parent_id))
+    parents_parent = config.r.comment(id=clean_id(reply_parent.parent_id))
     if 'done' in parents_parent.body.lower():
         logging.info(
             'Starting validation override for post {}'
             ', approved by {}'.format(parents_parent.fullname, reply.author.name)
         )
         process_done(
-            parents_parent, r, tor, config, override=True
+            parents_parent, config, override=True
         )
 
 
-def reload_config(reply, tor, config):
+def reload_config(reply, config):
     if not from_moderator(reply, config):
         reply.reply(_(random.choice(config.no_gifs)))
         logging.info(
@@ -61,7 +59,7 @@ def reload_config(reply, tor, config):
         logging.info(
             'Reloading configs at the request of {}'.format(reply.author.name)
         )
-        initialize(tor, config)
+        initialize(config.tor, config)
         logging.info('Reload complete.')
 
 

@@ -50,7 +50,7 @@ def flair_post(post, text):
     )
 
 
-def update_user_flair(post, tor, reddit):
+def update_user_flair(post, config):
     """
     On a successful transcription, this takes the user's current flair,
     increments the counter by one, and stores it back to the subreddit.
@@ -68,7 +68,7 @@ def update_user_flair(post, tor, reddit):
         # ID of our post object and re-request it from Reddit in order to
         # get the *actual* object, even though they have the same ID. It's
         # weird.
-        user_flair = reddit.comment(id=clean_id(post.fullname)).author_flair_text
+        user_flair = config.r.comment(id=clean_id(post.fullname)).author_flair_text
     except AttributeError:
         user_flair = flair_text
 
@@ -83,7 +83,7 @@ def update_user_flair(post, tor, reddit):
         user_flair = '{} Γ'.format(new_flair_count + 1)
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
-        tor.flair.set(post.author, text=user_flair, css_class='grafeas')
+        config.tor.flair.set(post.author, text=user_flair, css_class='grafeas')
         logging.info('Setting flair for {}'.format(post.author))
     else:
         # they're bot or a mod and have custom flair. Leave it alone.
