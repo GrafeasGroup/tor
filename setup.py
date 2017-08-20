@@ -40,6 +40,13 @@ setup(
     keywords='',
     packages=find_packages(exclude=['test*', 'bin/*']),
     test_suite='test',
+    entry_points={
+        'console_scripts': [
+            'tor-moderator = tor.main:main',
+            'tor-apprentice = tor.ocr:main',
+            'tor-archivist = tor.archiver:main',
+        ],
+    },
     install_requires=[
         'praw==4.4.0',
         'redis<3.0.0',

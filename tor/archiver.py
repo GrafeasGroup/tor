@@ -72,7 +72,10 @@ def run(tor, config, archive):
             logging.info('Post archived!')
 
 
-if __name__ == '__main__':
+def main():
+    '''
+    Console scripts entry point for Archiver Bot
+    '''
     r = Reddit('bot_archiver')
 
     configure_logging(config, log_name='archiver.log')
@@ -104,3 +107,7 @@ if __name__ == '__main__':
 
     except Exception as e:
         explode_gracefully('ToR_archivist', e, tor)
+
+
+if __name__ == '__main__':
+    main()

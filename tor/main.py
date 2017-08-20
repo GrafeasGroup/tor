@@ -55,7 +55,10 @@ def run(r, tor, config):
         time.sleep(60)
 
 
-if __name__ == '__main__':
+def main():
+    '''
+    Console scripts entry point for Moderator Bot
+    '''
     r = Reddit('bot')  # loaded from local praw.ini config file
     configure_logging(config)
 
@@ -77,3 +80,7 @@ if __name__ == '__main__':
 
     except Exception as e:
         explode_gracefully('u/ToR', e, tor)
+
+
+if __name__ == '__main__':
+    main()

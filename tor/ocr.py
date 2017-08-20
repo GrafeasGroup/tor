@@ -44,8 +44,6 @@ Bot:
     u_tor_post_id.reply(ocr_magic)
 """
 
-config.ocr_delay = 10
-
 
 def process_image(local_file):
     with PyTessBaseAPI() as api:
@@ -81,7 +79,7 @@ def chunks(s, n):
         yield s[start:(start + n)]
 
 
-def main(config):
+def run(config):
     while True:
         try:
             time.sleep(config.ocr_delay)
@@ -96,7 +94,7 @@ def main(config):
             logging.info(
                 'Found a new post, ID {}'.format(new_post)
             )
-            image_post = r.submission(id=clean_id(new_post))
+            image_post = config.r.submission(id=clean_id(new_post))
 
             # download image for processing
             # noinspection PyUnresolvedReferences
@@ -134,7 +132,7 @@ def main(config):
                 )
             )
 
-            tor_post = r.submission(id=clean_id(tor_post_id))
+            tor_post = config.r.submission(id=clean_id(tor_post_id))
 
             thing_to_reply_to = tor_post.reply(_(base_comment))
             for chunk in chunks(result, 9000):
@@ -156,8 +154,12 @@ def main(config):
             time.sleep(60)
 
 
-if __name__ == '__main__':
-    r = Reddit('bot_ocr')  # loaded from local praw.ini config file
+def main():
+    '''
+    Console scripts entry point for OCR Bot
+    '''
+    config.ocr_delay = 10
+    config.r = Reddit('bot_ocr')  # loaded from local praw.ini config file
     configure_logging(config, log_name='ocr.log')
     logging.basicConfig(
         filename='ocr.log'
@@ -166,10 +168,10 @@ if __name__ == '__main__':
     config.redis = configure_redis()
 
     # the subreddit object shortcut for TranscribersOfReddit
-    tor = configure_tor(r, config)
+    tor = configure_tor(config.r, config)
 
     try:
-        main(config)
+        run(config)
 
     except KeyboardInterrupt:
         logging.info('Received keyboard interrupt! Shutting down!')
@@ -177,3 +179,7 @@ if __name__ == '__main__':
 
     except Exception as e:
         explode_gracefully('u/transcribot', e, tor)
+
+
+if __name__ == '__main__':
+    main()
