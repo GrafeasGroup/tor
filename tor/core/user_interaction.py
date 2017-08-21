@@ -113,7 +113,7 @@ def process_done(post, config, override=False):
     :return: None.
     """
 
-    top_parent = get_parent_post_id(post, config)
+    top_parent = get_parent_post_id(post, config.r)
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name != 'transcribersofreddit':
