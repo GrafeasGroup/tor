@@ -1,12 +1,30 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import codecs
 from setuptools import (
     setup,
     find_packages,
 )
+from setuptools.command.test import test as TestCommand
+
 from tor import __version__
+
+
+class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = ''
+
+    def run_tests(self):
+        import shlex
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main(shlex.split(self.pytest_args))
+        sys.exit(errno)
 
 
 def long_description():
@@ -40,8 +58,19 @@ setup(
     keywords='',
     packages=find_packages(exclude=['test*', 'bin/*']),
     test_suite='test',
+    entry_points={
+        'console_scripts': [
+            'tor-moderator = tor.main:main',
+            'tor-apprentice = tor.ocr:main',
+            'tor-archivist = tor.archiver:main',
+        ],
+    },
+    tests_require=[
+        'pytest',
+    ],
+    cmdclass={'test': PyTest},
     install_requires=[
-        'praw==4.4.0',
+        'praw==5.0.1',
         'redis<3.0.0',
         'addict',
         'tesserocr',
@@ -49,5 +78,5 @@ setup(
         'sh',
         'bugsnag',
         'cython',  # WORKAROUND: 'tesserocr' only sometimes installs this dependency
-    ]
+    ],
 )

@@ -42,20 +42,21 @@ def test_process_override_not_moderator(mock_clean_id, mock_process_done):
     # for use with anything that requires a reply object
 
     config = Dict({'no_gifs': ['asdf', 'qwer'], 'tor_mods': ["asdf"]})
-    with patch('tor.helpers.reddit_ids.clean_id') as qwerty:
+    with patch('tor.helpers.reddit_ids.clean_id'):
         process_override(message(), reddit, tor, config)
 
     message.reply.assert_called_once()
     assert mock_process_done.call_count == 0
 
 
+@pytest.mark.skip(reason='Unfinished test implementation')
 @patch('tor.core.admin_commands.from_moderator', return_value=True)
 @patch('tor.core.user_interaction.process_done')
-def test_process_override_not_moderator(mock_process_done, asd):
+def test_process_override_not_moderator2(mock_process_done, asd):
     # for use with anything that requires a reply object
 
     config = Dict({'no_gifs': ['asdf', 'qwer'], 'tor_mods': ["asdf"]})
-    with patch('tor.helpers.reddit_ids.clean_id') as qwerty:
+    with patch('tor.helpers.reddit_ids.clean_id'):
         # pytest.set_trace()
         process_override(message(), reddit, tor, config)
 
