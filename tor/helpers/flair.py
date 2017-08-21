@@ -1,8 +1,7 @@
 import logging
 
 from addict import Dict
-
-from tor.helpers.reddit_ids import clean_id
+from tor_core.helpers import clean_id
 
 flair = Dict()
 flair.unclaimed = 'Unclaimed'
@@ -56,8 +55,7 @@ def update_user_flair(post, config):
     increments the counter by one, and stores it back to the subreddit.
 
     :param post: The post which holds the author information.
-    :param tor: A shortcut for the Subreddit object for ToR.
-    :param reddit: Active Reddit instance.
+    :param config: The global config instance.
     :return: None.
     """
     flair_text = '0 Γ - Beta Tester'
@@ -88,3 +86,27 @@ def update_user_flair(post, config):
     else:
         # they're bot or a mod and have custom flair. Leave it alone.
         return
+
+
+def set_meta_flair_on_other_posts(config):
+    """
+    Loops through the 10 newest posts on ToR and sets the flair to
+    'Meta' for any post that is not authored by the bot or any of
+    the moderators.
+
+    :param config: the active config object.
+    :return: None.
+    """
+    for post in config.tor.new(limit=10):
+
+        if (
+            post.author != config.r.redditor('transcribersofreddit') and
+            post.author not in config.tor_mods and
+            post.link_flair_text != flair.meta
+        ):
+            logging.info(
+                'Flairing post {} by author {} with Meta.'.format(
+                    post.fullname, post.author
+                )
+            )
+            flair_post(post, flair.meta)

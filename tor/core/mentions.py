@@ -1,10 +1,12 @@
 import logging
 
+# noinspection PyProtectedMember
+from tor_core.helpers import _
+from tor_core.helpers import clean_id
+
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
-from tor.helpers.misc import _
 from tor.helpers.reddit_ids import add_complete_post_id
-from tor.helpers.reddit_ids import clean_id
 from tor.helpers.reddit_ids import is_valid
 from tor.strings.posts import rules_comment_unknown_format
 from tor.strings.posts import summoned_by_comment

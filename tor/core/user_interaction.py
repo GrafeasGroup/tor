@@ -1,15 +1,16 @@
 import logging
 
 import praw
+# noinspection PyProtectedMember
+from tor_core.helpers import _
+from tor_core.helpers import get_parent_post_id
+from tor_core.helpers import get_wiki_page
+from tor_core.helpers import send_to_slack
 
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
-from tor.helpers.misc import _
-from tor.helpers.misc import send_to_slack
-from tor.helpers.reddit_ids import get_parent_post_id
-from tor.helpers.wiki import get_wiki_page
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success

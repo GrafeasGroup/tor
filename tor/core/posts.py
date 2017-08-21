@@ -1,8 +1,10 @@
 import logging
 
+# noinspection PyProtectedMember
+from tor_core.helpers import _
+
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
-from tor.helpers.misc import _
 from tor.helpers.reddit_ids import add_complete_post_id
 from tor.helpers.reddit_ids import is_valid
 from tor.helpers.youtube import get_yt_transcript
@@ -15,7 +17,7 @@ from tor.strings.posts import yt_already_has_transcripts
 from tor.strings.urls import reddit_url
 
 
-def check_submissions(subreddit, r, tor, config):
+def check_submissions(subreddit, config):
     """
     Loops through all of the subreddits that have opted in and pulls
     the 10 newest submissions. It checks the domain of the submission
@@ -23,13 +25,11 @@ def check_submissions(subreddit, r, tor, config):
     for formatting and posting on ToR.
 
     :param subreddit: String. A valid subreddit name.
-    :param r: the Reddit object.
-    :param tor: the ToR Subreddit object.
     :param config: the config object.
     :return: None.
     """
 
-    sr = r.subreddit(subreddit).new(limit=10)
+    sr = config.r.subreddit(subreddit).new(limit=10)
 
     for post in sr:
         if (
@@ -37,16 +37,15 @@ def check_submissions(subreddit, r, tor, config):
             post.domain in config.audio_domains or
             post.domain in config.video_domains
         ):
-            process_post(post, tor, config)
+            process_post(post, config)
 
 
-def process_post(new_post, tor, config):
+def process_post(new_post, config):
     """
     After a valid post has been discovered, this handles the formatting
     and posting of those calls as workable jobs to ToR.
 
     :param new_post: Submission object that needs to be posted.
-    :param tor: TranscribersOfReddit subreddit instance.
     :param config: the config object.
     :return: None.
     """
@@ -110,7 +109,7 @@ def process_post(new_post, tor, config):
 
     # noinspection PyBroadException
     try:
-        result = tor.submit(
+        result = config.tor.submit(
             title=discovered_submit_title.format(
                 sub=new_post.subreddit.display_name,
                 type=content_type.title(),

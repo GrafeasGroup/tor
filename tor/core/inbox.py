@@ -54,6 +54,11 @@ def check_inbox(config):
             # there's no reason to do anything else here because the process
             # will terminate and respawn
 
+        # ARE YOU ALIVE?!
+        if item.subject.lower() == 'ping':
+            item.mark_read()
+            item.reply('Pong!')
+
     # sort them and create posts where necessary
     for mention in mentions:
         logging.info('Received mention! ID {}'.format(mention))

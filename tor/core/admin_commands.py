@@ -1,14 +1,12 @@
 import logging
-
-import sh
-
 import random
-import os
-import sys
-from tor.helpers.reddit_ids import clean_id
-from tor.helpers.misc import _
+
+# noinspection PyProtectedMember
+from tor_core.helpers import _
+from tor_core.helpers import clean_id
+from tor_core.initialize import initialize
+
 from tor.core.user_interaction import process_done
-from tor.core.initialize import initialize
 
 
 def from_moderator(reply, config):
@@ -51,15 +49,15 @@ def process_override(reply, config):
 
 def reload_config(reply, config):
     if not from_moderator(reply, config):
-        reply.reply(_(random.choice(config.no_gifs)))
         logging.info(
             '{} just issued a reload command. No.'.format(reply.author.name)
         )
+        reply.reply(_(random.choice(config.no_gifs)))
     else:
         logging.info(
             'Reloading configs at the request of {}'.format(reply.author.name)
         )
-        initialize(config.tor, config)
+        initialize(config)
         logging.info('Reload complete.')
 
 
@@ -71,7 +69,9 @@ def update_and_restart(reply, config):
             '{} just issued update. No.'.format(reply.author.name)
         )
     else:
-        # update from repo
-        sh.git.pull("origin", "master")
-        # restart own process
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        pass
+        # TODO: This does not currently function on our primary box.
+        # # update from repo
+        # sh.git.pull("origin", "master")
+        # # restart own process
+        # os.execl(sys.executable, sys.executable, *sys.argv)

@@ -8,3 +8,5 @@ ocr.log
 *.swo
 *.egg-info
 .eggs
+.coverage
+heartbeat.port

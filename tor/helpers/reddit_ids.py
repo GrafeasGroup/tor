@@ -1,39 +1,6 @@
 import logging
 
 
-def clean_id(post_id):
-    """
-    Fixes the Reddit ID so that it can be used to get a new object.
-
-    By default, the Reddit ID is prefixed with something like `t1_` or
-    `t3_`, but this doesn't always work for getting a new object. This
-    method removes those prefixes and returns the rest.
-
-    :param post_id: String. Post fullname (ID)
-    :return: String. Post fullname minus the first three characters.
-    """
-    return post_id[post_id.index('_') + 1:]
-
-
-def get_parent_post_id(post, r):
-    """
-    Takes any given comment object and returns the object of the
-    original post, no matter how far up the chain it is. This is
-    a very time-intensive function because of how Reddit handles
-    rate limiting and the fact that you can't just request the
-    top parent -- you have to just loop your way to the top.
-
-    :param post: comment object
-    :param r: the instantiated reddit object
-    :return: submission object of the top post.
-    """
-    while True:
-        if not post.is_root:
-            post = r.comment(id=clean_id(post.parent_id))
-        else:
-            return r.submission(id=clean_id(post.parent_id))
-
-
 def add_complete_post_id(post_id, config):
     """
     Adds the post id to the complete_post_ids set in Redis. This is used

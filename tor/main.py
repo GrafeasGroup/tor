@@ -6,7 +6,7 @@ from tor_core.initialize import build_bot
 from tor import __version__
 from tor.core.inbox import check_inbox
 from tor.core.posts import check_submissions
-from tor.helpers.misc import set_meta_flair_on_other_posts
+from tor.helpers.flair import set_meta_flair_on_other_posts
 
 
 # Musical Dedications:
@@ -26,7 +26,7 @@ def run(config):
     """
     Primary routine.
 
-    :param config: Global config dict.
+    :param config: Global config dict, supplied by tor_core.
     :return: None.
     """
     check_inbox(config)
