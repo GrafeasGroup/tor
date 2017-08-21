@@ -36,7 +36,7 @@ done_completed_transcript = (
 done_cannot_find_transcript = (
     'Sorry; I can\'t find your transcript post on the link. Please message the '
     'mods to have them look at this.\n\nAlternatively, did you remember to put the '
-    'header in your comment?'
+    'footer in your comment?'
 )
 
 something_went_wrong = (

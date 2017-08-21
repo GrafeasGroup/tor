@@ -1,8 +1,7 @@
 import logging
 
 from addict import Dict
-
-from tor.helpers.reddit_ids import clean_id
+from tor_core.helpers import clean_id
 
 flair = Dict()
 flair.unclaimed = 'Unclaimed'
@@ -50,14 +49,13 @@ def flair_post(post, text):
     )
 
 
-def update_user_flair(post, tor, reddit):
+def update_user_flair(post, config):
     """
     On a successful transcription, this takes the user's current flair,
     increments the counter by one, and stores it back to the subreddit.
 
     :param post: The post which holds the author information.
-    :param tor: A shortcut for the Subreddit object for ToR.
-    :param reddit: Active Reddit instance.
+    :param config: The global config instance.
     :return: None.
     """
     flair_text = '0 Γ - Beta Tester'
@@ -68,7 +66,7 @@ def update_user_flair(post, tor, reddit):
         # ID of our post object and re-request it from Reddit in order to
         # get the *actual* object, even though they have the same ID. It's
         # weird.
-        user_flair = reddit.comment(id=clean_id(post.fullname)).author_flair_text
+        user_flair = config.r.comment(id=clean_id(post.fullname)).author_flair_text
     except AttributeError:
         user_flair = flair_text
 
@@ -83,8 +81,32 @@ def update_user_flair(post, tor, reddit):
         user_flair = '{} Γ'.format(new_flair_count + 1)
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
-        tor.flair.set(post.author, text=user_flair, css_class='grafeas')
+        config.tor.flair.set(post.author, text=user_flair, css_class='grafeas')
         logging.info('Setting flair for {}'.format(post.author))
     else:
         # they're bot or a mod and have custom flair. Leave it alone.
         return
+
+
+def set_meta_flair_on_other_posts(config):
+    """
+    Loops through the 10 newest posts on ToR and sets the flair to
+    'Meta' for any post that is not authored by the bot or any of
+    the moderators.
+
+    :param config: the active config object.
+    :return: None.
+    """
+    for post in config.tor.new(limit=10):
+
+        if (
+            post.author != config.r.redditor('transcribersofreddit') and
+            post.author not in config.tor_mods and
+            post.link_flair_text != flair.meta
+        ):
+            logging.info(
+                'Flairing post {} by author {} with Meta.'.format(
+                    post.fullname, post.author
+                )
+            )
+            flair_post(post, flair.meta)

@@ -1,7 +1,8 @@
 import logging
 import re
 
-from tor.helpers.reddit_ids import get_parent_post_id
+from tor_core.helpers import get_parent_post_id
+
 from tor.strings.posts import summoned_by_comment
 from tor.strings.urls import ToR_link
 
@@ -19,7 +20,7 @@ def _header_check(reply, config, tor_link=ToR_link):
         return True
 
 
-def verified_posted_transcript(post, r, config):
+def verified_posted_transcript(post, config):
     """
     Because we're using basic gamification, we need to put in at least
     a few things to make it difficult to game the system. When a user
@@ -29,11 +30,10 @@ def verified_posted_transcript(post, r, config):
     ask them to please contact the mods.
 
     :param post: The Comment object that contains the string 'done'.
-    :param r: Active Reddit object.
     :param config: the global config object.
     :return: True if a post is found, False if not.
     """
-    top_parent = get_parent_post_id(post, r)
+    top_parent = get_parent_post_id(post, config.r)
 
     # First we need to check to see if this is something we were
     # summoned for or not.
@@ -56,7 +56,7 @@ def verified_posted_transcript(post, r, config):
             original_comment = ''  # stop pycharm from yelling at me
 
             # get all the comments (replies included) in a handy list
-            original_comments = r.submission(url=comment_url).comments.list()
+            original_comments = config.r.submission(url=comment_url).comments.list()
             for thingy in original_comments:
                 if thingy.id in comment_url:
                     # thingy is the comment object we want! That's our parent!
@@ -74,7 +74,7 @@ def verified_posted_transcript(post, r, config):
 
     # get source link, check all comments, look for root level comment
     # by the author of the post. Return True if found, False if not.
-    linked_resource = r.submission(top_parent.id_from_url(top_parent.url))
+    linked_resource = config.r.submission(top_parent.id_from_url(top_parent.url))
     # get rid of the "See More Comments" crap
     linked_resource.comments.replace_more(limit=0)
     for top_level_comment in linked_resource.comments.list():

@@ -9,4 +9,5 @@ ocr.log
 *.egg-info
 .eggs
 .coverage
+heartbeat.port
 .cache

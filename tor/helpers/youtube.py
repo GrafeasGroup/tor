@@ -1,11 +1,11 @@
 import logging
 
-from urllib.parse import parse_qs
-from urllib.parse import urlparse
+# noinspection PyCompatibility
+from urllib.parse import parse_qs, urlparse
 
 import requests
 
-from tor.strings.urls import yt_transcript_url
+from tor.strings.urls import yt_transcript_url as youtube_transcription_url
 
 
 def get_yt_video_id(url):
@@ -25,7 +25,7 @@ def get_yt_video_id(url):
         'youtu.be/watch?v=_lOT2p_FCvA',
     """
     # initial version: http://stackoverflow.com/a/7936523/617185 \
-    #    by Mikhail Kashkin(http://stackoverflow.com/users/85739/mikhail-kashkin)
+    #    by Mikhail Kashkin (http://stackoverflow.com/users/85739/mikhail-kashkin)
 
     if url.startswith(('youtu', 'www')):
         url = 'http://' + url
@@ -43,7 +43,7 @@ def get_yt_video_id(url):
         raise ValueError
 
 
-def get_yt_transcript(url, yt_transcript_url=yt_transcript_url):
+def get_yt_transcript(url, yt_transcript_url=youtube_transcription_url):
     """
     Takes a url, formats it, and sends it off to Google to request the
     uploader-provided transcripts. If we get them, we return them;
@@ -80,7 +80,7 @@ def valid_youtube_video(url):
     those out here.
 
     :param url: the YouTube URL we need to check.
-    :return: True if it's a video; false if it's a channel or
+    :return: True if it's a video; false if it's a channel,
     user, or playlist.
     """
     banned_keywords = ['user', 'channel', 'playlist']

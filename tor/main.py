@@ -1,86 +1,48 @@
-import logging
-import sys
 import time
 
-import prawcore
-from praw import Reddit
+from tor_core.helpers import run_until_dead
+from tor_core.initialize import build_bot
 
-from tor.core.config import config
+from tor import __version__
 from tor.core.inbox import check_inbox
-from tor.core.initialize import configure_logging
-from tor.core.initialize import configure_redis
-from tor.core.initialize import configure_tor
-from tor.core.initialize import initialize
 from tor.core.posts import check_submissions
-from tor.helpers.misc import explode_gracefully
-from tor.helpers.misc import set_meta_flair_on_other_posts
+from tor.helpers.flair import set_meta_flair_on_other_posts
 
 
-# This program is dedicated to Aramanthe and Icon For Hire, whose music
-# has served as the soundtrack for much of its continued development.
+# Musical Dedications:
+#
+# This program is dedicated to the below artists; their music has
+# served as the soundtrack for the continued development of u/ToR.
+#
+# Aramanthe
+# Caravan Palace
+# Icon for Hire
+#
+# Streams:
+# https://www.youtube.com/watch?v=hX3j0sQ7ot8
 
 
-def run(r, tor, config):
+def run(config):
     """
     Primary routine.
 
-    :param r: Active Reddit connection.
-    :param tor: ToR subreddit object.
-    :param config: Global config dict.
+    :param config: Global config dict, supplied by tor_core.
     :return: None.
     """
-    try:
-        check_inbox(r, tor, config)
+    check_inbox(config)
 
-        for sub in config.subreddits_to_check:
-            check_submissions(sub, r, tor, config)
+    for sub in config.subreddits_to_check:
+        check_submissions(sub, config)
 
-        set_meta_flair_on_other_posts(r, tor, config)
+    set_meta_flair_on_other_posts(config)
 
-        if config.debug_mode:
-            time.sleep(60)
-
-    except (
-        prawcore.exceptions.RequestException,
-        prawcore.exceptions.ServerError,
-        # this will also trigger if we get banned from somewhere.
-        # We will need to plan on some jerk banning us without warning,
-        # but for now we will treat is as an API error and try again.
-        prawcore.exceptions.Forbidden
-    ) as e:
-        logging.warning(
-            '{} - Issue communicating with Reddit. Sleeping for 60s!'
-            ''.format(e)
-        )
+    if config.debug_mode:
         time.sleep(60)
 
 
 def main():
-    '''
-    Console scripts entry point for Moderator Bot
-    '''
-    r = Reddit('bot')  # loaded from local praw.ini config file
-    configure_logging(config)
-
-    config.redis = configure_redis()
-
-    # the subreddit object shortcut for TranscribersOfReddit
-    tor = configure_tor(r, config)
-
-    initialize(tor, config)
-    logging.info('Initialization complete.')
-
-    try:
-        while True:
-            run(r, tor, config)
-
-    except KeyboardInterrupt:
-        logging.info('User triggered shutdown. Shutting down.')
-        sys.exit(0)
-
-    except Exception as e:
-        explode_gracefully('u/ToR', e, tor)
-
+    build_bot('bot', __version__, full_name='u/ToR')
+    run_until_dead(run)
 
 if __name__ == '__main__':
     main()

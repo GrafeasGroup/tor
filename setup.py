@@ -70,7 +70,7 @@ setup(
     ],
     cmdclass={'test': PyTest},
     install_requires=[
-        'praw==4.4.0',
+        'praw==5.0.1',
         'redis<3.0.0',
         'addict',
         'tesserocr',
