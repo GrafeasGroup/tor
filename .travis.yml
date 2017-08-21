@@ -1,0 +1,24 @@
+language: python
+
+dist: trusty
+
+python:
+  - "3.6"
+  - "3.6-dev"
+  - "3.7-dev"
+  - "nightly"
+
+matrix:
+  allow_failures:
+    - python: 3.6-dev
+    - python: 3.7-dev
+    - python: nightly
+
+install:
+  - pip install -r requirements/base.txt
+
+script:
+  - pytest --cov ./
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

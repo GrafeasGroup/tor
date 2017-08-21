@@ -10,3 +10,4 @@ ocr.log
 .eggs
 .coverage
 heartbeat.port
+.cache
