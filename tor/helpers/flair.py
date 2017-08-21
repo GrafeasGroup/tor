@@ -1,22 +1,7 @@
 import logging
 
-from addict import Dict
 from tor_core.helpers import clean_id
-
-flair = Dict()
-flair.unclaimed = 'Unclaimed'
-flair.summoned_unclaimed = 'Summoned - Unclaimed'
-flair.completed = 'Completed!'
-flair.in_progress = 'In Progress'
-flair.meta = 'Meta'
-flair.disregard = 'Disregard'
-
-css_flair = Dict()
-css_flair.unclaimed = 'unclaimed'
-css_flair.completed = 'transcriptioncomplete'
-css_flair.in_progress = 'inprogress'
-css_flair.meta = 'meta'
-css_flair.disregard = 'disregard'
+from tor_core.helpers import flair
 
 
 def flair_post(post, text):

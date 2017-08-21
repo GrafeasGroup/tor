@@ -3,6 +3,7 @@ import logging
 # noinspection PyProtectedMember
 from tor_core.helpers import _
 from tor_core.helpers import clean_id
+from tor_core.strings import reddit_url
 
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
@@ -12,7 +13,6 @@ from tor.strings.posts import rules_comment_unknown_format
 from tor.strings.posts import summoned_by_comment
 from tor.strings.posts import summoned_submit_title
 from tor.strings.responses import something_went_wrong
-from tor.strings.urls import reddit_url
 
 
 def process_mention(mention, config):

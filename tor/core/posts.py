@@ -2,6 +2,7 @@ import logging
 
 # noinspection PyProtectedMember
 from tor_core.helpers import _
+from tor_core.strings import reddit_url
 
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
@@ -14,7 +15,6 @@ from tor.strings.debug import id_already_handled_in_db
 from tor.strings.posts import discovered_submit_title
 from tor.strings.posts import rules_comment
 from tor.strings.posts import yt_already_has_transcripts
-from tor.strings.urls import reddit_url
 
 
 def check_submissions(subreddit, config):
