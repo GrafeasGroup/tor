@@ -73,7 +73,7 @@ def process_claim(post, config):
     if not coc_accepted(post, config):
         # do not cache this page. We want to get it every time.
         post.reply(_(
-            please_accept_coc.format(get_wiki_page('codeofconduct', config.tor))
+            please_accept_coc.format(get_wiki_page('codeofconduct', config))
         ))
         return
 
