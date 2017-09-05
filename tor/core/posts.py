@@ -108,13 +108,20 @@ def process_post(new_post, config):
         content_type = 'Unknown'
         content_format = 'Formatting? I think something went wrong here...'
 
+    # Truncate a post title if it exceeds 250 characters, so the added
+    # formatting still fits in Reddit's 300 char limit for post titles
+    post_title = new_post.title
+    max_title_length = 250
+    if len(post_title) > max_title_length:
+        post_title = post_title[:max_title_length - 3] + '...'
+
     # noinspection PyBroadException
     try:
         result = config.tor.submit(
             title=discovered_submit_title.format(
                 sub=new_post.subreddit.display_name,
                 type=content_type.title(),
-                title=new_post.title
+                title=post_title
             ),
             url=reddit_url.format(new_post.permalink)
         )
