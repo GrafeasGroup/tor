@@ -73,11 +73,16 @@ def verified_posted_transcript(post, config):
                 return False
 
     # get source link, check all comments, look for root level comment
-    # by the author of the post. Return True if found, False if not.
+    # by the author of the post and verify that the key is in their post.
+    # Return True if found, False if not.
     linked_resource = config.r.submission(top_parent.id_from_url(top_parent.url))
     # get rid of the "See More Comments" crap
     linked_resource.comments.replace_more(limit=0)
     for top_level_comment in linked_resource.comments.list():
-        if post.author == top_level_comment.author:
-            return True
+        if _author_check(post, top_level_comment):
+            # we can do an 'and' statement above, but that would require
+            # running the header check on every comment as well as the author
+            # check and we want to save cycles wherever we can.
+            if _header_check(top_level_comment, config):
+                return True
     return False

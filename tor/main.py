@@ -1,5 +1,6 @@
 import time
 
+from tor_core.config import config
 from tor_core.helpers import run_until_dead
 from tor_core.initialize import build_bot
 
@@ -42,6 +43,7 @@ def run(config):
 
 def main():
     build_bot('bot', __version__, full_name='u/ToR')
+    config.perform_header_check = True
     run_until_dead(run)
 
 if __name__ == '__main__':

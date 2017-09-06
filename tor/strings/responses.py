@@ -1,3 +1,5 @@
+import random
+
 bot_footer = (
     "{}\n\n---\n\n"
     "v{version} | This message was posted by a bot. "
@@ -51,4 +53,20 @@ please_accept_coc = (
     'then respond to this comment with `I accept`.\n\nAfter you respond, I\'ll '
     'process your claim as normal.'
     '\n\n---\n\n{}'
+)
+
+thumbs_up_gifs = [
+    'https://media.giphy.com/media/oBPOP48aQpIxq/giphy.gif',
+    'https://media.giphy.com/media/vMnuZGHJfFSTe/giphy.gif',
+    'https://media.giphy.com/media/XreQmk7ETCak0/giphy.gif',
+    'https://media.giphy.com/media/ClcWrARkrq1GM/giphy.gif',
+    'http://i.imgur.com/QMPRHW9.gif',
+    'https://media.giphy.com/media/j5QcmXoFWl4Q0/giphy.gif',
+    'http://www.reactiongifs.com/r/a-b-yay.gif',
+    'https://media.tenor.com/images/7dcd26f4d9a2eaa246cd4ea9967d2336/tenor.gif',
+    'http://media0.giphy.com/media/wTzPSxZBqSove/giphy.gif'
+]
+
+youre_welcome = (  # just format that sucker as a link and send it back
+    '[Hey, you\'re welcome!]({})'.format(random.choice(thumbs_up_gifs))
 )

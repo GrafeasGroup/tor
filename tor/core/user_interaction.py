@@ -18,6 +18,7 @@ from tor.strings.responses import done_cannot_find_transcript
 from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
+from tor.strings.responses import youre_welcome
 
 
 def coc_accepted(post, config):
@@ -172,3 +173,7 @@ def process_done(post, config, override=False):
         flair_post(top_parent, flair.completed)
 
         config.redis.incr('total_completed', amount=1)
+
+
+def process_thanks(post, config):
+    post.reply(_(youre_welcome))
