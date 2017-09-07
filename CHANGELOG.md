@@ -11,7 +11,7 @@ Nothing yet...
 
 - Adds Travis CI support, enforcing support for python 3.6
 - Updates docs for `pip install` using a git url
-- Adds CLI tools `tor-moderator`, `tor-apprentice`, and `tor-archivist` to PATH (instead of `python path/to/bot.py`)
+- Adds CLI tool `tor-moderator` to PATH (instead of `python tor/main.py`)
 - Splits to multiple requirements.txt files, depending on usage
 - `python setup.py test` defers to PyTest as the framework
 - Initial attempts at automated test support
