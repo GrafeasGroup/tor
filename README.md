@@ -24,15 +24,21 @@ be, though there are some external requirements.
 
 ## Installation
 
+Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/) and Python 3.6.
+
+Find the [latest release](https://github.com/TranscribersOfReddit/TranscribersOfReddit/releases/latest) and replace `v3.0.1` below with the more up-to-date version.
+
 ```
 $ git clone https://github.com/TranscribersOfReddit/TranscribersOfReddit.git tor
-$ pip install tor/
+$ cd tor/
+$ git checkout v3.0.1
+$ pip install .
 ```
 
 OR
 
 ```
-$ pip install 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor'
+$ pip install 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@v3.0.1#egg=tor'
 ```
 
 ## Moderator Bot (`/u/transcribersofreddit`)
