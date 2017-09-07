@@ -79,10 +79,6 @@ def verified_posted_transcript(post, config):
     # get rid of the "See More Comments" crap
     linked_resource.comments.replace_more(limit=0)
     for top_level_comment in linked_resource.comments.list():
-        if _author_check(post, top_level_comment):
-            # we can do an 'and' statement above, but that would require
-            # running the header check on every comment as well as the author
-            # check and we want to save cycles wherever we can.
-            if _header_check(top_level_comment, config):
-                return True
+        if _author_check(post, top_level_comment) and _header_check(top_level_comment, config):
+            return True
     return False
