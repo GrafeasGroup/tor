@@ -1,4 +1,5 @@
 import logging
+import random
 
 import praw
 # noinspection PyProtectedMember
@@ -19,6 +20,7 @@ from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
 from tor.strings.responses import youre_welcome
+from tor.strings.responses import thumbs_up_gifs
 
 
 def coc_accepted(post, config):
@@ -176,4 +178,4 @@ def process_done(post, config, override=False):
 
 
 def process_thanks(post, config):
-    post.reply(_(youre_welcome))
+    post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))

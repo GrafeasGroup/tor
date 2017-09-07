@@ -1,5 +1,3 @@
-import random
-
 bot_footer = (
     "{}\n\n---\n\n"
     "v{version} | This message was posted by a bot. "
@@ -67,6 +65,6 @@ thumbs_up_gifs = [
     'http://media0.giphy.com/media/wTzPSxZBqSove/giphy.gif'
 ]
 
-youre_welcome = (  # just format that sucker as a link and send it back
-    '[Hey, you\'re welcome!]({})'.format(random.choice(thumbs_up_gifs))
+youre_welcome = (
+    '[Hey, you\'re welcome!]({})'
 )
