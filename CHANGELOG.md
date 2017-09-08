@@ -3,6 +3,36 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
+## [Unreleased]
+
+Nothing yet...
+
+## v3.0.1 (2017-09-05)
+
+- Adds Travis CI support, enforcing support for python 3.6
+- Updates docs for `pip install` using a git url
+- Adds CLI tool `tor-moderator` to PATH (instead of `python tor/main.py`)
+- Splits to multiple requirements.txt files, depending on usage
+- `python setup.py test` defers to PyTest as the framework
+- Initial attempts at automated test support
+- Moves parts of `tor.strings` into `tor_core`
+- Moves flair flair helpers into `tor_core`
+- Post title is truncated if longer than 250 characters
+- Better method dependency tracking (e.g., passing `config.r` instead of whole `config`)
+
+## v3.0.0 (2017-08-20)
+
+- Updates PRAW (Reddit API) library: v4.4.0 -> v5.0.1
+- Extracts major parts of `tor.core` into [`tor_core`](https://github.com/TranscribersOfReddit/TranscribersOfReddit)
+- Moves `tor-archivist` bot to [`ToR_Archivist`](https://github.com/TranscribersOfReddit/ToR_Archivist)
+- Moves `tor-apprentice` bot to [`ToR_OCR`](https://github.com/TranscribersOfReddit/ToR_OCR)
+- Reverts dependency management change (pass entire `config` object again)
+- Disable self-update directive to bot (does not yet work)
+- Adds directive 'ping' to check if bot is alive
+- Adds 'Meta' flair for posts by author who isn't a mod or known bot
+- Rewrite `tor-moderator` to use bot framework in `tor_core`
+- Rule change to have user transcript require footer instead of header
+
 ## v2.7.1 (2017-07-01)
 
 - Modify date logic and fix config loading for archivist bot

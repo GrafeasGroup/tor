@@ -1,6 +1,6 @@
-[![Stories in Ready](https://badge.waffle.io/itsthejoker/TranscribersOfReddit.png?label=ready&title=Ready)](http://waffle.io/itsthejoker/TranscribersOfReddit)
+[![Stories in Ready](https://badge.waffle.io/TranscribersOfReddit/TranscribersOfReddit.png?label=ready&title=Ready)](http://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
 
-# Transcribers Of Reddit
+# Transcribers of Reddit
 
 This is the source code for the set of bots that run under the usernames listed
 below. Together, they all assist in the running or /r/TranscribersOfReddit, which
@@ -24,18 +24,24 @@ be, though there are some external requirements.
 
 ## Installation
 
+Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/) and Python 3.6.
+
+Find the [latest release](https://github.com/TranscribersOfReddit/TranscribersOfReddit/releases/latest) and replace `v3.0.1` below with the more up-to-date version.
+
 ```
 $ git clone https://github.com/TranscribersOfReddit/TranscribersOfReddit.git tor
-$ pip install tor/
+$ cd tor/
+$ git checkout v3.0.1
+$ pip install .
 ```
 
 OR
 
 ```
-$ pip install 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor'
+$ pip install 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@v3.0.1#egg=tor'
 ```
 
-## Moderator Bot (`/u/transcribersofreddit`)
+## Big Picture
 
 Triggered flow (via bot inbox):
 
@@ -53,48 +59,13 @@ Monitoring daemon (via subreddit's /new feed):
     - Check against whitelist of domain filters
     - Post url to the content back to /r/TranscribersOfReddit
 
-### Running Moderator Bot
+## Usage
 
 ```
 $ tor-moderator
 # => [daemon mode + logging]
 ```
 
-## Apprentice Bot (`/u/transcribot`)
-
-Monitoring daemon (via Redis queue):
-
-- Pull job (by post id) off of queue:
-  - Download image
-  - OCR the image
-  - If OCR successful:
-    - Post OCR-ed content to post on /r/TranscribersOfReddit in 9000 character chunks
-  - Delete local copy of image
-
-### Running Apprentice Bot
-
-```
-$ tor-apprentice
-# => [daemon mode + logging]
-```
-
-## Archiver Bot (`/u/ToR_archivist`)
-
-Monitoring daemon (via subreddit's /new feed):
-
-- For each completed or unclaimed post:
-   - Retrieve in which subreddit the original post was made
-   - If the post is older than the configured amount of time for this subreddit:
-     - Remove the post
-     - If it was completed, make the same post in the archive subreddit
-
-### Running Archiver Bot
-
-```
-$ tor-archivist
-# => [daemon mode + logging]
-```
-
-# Contributing
+## Contributing
 
 See [`CONTRIBUTING.md`](/CONTRIBUTING.md) for more.

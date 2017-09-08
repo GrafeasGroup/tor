@@ -61,8 +61,6 @@ setup(
     entry_points={
         'console_scripts': [
             'tor-moderator = tor.main:main',
-            'tor-apprentice = tor.ocr:main',
-            'tor-archivist = tor.archiver:main',
         ],
     },
     tests_require=[
