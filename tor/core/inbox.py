@@ -7,6 +7,7 @@ from tor.core.admin_commands import reload_config
 from tor.core.mentions import process_mention
 from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_done
+from tor.core.user_interaction import process_thanks
 from tor.helpers.reddit_ids import is_valid
 from tor.strings.debug import id_already_handled_in_db
 from tor.core.user_interaction import process_coc
@@ -95,6 +96,11 @@ def check_inbox(config):
 
             if 'done' in reply.body.lower():
                 process_done(reply, config)
+                reply.mark_read()
+                return
+
+            if 'thank' in reply.body.lower():  # trigger on "thanks" and "thank you"
+                process_thanks(reply, config)
                 reply.mark_read()
                 return
 
