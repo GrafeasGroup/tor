@@ -108,6 +108,9 @@ def check_inbox(config):
                 process_override(reply, config)
                 reply.mark_read()
                 return
+            if 'good bot' in reply.body.lower() or 'bad bot' in reply.body.lower():
+                # please stop emailing me, I just don't care
+                reply.mark_read()
 
         except (AttributeError, praw.exceptions.ClientException):
             # the only way we should hit this is if somebody comments and then
