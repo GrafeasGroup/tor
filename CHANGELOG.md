@@ -7,6 +7,10 @@ means we will never make a backwards-incompatible change within a major version 
 
 Nothing yet...
 
+## v3.0.2 (2017-09-20)
+
+- Fixes bug with parsing messages from Reddit itself
+
 ## v3.0.1 (2017-09-05)
 
 - Adds Travis CI support, enforcing support for python 3.6
