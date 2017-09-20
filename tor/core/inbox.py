@@ -1,18 +1,19 @@
 import logging
 
 import praw
+from tor_core.helpers import send_to_slack
 
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import reload_config
+from tor.core.admin_commands import update_and_restart
 from tor.core.mentions import process_mention
 from tor.core.user_interaction import process_claim
+from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
 from tor.helpers.reddit_ids import is_valid
 from tor.strings.debug import id_already_handled_in_db
-from tor.core.user_interaction import process_coc
-from tor.core.admin_commands import update_and_restart
-from tor_core.helpers import send_to_slack
+
 
 def check_inbox(config):
     """
