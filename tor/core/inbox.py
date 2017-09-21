@@ -1,17 +1,18 @@
 import logging
 
 import praw
+from tor_core.helpers import send_to_slack
 
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import reload_config
+from tor.core.admin_commands import update_and_restart
 from tor.core.mentions import process_mention
 from tor.core.user_interaction import process_claim
+from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
 from tor.helpers.reddit_ids import is_valid
 from tor.strings.debug import id_already_handled_in_db
-from tor.core.user_interaction import process_coc
-from tor.core.admin_commands import update_and_restart
 
 
 def check_inbox(config):
@@ -31,6 +32,16 @@ def check_inbox(config):
     replies = []
     # grab all of our messages and filter
     for item in config.r.inbox.unread(limit=None):
+        # Very rarely we may actually get a message from Reddit itself.
+        # In this case, there will be no author attribute.
+        if item.author is None:
+            send_to_slack(
+                'We received a message without an author. Subject: {}'
+                ''.format(item.subject), config
+            )
+            item.mark_read()
+            continue
+
         if item.author.name == 'transcribot':
             item.mark_read()
             continue
