@@ -50,8 +50,8 @@ def process_coc(post, config):
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_slack(
-            '<http://www.reddit.com/u/{}|u/{}> has just accepted the CoC!'.format(
-                post.author.name, post.author.name
+            'u/{} has just accepted the CoC!'.format(
+                post.author.name
             ), config
         )
     process_claim(post, config)
