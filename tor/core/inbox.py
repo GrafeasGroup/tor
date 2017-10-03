@@ -75,16 +75,9 @@ def check_inbox(config):
     for mention in mentions:
         logging.info('Received mention! ID {}'.format(mention))
 
-        if not is_valid(mention.parent_id, config):
-            # Do our check here to make sure we can actually work on this one and
-            # that we haven't already posted about it. We use the full ID here
-            # instead of the cleaned one, just in case.
-            logging.info(id_already_handled_in_db.format(mention.parent_id))
-            continue
-
         # noinspection PyUnresolvedReferences
         try:
-            process_mention(mention, config)
+            process_mention(mention)
         except (AttributeError, praw.exceptions.ClientException):
             # apparently this crashes with an AttributeError if someone calls
             # the bot and immediately deletes their comment. This should fix

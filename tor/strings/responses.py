@@ -68,3 +68,18 @@ thumbs_up_gifs = [
 youre_welcome = (
     '[Hey, you\'re welcome!]({})'
 )
+
+pm_subject = (
+    'Username Call'
+)
+
+pm_body = (
+    'Hi there! Thanks for pinging me!\n\n'
+    'Due to some changes with how Reddit and individual subreddits handle bots, I can\'t '
+    'be summoned directly to your comment anymore. If there\'s something that you would like '
+    'assistance with, please post a link to that content on /r/DescriptionPlease, '
+    'and one of our lovely volunteers will be along shortly.\n\n'
+    'Thanks for using our services! We hope we can make your day a little bit better :)\n\n'
+    'Cheers,\n\n'
+    'The Mods of /r/TranscribersOfReddit'
+)
