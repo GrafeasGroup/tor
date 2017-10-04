@@ -1,10 +1,5 @@
-import logging
-import re
-
-from tor_core.helpers import get_parent_post_id
-
-from tor.strings.posts import summoned_by_comment
 from tor.strings.urls import ToR_link
+from tor_core.helpers import get_parent_post_id
 
 
 def _author_check(original_post, claimant_post):
@@ -34,43 +29,6 @@ def verified_posted_transcript(post, config):
     :return: True if a post is found, False if not.
     """
     top_parent = get_parent_post_id(post, config.r)
-
-    # First we need to check to see if this is something we were
-    # summoned for or not.
-    for comment in top_parent.comments:
-        if summoned_by_comment[:40] in comment.body and \
-           comment.author.name == 'transcribersofreddit':
-
-            url_regex = re.compile(
-                'their comment can be found here\.\]\((?P<url>.*)\)'
-            )
-            comment_url = re.search(url_regex, comment.body).group('url')
-
-            # I don't like this because it's a costly operation on top
-            # of all the other costly operations we need to make, but
-            # if you just ask for the comment itself Reddit doesn't send
-            # you the replies. That means you have to ask for the entire
-            # thing (but really just the comment you want) and *then*
-            # Reddit will send the replies. *headdesk*
-
-            original_comment = ''  # stop pycharm from yelling at me
-
-            # get all the comments (replies included) in a handy list
-            original_comments = config.r.submission(url=comment_url).comments.list()
-            for thingy in original_comments:
-                if thingy.id in comment_url:
-                    # thingy is the comment object we want! That's our parent!
-                    original_comment = thingy
-                    break
-            # noinspection PyBroadException
-            try:
-                for reply in original_comment.replies:
-                    if _author_check(reply, post) and _header_check(reply, config):
-                        return True
-            except Exception as e:
-                logging.error(e)
-                # I don't care what the exception is, just don't break.
-                return False
 
     # get source link, check all comments, look for root level comment
     # by the author of the post and verify that the key is in their post.
