@@ -104,8 +104,8 @@ def process_post(new_post, config):
         content_type = 'video'
         content_format = config.video_formatting
     else:
-        # This means we pulled from a subreddit's bypassing the filters.
-        content_type = 'Unknown'
+        # This means we pulled from a subreddit bypassing the filters.
+        content_type = 'Other'
         content_format = config.other_formatting
 
     # Truncate a post title if it exceeds 250 characters, so the added
