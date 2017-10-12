@@ -5,7 +5,7 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## [Unreleased]
 
-Nothing yet...
+- Handle top-level post replies the same as comment replies
 
 ## v3.0.3 (2017-10-01)
 
