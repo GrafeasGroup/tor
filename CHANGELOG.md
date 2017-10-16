@@ -8,6 +8,7 @@ means we will never make a backwards-incompatible change within a major version 
 Nothing yet...
 
 ## v3.1.0 (2017-10-14)
+- Now processing inbox messages in the correct order
 - Adds support for pulling all submissions from specific subreddits
 
 ## v3.0.3 (2017-10-01)
