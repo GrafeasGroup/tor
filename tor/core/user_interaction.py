@@ -1,5 +1,6 @@
 import logging
 import random
+import sys
 
 import praw
 # noinspection PyProtectedMember
@@ -88,7 +89,13 @@ def process_claim(post, config):
 
     if flair.unclaimed in top_parent.link_flair_text:
         # need to get that "Summoned - Unclaimed" in there too
-        post.reply(_(claim_success))
+        try:
+            post.reply(_(claim_success))
+        except:
+            # Pause bubbling up the stack trace to log this error
+            logging.error('ERROR: {1} of type {0}\n{2}'.format(*sys.exc_info()))
+            raise  # Bubble up the original exception
+
         flair_post(top_parent, flair.in_progress)
         logging.info(
             'Claim on ID {} by {} successful'.format(
