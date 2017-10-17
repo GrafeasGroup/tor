@@ -5,7 +5,7 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## [Unreleased]
 
-- Nothing yet...
+- Guard every comment reply in case it gets deleted
 
 ## v3.0.4 (2017-10-12)
 
