@@ -93,7 +93,7 @@ def process_claim(post, config):
             post.reply(_(claim_success))
         except:
             # Pause bubbling up the stack trace to log this error
-            logging.error('ERROR: {1} of type {0}\n{2}'.format(*sys.exc_info()))
+            logging.error('ERROR: {1} of type {0}\n{2}'.format(*sys.exc_info()), extra={'stack': True})
             raise  # Bubble up the original exception
 
         flair_post(top_parent, flair.in_progress)
