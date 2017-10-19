@@ -6,6 +6,7 @@ means we will never make a backwards-incompatible change within a major version 
 ## [Unreleased]
 
 - Guard every comment reply in case it gets deleted
+- Prunes unneeded dependencies from before tor_core extraction
 
 ## v3.0.4 (2017-10-12)
 
