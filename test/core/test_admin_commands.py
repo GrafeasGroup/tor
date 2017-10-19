@@ -1,4 +1,3 @@
-from addict import Dict
 import pytest
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -8,6 +7,10 @@ from tor.core.admin_commands import process_override
 
 
 tor = MagicMock()
+
+
+class Object(object):
+    pass
 
 
 class message(object):
@@ -23,15 +26,19 @@ class reddit(MagicMock):
 
 def test_from_moderator_true():
     # enable dot notation to match what it's looking for
-    config = Dict({'tor_mods': ['asdf', 'qwer']})
-    reply = Dict({'author': 'qwer'})
+    config = Object()
+    config.tor_mods = ['asdf', 'qwer']
+    reply = Object()
+    reply.author = 'qwer'
 
     assert from_moderator(reply, config) is True
 
 
 def test_from_moderator_false():
-    config = Dict({'tor_mods': ['asdf', 'qwer']})
-    reply = Dict({'author': 'poiu'})
+    config = Object()
+    config.tor_mods = ['asdf', 'qwer']
+    reply = Object()
+    reply.author = 'poiu'
 
     assert from_moderator(reply, config) is False
 
@@ -41,7 +48,10 @@ def test_from_moderator_false():
 def test_process_override_not_moderator(mock_clean_id, mock_process_done):
     # for use with anything that requires a reply object
 
-    config = Dict({'no_gifs': ['asdf', 'qwer'], 'tor_mods': ["asdf"]})
+    config = Object()
+    config.no_gifs = ['asdf', 'qwer']
+    config.tor_mods = ['asdf']
+
     with patch('tor.helpers.reddit_ids.clean_id'):
         process_override(message(), reddit, tor, config)
 
@@ -55,7 +65,9 @@ def test_process_override_not_moderator(mock_clean_id, mock_process_done):
 def test_process_override_not_moderator2(mock_process_done, asd):
     # for use with anything that requires a reply object
 
-    config = Dict({'no_gifs': ['asdf', 'qwer'], 'tor_mods': ["asdf"]})
+    config = Object()
+    config.no_gifs = ['asdf', 'qwer']
+    config.tor_mods = ['asdf']
     with patch('tor.helpers.reddit_ids.clean_id'):
         # pytest.set_trace()
         process_override(message(), reddit, tor, config)

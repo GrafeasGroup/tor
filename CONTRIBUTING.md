@@ -22,7 +22,7 @@ or bug report hasn't already been posted and resolved.
 
 After checking out the repo, run `bin/run setup` to install native dependencies.
 
-To install this package locally, setup a virtualenv environment and run `pip install -e .`
+To install this package locally, setup a virtualenv environment and run `pip install --process-dependency-links -e .`
 from the project root. To make sure you have everything setup correctly, run `bin/run test`
 and it _should_ pass entirely.
 

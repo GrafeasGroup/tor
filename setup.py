@@ -58,6 +58,7 @@ setup(
     keywords='',
     packages=find_packages(exclude=['test*', 'bin/*']),
     test_suite='test',
+    zip_safe=True,
     entry_points={
         'console_scripts': [
             'tor-moderator = tor.main:main',
@@ -70,11 +71,11 @@ setup(
     install_requires=[
         'praw==5.0.1',
         'redis<3.0.0',
-        'addict',
-        'tesserocr',
-        'wget',
+        'tor_core',
         'sh',
         'bugsnag',
-        'cython',  # WORKAROUND: 'tesserocr' only sometimes installs this dependency
+    ],
+    dependency_links=[
+        'git+https://github.com/TranscribersOfReddit/tor_core.git@master#egg=tor_core-0',
     ],
 )
