@@ -30,8 +30,9 @@ def check_inbox(config):
     # Sort inbox, then act on it
     mentions = []
     replies = []
-    # grab all of our messages and filter
-    for item in config.r.inbox.unread(limit=None):
+    # Grab all of our messages and filter.
+    # Invert the inbox so we're processing oldest first!
+    for item in reversed(list(config.r.inbox.unread(limit=None))):
         # Very rarely we may actually get a message from Reddit itself.
         # In this case, there will be no author attribute.
         if item.author is None:
