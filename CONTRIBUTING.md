@@ -14,20 +14,28 @@ Do your best to check as many of these boxes as you can and everything will be f
 ## Issues
 
 Any bugs you find, features you want to request, or questions you have should go in the
-repository's [issues section](https://github.com/itsthejoker/TranscribersOfReddit/issues).
+repository's [issues section](https://github.com/TranscribersOfReddit/TranscribersOfReddit/issues).
 Please, be kind and search through both open and closed issues to make sure your question
 or bug report hasn't already been posted and resolved.
 
 ## Development
 
-After checking out the repo, run `bin/run setup` to install native dependencies.
+Initial setup:
 
-To install this package locally, setup a virtualenv environment and run `pip install --process-dependency-links -e .`
-from the project root. To make sure you have everything setup correctly, run `bin/run test`
-and it _should_ pass entirely.
+```bash
+# Clone the repository
+$ git clone git@github.com:TranscribersOfReddit/TranscribersOfReddit.git tor
+$ cd ./tor
 
-In case you get tired of prefixing `bin/` to the `run` script here, [Tim Pope's method](https://twitter.com/tpope/status/165631968996900865)
-of safely adding a script to your PATH is recommended.
+# Setup sandbox
+$ virtualenv --no-site-packages --python=python3 venv
+$ source ./venv/bin/activate
+
+# Install the project in "editable" mode
+$ pip install --process-dependency-links -e .[dev]
+```
+
+In case there are any tests, they would be run by calling `python setup.py test`.
 
 ## Testing
 
