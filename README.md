@@ -27,19 +27,16 @@ be, though there are some external requirements.
 
 Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/) and Python 3.6.
 
-Find the [latest release](https://github.com/TranscribersOfReddit/TranscribersOfReddit/releases/latest) and replace `v3.0.1` below with the more up-to-date version.
-
 ```
 $ git clone https://github.com/TranscribersOfReddit/TranscribersOfReddit.git tor
 $ cd tor/
-$ git checkout v3.0.1
 $ pip install --process-dependency-links .
 ```
 
 OR
 
 ```
-$ pip install --process-dependency-links 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor'
+$ pip install --process-dependency-links 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor-0'
 ```
 
 ## Big Picture
