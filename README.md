@@ -38,7 +38,7 @@ $ pip install --process-dependency-links .
 OR
 
 ```
-$ pip install --process-dependency-links 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@v3.0.1#egg=tor'
+$ pip install --process-dependency-links 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor'
 ```
 
 ## Big Picture
