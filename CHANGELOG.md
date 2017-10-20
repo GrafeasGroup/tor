@@ -6,6 +6,7 @@ means we will never make a backwards-incompatible change within a major version 
 ## [Unreleased]
 
 - Guard every comment reply in case it gets deleted
+- Prunes unneeded dependencies from before tor_core extraction
 
 ## v3.1.0 (2017-10-14)
 - Now processing inbox messages in the correct order

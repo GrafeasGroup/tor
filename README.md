@@ -32,13 +32,13 @@ Find the [latest release](https://github.com/TranscribersOfReddit/TranscribersOf
 $ git clone https://github.com/TranscribersOfReddit/TranscribersOfReddit.git tor
 $ cd tor/
 $ git checkout v3.0.1
-$ pip install .
+$ pip install --process-dependency-links .
 ```
 
 OR
 
 ```
-$ pip install 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@v3.0.1#egg=tor'
+$ pip install --process-dependency-links 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor'
 ```
 
 ## Big Picture

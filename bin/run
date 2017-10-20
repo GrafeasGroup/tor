@@ -50,6 +50,13 @@ case "$action" in
     install_native_libs
     ;;
 
+  test)
+    if ! command -v pytest &>/dev/null; then
+      pip install --process-dependency-links -e .
+    fi
+    pytest
+    ;;
+
   *)
     python setup.py "$action"
     ;;
