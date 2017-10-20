@@ -79,11 +79,8 @@ setup(
     },
     cmdclass={'test': PyTest},
     install_requires=[
-        'praw==5.0.1',
-        'redis<3.0.0',
         'tor_core',
         'sh',
-        'bugsnag',
     ],
     dependency_links=[
         'git+https://github.com/TranscribersOfReddit/tor_core.git@master#egg=tor_core-0',
