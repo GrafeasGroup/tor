@@ -3,19 +3,20 @@
 
 # Transcribers of Reddit
 
-This is the source code for the set of bots that run under the usernames listed
-below. Together, they all assist in the running or /r/TranscribersOfReddit, which
-is privileged to have the incredibly important job of organizing crowd-sourced
-transcriptions of images, video, and audio.
+This is the source code for the bot moderating and managing several parts of the subreddit
+/r/TranscribersOfReddit, a community dedicated to transcribing images, audio, and video.
+It acts under the username "/u/TranscribersOfReddit".
 
-- `/u/transcribersofreddit`: the automated owner and warden of /r/TranscribersOfReddit.
-- `/u/transcribot`: a companion bot that monitors a Redis queue, downloads, and attempts to OCR images to assist the human transcribers.
+Among other things, this bot handles:
 
-The ToR bots are designed to be as light on local resources as they can possibly
-be, though there are some external requirements.
+- Posting transcription requests to /r/TranscribersOfReddit as relevant content shows up on partner subreddits
+- Responding to transcribers claiming and marking requests as complete
+- Augmenting the score of a transcriber upon successful completion of a transcription
 
-- Redis (tracking completed posts and queue system)
-- Tesseract (OCR solution used by u/transcribot)
+## Requirements
+
+Redis (tracking completed posts and queue system)
+Reddit API keys
 
 > **NOTE:**
 >
