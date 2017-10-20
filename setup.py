@@ -35,12 +35,21 @@ def long_description():
         return f.read()
 
 
+testing_deps = [
+    'pytest',
+    'pytest-cov',
+]
+dev_helper_deps = [
+    'better-exceptions',
+]
+
+
 setup(
     name='tor',
     version=__version__,
-    description='',
+    description='A bot that handles moderating and scoring in /r/TranscribersOfReddit',
     long_description=long_description(),
-    url='https://github.com/itsthejoker/transcribersofreddit',
+    url='https://github.com/TranscribersOfReddit/TranscribersOfReddit',
     author='Joe Kaufeld',
     author_email='joe.kaufeld@gmail.com',
     license='MIT',
@@ -56,7 +65,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     keywords='',
-    packages=find_packages(exclude=['test*', 'bin/*']),
+    packages=find_packages(exclude=['test', 'test.*', '*.test', '*.test.*']),
     test_suite='test',
     zip_safe=True,
     entry_points={
@@ -64,9 +73,10 @@ setup(
             'tor-moderator = tor.main:main',
         ],
     },
-    tests_require=[
-        'pytest',
-    ],
+    tests_require=testing_deps,
+    extras_require={
+        'dev': testing_deps + dev_helper_deps,
+    },
     cmdclass={'test': PyTest},
     install_requires=[
         'praw==5.0.1',
