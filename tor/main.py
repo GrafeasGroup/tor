@@ -14,10 +14,14 @@ from tor.helpers.flair import set_meta_flair_on_other_posts
 #
 # This program is dedicated to the below artists; their music has
 # served as the soundtrack for the continued development of u/ToR.
+# List is in alphabetical order.
 #
 # Aramanthe
 # Caravan Palace
+# Hiromi
+# Girl Talk
 # Icon for Hire
+# Lady Gaga
 #
 # Streams:
 # https://www.youtube.com/watch?v=hX3j0sQ7ot8
