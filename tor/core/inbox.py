@@ -49,7 +49,7 @@ def check_inbox(config):
         if item.subject == 'username mention':
             mentions.append(item)
             item.mark_read()
-        if item.subject == 'comment reply':
+        if item.subject in ('comment reply', 'post reply'):
             replies.append(item)
             # we don't mark as read here so that any comments that are not
             # ones we're looking for will eventually get emailed to me as
