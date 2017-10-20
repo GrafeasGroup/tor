@@ -66,18 +66,18 @@ setup(
     ],
     keywords='',
     packages=find_packages(exclude=['test', 'test.*', '*.test', '*.test.*']),
-    test_suite='test',
     zip_safe=True,
+    cmdclass={'test': PyTest},
+    test_suite='test',
     entry_points={
         'console_scripts': [
             'tor-moderator = tor.main:main',
         ],
     },
-    tests_require=testing_deps,
     extras_require={
         'dev': testing_deps + dev_helper_deps,
     },
-    cmdclass={'test': PyTest},
+    tests_require=testing_deps,
     install_requires=[
         'tor_core',
         'sh',
