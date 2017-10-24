@@ -1,5 +1,7 @@
 [![Stories in Ready](https://badge.waffle.io/TranscribersOfReddit/TranscribersOfReddit.png?label=ready&title=Ready)](http://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
 
+[![BugSnag](https://img.shields.io/badge/errors--hosted--by-BugSnag-blue.svg)](https://www.bugsnag.com/open-source/)
+
 # Transcribers of Reddit
 
 This is the source code for the set of bots that run under the usernames listed
