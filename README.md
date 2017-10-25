@@ -1,5 +1,9 @@
+[![Waffle.io - Ready](https://img.shields.io/waffle/label/TranscribersOfReddit/TranscribersOfReddit/ready.svg?colorB=yellow&label=Available%20Issues)](https://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
+[![Waffle.io - In Progress](https://img.shields.io/waffle/label/TranscribersOfReddit/TranscribersOfReddit/in%20progress.svg?colorB=green&label=Issues%20Being%20Worked%20On)](https://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
+[![Codacy quality](https://img.shields.io/codacy/grade/3b7f08973a9644cc98faea4cbcd71eb2.svg)](https://www.codacy.com/app/TranscribersOfReddit/TranscribersOfReddit)
+[![Codacy coverage](https://img.shields.io/codacy/coverage/3b7f08973a9644cc98faea4cbcd71eb2.svg)](https://www.codacy.com/app/TranscribersOfReddit/TranscribersOfReddit)
+[![Travis build status](https://img.shields.io/travis/TranscribersOfReddit/TranscribersOfReddit.svg)](https://travis-ci.org/TranscribersOfReddit/TranscribersOfReddit)
 [![BugSnag](https://img.shields.io/badge/errors--hosted--by-Bugsnag-blue.svg)](https://www.bugsnag.com/open-source/)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/TranscribersOfReddit/TranscribersOfReddit.svg?columns=all)](http://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
 
 # Transcribers of Reddit
 
