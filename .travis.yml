@@ -17,9 +17,11 @@ matrix:
 
 install:
   - pip install --process-dependency-links .[dev]
+  - pip install codacy-coverage
 
 script:
   - pytest --cov=tor
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - coverage xml
+  - python-codacy-coverage -r coverage.xml
