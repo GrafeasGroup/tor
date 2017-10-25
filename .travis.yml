@@ -1,3 +1,4 @@
+---
 language: python
 
 dist: trusty
@@ -15,10 +16,10 @@ matrix:
     - python: nightly
 
 install:
-  - pip install -r requirements/base.txt
+  - pip install --process-dependency-links .[dev]
 
 script:
-  - pytest --cov ./
+  - pytest --cov=tor
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
