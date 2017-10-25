@@ -57,9 +57,7 @@ def check_inbox(config):
         if 'reload' in item.subject.lower():
             item.mark_read()
             reload_config(item, config)
-            item.reply(
-                'Config reloaded!'
-            )
+
             continue
         if 'update' in item.subject.lower():
             item.mark_read()
