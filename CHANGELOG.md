@@ -8,7 +8,7 @@ means we will never make a backwards-incompatible change within a major version 
 - Guard every comment reply in case it gets deleted
 - Prunes unneeded dependencies from before tor_core extraction
 
-## v3.1.1 (2017-10-15)
+## v3.1.1 (2017-10-25)
 - Minor bug fix, the bot would reply that the config was reloaded when it really wasn't.
 
 ## v3.1.0 (2017-10-14)
