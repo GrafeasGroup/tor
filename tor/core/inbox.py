@@ -64,7 +64,6 @@ def check_inbox(config):
             update_and_restart(item, config)
             # there's no reason to do anything else here because the process
             # will terminate and respawn
-            # ok so that doesn't actually happen so ignore that
 
         # ARE YOU ALIVE?!
         if item.subject.lower() == 'ping':
