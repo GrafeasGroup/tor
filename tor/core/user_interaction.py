@@ -105,8 +105,9 @@ def process_claim(post, config):
             post.reply(_(claim_already_complete))
 
     except praw.exceptions.APIException as e:
+        logging.info('Hit APIException!')
         if e.error_type == 'DELETED_COMMENT':
-            logging.debug(
+            logging.info(
                 'Comment attempting to claim ID {} has been deleted. '
                 'Back up for grabs!'.format(top_parent.fullname)
             )
