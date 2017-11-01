@@ -68,6 +68,7 @@ def check_inbox(config):
         # ARE YOU ALIVE?!
         if item.subject.lower() == 'ping':
             item.mark_read()
+            logging.info('Received ping from {}. Pong!'.format(item.author.name))
             item.reply('Pong!')
 
     # sort them and create posts where necessary

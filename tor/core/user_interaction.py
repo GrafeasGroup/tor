@@ -105,7 +105,6 @@ def process_claim(post, config):
             post.reply(_(claim_already_complete))
 
     except praw.exceptions.APIException as e:
-        logging.info('Hit APIException!')
         if e.error_type == 'DELETED_COMMENT':
             logging.info(
                 'Comment attempting to claim ID {} has been deleted. '
@@ -133,7 +132,7 @@ def process_done(post, config, override=False):
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name != 'transcribersofreddit':
-        logging.debug('Received `done` on post we do not own. Ignoring.')
+        logging.info('Received `done` on post we do not own. Ignoring.')
         return
 
     try:
@@ -192,7 +191,7 @@ def process_done(post, config, override=False):
 
     except praw.exceptions.APIException as e:
         if e.error_type == 'DELETED_COMMENT':
-            logging.debug(
+            logging.info(
                 'Comment attempting to mark ID {} as done has been deleted'
                 ''.format(top_parent.fullname)
             )

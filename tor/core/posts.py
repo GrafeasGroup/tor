@@ -107,7 +107,6 @@ def process_post(new_post, config):
         # This means we pulled from a subreddit bypassing the filters.
         content_type = 'Other'
         content_format = config.other_formatting
-        logging.info('Discovered post with format: OTHER!')
 
     # Truncate a post title if it exceeds 250 characters, so the added
     # formatting still fits in Reddit's 300 char limit for post titles
