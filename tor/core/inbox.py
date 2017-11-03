@@ -1,4 +1,5 @@
 import logging
+import re
 
 import praw
 from tor_core.helpers import send_to_slack
@@ -11,6 +12,14 @@ from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
+
+
+MOD_SUPPORT_PHRASES = [
+    re.compile('fuck', re.IGNORECASE),
+    re.compile('unclaim', re.IGNORECASE),
+    re.compile('undo', re.IGNORECASE),
+    re.compile('(?:good|bad) bot', re.IGNORECASE),
+]
 
 
 def check_inbox(config):
@@ -106,10 +115,15 @@ def check_inbox(config):
                 reply.mark_read()
                 return
 
+            if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
+                # TODO: Handle message
+                pass
+
             if '!override' in reply.body.lower():
                 process_override(reply, config)
                 reply.mark_read()
                 return
+
             if 'good bot' in reply.body.lower() or 'bad bot' in reply.body.lower():
                 # please stop emailing me, I just don't care
                 reply.mark_read()
