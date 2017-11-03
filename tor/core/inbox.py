@@ -11,8 +11,6 @@ from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
-from tor.helpers.reddit_ids import is_valid
-from tor.strings.debug import id_already_handled_in_db
 
 
 def check_inbox(config):
