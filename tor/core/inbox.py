@@ -1,7 +1,8 @@
 import logging
 import re
 
-import praw
+from praw.exceptions import ClientException as RedditClientException
+from praw.models import Comment as RedditComment
 from tor_core.helpers import send_to_slack
 
 from tor.core.admin_commands import process_override
@@ -20,6 +21,39 @@ MOD_SUPPORT_PHRASES = [
     re.compile('undo', re.IGNORECASE),
     re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
+
+
+def process_mod_intervention(post, config):
+    """
+    Triggers an alert in slack with a link to the comment if there is something
+    offensive or in need of moderator intervention
+    """
+    if not isinstance(post, RedditComment):
+        # Why are we here if it's not a comment?
+        return
+
+    # Collect all offenses (noted by the above regular expressions) from the
+    # original
+    phrases = []
+    for regex in MOD_SUPPORT_PHRASES:
+        matches = regex.search(post.body)
+        if not matches:
+            continue
+
+        phrases.append(matches.match)
+
+    if len(phrases) == 0:
+        # Nothing offensive here, why did this function get triggered?
+        return
+
+    # Wrap each phrase in double-quotes (") and commas in between
+    phrases = '"' + '", "'.join(phrases) + '"'
+
+    send_to_slack(
+        'Mod Intervention Needed: Detected use of {phrases} <{link}>'
+        ''.format(link=post.submission.shortlink, phrases=phrases),
+        config
+    )
 
 
 def check_inbox(config):
@@ -85,7 +119,7 @@ def check_inbox(config):
         # noinspection PyUnresolvedReferences
         try:
             process_mention(mention)
-        except (AttributeError, praw.exceptions.ClientException):
+        except (AttributeError, RedditClientException):
             # apparently this crashes with an AttributeError if someone calls
             # the bot and immediately deletes their comment. This should fix
             # that.
@@ -95,40 +129,36 @@ def check_inbox(config):
     for reply in replies:
         # noinspection PyUnresolvedReferences
         try:
+            if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
+                process_mod_intervention(reply, config)
+                continue
+
             if 'i accept' in reply.body.lower():
                 process_coc(reply, config)
                 reply.mark_read()
-                return
+                continue
 
             if 'claim' in reply.body.lower():
                 process_claim(reply, config)
                 reply.mark_read()
-                return
+                continue
 
             if 'done' in reply.body.lower():
                 process_done(reply, config)
                 reply.mark_read()
-                return
+                continue
 
             if 'thank' in reply.body.lower():  # trigger on "thanks" and "thank you"
                 process_thanks(reply, config)
                 reply.mark_read()
-                return
-
-            if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
-                # TODO: Handle message
-                pass
+                continue
 
             if '!override' in reply.body.lower():
                 process_override(reply, config)
                 reply.mark_read()
-                return
+                return  # Because overrides should stop the world and start fresh
 
-            if 'good bot' in reply.body.lower() or 'bad bot' in reply.body.lower():
-                # please stop emailing me, I just don't care
-                reply.mark_read()
-
-        except (AttributeError, praw.exceptions.ClientException):
+        except (AttributeError, RedditClientException):
             # the only way we should hit this is if somebody comments and then
             # deletes their comment before the bot finished processing. It's
             # uncommon, but common enough that this is necessary.
