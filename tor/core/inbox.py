@@ -30,8 +30,9 @@ def check_inbox(config):
     # Sort inbox, then act on it
     mentions = []
     replies = []
-    # grab all of our messages and filter
-    for item in config.r.inbox.unread(limit=None):
+    # Grab all of our messages and filter.
+    # Invert the inbox so we're processing oldest first!
+    for item in reversed(list(config.r.inbox.unread(limit=None))):
         # Very rarely we may actually get a message from Reddit itself.
         # In this case, there will be no author attribute.
         if item.author is None:
@@ -56,9 +57,7 @@ def check_inbox(config):
         if 'reload' in item.subject.lower():
             item.mark_read()
             reload_config(item, config)
-            item.reply(
-                'Config reloaded!'
-            )
+
             continue
         if 'update' in item.subject.lower():
             item.mark_read()
@@ -69,6 +68,7 @@ def check_inbox(config):
         # ARE YOU ALIVE?!
         if item.subject.lower() == 'ping':
             item.mark_read()
+            logging.info('Received ping from {}. Pong!'.format(item.author.name))
             item.reply('Pong!')
 
     # sort them and create posts where necessary

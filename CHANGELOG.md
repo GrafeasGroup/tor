@@ -5,7 +5,16 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## [Unreleased]
 
-- Nothing yet...
+- Guard every comment reply in case it gets deleted
+- Prunes unneeded dependencies from before tor_core extraction
+- Defers bot reference in `praw.ini` and whether in debug mode from environment variables (by @thelonelyghost)
+
+## v3.1.1 (2017-10-25)
+- Minor bug fix, the bot would reply that the config was reloaded when it really wasn't.
+
+## v3.1.0 (2017-10-14)
+- Now processing inbox messages in the correct order
+- Adds support for pulling all submissions from specific subreddits
 
 ## v3.0.4 (2017-10-12)
 

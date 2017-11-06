@@ -1,6 +1,5 @@
 import logging
 import random
-import sys
 
 import praw
 # noinspection PyProtectedMember
@@ -74,39 +73,45 @@ def process_claim(post, config):
         logging.debug('Received `claim` on post we do not own. Ignoring.')
         return
 
-    if not coc_accepted(post, config):
-        # do not cache this page. We want to get it every time.
-        post.reply(_(
-            please_accept_coc.format(get_wiki_page('codeofconduct', config))
-        ))
-        return
+    try:
+        if not coc_accepted(post, config):
+            # do not cache this page. We want to get it every time.
+            post.reply(_(
+                please_accept_coc.format(get_wiki_page('codeofconduct', config))
+            ))
+            return
 
-    if top_parent.link_flair_text is None:
-        # There exists the very small possibility that the post was malformed
-        # and doesn't actually have flair on it. In that case, let's set
-        # something so the next part doesn't crash.
-        flair_post(top_parent, flair.unclaimed)
+        if top_parent.link_flair_text is None:
+            # There exists the very small possibility that the post was malformed
+            # and doesn't actually have flair on it. In that case, let's set
+            # something so the next part doesn't crash.
+            flair_post(top_parent, flair.unclaimed)
 
-    if flair.unclaimed in top_parent.link_flair_text:
-        # need to get that "Summoned - Unclaimed" in there too
-        try:
+        if flair.unclaimed in top_parent.link_flair_text:
+            # need to get that "Summoned - Unclaimed" in there too
             post.reply(_(claim_success))
-        except:
-            # Pause bubbling up the stack trace to log this error
-            logging.error('ERROR: {1} of type {0}\n{2}'.format(*sys.exc_info()), extra={'stack': True})
-            raise  # Bubble up the original exception
 
-        flair_post(top_parent, flair.in_progress)
-        logging.info(
-            'Claim on ID {} by {} successful'.format(
-                top_parent.fullname, post.author
+            flair_post(top_parent, flair.in_progress)
+            logging.info(
+                'Claim on ID {} by {} successful'.format(
+                    top_parent.fullname, post.author
+                )
             )
-        )
-    # can't claim something that's already claimed
-    elif top_parent.link_flair_text == flair.in_progress:
-        post.reply(_(already_claimed))
-    elif top_parent.link_flair_text == flair.completed:
-        post.reply(_(claim_already_complete))
+
+        # can't claim something that's already claimed
+        elif top_parent.link_flair_text == flair.in_progress:
+            post.reply(_(already_claimed))
+        elif top_parent.link_flair_text == flair.completed:
+            post.reply(_(claim_already_complete))
+
+    except praw.exceptions.APIException as e:
+        if e.error_type == 'DELETED_COMMENT':
+            logging.info(
+                'Comment attempting to claim ID {} has been deleted. '
+                'Back up for grabs!'.format(top_parent.fullname)
+            )
+            return
+        raise  # Re-raise exception if not
 
 
 def process_done(post, config, override=False):
@@ -127,14 +132,14 @@ def process_done(post, config, override=False):
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name != 'transcribersofreddit':
-        logging.debug('Received `done` on post we do not own. Ignoring.')
+        logging.info('Received `done` on post we do not own. Ignoring.')
         return
 
-    if flair.unclaimed in top_parent.link_flair_text:
-        post.reply(_(done_still_unclaimed))
-    elif top_parent.link_flair_text == flair.in_progress:
-        if not override:
-            if not verified_posted_transcript(post, config):
+    try:
+        if flair.unclaimed in top_parent.link_flair_text:
+            post.reply(_(done_still_unclaimed))
+        elif top_parent.link_flair_text == flair.in_progress:
+            if not override and not verified_posted_transcript(post, config):
                 # we need to double-check these things to keep people
                 # from gaming the system
                 logging.info(
@@ -156,33 +161,49 @@ def process_done(post, config, override=False):
                     logging.warning(e)
                 return
 
-        # Control flow:
-        # If we have an override, we end up here to complete.
-        # If there is no override, we go into the validation above.
-        # If the validation fails, post the apology and return.
-        # If the validation succeeds, come down here.
+            # Control flow:
+            # If we have an override, we end up here to complete.
+            # If there is no override, we go into the validation above.
+            # If the validation fails, post the apology and return.
+            # If the validation succeeds, come down here.
 
-        if override:
-            logging.info('Moderator override starting!')
-        # noinspection PyUnresolvedReferences
-        try:
-            post.reply(_(done_completed_transcript))
-            update_user_flair(post, config)
-            logging.info(
-                'Post {} completed by {}!'.format(
-                    top_parent.fullname, post.author
+            if override:
+                logging.info('Moderator override starting!')
+            # noinspection PyUnresolvedReferences
+            try:
+                post.reply(_(done_completed_transcript))
+                update_user_flair(post, config)
+                logging.info(
+                    'Post {} completed by {}!'.format(
+                        top_parent.fullname, post.author
+                    )
                 )
-            )
-        except praw.exceptions.ClientException:
-            # If the butt deleted their comment and we're already this far into
-            # validation, just mark it as done. Clearly they already passed.
-            logging.info(
-                'Attempted to mark post {} as done... hit ClientException.'
-            )
-        flair_post(top_parent, flair.completed)
+            except praw.exceptions.ClientException:
+                # If the butt deleted their comment and we're already this far into
+                # validation, just mark it as done. Clearly they already passed.
+                logging.info(
+                    'Attempted to mark post {} as done... hit ClientException.'
+                    ''.format(top_parent.fullname)
+                )
+            flair_post(top_parent, flair.completed)
 
-        config.redis.incr('total_completed', amount=1)
+            config.redis.incr('total_completed', amount=1)
+
+    except praw.exceptions.APIException as e:
+        if e.error_type == 'DELETED_COMMENT':
+            logging.info(
+                'Comment attempting to mark ID {} as done has been deleted'
+                ''.format(top_parent.fullname)
+            )
+            return
+        raise  # Re-raise exception if not
 
 
 def process_thanks(post, config):
-    post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
+    try:
+        post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
+    except praw.exceptions.APIException as e:
+        if e.error_type == 'DELETED_COMMENT':
+            logging.debug('Comment requiring thanks was deleted')
+            return
+        raise

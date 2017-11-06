@@ -52,10 +52,14 @@ def reload_config(reply, config):
         logging.info(
             '{} just issued a reload command. No.'.format(reply.author.name)
         )
+
         reply.reply(_(random.choice(config.no_gifs)))
     else:
         logging.info(
             'Reloading configs at the request of {}'.format(reply.author.name)
+        )
+        item.reply(
+            'Config reloaded!'
         )
         initialize(config)
         logging.info('Reload complete.')
