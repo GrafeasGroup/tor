@@ -1,8 +1,8 @@
 import logging
 
 import praw
-from tor_core.helpers import send_to_slack
 
+from tor_core.helpers import send_to_slack
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import reload_config
 from tor.core.admin_commands import update_and_restart
@@ -11,8 +11,6 @@ from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
-from tor.helpers.reddit_ids import is_valid
-from tor.strings.debug import id_already_handled_in_db
 
 
 def check_inbox(config):
@@ -68,7 +66,8 @@ def check_inbox(config):
         # ARE YOU ALIVE?!
         if item.subject.lower() == 'ping':
             item.mark_read()
-            logging.info('Received ping from {}. Pong!'.format(item.author.name))
+            logging.info(
+                'Received ping from {}. Pong!'.format(item.author.name))
             item.reply('Pong!')
 
     # sort them and create posts where necessary
@@ -91,30 +90,30 @@ def check_inbox(config):
             if 'i accept' in reply.body.lower():
                 process_coc(reply, config)
                 reply.mark_read()
-                return
 
-            if 'claim' in reply.body.lower():
+            elif 'claim' in reply.body.lower():
                 process_claim(reply, config)
                 reply.mark_read()
-                return
 
-            if 'done' in reply.body.lower():
+            elif 'done' in reply.body.lower():
                 process_done(reply, config)
                 reply.mark_read()
-                return
 
-            if 'thank' in reply.body.lower():  # trigger on "thanks" and "thank you"
+            elif 'thank' in reply.body.lower():  # trigger on "thanks" and "thank you"
                 process_thanks(reply, config)
                 reply.mark_read()
-                return
 
-            if '!override' in reply.body.lower():
+            elif '!override' in reply.body.lower():
                 process_override(reply, config)
                 reply.mark_read()
-                return
-            if 'good bot' in reply.body.lower() or 'bad bot' in reply.body.lower():
+
+            elif 'good bot' in reply.body.lower() or 'bad bot' in reply.body.lower():
                 # please stop emailing me, I just don't care
                 reply.mark_read()
+
+            else:
+                send_to_slack('Unknown reply: ' + reply.body)
+
 
         except (AttributeError, praw.exceptions.ClientException):
             # the only way we should hit this is if somebody comments and then
