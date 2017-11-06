@@ -58,7 +58,7 @@ def reload_config(reply, config):
         logging.info(
             'Reloading configs at the request of {}'.format(reply.author.name)
         )
-        item.reply(
+        reply.reply(
             'Config reloaded!'
         )
         initialize(config)
