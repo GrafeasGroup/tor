@@ -15,14 +15,20 @@ def _header_check(reply, config, tor_link=ToR_link):
         return True
 
 
+def _author_history_check(post, config):
+    for doohickey in post.author.new(limit=3):
+        if _header_check(doohickey, config):
+            pass
+
+
 def verified_posted_transcript(post, config):
     """
     Because we're using basic gamification, we need to put in at least
     a few things to make it difficult to game the system. When a user
     says they've completed a post, we check the parent post for a top-level
-    comment by the user who is attempting to complete the post. If it's
-    there, we update their flair and mark it complete. Otherwise, we
-    ask them to please contact the mods.
+    comment by the user who is attempting to complete the post and for the
+    presence of the key. If it's all there, we update their flair and mark
+    it complete. Otherwise, we ask them to please contact the mods.
 
     :param post: The Comment object that contains the string 'done'.
     :param config: the global config object.
@@ -39,4 +45,7 @@ def verified_posted_transcript(post, config):
     for top_level_comment in linked_resource.comments.list():
         if _author_check(post, top_level_comment) and _header_check(top_level_comment, config):
             return True
-    return False
+    # Did it get removed? Check their history.
+    # if _author_history_check:
+    #     return True
+    # return False
