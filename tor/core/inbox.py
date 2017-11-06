@@ -1,8 +1,8 @@
 import logging
 
 import praw
-
 from tor_core.helpers import send_to_slack
+
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import reload_config
 from tor.core.admin_commands import update_and_restart
@@ -99,7 +99,8 @@ def check_inbox(config):
                 process_done(reply, config)
                 reply.mark_read()
 
-            elif 'thank' in reply.body.lower():  # trigger on "thanks" and "thank you"
+            # trigger on "thanks" and "thank you"
+            elif 'thank' in reply.body.lower():
                 process_thanks(reply, config)
                 reply.mark_read()
 
@@ -107,13 +108,13 @@ def check_inbox(config):
                 process_override(reply, config)
                 reply.mark_read()
 
-            elif 'good bot' in reply.body.lower() or 'bad bot' in reply.body.lower():
+            elif 'good bot' in reply.body.lower() \
+                    or 'bad bot' in reply.body.lower():
                 # please stop emailing me, I just don't care
                 reply.mark_read()
 
             else:
                 send_to_slack('Unknown reply: ' + reply.body)
-
 
         except (AttributeError, praw.exceptions.ClientException):
             # the only way we should hit this is if somebody comments and then
