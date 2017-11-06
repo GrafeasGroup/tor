@@ -18,7 +18,7 @@ def _header_check(reply, config, tor_link=ToR_link):
 def _author_history_check(post, config):
     for doohickey in post.author.new(limit=3):
         if _header_check(doohickey, config):
-
+            pass
 
 
 def verified_posted_transcript(post, config):
@@ -46,6 +46,6 @@ def verified_posted_transcript(post, config):
         if _author_check(post, top_level_comment) and _header_check(top_level_comment, config):
             return True
     # Did it get removed? Check their history.
-    if _author_history_check:
-        return True
-    return False
+    # if _author_history_check:
+    #     return True
+    # return False
