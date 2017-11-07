@@ -40,7 +40,7 @@ def process_mod_intervention(post, config):
         if not matches:
             continue
 
-        phrases.append(matches.match)
+        phrases.append(matches.group())
 
     if len(phrases) == 0:
         # Nothing offensive here, why did this function get triggered?
@@ -137,7 +137,7 @@ def check_inbox(config):
             item.mark_read()
 
         elif item.subject in ('comment reply', 'post reply'):
-            process_reply(item)
+            process_reply(item, config)
 
         elif 'reload' in item.subject.lower():
             item.mark_read()
