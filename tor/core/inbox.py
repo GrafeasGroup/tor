@@ -119,7 +119,11 @@ def check_inbox(config):
                 reply.mark_read()
                 return
 
-            send_to_slack('Unknown reply: ' + reply.body, config)
+            send_to_slack(
+                'Unknown reply by {author}: {body}'.format(
+                    author=reply.author, body=reply.body
+                ), config
+            )
 
         except (AttributeError, praw.exceptions.ClientException):
             # the only way we should hit this is if somebody comments and then
