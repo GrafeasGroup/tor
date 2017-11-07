@@ -120,8 +120,10 @@ def check_inbox(config):
                 return
 
             send_to_slack(
-                'Unknown reply by {author}: {body}'.format(
-                    author=reply.author, body=reply.body
+                'Unknown reply by **{author}**, {subject}: {body}'.format(
+                    author=reply.author,
+                    body=reply.body,
+                    subject=reply.subject,
                 ), config
             )
 
