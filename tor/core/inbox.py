@@ -90,31 +90,35 @@ def check_inbox(config):
             if 'i accept' in reply.body.lower():
                 process_coc(reply, config)
                 reply.mark_read()
+                return
 
-            elif 'claim' in reply.body.lower():
+            if 'claim' in reply.body.lower():
                 process_claim(reply, config)
                 reply.mark_read()
+                return
 
-            elif 'done' in reply.body.lower():
+            if 'done' in reply.body.lower():
                 process_done(reply, config)
                 reply.mark_read()
+                return
 
             # trigger on "thanks" and "thank you"
-            elif 'thank' in reply.body.lower():
+            if 'thank' in reply.body.lower():
                 process_thanks(reply, config)
                 reply.mark_read()
+                return
 
-            elif '!override' in reply.body.lower():
+            if '!override' in reply.body.lower():
                 process_override(reply, config)
                 reply.mark_read()
+                return
 
-            elif 'good bot' in reply.body.lower() \
-                    or 'bad bot' in reply.body.lower():
+            if 'good bot' in reply.body.lower() or 'bad bot' in reply.body.lower():
                 # please stop emailing me, I just don't care
                 reply.mark_read()
+                return
 
-            else:
-                send_to_slack('Unknown reply: ' + reply.body)
+            send_to_slack('Unknown reply: ' + reply.body, config)
 
         except (AttributeError, praw.exceptions.ClientException):
             # the only way we should hit this is if somebody comments and then
