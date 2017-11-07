@@ -56,6 +56,46 @@ def process_mod_intervention(post, config):
     )
 
 
+def process_reply(reply, config):
+    # noinspection PyUnresolvedReferences
+    try:
+        if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
+            process_mod_intervention(reply, config)
+            reply.mark_read()
+            return
+
+        if 'i accept' in reply.body.lower():
+            process_coc(reply, config)
+            reply.mark_read()
+            return
+
+        if 'claim' in reply.body.lower():
+            process_claim(reply, config)
+            reply.mark_read()
+            return
+
+        if 'done' in reply.body.lower():
+            process_done(reply, config)
+            reply.mark_read()
+            return
+
+        if 'thank' in reply.body.lower():  # trigger on "thanks" and "thank you"
+            process_thanks(reply, config)
+            reply.mark_read()
+            return
+
+        if '!override' in reply.body.lower():
+            process_override(reply, config)
+            reply.mark_read()
+            return  # Because overrides should stop the world and start fresh
+
+    except (AttributeError, RedditClientException):
+        # the only way we should hit this is if somebody comments and then
+        # deletes their comment before the bot finished processing. It's
+        # uncommon, but common enough that this is necessary.
+        pass
+
+
 def check_inbox(config):
     """
     Goes through all the unread messages in the inbox. It has two
@@ -69,9 +109,6 @@ def check_inbox(config):
     :return: None.
     """
     # Sort inbox, then act on it
-    mentions = []
-    replies = []
-    # Grab all of our messages and filter.
     # Invert the inbox so we're processing oldest first!
     for item in reversed(list(config.r.inbox.unread(limit=None))):
         # Very rarely we may actually get a message from Reddit itself.
@@ -87,14 +124,20 @@ def check_inbox(config):
             item.mark_read()
 
         elif item.subject == 'username mention':
-            mentions.append(item)
+            logging.info('Received mention! ID {}'.format(item))
+
+            # noinspection PyUnresolvedReferences
+            try:
+                process_mention(item)
+            except (AttributeError, RedditClientException):
+                # apparently this crashes with an AttributeError if someone calls
+                # the bot and immediately deletes their comment. This should fix
+                # that.
+                continue
             item.mark_read()
 
         elif item.subject in ('comment reply', 'post reply'):
-            replies.append(item)
-            # we don't mark as read here so that any comments that are not
-            # ones we're looking for will eventually get emailed to me as
-            # things I need to look at
+            process_reply(item)
 
         elif 'reload' in item.subject.lower():
             item.mark_read()
@@ -111,55 +154,3 @@ def check_inbox(config):
             item.mark_read()
             logging.info('Received ping from {}. Pong!'.format(item.author.name))
             item.reply('Pong!')
-
-    # sort them and create posts where necessary
-    for mention in mentions:
-        logging.info('Received mention! ID {}'.format(mention))
-
-        # noinspection PyUnresolvedReferences
-        try:
-            process_mention(mention)
-        except (AttributeError, RedditClientException):
-            # apparently this crashes with an AttributeError if someone calls
-            # the bot and immediately deletes their comment. This should fix
-            # that.
-            continue
-
-    # comment replies
-    for reply in replies:
-        # noinspection PyUnresolvedReferences
-        try:
-            if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
-                process_mod_intervention(reply, config)
-                continue
-
-            if 'i accept' in reply.body.lower():
-                process_coc(reply, config)
-                reply.mark_read()
-                continue
-
-            if 'claim' in reply.body.lower():
-                process_claim(reply, config)
-                reply.mark_read()
-                continue
-
-            if 'done' in reply.body.lower():
-                process_done(reply, config)
-                reply.mark_read()
-                continue
-
-            if 'thank' in reply.body.lower():  # trigger on "thanks" and "thank you"
-                process_thanks(reply, config)
-                reply.mark_read()
-                continue
-
-            if '!override' in reply.body.lower():
-                process_override(reply, config)
-                reply.mark_read()
-                return  # Because overrides should stop the world and start fresh
-
-        except (AttributeError, RedditClientException):
-            # the only way we should hit this is if somebody comments and then
-            # deletes their comment before the bot finished processing. It's
-            # uncommon, but common enough that this is necessary.
-            continue
