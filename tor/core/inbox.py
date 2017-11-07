@@ -14,13 +14,22 @@ from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
 
-
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
     re.compile('unclaim', re.IGNORECASE),
     re.compile('undo', re.IGNORECASE),
     re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
+
+
+def send_reply_to_slack(item, config):
+    send_to_slack(
+        'Unknown reply by **{author}**, {subject}: {body}'.format(
+            author=item.author,
+            body=item.body,
+            subject=item.subject,
+        ), config
+    )
 
 
 def process_mod_intervention(post, config):
@@ -89,6 +98,8 @@ def process_reply(reply, config):
             reply.mark_read()
             return  # Because overrides should stop the world and start fresh
 
+        send_reply_to_slack(reply, config)
+
     except (AttributeError, RedditClientException):
         # the only way we should hit this is if somebody comments and then
         # deletes their comment before the bot finished processing. It's
@@ -130,9 +141,9 @@ def check_inbox(config):
             try:
                 process_mention(item)
             except (AttributeError, RedditClientException):
-                # apparently this crashes with an AttributeError if someone calls
-                # the bot and immediately deletes their comment. This should fix
-                # that.
+                # apparently this crashes with an AttributeError if someone
+                # calls the bot and immediately deletes their comment. This
+                # should fix that.
                 continue
             item.mark_read()
 
@@ -157,51 +168,5 @@ def check_inbox(config):
             )
             item.reply('Pong!')
 
-    # comment replies
-    for reply in replies:
-        # noinspection PyUnresolvedReferences
-        try:
-            if 'i accept' in reply.body.lower():
-                process_coc(reply, config)
-                reply.mark_read()
-                return
-
-            if 'claim' in reply.body.lower():
-                process_claim(reply, config)
-                reply.mark_read()
-                return
-
-            if 'done' in reply.body.lower():
-                process_done(reply, config)
-                reply.mark_read()
-                return
-
-            # trigger on "thanks" and "thank you"
-            if 'thank' in reply.body.lower():
-                process_thanks(reply, config)
-                reply.mark_read()
-                return
-
-            if '!override' in reply.body.lower():
-                process_override(reply, config)
-                reply.mark_read()
-                return
-
-            if 'good bot' in reply.body.lower() or 'bad bot' in reply.body.lower():
-                # please stop emailing me, I just don't care
-                reply.mark_read()
-                return
-
-            send_to_slack(
-                'Unknown reply by **{author}**, {subject}: {body}'.format(
-                    author=reply.author,
-                    body=reply.body,
-                    subject=reply.subject,
-                ), config
-            )
-
-        except (AttributeError, praw.exceptions.ClientException):
-            # the only way we should hit this is if somebody comments and then
-            # deletes their comment before the bot finished processing. It's
-            # uncommon, but common enough that this is necessary.
-            continue
+        else:
+            send_reply_to_slack(item, config)
