@@ -22,7 +22,7 @@ MOD_SUPPORT_PHRASES = [
 ]
 
 
-def send_reply_to_slack(item, config):
+def forward_to_slack(item, config):
     send_to_slack(
         'Unknown reply by **{author}**, {subject}: {body}'.format(
             author=item.author,
@@ -98,7 +98,8 @@ def process_reply(reply, config):
             reply.mark_read()
             return  # Because overrides should stop the world and start fresh
 
-        send_reply_to_slack(reply, config)
+        forward_to_slack(reply, config)
+        reply.mark_read()  # no spamming the slack channel :)
 
     except (AttributeError, RedditClientException):
         # the only way we should hit this is if somebody comments and then
@@ -169,4 +170,5 @@ def check_inbox(config):
             item.reply('Pong!')
 
         else:
-            send_reply_to_slack(item, config)
+            item.mark_read()
+            forward_to_slack(item, config)
