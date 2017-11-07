@@ -82,32 +82,32 @@ def check_inbox(config):
                 ''.format(item.subject), config
             )
             item.mark_read()
-            continue
 
-        if item.author.name == 'transcribot':
+        elif item.author.name == 'transcribot':
             item.mark_read()
-            continue
-        if item.subject == 'username mention':
+
+        elif item.subject == 'username mention':
             mentions.append(item)
             item.mark_read()
-        if item.subject in ('comment reply', 'post reply'):
+
+        elif item.subject in ('comment reply', 'post reply'):
             replies.append(item)
             # we don't mark as read here so that any comments that are not
             # ones we're looking for will eventually get emailed to me as
             # things I need to look at
-        if 'reload' in item.subject.lower():
+
+        elif 'reload' in item.subject.lower():
             item.mark_read()
             reload_config(item, config)
 
-            continue
-        if 'update' in item.subject.lower():
+        elif 'update' in item.subject.lower():
             item.mark_read()
             update_and_restart(item, config)
             # there's no reason to do anything else here because the process
             # will terminate and respawn
 
         # ARE YOU ALIVE?!
-        if item.subject.lower() == 'ping':
+        elif item.subject.lower() == 'ping':
             item.mark_read()
             logging.info('Received ping from {}. Pong!'.format(item.author.name))
             item.reply('Pong!')
