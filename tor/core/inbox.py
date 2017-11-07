@@ -28,7 +28,11 @@ def forward_to_slack(item, config):
             author=item.author,
             body=item.body,
             subject=item.subject,
-        ), config
+        ), config)
+
+    logging.info(
+        'Received unhandled inbox message from {}. \nSubject: {}\n\nBody: {}'
+        .format(item.author, item.subject, item.body)
     )
 
 
