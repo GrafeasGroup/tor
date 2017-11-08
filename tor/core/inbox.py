@@ -14,13 +14,26 @@ from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
 
-
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
     re.compile('unclaim', re.IGNORECASE),
     re.compile('undo', re.IGNORECASE),
     re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
+
+
+def forward_to_slack(item, config):
+    send_to_slack(
+        'Unknown reply by **{author}**, {subject}: {body}'.format(
+            author=item.author,
+            body=item.body,
+            subject=item.subject,
+        ), config)
+
+    logging.info(
+        'Received unhandled inbox message from {}. \nSubject: {}\n\nBody: {}'
+        ''.format(item.author, item.subject, item.body)
+    )
 
 
 def process_mod_intervention(post, config):
@@ -89,6 +102,9 @@ def process_reply(reply, config):
             reply.mark_read()
             return  # Because overrides should stop the world and start fresh
 
+        forward_to_slack(reply, config)
+        reply.mark_read()  # no spamming the slack channel :)
+
     except (AttributeError, RedditClientException):
         # the only way we should hit this is if somebody comments and then
         # deletes their comment before the bot finished processing. It's
@@ -130,9 +146,9 @@ def check_inbox(config):
             try:
                 process_mention(item)
             except (AttributeError, RedditClientException):
-                # apparently this crashes with an AttributeError if someone calls
-                # the bot and immediately deletes their comment. This should fix
-                # that.
+                # apparently this crashes with an AttributeError if someone
+                # calls the bot and immediately deletes their comment. This
+                # should fix that.
                 continue
             item.mark_read()
 
@@ -152,5 +168,11 @@ def check_inbox(config):
         # ARE YOU ALIVE?!
         elif item.subject.lower() == 'ping':
             item.mark_read()
-            logging.info('Received ping from {}. Pong!'.format(item.author.name))
+            logging.info(
+                'Received ping from {}. Pong!'.format(item.author.name)
+            )
             item.reply('Pong!')
+
+        else:
+            item.mark_read()
+            forward_to_slack(item, config)
