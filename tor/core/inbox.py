@@ -63,7 +63,9 @@ def process_mod_intervention(post, config):
     phrases = '"' + '", "'.join(phrases) + '"'
 
     send_to_slack(
-        'Mod Intervention Needed: Detected use of {phrases} <{link}>'
+        ':rotating_light::rotating_light: Mod Intervention Needed '
+        ':rotating_light::rotating_light: \n\nDetected use of '
+        '{phrases} <{link}>'
         ''.format(link=post.submission.shortlink, phrases=phrases),
         config
     )
