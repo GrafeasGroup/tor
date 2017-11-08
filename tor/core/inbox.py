@@ -24,7 +24,7 @@ MOD_SUPPORT_PHRASES = [
 
 def forward_to_slack(item, config):
     send_to_slack(
-        'Unknown reply by **{author}**, {subject}: {body}'.format(
+        'Unhandled inbox reply by *{author}* -- *{subject}*: {body}'.format(
             author=item.author,
             body=item.body,
             subject=item.subject,
