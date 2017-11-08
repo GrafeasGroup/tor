@@ -102,6 +102,7 @@ def process_reply(reply, config):
             reply.mark_read()
             return  # Because overrides should stop the world and start fresh
 
+        # If we made it this far, it's something we can't process automatically
         forward_to_slack(reply, config)
         reply.mark_read()  # no spamming the slack channel :)
 

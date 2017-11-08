@@ -5,6 +5,12 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## [Unreleased]
 
+...Nothing yet!
+
+## v3.2.0 (2017-11-7)
+
+- Update inbox handler to increase handling speed
+- Update inbox handler to increase legibility and modularity
 - Guard every comment reply in case it gets deleted
 - Prunes unneeded dependencies from before tor_core extraction
 - Defers bot reference in `praw.ini` and whether in debug mode from environment variables (by @thelonelyghost)
