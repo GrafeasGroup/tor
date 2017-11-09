@@ -35,12 +35,21 @@ def long_description():
         return f.read()
 
 
+testing_deps = [
+    'pytest',
+    'pytest-cov',
+]
+dev_helper_deps = [
+    'better-exceptions',
+]
+
+
 setup(
     name='tor',
     version=__version__,
-    description='',
+    description='A bot that handles moderating and scoring in /r/TranscribersOfReddit',
     long_description=long_description(),
-    url='https://github.com/itsthejoker/transcribersofreddit',
+    url='https://github.com/TranscribersOfReddit/TranscribersOfReddit',
     author='Joe Kaufeld',
     author_email='joe.kaufeld@gmail.com',
     license='MIT',
@@ -56,25 +65,24 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     keywords='',
-    packages=find_packages(exclude=['test*', 'bin/*']),
+    packages=find_packages(exclude=['test', 'test.*', '*.test', '*.test.*']),
+    zip_safe=True,
+    cmdclass={'test': PyTest},
     test_suite='test',
     entry_points={
         'console_scripts': [
             'tor-moderator = tor.main:main',
         ],
     },
-    tests_require=[
-        'pytest',
-    ],
-    cmdclass={'test': PyTest},
+    extras_require={
+        'dev': testing_deps + dev_helper_deps,
+    },
+    tests_require=testing_deps,
     install_requires=[
-        'praw==5.0.1',
-        'redis<3.0.0',
-        'addict',
-        'tesserocr',
-        'wget',
+        'tor_core',
         'sh',
-        'bugsnag',
-        'cython',  # WORKAROUND: 'tesserocr' only sometimes installs this dependency
+    ],
+    dependency_links=[
+        'git+https://github.com/TranscribersOfReddit/tor_core.git@master#egg=tor_core-0',
     ],
 )

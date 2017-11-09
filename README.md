@@ -1,20 +1,26 @@
-[![Stories in Ready](https://badge.waffle.io/TranscribersOfReddit/TranscribersOfReddit.png?label=ready&title=Ready)](http://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
+[![Waffle.io - Ready](https://img.shields.io/waffle/label/TranscribersOfReddit/TranscribersOfReddit/ready.svg?colorB=yellow&label=Available%20Issues)](https://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
+[![Waffle.io - In Progress](https://img.shields.io/waffle/label/TranscribersOfReddit/TranscribersOfReddit/in%20progress.svg?colorB=green&label=Issues%20Being%20Worked%20On)](https://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
+[![Codacy quality](https://img.shields.io/codacy/grade/3b7f08973a9644cc98faea4cbcd71eb2.svg)](https://www.codacy.com/app/TranscribersOfReddit/TranscribersOfReddit)
+[![Codacy coverage](https://img.shields.io/codacy/coverage/3b7f08973a9644cc98faea4cbcd71eb2.svg)](https://www.codacy.com/app/TranscribersOfReddit/TranscribersOfReddit)
+[![Travis build status](https://img.shields.io/travis/TranscribersOfReddit/TranscribersOfReddit.svg)](https://travis-ci.org/TranscribersOfReddit/TranscribersOfReddit)
+[![BugSnag](https://img.shields.io/badge/errors--hosted--by-Bugsnag-blue.svg)](https://www.bugsnag.com/open-source/)
 
 # Transcribers of Reddit
 
-This is the source code for the set of bots that run under the usernames listed
-below. Together, they all assist in the running or /r/TranscribersOfReddit, which
-is privileged to have the incredibly important job of organizing crowd-sourced
-transcriptions of images, video, and audio.
+This is the source code for the bot moderating and managing several parts of the subreddit
+/r/TranscribersOfReddit, a community dedicated to transcribing images, audio, and video.
+It acts under the username "/u/TranscribersOfReddit".
 
-- `/u/transcribersofreddit`: the automated owner and warden of /r/TranscribersOfReddit.
-- `/u/transcribot`: a companion bot that monitors a Redis queue, downloads, and attempts to OCR images to assist the human transcribers.
+Among other things, this bot handles:
 
-The ToR bots are designed to be as light on local resources as they can possibly
-be, though there are some external requirements.
+- Posting transcription requests to /r/TranscribersOfReddit as relevant content shows up on partner subreddits
+- Responding to transcribers claiming and marking requests as complete
+- Augmenting the score of a transcriber upon successful completion of a transcription
 
-- Redis (tracking completed posts and queue system)
-- Tesseract (OCR solution used by u/transcribot)
+## Requirements
+
+Redis (tracking completed posts and queue system)
+Reddit API keys
 
 > **NOTE:**
 >
@@ -26,19 +32,16 @@ be, though there are some external requirements.
 
 Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/) and Python 3.6.
 
-Find the [latest release](https://github.com/TranscribersOfReddit/TranscribersOfReddit/releases/latest) and replace `v3.0.1` below with the more up-to-date version.
-
 ```
 $ git clone https://github.com/TranscribersOfReddit/TranscribersOfReddit.git tor
 $ cd tor/
-$ git checkout v3.0.1
-$ pip install .
+$ pip install --process-dependency-links .
 ```
 
 OR
 
 ```
-$ pip install 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@v3.0.1#egg=tor'
+$ pip install --process-dependency-links 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor-0'
 ```
 
 ## Big Picture

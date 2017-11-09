@@ -78,5 +78,6 @@ def verified_posted_transcript(post, config):
             _header_check(top_level_comment, config)
         ):
             return True
+
     # Did their transcript get flagged by the spam filter? Check their history.
     return _author_history_check(post, config)

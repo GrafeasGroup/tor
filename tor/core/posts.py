@@ -35,7 +35,8 @@ def check_submissions(subreddit, config):
         if (
             post.domain in config.image_domains or
             post.domain in config.audio_domains or
-            post.domain in config.video_domains
+            post.domain in config.video_domains or
+            subreddit in config.subreddits_domain_filter_bypass
         ):
             process_post(post, config)
 
@@ -103,10 +104,9 @@ def process_post(new_post, config):
         content_type = 'video'
         content_format = config.video_formatting
     else:
-        # how could we get here without fulfilling one of the above
-        # criteria? Just remember: the users will find a way.
-        content_type = 'Unknown'
-        content_format = 'Formatting? I think something went wrong here...'
+        # This means we pulled from a subreddit bypassing the filters.
+        content_type = 'Other'
+        content_format = config.other_formatting
 
     # Truncate a post title if it exceeds 250 characters, so the added
     # formatting still fits in Reddit's 300 char limit for post titles
