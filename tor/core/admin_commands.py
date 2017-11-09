@@ -1,6 +1,7 @@
 import logging
 import random
 
+from praw.exceptions import ClientException as RedditClientException
 # noinspection PyProtectedMember
 from tor_core.helpers import _
 from tor_core.helpers import clean_id
@@ -46,6 +47,57 @@ def process_override(reply, config):
         )
         process_done(
             parents_parent, config, override=True
+        )
+
+
+def process_blacklist(reply, config):
+    """
+    This is used to basically "shadow-ban" people from the bot.
+    Format is:
+    Subject: !blacklist
+    body: <username1>\n<username2>...
+    :param reply: the comment reply object from the inbox
+    :param config: the global config object
+    :return: None
+    """
+
+    if not from_moderator(reply, config):
+        reply.reply(_(random.choice(config.no_gifs)))
+        logging.info(
+            '{} just tried to blacklist. Get your own bot!'
+            ''.format(reply.author.name)
+        )
+        return
+
+    usernames = reply.body.split('\n')
+    results = ""
+    results_for_log = {'failed': [], 'successes': []}
+
+    for username in usernames:
+        if username in config.tor_mods:
+            results += f"{username} is a mod! Don't blacklist mods!\n"
+            results_for_log['failed'].append(username)
+            continue
+
+        try:
+            config.r.redditor(username)
+        except RedditClientException:
+            results += "{} isn't a valid user\n"
+            results_for_log['failed'].append(username)
+            continue
+
+        config.redis.sadd('blacklist', username)
+        results += "{} is now blacklisted (or already was :O)" \
+            .format(username)
+        results_for_log['successes'].append(username)
+
+        reply.reply(results)
+
+        logging.info(
+            "{} failed to blacklist, {} were successfully blacklisted".format(
+                ', '.join(results_for_log['failed']),
+                ', '.join(results_for_log['successes'])
+            )
         )
 
 
