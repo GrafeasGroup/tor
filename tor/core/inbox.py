@@ -148,7 +148,10 @@ def check_inbox(config):
             item.mark_read()
 
         elif item.author.name in config.redis.smembers('blacklist'):
-            logging.info('Skipping inbox item from person on blacklist')
+            logging.info(
+                f'Skipping inbox item from {item.author.name} who is on the '
+                f'blacklist '
+            )
             item.mark_read()
             continue
 
