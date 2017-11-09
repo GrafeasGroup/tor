@@ -5,7 +5,7 @@ from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
 from tor_core.helpers import send_to_slack
 
-from tor.core.admin_commands import process_override
+from tor.core.admin_commands import process_override, process_blacklist
 from tor.core.admin_commands import reload_config
 from tor.core.admin_commands import update_and_restart
 from tor.core.mentions import process_mention
@@ -104,6 +104,11 @@ def process_reply(reply, config):
             reply.mark_read()
             return  # Because overrides should stop the world and start fresh
 
+        if '!blacklist' in reply.body.lower():
+            process_blacklist(reply, config)
+            reply.mark_read()
+            return
+
         # If we made it this far, it's something we can't process automatically
         forward_to_slack(reply, config)
         reply.mark_read()  # no spamming the slack channel :)
@@ -141,6 +146,11 @@ def check_inbox(config):
 
         elif item.author.name == 'transcribot':
             item.mark_read()
+
+        elif item.author.name in config.redis.smembers('blacklist'):
+            logging.info('Skipping inbox item from person on blacklist')
+            item.mark_read()
+            continue
 
         elif item.subject == 'username mention':
             logging.info('Received mention! ID {}'.format(item))
