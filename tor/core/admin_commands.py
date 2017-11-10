@@ -181,6 +181,13 @@ def process_blacklist(reply, config):
             )
         )
 
+def reload_config(reply, config):
+    logging.info(
+        'Reloading configs at the request of {}'.format(reply.author.name)
+    )
+    initialize(config)
+    logging.info('Reload complete.')
+    return 'Config reloaded!'
 
 def reload_config(reply, config):
     logging.info(
