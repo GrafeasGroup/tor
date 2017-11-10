@@ -19,8 +19,8 @@ from tor.strings.responses import done_cannot_find_transcript
 from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
-from tor.strings.responses import youre_welcome
 from tor.strings.responses import thumbs_up_gifs
+from tor.strings.responses import youre_welcome
 
 
 def coc_accepted(post, config):
@@ -50,7 +50,8 @@ def process_coc(post, config):
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_slack(
-            '<http://www.reddit.com/u/{user}|u/{user}> has just accepted the CoC!'.format(
+            '<http://www.reddit.com/u/{user}|u/{user}> has just '
+            'accepted the CoC!'.format(
                 user=post.author.name
             ), config
         )
@@ -82,9 +83,9 @@ def process_claim(post, config):
             return
 
         if top_parent.link_flair_text is None:
-            # There exists the very small possibility that the post was malformed
-            # and doesn't actually have flair on it. In that case, let's set
-            # something so the next part doesn't crash.
+            # There exists the very small possibility that the post was
+            # malformed and doesn't actually have flair on it. In that case,
+            # let's set something so the next part doesn't crash.
             flair_post(top_parent, flair.unclaimed)
 
         if flair.unclaimed in top_parent.link_flair_text:
@@ -179,8 +180,9 @@ def process_done(post, config, override=False):
                     )
                 )
             except praw.exceptions.ClientException:
-                # If the butt deleted their comment and we're already this far into
-                # validation, just mark it as done. Clearly they already passed.
+                # If the butt deleted their comment and we're already this
+                # far into validation, just mark it as done. Clearly they
+                # already passed.
                 logging.info(
                     'Attempted to mark post {} as done... hit ClientException.'
                     ''.format(top_parent.fullname)

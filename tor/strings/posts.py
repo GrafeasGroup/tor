@@ -4,9 +4,9 @@ discovered_submit_title = (
 
 rules_comment = (
     'If you would like to claim this post, please respond to this comment '
-    'with the word `claiming` or `claim` in your response. I will automatically '
-    'update the flair so that only one person is working on a post at any given '
-    'time.'
+    'with the word `claiming` or `claim` in your response. I will '
+    'automatically update the flair so that only one person is working on a '
+    'post at any given time.'
     '\n\nWhen you\'re done, please comment again with `done`. Your flair will '
     'be updated to reflect the number of posts you\'ve transcribed and the '
     'will be marked as completed.'
@@ -21,7 +21,7 @@ rules_comment = (
 )
 
 yt_already_has_transcripts = (
-    'Hi! For those who need it, it appears that this video already has transcripts '
-    'provided by the uploader. If this is untrue, please use the "Message the mods" '
-    'link below to let us know.'
+    'Hi! For those who need it, it appears that this video already has '
+    'transcripts provided by the uploader. If this is untrue, please use the '
+    '"Message the mods" link below to let us know.'
 )

@@ -40,7 +40,9 @@ def process_override(reply, config):
     if 'done' in parents_parent.body.lower():
         logging.info(
             'Starting validation override for post {}'
-            ', approved by {}'.format(parents_parent.fullname, reply.author.name)
+            ', approved by {}'.format(
+                parents_parent.fullname, reply.author.name
+            )
         )
         process_done(
             parents_parent, config, override=True
