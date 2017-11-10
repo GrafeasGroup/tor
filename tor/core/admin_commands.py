@@ -42,7 +42,8 @@ def process_override(reply, config):
         logging.info(
             'Starting validation override for post {}'
             ', approved by {}'.format(
-                parents_parent.fullname, reply.author.name
+                parents_parent.fullname,
+                reply.author.name
             )
         )
         process_done(
