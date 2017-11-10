@@ -51,7 +51,9 @@ def update_user_flair(post, config):
         # ID of our post object and re-request it from Reddit in order to
         # get the *actual* object, even though they have the same ID. It's
         # weird.
-        user_flair = config.r.comment(id=clean_id(post.fullname)).author_flair_text
+        user_flair = config.r.comment(
+            id=clean_id(post.fullname)
+        ).author_flair_text
     except AttributeError:
         user_flair = flair_text
 

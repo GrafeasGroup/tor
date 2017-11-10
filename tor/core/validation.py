@@ -43,7 +43,8 @@ def verified_posted_transcript(post, config):
     # get rid of the "See More Comments" crap
     linked_resource.comments.replace_more(limit=0)
     for top_level_comment in linked_resource.comments.list():
-        if _author_check(post, top_level_comment) and _header_check(top_level_comment, config):
+        if _author_check(post, top_level_comment) \
+                and _header_check(top_level_comment, config):
             return True
     # Did it get removed? Check their history.
     # if _author_history_check:

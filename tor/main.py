@@ -48,7 +48,8 @@ def run(config):
 
 def main():
     config.debug_mode = bool(os.environ.get('DEBUG_MODE', False))
-    bot_name = 'debug' if config.debug_mode else os.environ.get('BOT_NAME', 'bot')
+    bot_name = 'debug' if config.debug_mode \
+        else os.environ.get('BOT_NAME', 'bot')
     build_bot(bot_name, __version__, full_name='u/ToR')
     config.perform_header_check = True
     run_until_dead(run)
