@@ -1,3 +1,4 @@
+import csv
 import logging
 import random
 
@@ -8,6 +9,35 @@ from tor_core.helpers import clean_id
 from tor_core.initialize import initialize
 
 from tor.core.user_interaction import process_done
+
+no_mod_replies = ['ha nope \n\n{}', 'l0l no \n\n{}', '{}']
+
+
+def process_command(reply, config):
+    with open('commands.csv', newline='') as commands_file:
+        command_reader = csv.reader(commands_file)
+        for row in command_reader:
+            # this code also iterates over the headers, but it doesn't really
+            # matter
+
+            # command name, needs mod, function name
+            if reply.subject[1:] == row[0]:
+                # command found
+
+                # does it need mod privileges?
+                if row[1] == 'true':
+                    if not from_moderator(reply, config):
+                        reply.reply(
+                            random.choice(no_mod_replies).format(
+                                random.choice(config.no_gifs)
+                            )
+                        )
+
+                        return
+
+                reply.reply(
+                    command_funcs[row[2]](reply.body, config)
+                )
 
 
 def from_moderator(reply, config):
@@ -111,34 +141,27 @@ def process_blacklist(reply, config):
 
 
 def reload_config(reply, config):
-    if not from_moderator(reply, config):
-        logging.info(
-            '{} just issued a reload command. No.'.format(reply.author.name)
-        )
+    logging.info(
+        'Reloading configs at the request of {}'.format(reply.author.name)
+    )
+    initialize(config)
+    logging.info('Reload complete.')
 
-        reply.reply(_(random.choice(config.no_gifs)))
-    else:
-        logging.info(
-            'Reloading configs at the request of {}'.format(reply.author.name)
-        )
-        reply.reply(
-            'Config reloaded!'
-        )
-        initialize(config)
-        logging.info('Reload complete.')
+    return 'Config reloaded!'
 
 
 def update_and_restart(reply, config):
-    if not from_moderator(reply, config):
+    return "This doesn't work quite yet"
+    # TODO: This does not currently function on our primary box.
+    # # update from repo
+    # sh.git.pull("origin", "master")
+    # # restart own process
+    # os.execl(sys.executable, sys.executable, *sys.argv)
 
-        reply.reply(_(random.choice(config.no_gifs)))
-        logging.info(
-            '{} just issued update. No.'.format(reply.author.name)
-        )
-    else:
-        pass
-        # TODO: This does not currently function on our primary box.
-        # # update from repo
-        # sh.git.pull("origin", "master")
-        # # restart own process
-        # os.execl(sys.executable, sys.executable, *sys.argv)
+
+# Don't forget to add to this!
+command_funcs = {
+    'process_override': process_override,
+    'reload_config': reload_config,
+    'update_and_restart': update_and_restart
+}

@@ -1,0 +1,4 @@
+command name,needs mod,function
+blacklist,true,process_override
+reload,true,reload_config
+update,true,update_and_restart
