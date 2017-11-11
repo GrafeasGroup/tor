@@ -10,23 +10,46 @@ from tor_core.initialize import initialize
 
 from tor.core.user_interaction import process_done
 
-no_mod_replies = ['ha nope \n\n{}', 'l0l no \n\n{}', '{}']
+no_mod_replies = ['ha nope \n\n{}', 'l0l no \n\n{}', '{}', 'nada \n\n{}']
 
 
 def process_command(reply, config):
+    """
+    This function processes any commands send to the bot via PM with a subject
+    that stars with a !. The basic flow is read CSV file, look for row with same
+    subject, check if it needs mod, and check for mod, and then reply to the
+    PM with the results of the function listed in the CSV file.
+
+    To add a new command: add an entry to commands.csv, (look at the top line
+    for row names) add your function to command_funcs, and add your function.
+    :param reply:
+    :param config:
+    :return:
+    """
     with open('commands.csv', newline='') as commands_file:
         command_reader = csv.reader(commands_file)
         for row in command_reader:
             # this code also iterates over the headers, but it doesn't really
             # matter
 
+            logging.info(
+                f'Searching for command {reply.subject[1:]}, '
+                f'from {reply.author}.'
+            )
+
             # command name, needs mod, function name
             if reply.subject[1:] == row[0]:
                 # command found
-
+                logging.info(
+                    f'{reply.author} is attempting to run {reply.subject[1:]}'
+                )
                 # does it need mod privileges?
                 if row[1] == 'true':
                     if not from_moderator(reply, config):
+                        logging.info(
+                            f"{reply.author} failed to run {reply.subject[1:]},"
+                            f" because they aren't a mod"
+                        )
                         reply.reply(
                             random.choice(no_mod_replies).format(
                                 random.choice(config.no_gifs)
@@ -35,6 +58,10 @@ def process_command(reply, config):
 
                         return
 
+                logging.info(
+                    f'Now executing command {reply.subject[1:]},'
+                    f' by {reply.author}.'
+                )
                 reply.reply(
                     command_funcs[row[2]](reply.body, config)
                 )
@@ -159,9 +186,15 @@ def update_and_restart(reply, config):
     # os.execl(sys.executable, sys.executable, *sys.argv)
 
 
+def ping(reply, config):
+    return "Pongity ping pong pong!"
+
+
 # Don't forget to add to this!
 command_funcs = {
     'process_override': process_override,
     'reload_config': reload_config,
-    'update_and_restart': update_and_restart
+    'update_and_restart': update_and_restart,
+    'ping': ping,
+    'blacklist': "Not implemented yet"
 }

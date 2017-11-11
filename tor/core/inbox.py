@@ -178,25 +178,6 @@ def check_inbox(config):
             process_command(item, config)
             item.mark_read()
             continue
-
-        # elif 'reload' in item.subject.lower():
-        #     item.mark_read()
-        #     reload_config(item, config)
-        #
-        # elif 'update' in item.subject.lower():
-        #     item.mark_read()
-        #     update_and_restart(item, config)
-        #     # there's no reason to do anything else here because the process
-        #     # will terminate and respawn
-        #
-        # # ARE YOU ALIVE?!
-        # elif item.subject.lower() == 'ping':
-        #     item.mark_read()
-        #     logging.info(
-        #         'Received ping from {}. Pong!'.format(item.author.name)
-        #     )
-        #     item.reply('Pong!')
-        #
         else:
             item.mark_read()
             forward_to_slack(item, config)
