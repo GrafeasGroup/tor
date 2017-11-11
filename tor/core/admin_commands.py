@@ -211,5 +211,5 @@ command_funcs = {
     'reload_config': reload_config,
     'update_and_restart': update_and_restart,
     'ping': ping,
-    'blacklist': "Not implemented yet"
+    'override': process_override
 }
