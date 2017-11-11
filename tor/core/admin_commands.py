@@ -4,7 +4,6 @@ import random
 
 from praw.exceptions import ClientException as RedditClientException
 # noinspection PyProtectedMember
-from tor_core.helpers import _
 from tor_core.helpers import clean_id
 from tor_core.initialize import initialize
 
@@ -64,9 +63,14 @@ def process_command(reply, config):
                 )
 
                 try:
-                    reply.reply(
-                        command_funcs[row[2]](reply.body, config)
-                    )
+
+                    result = command_funcs[row[2]](reply.body, config)
+
+                    if result is not None:
+                        reply.reply(result)
+                    else:
+                        return
+
                 except KeyError:
                     reply.reply(
                         "Command function not found, please message a developer"
@@ -100,14 +104,7 @@ def process_override(reply, config):
     :param config: the global config object.
     :return: None.
     """
-    # first we verify that this comment comes from a moderator and that
-    # we can work on it.
-    if not from_moderator(reply, config):
-        reply.reply(_(random.choice(config.no_gifs)))
-        logging.info(
-            '{} just tried to override. Lolno.'.format(reply.author.name)
-        )
-        return
+
     # okay, so the parent of the reply should be the bot's comment
     # saying it can't find it. In that case, we need the parent's
     # parent. That should be the comment with the `done` call in it.
