@@ -62,8 +62,26 @@ def process_command(reply, config):
                     f'Now executing command {reply.subject[1:]},'
                     f' by {reply.author}.'
                 )
+
+                try:
+                    reply.reply(
+                        command_funcs[row[2]](reply.body, config)
+                    )
+                except KeyError:
+                    reply.reply(
+                        "Command function not found, please message a developer"
+                    )
+
+                    logging.error(
+                        "Did someone forget to add a function to command_funcs?"
+                    )
+
+                    return
+
+            else:
                 reply.reply(
-                    command_funcs[row[2]](reply.body, config)
+                    "That command hasn't been implemented yet ):"
+                    "\n\nMessage a dev to make your dream come true."
                 )
 
 
