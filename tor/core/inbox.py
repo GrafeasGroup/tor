@@ -101,10 +101,9 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        if '!override' in reply.body.lower():
-            process_override(reply, config)
-            reply.mark_read()
-            return  # Because overrides should stop the world and start fresh
+        if reply.subject[0] == '!':
+            process_command(reply, config)
+            return
 
         if '!blacklist' in reply.subject.lower():
             process_blacklist(reply, config)
