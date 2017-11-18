@@ -52,9 +52,9 @@ means we will never make a backwards-incompatible change within a major version 
 ## v3.0.0 (2017-08-20)
 
 - Updates PRAW (Reddit API) library: v4.4.0 -> v5.0.1
-- Extracts major parts of `tor.core` into [`tor_core`](https://github.com/TranscribersOfReddit/TranscribersOfReddit)
-- Moves `tor-archivist` bot to [`ToR_Archivist`](https://github.com/TranscribersOfReddit/ToR_Archivist)
-- Moves `tor-apprentice` bot to [`ToR_OCR`](https://github.com/TranscribersOfReddit/ToR_OCR)
+- Extracts major parts of `tor.core` into [`tor_core`](https://github.com/GrafeasGroup/tor_core)
+- Moves `tor-archivist` bot to [`ToR_Archivist`](https://github.com/GrafeasGroup/tor_archivist)
+- Moves `tor-apprentice` bot to [`ToR_OCR`](https://github.com/GrafeasGroup/tor_ocr)
 - Reverts dependency management change (pass entire `config` object again)
 - Disable self-update directive to bot (does not yet work)
 - Adds directive 'ping' to check if bot is alive

@@ -49,7 +49,7 @@ setup(
     version=__version__,
     description='A bot that handles moderating and scoring in /r/TranscribersOfReddit',
     long_description=long_description(),
-    url='https://github.com/TranscribersOfReddit/TranscribersOfReddit',
+    url='https://github.com/GrafeasGroup/tor',
     author='Joe Kaufeld',
     author_email='joe.kaufeld@gmail.com',
     license='MIT',
@@ -83,6 +83,6 @@ setup(
         'sh',
     ],
     dependency_links=[
-        'git+https://github.com/TranscribersOfReddit/tor_core.git@master#egg=tor_core-0',
+        'git+https://github.com/GrafeasGroup/tor_core.git@master#egg=tor_core-0',
     ],
 )
