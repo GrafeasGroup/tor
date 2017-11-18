@@ -10,6 +10,16 @@ from tor.core.inbox import check_inbox
 from tor.core.posts import check_submissions
 from tor.helpers.flair import set_meta_flair_on_other_posts
 
+# Patreon Dedications:
+#
+# Through our work supported by Grafeas Group Ltd., some people see
+# fit to help us keep the lights on. Of those helpful souls, even
+# fewer gift $50 or more and they have earned their place in the
+# following list. For reference, the link can be found here:
+# https://www.patreon.com/grafeasgroup
+# List is in date order.
+#
+# Jake L (2017-11-17)
 
 # Musical Dedications:
 #
