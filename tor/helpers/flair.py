@@ -1,5 +1,7 @@
 import logging
 
+from collections import OrderedDict
+
 from tor_core.helpers import clean_id
 from tor_core.helpers import flair
 
@@ -39,11 +41,31 @@ def update_user_flair(post, config):
     On a successful transcription, this takes the user's current flair,
     increments the counter by one, and stores it back to the subreddit.
 
+    If the user is past 50 transcriptions, select the appropriate flair
+    class and write that back too.
+
     :param post: The post which holds the author information.
     :param config: The global config instance.
     :return: None.
     """
     flair_text = '0 Γ - Beta Tester'
+
+    flair_levels = {
+        0: 'grafeas',
+        51: 'grafeas-green',
+        101: 'grafeas-orange',
+        251: 'grafeas-purple',
+        501: 'grafeas-golden',
+        1000: 'grafeas-diamond'
+    }
+
+    # put them in the right order, since apparently creating the thing as an
+    # OrderedDict doesn't always do that
+    flair_levels = OrderedDict(
+        sorted(
+            flair_levels.items(), key=lambda t: t[0]
+        )
+    )
 
     try:
         # The post object is technically an inbox mention, even though it's
@@ -61,14 +83,31 @@ def update_user_flair(post, config):
         user_flair = flair_text
 
     if 'Γ' in user_flair:
-        # take their current flair and add one to it
-        new_flair_count = int(user_flair[:user_flair.index('Γ') - 1])
+        # extract their current flair and add one to it
+        new_flair_count = int(user_flair[:user_flair.index('Γ') - 1]) + 1
         # if there's anything special in their flair string, let's save it
         additional_flair_text = user_flair[user_flair.index('Γ') + 1:]
-        user_flair = '{} Γ'.format(new_flair_count + 1)
+        user_flair = '{} Γ'.format(new_flair_count)
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
-        config.tor.flair.set(post.author, text=user_flair, css_class='grafeas')
+        # time to grab the css class. Let's do a quick run through our dict
+        # to see what we have.
+        css = None
+        for key in flair_levels.keys():
+            if new_flair_count >= key:
+                css = flair_levels[key]
+
+        # check to make sure we actually got something
+        if css is None:
+            logging.error(
+                'Cannot find flair css for value {}. What happened?'.format(
+                    new_flair_count
+                )
+            )
+            # set to the default with no special looks on the subreddit
+            css = 'grafeas'
+
+        config.tor.flair.set(post.author, text=user_flair, css_class=css)
         logging.info('Setting flair for {}'.format(post.author))
     else:
         # they're bot or a mod and have custom flair. Leave it alone.
