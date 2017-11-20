@@ -1,7 +1,5 @@
 import logging
 
-from collections import OrderedDict
-
 from tor_core.helpers import clean_id
 from tor_core.helpers import flair
 
