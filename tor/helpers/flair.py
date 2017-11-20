@@ -36,6 +36,21 @@ def flair_post(post, text):
     )
 
 
+def _get_flair_css(transcription_count):
+    if transcription_count >= 1000:
+        return 'grafeas-diamond'
+    elif transcription_count >= 501:
+        return 'grafeas-golden'
+    elif transcription_count >= 251:
+        return 'grafeas-purple'
+    elif transcription_count >= 101:
+        return 'grafeas-orange'
+    elif transcription_count >= 51:
+        return 'grafeas-green'
+    else:
+        return 'grafeas'
+
+
 def _parse_existing_flair(user_flair):
     """
     Take the flair string and identify the proper incremented score along with
@@ -44,31 +59,11 @@ def _parse_existing_flair(user_flair):
     :param user_flair: String; the existing flair string for the user.
     :return:
     """
-    flair_levels = {
-        0: 'grafeas',
-        51: 'grafeas-green',
-        101: 'grafeas-orange',
-        251: 'grafeas-purple',
-        501: 'grafeas-golden',
-        1000: 'grafeas-diamond'
-    }
-
-    # put them in the right order, since apparently creating the thing as an
-    # OrderedDict doesn't always do that
-    flair_levels = OrderedDict(
-        sorted(
-            flair_levels.items(), key=lambda t: t[0]
-        )
-    )
 
     # extract their current flair and add one to it
     new_flair_count = int(user_flair[:user_flair.index('Γ') - 1]) + 1
-    # time to grab the css class. Let's do a quick run through our dict
-    # to see what we have.
-    css = None
-    for key in flair_levels.keys():
-        if new_flair_count >= key:
-            css = flair_levels[key]
+
+    css = _get_flair_css(new_flair_count)
 
     # check to make sure we actually got something
     if css is None:
