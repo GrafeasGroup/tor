@@ -36,20 +36,14 @@ def flair_post(post, text):
     )
 
 
-def update_user_flair(post, config):
+def _parse_existing_flair(user_flair):
     """
-    On a successful transcription, this takes the user's current flair,
-    increments the counter by one, and stores it back to the subreddit.
+    Take the flair string and identify the proper incremented score along with
+    its matching CSS class.
 
-    If the user is past 50 transcriptions, select the appropriate flair
-    class and write that back too.
-
-    :param post: The post which holds the author information.
-    :param config: The global config instance.
-    :return: None.
+    :param user_flair: String; the existing flair string for the user.
+    :return:
     """
-    flair_text = '0 Γ - Beta Tester'
-
     flair_levels = {
         0: 'grafeas',
         51: 'grafeas-green',
@@ -67,6 +61,42 @@ def update_user_flair(post, config):
         )
     )
 
+    # extract their current flair and add one to it
+    new_flair_count = int(user_flair[:user_flair.index('Γ') - 1]) + 1
+    # time to grab the css class. Let's do a quick run through our dict
+    # to see what we have.
+    css = None
+    for key in flair_levels.keys():
+        if new_flair_count >= key:
+            css = flair_levels[key]
+
+    # check to make sure we actually got something
+    if css is None:
+        logging.error(
+            'Cannot find flair css for value {}. What happened?'.format(
+                new_flair_count
+            )
+        )
+        # set to the default with no special looks on the subreddit
+        css = 'grafeas'
+
+    return new_flair_count, css
+
+
+def update_user_flair(post, config):
+    """
+    On a successful transcription, this takes the user's current flair,
+    increments the counter by one, and stores it back to the subreddit.
+
+    If the user is past 50 transcriptions, select the appropriate flair
+    class and write that back too.
+
+    :param post: The post which holds the author information.
+    :param config: The global config instance.
+    :return: None.
+    """
+    flair_text = '0 Γ - Beta Tester'
+
     try:
         # The post object is technically an inbox mention, even though it's
         # a Comment object. In order to get the flair, we have to take the
@@ -83,31 +113,15 @@ def update_user_flair(post, config):
         user_flair = flair_text
 
     if 'Γ' in user_flair:
-        # extract their current flair and add one to it
-        new_flair_count = int(user_flair[:user_flair.index('Γ') - 1]) + 1
+        new_count, flair_css = _parse_existing_flair(user_flair)
+
         # if there's anything special in their flair string, let's save it
         additional_flair_text = user_flair[user_flair.index('Γ') + 1:]
-        user_flair = '{} Γ'.format(new_flair_count)
+        user_flair = '{} Γ'.format(new_count)
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
-        # time to grab the css class. Let's do a quick run through our dict
-        # to see what we have.
-        css = None
-        for key in flair_levels.keys():
-            if new_flair_count >= key:
-                css = flair_levels[key]
 
-        # check to make sure we actually got something
-        if css is None:
-            logging.error(
-                'Cannot find flair css for value {}. What happened?'.format(
-                    new_flair_count
-                )
-            )
-            # set to the default with no special looks on the subreddit
-            css = 'grafeas'
-
-        config.tor.flair.set(post.author, text=user_flair, css_class=css)
+        config.tor.flair.set(post.author, text=user_flair, css_class=flair_css)
         logging.info('Setting flair for {}'.format(post.author))
     else:
         # they're bot or a mod and have custom flair. Leave it alone.
