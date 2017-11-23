@@ -14,7 +14,7 @@ Do your best to check as many of these boxes as you can and everything will be f
 ## Issues
 
 Any bugs you find, features you want to request, or questions you have should go in the
-repository's [issues section](https://github.com/TranscribersOfReddit/TranscribersOfReddit/issues).
+repository's [issues section](https://github.com/GrafeasGroup/tor/issues).
 Please, be kind and search through both open and closed issues to make sure your question
 or bug report hasn't already been posted and resolved.
 
@@ -24,7 +24,7 @@ Initial setup:
 
 ```bash
 # Clone the repository
-$ git clone git@github.com:TranscribersOfReddit/TranscribersOfReddit.git tor
+$ git clone git@github.com:GrafeasGroup/tor.git tor
 $ cd ./tor
 
 # Setup sandbox

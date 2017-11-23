@@ -33,7 +33,7 @@ Reddit API keys
 Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/) and Python 3.6.
 
 ```
-$ git clone https://github.com/TranscribersOfReddit/TranscribersOfReddit.git tor
+$ git clone https://github.com/GrafeasGroup/tor.git tor
 $ cd tor/
 $ pip install --process-dependency-links .
 ```
@@ -41,7 +41,7 @@ $ pip install --process-dependency-links .
 OR
 
 ```
-$ pip install --process-dependency-links 'git+https://github.com/TranscribersOfReddit/TranscribersOfReddit.git@master#egg=tor-0'
+$ pip install --process-dependency-links 'git+https://github.com/GrafeasGroup/tor.git@master#egg=tor-0'
 ```
 
 ## Big Picture

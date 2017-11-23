@@ -34,10 +34,55 @@ def flair_post(post, text):
     )
 
 
+def _get_flair_css(transcription_count):
+    if transcription_count >= 1000:
+        return 'grafeas-diamond'
+    elif transcription_count >= 501:
+        return 'grafeas-golden'
+    elif transcription_count >= 251:
+        return 'grafeas-purple'
+    elif transcription_count >= 101:
+        return 'grafeas-orange'
+    elif transcription_count >= 51:
+        return 'grafeas-green'
+    else:
+        return 'grafeas'
+
+
+def _parse_existing_flair(user_flair):
+    """
+    Take the flair string and identify the proper incremented score along with
+    its matching CSS class.
+
+    :param user_flair: String; the existing flair string for the user.
+    :return:
+    """
+
+    # extract their current flair and add one to it
+    new_flair_count = int(user_flair[:user_flair.index('Γ') - 1]) + 1
+
+    css = _get_flair_css(new_flair_count)
+
+    # check to make sure we actually got something
+    if css is None:
+        logging.error(
+            'Cannot find flair css for value {}. What happened?'.format(
+                new_flair_count
+            )
+        )
+        # set to the default with no special looks on the subreddit
+        css = 'grafeas'
+
+    return new_flair_count, css
+
+
 def update_user_flair(post, config):
     """
     On a successful transcription, this takes the user's current flair,
     increments the counter by one, and stores it back to the subreddit.
+
+    If the user is past 50 transcriptions, select the appropriate flair
+    class and write that back too.
 
     :param post: The post which holds the author information.
     :param config: The global config instance.
@@ -51,7 +96,9 @@ def update_user_flair(post, config):
         # ID of our post object and re-request it from Reddit in order to
         # get the *actual* object, even though they have the same ID. It's
         # weird.
-        user_flair = config.r.comment(id=clean_id(post.fullname)).author_flair_text
+        user_flair = config.r.comment(
+            id=clean_id(post.fullname)
+        ).author_flair_text
     except AttributeError:
         user_flair = flair_text
 
@@ -59,14 +106,15 @@ def update_user_flair(post, config):
         user_flair = flair_text
 
     if 'Γ' in user_flair:
-        # take their current flair and add one to it
-        new_flair_count = int(user_flair[:user_flair.index('Γ') - 1])
+        new_count, flair_css = _parse_existing_flair(user_flair)
+
         # if there's anything special in their flair string, let's save it
         additional_flair_text = user_flair[user_flair.index('Γ') + 1:]
-        user_flair = '{} Γ'.format(new_flair_count + 1)
+        user_flair = '{} Γ'.format(new_count)
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
-        config.tor.flair.set(post.author, text=user_flair, css_class='grafeas')
+
+        config.tor.flair.set(post.author, text=user_flair, css_class=flair_css)
         logging.info('Setting flair for {}'.format(post.author))
     else:
         # they're bot or a mod and have custom flair. Leave it alone.

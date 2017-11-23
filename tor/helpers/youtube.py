@@ -1,5 +1,4 @@
 import logging
-
 # noinspection PyCompatibility
 from urllib.parse import parse_qs, urlparse
 
@@ -24,8 +23,8 @@ def get_yt_video_id(url):
       Invalid:
         'youtu.be/watch?v=_lOT2p_FCvA',
     """
-    # initial version: http://stackoverflow.com/a/7936523/617185 \
-    #    by Mikhail Kashkin (http://stackoverflow.com/users/85739/mikhail-kashkin)
+    # initial version: http://stackoverflow.com/a/7936523/617185
+    # by Mikhail Kashkin (http://stackoverflow.com/users/85739/mikhail-kashkin)
 
     if url.startswith(('youtu', 'www')):
         url = 'http://' + url
