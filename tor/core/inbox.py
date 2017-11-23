@@ -6,9 +6,6 @@ from praw.models import Comment as RedditComment
 from tor_core.helpers import send_to_slack
 
 from tor.core.admin_commands import process_override
-from tor.core.admin_commands import process_blacklist
-from tor.core.admin_commands import reload_config
-from tor.core.admin_commands import update_and_restart
 from tor.core.admin_commands import process_command
 from tor.core.mentions import process_mention
 from tor.core.user_interaction import process_claim
@@ -101,12 +98,8 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        if reply.subject[0] == '!':
-            process_command(reply, config)
-            return
-
-        if '!blacklist' in reply.subject.lower():
-            process_blacklist(reply, config)
+        if '!override' in reply.body.lower():
+            process_override(reply, config)
             reply.mark_read()
             return
 
@@ -177,6 +170,7 @@ def check_inbox(config):
             process_command(item, config)
             item.mark_read()
             continue
+
         else:
             item.mark_read()
             forward_to_slack(item, config)
