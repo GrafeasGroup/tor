@@ -101,11 +101,11 @@ def process_blacklist(reply, config):
         reply.reply(results)
 
         logging.info(
-            "{} failed to blacklist, {} were successfully blacklisted, and {} "
-            "were already blacklisted".format(
-                ', '.join(failed),
-                ', '.join(successes),
-                ', '.join(already_added)
+            "Blacklist: {failed} failed, {success} succeeded, {ignored} were "
+            "already blacklisted".format(
+                failed=repr(failed),
+                success=repr(successes),
+                ignored=repr(already_added)
             )
         )
 
