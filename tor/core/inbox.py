@@ -5,7 +5,8 @@ from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
 from tor_core.helpers import send_to_slack
 
-from tor.core.admin_commands import process_override, process_blacklist
+from tor.core.admin_commands import process_override
+from tor.core.admin_commands import process_blacklist
 from tor.core.admin_commands import reload_config
 from tor.core.admin_commands import update_and_restart
 from tor.core.mentions import process_mention
