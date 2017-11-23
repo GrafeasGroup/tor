@@ -1,4 +1,5 @@
-import csv
+import ast
+import json
 import logging
 import random
 
@@ -8,8 +9,6 @@ from tor_core.helpers import clean_id
 from tor_core.initialize import initialize
 
 from tor.core.user_interaction import process_done
-
-no_mod_replies = ['ha nope \n\n{}', 'l0l no \n\n{}', '{}', 'nada \n\n{}']
 
 
 def process_command(reply, config):
@@ -26,67 +25,62 @@ def process_command(reply, config):
     :return:
     """
     with open('commands.csv', newline='') as commands_file:
-        command_reader = csv.reader(commands_file)
-        for row in command_reader:
-            # this code also iterates over the headers, but it doesn't really
-            # matter
+        commands = json.loads(commands_file)
+        logging.info(
+            f'Searching for command {reply.subject[1:]}, '
+            f'from {reply.author}.'
+        )
 
-            logging.info(
-                f'Searching for command {reply.subject[1:]}, '
-                f'from {reply.author}.'
+        try:
+            command = commands['commands'][reply.subject[1:]]
+
+        except KeyError:
+            reply.reply(
+                "That command hasn't been implemented yet ):"
+                "\n\nMessage a dev to make your dream come true."
             )
 
-            # command name, needs mod, function name
-            if reply.subject[1:] == row[0]:
-                # command found
+            logging.error(
+                f"Error, command: {reply.subject[1:]} not found!"
+                f" (from {reply.author})"
+            )
+
+            return
+
+        # command found
+        logging.info(
+            f'{reply.author} is attempting to run {reply.subject[1:]}'
+        )
+        # does it need mod privileges?
+        if command['needs_moderator']:
+            if not from_moderator(reply, config):
                 logging.info(
-                    f'{reply.author} is attempting to run {reply.subject[1:]}'
+                    f"{reply.author} failed to run {reply.subject[1:]},"
+                    f" because they aren't a mod"
                 )
-                # does it need mod privileges?
-                if row[1] == 'true':
-                    if not from_moderator(reply, config):
-                        logging.info(
-                            f"{reply.author} failed to run {reply.subject[1:]},"
-                            f" because they aren't a mod"
-                        )
-                        reply.reply(
-                            random.choice(no_mod_replies).format(
-                                random.choice(config.no_gifs)
-                            )
-                        )
-
-                        return
-
-                logging.info(
-                    f'Now executing command {reply.subject[1:]},'
-                    f' by {reply.author}.'
-                )
-
-                try:
-
-                    result = command_funcs[row[2]](reply.body, config)
-
-                    if result is not None:
-                        reply.reply(result)
-                    else:
-                        return
-
-                except KeyError:
-                    reply.reply(
-                        "Command function not found, please message a developer"
-                    )
-
-                    logging.error(
-                        "Did someone forget to add a function to command_funcs?"
-                    )
-
-                    return
-
-            else:
                 reply.reply(
-                    "That command hasn't been implemented yet ):"
-                    "\n\nMessage a dev to make your dream come true."
+                    random.choice(commands['notAuthorizedResponses']).format(
+                        random.choice(config.no_gifs)
+                    )
                 )
+
+                return
+
+        logging.info(
+            f'Now executing command {reply.subject[1:]},'
+            f' by {reply.author}.'
+        )
+
+        result = ast.literal_eval(
+            command['python_function'](reply.body, config)
+        )
+
+        result = globals()[command['python_function']](reply.body, config)
+
+        if result is not None:
+            reply.reply(result)
+        else:
+            return
 
 
 def from_moderator(reply, config):
@@ -135,12 +129,12 @@ def process_blacklist(reply, config):
     """
 
     if not from_moderator(reply, config):
-        reply.reply(_(random.choice(config.no_gifs)))
         logging.info(
             '{} just tried to blacklist. Get your own bot!'
             ''.format(reply.author.name)
+
         )
-        return
+        return random.choice(config.no_gifs)
 
     usernames = reply.body.splitlines()
     results = ""
@@ -170,8 +164,6 @@ def process_blacklist(reply, config):
         results += f"{username} is now blacklisted\n"
         successes.append(username)
 
-        reply.reply(results)
-
         logging.info(
             "Blacklist: {failed} failed, {success} succeeded, {ignored} were "
             "already blacklisted".format(
@@ -181,13 +173,8 @@ def process_blacklist(reply, config):
             )
         )
 
-def reload_config(reply, config):
-    logging.info(
-        'Reloading configs at the request of {}'.format(reply.author.name)
-    )
-    initialize(config)
-    logging.info('Reload complete.')
-    return 'Config reloaded!'
+        return results
+
 
 def reload_config(reply, config):
     logging.info(
@@ -210,13 +197,3 @@ def update_and_restart(reply, config):
 
 def ping(reply, config):
     return "Pongity ping pong pong!"
-
-
-# Don't forget to add to this!
-command_funcs = {
-    'process_override': process_override,
-    'reload_config': reload_config,
-    'update_and_restart': update_and_restart,
-    'ping': ping,
-    'override': process_override
-}
