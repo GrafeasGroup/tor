@@ -70,40 +70,42 @@ def process_blacklist(reply, config):
         )
         return
 
-    usernames = reply.body.split('\n')
+    usernames = str.re('\n')
     results = ""
-    results_for_log = {'failed': [], 'successes': [], ['already_added']: []}
+    failed = []
+    successes = []
+    already_added = []
 
     for username in usernames:
         if username in config.tor_mods:
             results += f"{username} is a mod! Don't blacklist mods!\n"
-            results_for_log['failed'].append(username)
+            failed.append(username)
             continue
 
         try:
             config.r.redditor(username)
         except RedditClientException:
             results += f"{username} isn't a valid user\n"
-            results_for_log['failed'].append(username)
+            failed.append(username)
             continue
 
         already_added = config.redis.sadd('blacklist', username)
         if already_added == 0:
             results += f"{username} is already blacklisted, ya fool!\n"
-            results_for_log['already_added'].append(username)
+            already_added.append(username)
             continue
 
         results += f"{username} is now blacklisted\n"
-        results_for_log['successes'].append(username)
+        successes.append(username)
 
         reply.reply(results)
 
         logging.info(
             "{} failed to blacklist, {} were successfully blacklisted, and {} "
             "were already blacklisted".format(
-                ', '.join(results_for_log['failed']),
-                ', '.join(results_for_log['successes']),
-                ', '.join(results_for_log['already_added'])
+                ', '.join(failed),
+                ', '.join(successes),
+                ', '.join(already_added)
             )
         )
 
