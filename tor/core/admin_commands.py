@@ -70,7 +70,7 @@ def process_blacklist(reply, config):
         )
         return
 
-    usernames = str.re('\n')
+    usernames = reply.body.splitlines()
     results = ""
     failed = []
     successes = []
