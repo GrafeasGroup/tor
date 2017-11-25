@@ -1,4 +1,3 @@
-import ast
 import json
 import logging
 import random
@@ -24,7 +23,7 @@ def process_command(reply, config):
     :param config:
     :return:
     """
-    with open('commands.csv', newline='') as commands_file:
+    with open('commands.json', newline='') as commands_file:
         commands = json.loads(commands_file)
         logging.info(
             f'Searching for command {reply.subject[1:]}, '
@@ -69,10 +68,6 @@ def process_command(reply, config):
         logging.info(
             f'Now executing command {reply.subject[1:]},'
             f' by {reply.author}.'
-        )
-
-        result = ast.literal_eval(
-            command['python_function'](reply.body, config)
         )
 
         result = globals()[command['python_function']](reply.body, config)
