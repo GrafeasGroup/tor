@@ -23,24 +23,29 @@ def process_command(reply, config):
     :param config:
     :return:
     """
+
+    # Trim off the ! from the start of the string
+    requested_command = reply.subject[1:]
+
     with open('commands.json', newline='') as commands_file:
         commands = json.loads(commands_file)
         logging.info(
-            f'Searching for command {reply.subject[1:]}, '
+            f'Searching for command {requested_command}, '
             f'from {reply.author}.'
         )
 
         try:
-            command = commands['commands'][reply.subject[1:]]
+            command = commands['commands'][requested_command]
 
         except KeyError:
-            reply.reply(
-                "That command hasn't been implemented yet ):"
-                "\n\nMessage a dev to make your dream come true."
-            )
+            if from_moderator(reply, config):
+                reply.reply(
+                    "That command hasn't been implemented yet ):"
+                    "\n\nMessage a dev to make your dream come true."
+                )
 
             logging.error(
-                f"Error, command: {reply.subject[1:]} not found!"
+                f"Error, command: {requested_command} not found!"
                 f" (from {reply.author})"
             )
 
@@ -48,34 +53,33 @@ def process_command(reply, config):
 
         # command found
         logging.info(
-            f'{reply.author} is attempting to run {reply.subject[1:]}'
+            f'{reply.author} is attempting to run {requested_command}'
         )
-        # does it need mod privileges?
-        if command['needs_moderator']:
-            if not from_moderator(reply, config):
-                logging.info(
-                    f"{reply.author} failed to run {reply.subject[1:]},"
-                    f" because they aren't a mod"
-                )
-                reply.reply(
-                    random.choice(commands['notAuthorizedResponses']).format(
-                        random.choice(config.no_gifs)
-                    )
-                )
 
-                return
+        if reply.author not in command['allowedNames'] \
+                or not from_moderator(reply, config):
+            logging.info(
+                f"{reply.author} failed to run {requested_command},"
+                f"because they aren't a mod, or aren't in the allowed names "
+                f"list "
+            )
+            reply.reply(
+                random.choice(commands['notAuthorizedResponses']).format(
+                    random.choice(config.no_gifs)
+                )
+            )
+
+            return
 
         logging.info(
-            f'Now executing command {reply.subject[1:]},'
+            f'Now executing command {requested_command},'
             f' by {reply.author}.'
         )
 
-        result = globals()[command['python_function']](reply.body, config)
+        result = globals()[command['pythonFunction']](reply.body, config)
 
         if result is not None:
             reply.reply(result)
-        else:
-            return
 
 
 def from_moderator(reply, config):
@@ -123,14 +127,6 @@ def process_blacklist(reply, config):
     :return: None
     """
 
-    if not from_moderator(reply, config):
-        logging.info(
-            '{} just tried to blacklist. Get your own bot!'
-            ''.format(reply.author.name)
-
-        )
-        return random.choice(config.no_gifs)
-
     usernames = reply.body.splitlines()
     results = ""
     failed = []
@@ -150,8 +146,8 @@ def process_blacklist(reply, config):
             failed.append(username)
             continue
 
-        already_added = config.redis.sadd('blacklist', username)
-        if already_added == 0:
+        redis_already_added = config.redis.sadd('blacklist', username)
+        if redis_already_added == 0:
             results += f"{username} is already blacklisted, ya fool!\n"
             already_added.append(username)
             continue
@@ -179,15 +175,6 @@ def reload_config(reply, config):
     logging.info('Reload complete.')
 
     return 'Config reloaded!'
-
-
-def update_and_restart(reply, config):
-    return "This doesn't work quite yet"
-    # TODO: This does not currently function on our primary box.
-    # # update from repo
-    # sh.git.pull("origin", "master")
-    # # restart own process
-    # os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 def ping(reply, config):

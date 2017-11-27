@@ -9,23 +9,27 @@
   "commands": {
     "blacklist": {
       "description": "Add usernames to internal blacklist - a.k.a do not interact with this user.",
-      "needs_moderator": true,
-      "python_function": "process_blacklist"
+      "allowedNames": [],
+      "pythonFunction": "process_blacklist",
     },
     "reload": {
       "description": "Re-run the initialization for the global config object and refresh all values.",
-      "needs_moderator": true,
-      "python_function": "reload_config"
+      "allowedNames": [],
+      "pythonFunction": "reload_config"
     },
     "update": {
       "description": "Update the local repo from master and respawn process.",
-      "needs_moderator": true,
-      "python_function": "update_and_restart"
+      "allowedNames": [],
+      "pythonFunction": "update_and_restart"
     },
     "ping": {
       "description": "Ping the bot to see if it's alive - user receives 'Pong!' response on success.",
-      "needs_moderator": false,
-      "python_function": "ping"
+      "allowedNames": [
+        "jabbathehutt1234",
+        "carrillo232",
+        "FletcherAU"
+      ],
+      "pythonFunction": "ping"
     }
   }
 }
