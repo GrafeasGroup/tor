@@ -108,6 +108,16 @@ def process_override(reply, config):
     :return: None.
     """
 
+    # don't remove this check, it's not covered like other admin_commands
+    # because it's used in reply to people, not as a PM
+    if not from_moderator(reply, config):
+        reply.reply(_(random.choice(config.no_gifs)))
+        logging.info(
+            '{} just tried to override. Lolno.'.format(reply.author.name)
+        )
+
+        return
+
     # okay, so the parent of the reply should be the bot's comment
     # saying it can't find it. In that case, we need the parent's
     # parent. That should be the comment with the `done` call in it.
