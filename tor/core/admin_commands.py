@@ -5,6 +5,7 @@ import random
 from praw.exceptions import ClientException as RedditClientException
 # noinspection PyProtectedMember
 from tor_core.helpers import clean_id
+from tor_core.helpers import send_to_slack
 from tor_core.initialize import initialize
 
 from tor.core.user_interaction import process_done
@@ -13,12 +14,12 @@ from tor.core.user_interaction import process_done
 def process_command(reply, config):
     """
     This function processes any commands send to the bot via PM with a subject
-    that stars with a !. The basic flow is read CSV file, look for row with same
-    subject, check if it needs mod, and check for mod, and then reply to the
-    PM with the results of the function listed in the CSV file.
+    that stars with a !. The basic flow is read JSON file, look for key with same
+    subject, check if the caller is mod, or is in the list of allowed people, then
+    reply with the results of pythonFunction
 
-    To add a new command: add an entry to commands.csv, (look at the top line
-    for row names) add your function to command_funcs, and add your function.
+    To add a new command: add an entry to commands.json, (look at the other commands
+    already listed), and add your function to admin_commands.py.
     :param reply:
     :param config:
     :return:
@@ -56,13 +57,22 @@ def process_command(reply, config):
             f'{reply.author} is attempting to run {requested_command}'
         )
 
+        # Mods are allowed to do any command, and some people are whitelisted
+        # per command to be able to use them
         if reply.author not in command['allowedNames'] \
                 or not from_moderator(reply, config):
-            logging.info(
+            logging.warn(
                 f"{reply.author} failed to run {requested_command},"
-                f"because they aren't a mod, or aren't in the allowed names "
-                f"list "
+                f"because they aren't a mod, or aren't whitelisted to use this"
+                f" command"
             )
+
+            send_to_slack(
+                f"Someone did something bad! *{reply.author}* tried "
+                f"to run {requested_command}! Go give them a "
+                f"spanking!"
+            )
+
             reply.reply(
                 random.choice(commands['notAuthorizedResponses']).format(
                     random.choice(config.no_gifs)
@@ -146,8 +156,7 @@ def process_blacklist(reply, config):
             failed.append(username)
             continue
 
-        redis_already_added = config.redis.sadd('blacklist', username)
-        if redis_already_added == 0:
+        if config.redis.sadd('blacklist', username):
             results += f"{username} is already blacklisted, ya fool!\n"
             already_added.append(username)
             continue
