@@ -4,6 +4,7 @@ import random
 
 from praw.exceptions import ClientException as RedditClientException
 # noinspection PyProtectedMember
+from tor_core.helpers import _
 from tor_core.helpers import clean_id
 from tor_core.helpers import send_to_slack
 from tor_core.initialize import initialize
