@@ -24,12 +24,7 @@
     },
     "ping": {
       "description": "Ping the bot to see if it's alive - user receives 'Pong!' response on success.",
-      "allowedNames": [
-        "jabbathehutt1234",
-        "carrillo232",
-        "FletcherAU",
-        "ILikePokemonGo101"
-      ],
+      "allowedNames": [],
       "pythonFunction": "ping"
     }
   }
