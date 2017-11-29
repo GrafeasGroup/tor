@@ -44,6 +44,18 @@ def _thread_title_check(original_post, history_item):
 
 
 def _thread_author_check(original_post, history_item, config):
+    """
+    This allows us to check whether the author of the thread that the
+    transcription is posted in is the same as the author of the linked
+    thread in the event of a removed comment where they cannot be directly
+    linked.
+
+    :param original_post: Comment object; comment that says "done".
+    :param history_item: Comment object; comment pulled from user's history.
+    :param config: the global config object.
+    :return: True if the author of the original submission matches the author
+        of the submission the transcription is on.
+    """
     return (
         history_item.submission.author == config.r.submission(
             url=original_post.submission.url
