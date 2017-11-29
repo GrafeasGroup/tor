@@ -167,7 +167,7 @@ def process_blacklist(reply, config):
             failed.append(username)
             continue
 
-        if config.redis.sadd('blacklist', username):
+        if not config.redis.sadd('blacklist', username):
             results += f"{username} is already blacklisted, ya fool!\n"
             already_added.append(username)
             continue
