@@ -7,6 +7,10 @@ means we will never make a backwards-incompatible change within a major version 
 
 ...Nothing yet!
 
+## v3.3.0 (2017-11-22)
+
+- Enable alternate validation method to get around spam filter nuking posts
+
 ## v3.2.0 (2017-11-7)
 
 - Update inbox handler to increase handling speed
