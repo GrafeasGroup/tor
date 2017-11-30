@@ -23,7 +23,7 @@
       "pythonFunction": "update_and_restart"
     },
     "ping": {
-      "description": "Ping the bot to see if it's alive - user receives 'Pong!' response on success.",
+      "description": "Ping the bot to see if it's alive - user receives 'Pongity ping pong pong!' response on success.",
       "allowedNames": [],
       "pythonFunction": "ping"
     }
