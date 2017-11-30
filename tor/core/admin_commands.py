@@ -198,4 +198,10 @@ def reload_config(reply, config):
 
 
 def ping(reply, config):
+    """
+    Replies to the !ping command, and is used as a keep alive check
+    :param reply: Not used, but it is here due to the way the function is called
+    :param config: See reply param
+    :return: The ping string, which in turn is given to Reddit's reply.reply()
+    """
     return "Pongity ping pong pong!"
