@@ -126,7 +126,8 @@ def process_override(reply, config):
     parents_parent = config.r.comment(id=clean_id(reply_parent.parent_id))
     if 'done' in parents_parent.body.lower():
         logging.info(
-            f'Starting validation override for post {parents_parent.fullname}, approved by {reply.author.name}'
+            f'Starting validation override for post {parents_parent.fullname}, '
+            f'approved by {reply.author.name}'
         )
         process_done(
             parents_parent, config, override=True
@@ -152,27 +153,28 @@ def process_blacklist(reply, config):
 
     for username in usernames:
         if username in config.tor_mods:
-            results += f"{username} is a mod! Don't blacklist mods!\n"
+            results += f'{username} is a mod! Don\'t blacklist mods!\n'
             failed.append(username)
             continue
 
         try:
             config.r.redditor(username)
         except RedditClientException:
-            results += f"{username} isn't a valid user\n"
+            results += f'{username} isn\'t a valid user\n'
             failed.append(username)
             continue
 
         if not config.redis.sadd('blacklist', username):
-            results += f"{username} is already blacklisted, ya fool!\n"
+            results += f'{username} is already blacklisted, ya fool!\n'
             already_added.append(username)
             continue
 
-        results += f"{username} is now blacklisted\n"
+        results += f'{username} is now blacklisted\n'
         successes.append(username)
 
         logging.info(
-            f"Blacklist: {repr(failed)} failed, {repr(successes)} succeeded, {repr(already_added)} were already blacklisted"
+            f'Blacklist: {repr(failed)} failed, {repr(successes)} succeeded, '
+            f'{repr(already_added)} were already blacklisted '
         )
 
         return results

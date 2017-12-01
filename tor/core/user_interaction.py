@@ -50,7 +50,8 @@ def process_coc(post, config):
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_slack(
-            f'<http://www.reddit.com/u/{post.author.name}|u/{post.author.name}> has just accepted the CoC!', config
+            f'<http://www.reddit.com/u/{post.author.name}|u/{post.author.name}>'
+            f' has just accepted the CoC!', config
         )
     process_claim(post, config)
 
@@ -103,7 +104,8 @@ def process_claim(post, config):
     except praw.exceptions.APIException as e:
         if e.error_type == 'DELETED_COMMENT':
             logging.info(
-                f'Comment attempting to claim ID {top_parent.fullname} has been deleted. Back up for grabs!'
+                f'Comment attempting to claim ID {top_parent.fullname} has '
+                f'been deleted. Back up for grabs! '
             )
             return
         raise  # Re-raise exception if not
@@ -138,7 +140,8 @@ def process_done(post, config, override=False):
                 # we need to double-check these things to keep people
                 # from gaming the system
                 logging.info(
-                    f'Post {top_parent.fullname} does not appear to have a post by claimant {post.author}. Hrm...'
+                    f'Post {top_parent.fullname} does not appear to have a '
+                    f'post by claimant {post.author}. Hrm... '
                 )
                 # noinspection PyUnresolvedReferences
                 try:
@@ -173,7 +176,8 @@ def process_done(post, config, override=False):
                 # far into validation, just mark it as done. Clearly they
                 # already passed.
                 logging.info(
-                    f'Attempted to mark post {top_parent.fullname} as done... hit ClientException.'
+                    f'Attempted to mark post {top_parent.fullname} '
+                    f'as done... hit ClientException.'
                 )
             flair_post(top_parent, flair.completed)
 
@@ -182,7 +186,8 @@ def process_done(post, config, override=False):
     except praw.exceptions.APIException as e:
         if e.error_type == 'DELETED_COMMENT':
             logging.info(
-                f'Comment attempting to mark ID {top_parent.fullname} as done has been deleted'
+                f'Comment attempting to mark ID {top_parent.fullname} '
+                f'as done has been deleted'
             )
             return
         raise  # Re-raise exception if not
