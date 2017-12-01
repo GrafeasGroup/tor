@@ -136,6 +136,7 @@ def set_meta_flair_on_other_posts(config):
             post.link_flair_text != flair.meta
         ):
             logging.info(
-                f'Flairing post {post.fullname} by author {post.author} with Meta.'
+                f'Flairing post {post.fullname} by author {post.author} with '
+                f'Meta. '
             )
             flair_post(post, flair.meta)

@@ -23,10 +23,12 @@ MOD_SUPPORT_PHRASES = [
 
 def forward_to_slack(item, config):
     send_to_slack(
-        f'Unhandled inbox reply by *{item.author}* -- *{item.subject}*: {item.body}', config)
+        f'Unhandled inbox reply by *{item.author}* -- *{item.subject}*: '
+        f'{item.body}', config)
 
     logging.info(
-        f'Received unhandled inbox message from {item.author}. \nSubject: {item.subject}\n\nBody: {item.body}'
+        f'Received unhandled inbox message from {item.author}. \n Subject: '
+        f'{item.subject}\n\nBody: {item.body} '
     )
 
 
@@ -57,7 +59,8 @@ def process_mod_intervention(post, config):
     phrases = '"' + '", "'.join(phrases) + '"'
 
     send_to_slack(
-        f':rotating_light::rotating_light: Mod Intervention Needed :rotating_light::rotating_light: '
+        f':rotating_light::rotating_light: Mod Intervention Needed '
+        f':rotating_light::rotating_light: '
         f'\n\nDetected use of {phrases} <{post.submission.shortlink}>',
         config
     )
@@ -126,7 +129,8 @@ def check_inbox(config):
         # In this case, there will be no author attribute.
         if item.author is None:
             send_to_slack(
-                f'We received a message without an author. Subject: {item.subject}', config
+                f'We received a message without an author. Subject: '
+                f'{item.subject}', config
             )
             item.mark_read()
 

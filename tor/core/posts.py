@@ -71,7 +71,8 @@ def process_post(new_post, config):
         return
 
     logging.info(
-        f'Posting call for transcription on ID {new_post.fullname} posted by {new_post.author.name}'
+        f'Posting call for transcription on ID {new_post.fullname} posted by '
+        f'{new_post.author.name} '
     )
 
     if new_post.domain in config.image_domains:
@@ -93,7 +94,8 @@ def process_post(new_post, config):
                 ))
                 add_complete_post_id(new_post.fullname, config)
                 logging.info(
-                    f'Found YouTube video, {get_yt_video_id(new_post.url)}, with good transcripts.'
+                    f'Found YouTube video, {get_yt_video_id(new_post.url)}, '
+                    f'with good transcripts.'
                 )
                 return
         content_type = 'video'
@@ -147,5 +149,6 @@ def process_post(new_post, config):
     except Exception as e:
         logging.error(
             f'{e} - unable to post content.\nID: {new_post.fullname}\n '
-            f'Title: {new_post.title}\nSubreddit: {new_post.subreddit.display_name}'
+            f'Title: {new_post.title}\n Subreddit: '
+            f'{new_post.subreddit.display_name} '
         )
