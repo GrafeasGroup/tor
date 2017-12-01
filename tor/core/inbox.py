@@ -23,15 +23,10 @@ MOD_SUPPORT_PHRASES = [
 
 def forward_to_slack(item, config):
     send_to_slack(
-        'Unhandled inbox reply by *{author}* -- *{subject}*: {body}'.format(
-            author=item.author,
-            body=item.body,
-            subject=item.subject,
-        ), config)
+        f'Unhandled inbox reply by *{item.author}* -- *{item.subject}*: {item.body}', config)
 
     logging.info(
-        'Received unhandled inbox message from {}. \nSubject: {}\n\nBody: {}'
-        ''.format(item.author, item.subject, item.body)
+        f'Received unhandled inbox message from {item.author}. \nSubject: {item.subject}\n\nBody: {item.body}'
     )
 
 
@@ -62,10 +57,8 @@ def process_mod_intervention(post, config):
     phrases = '"' + '", "'.join(phrases) + '"'
 
     send_to_slack(
-        ':rotating_light::rotating_light: Mod Intervention Needed '
-        ':rotating_light::rotating_light: \n\nDetected use of '
-        '{phrases} <{link}>'
-        ''.format(link=post.submission.shortlink, phrases=phrases),
+        f':rotating_light::rotating_light: Mod Intervention Needed :rotating_light::rotating_light: '
+        f'\n\nDetected use of {phrases} <{post.submission.shortlink}>',
         config
     )
 
@@ -133,8 +126,7 @@ def check_inbox(config):
         # In this case, there will be no author attribute.
         if item.author is None:
             send_to_slack(
-                'We received a message without an author. Subject: {}'
-                ''.format(item.subject), config
+                f'We received a message without an author. Subject: {item.subject}', config
             )
             item.mark_read()
 
@@ -150,7 +142,7 @@ def check_inbox(config):
             continue
 
         elif item.subject == 'username mention':
-            logging.info('Received mention! ID {}'.format(item))
+            logging.info(f'Received mention! ID {item}')
 
             # noinspection PyUnresolvedReferences
             try:

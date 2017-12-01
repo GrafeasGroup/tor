@@ -45,7 +45,7 @@ def is_valid(post_id, config):
             # It's in post_ids, which means we started it, but it's not
             # in complete_post_ids, which means we never finished it for
             # some reason. Let's try it again.
-            logging.warning('Incomplete post found! ID: {}'.format(post_id))
+            logging.warning(f'Incomplete post found! ID: {post_id}')
             return True
 
         else:

@@ -114,7 +114,7 @@ def process_override(reply, config):
     if not from_moderator(reply, config):
         reply.reply(_(random.choice(config.no_gifs)))
         logging.info(
-            '{} just tried to override. Lolno.'.format(reply.author.name)
+            f'{reply.author.name} just tried to override. Lolno.'
         )
 
         return
@@ -126,11 +126,7 @@ def process_override(reply, config):
     parents_parent = config.r.comment(id=clean_id(reply_parent.parent_id))
     if 'done' in parents_parent.body.lower():
         logging.info(
-            'Starting validation override for post {}'
-            ', approved by {}'.format(
-                parents_parent.fullname,
-                reply.author.name
-            )
+            f'Starting validation override for post {parents_parent.fullname}, approved by {reply.author.name}'
         )
         process_done(
             parents_parent, config, override=True
@@ -176,12 +172,7 @@ def process_blacklist(reply, config):
         successes.append(username)
 
         logging.info(
-            "Blacklist: {failed} failed, {success} succeeded, {ignored} were "
-            "already blacklisted".format(
-                failed=repr(failed),
-                success=repr(successes),
-                ignored=repr(already_added)
-            )
+            f"Blacklist: {repr(failed)} failed, {repr(successes)} succeeded, {repr(already_added)} were already blacklisted"
         )
 
         return results
@@ -189,7 +180,10 @@ def process_blacklist(reply, config):
 
 def reload_config(reply, config):
     logging.info(
-        'Reloading configs at the request of {}'.format(reply.author.name)
+        f'Reloading configs at the request of {reply.author.name}'
+    )
+    reply.reply(
+        'Config reloaded!'
     )
     initialize(config)
     logging.info('Reload complete.')
@@ -204,4 +198,7 @@ def ping(reply, config):
     :param config: See reply param
     :return: The ping string, which in turn is given to Reddit's reply.reply()
     """
+    logging.info(
+        f'Received ping from {reply.author.name}. Pong!'
+    )
     return "Pongity ping pong pong!"
