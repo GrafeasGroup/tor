@@ -30,7 +30,7 @@ def flair_post(post, text):
 
     # if the flairing is successful, we won't hit this line.
     logging.error(
-        'Cannot find requested flair {}. Not flairing.'.format(text)
+        f'Cannot find requested flair {text}. Not flairing.'
     )
 
 
@@ -66,9 +66,7 @@ def _parse_existing_flair(user_flair):
     # check to make sure we actually got something
     if css is None:
         logging.error(
-            'Cannot find flair css for value {}. What happened?'.format(
-                new_flair_count
-            )
+            f'Cannot find flair css for value {new_flair_count}. What happened?'
         )
         # set to the default with no special looks on the subreddit
         css = 'grafeas'
@@ -110,12 +108,12 @@ def update_user_flair(post, config):
 
         # if there's anything special in their flair string, let's save it
         additional_flair_text = user_flair[user_flair.index('Γ') + 1:]
-        user_flair = '{} Γ'.format(new_count)
+        user_flair = f'{new_count} Γ'
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
 
         config.tor.flair.set(post.author, text=user_flair, css_class=flair_css)
-        logging.info('Setting flair for {}'.format(post.author))
+        logging.info(f'Setting flair for {post.author}')
     else:
         # they're bot or a mod and have custom flair. Leave it alone.
         return
@@ -138,8 +136,6 @@ def set_meta_flair_on_other_posts(config):
             post.link_flair_text != flair.meta
         ):
             logging.info(
-                'Flairing post {} by author {} with Meta.'.format(
-                    post.fullname, post.author
-                )
+                f'Flairing post {post.fullname} by author {post.author} with Meta.'
             )
             flair_post(post, flair.meta)

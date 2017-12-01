@@ -50,10 +50,7 @@ def process_coc(post, config):
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_slack(
-            '<http://www.reddit.com/u/{user}|u/{user}> has just '
-            'accepted the CoC!'.format(
-                user=post.author.name
-            ), config
+            f'<http://www.reddit.com/u/{post.author.name}|u/{post.author.name}> has just accepted the CoC!', config
         )
     process_claim(post, config)
 
@@ -94,9 +91,7 @@ def process_claim(post, config):
 
             flair_post(top_parent, flair.in_progress)
             logging.info(
-                'Claim on ID {} by {} successful'.format(
-                    top_parent.fullname, post.author
-                )
+                f'Claim on ID {top_parent.fullname} by {post.author} successful'
             )
 
         # can't claim something that's already claimed
@@ -108,8 +103,7 @@ def process_claim(post, config):
     except praw.exceptions.APIException as e:
         if e.error_type == 'DELETED_COMMENT':
             logging.info(
-                'Comment attempting to claim ID {} has been deleted. '
-                'Back up for grabs!'.format(top_parent.fullname)
+                f'Comment attempting to claim ID {top_parent.fullname} has been deleted. Back up for grabs!'
             )
             return
         raise  # Re-raise exception if not
@@ -144,10 +138,7 @@ def process_done(post, config, override=False):
                 # we need to double-check these things to keep people
                 # from gaming the system
                 logging.info(
-                    'Post {} does not appear to have a post by claimant {}. '
-                    'Hrm...'.format(
-                        top_parent.fullname, post.author
-                    )
+                    f'Post {top_parent.fullname} does not appear to have a post by claimant {post.author}. Hrm...'
                 )
                 # noinspection PyUnresolvedReferences
                 try:
@@ -175,17 +166,14 @@ def process_done(post, config, override=False):
                 post.reply(_(done_completed_transcript))
                 update_user_flair(post, config)
                 logging.info(
-                    'Post {} completed by {}!'.format(
-                        top_parent.fullname, post.author
-                    )
+                    f'Post {top_parent.fullname} completed by {post.author}!'
                 )
             except praw.exceptions.ClientException:
                 # If the butt deleted their comment and we're already this
                 # far into validation, just mark it as done. Clearly they
                 # already passed.
                 logging.info(
-                    'Attempted to mark post {} as done... hit ClientException.'
-                    ''.format(top_parent.fullname)
+                    f'Attempted to mark post {top_parent.fullname} as done... hit ClientException.'
                 )
             flair_post(top_parent, flair.completed)
 
@@ -194,8 +182,7 @@ def process_done(post, config, override=False):
     except praw.exceptions.APIException as e:
         if e.error_type == 'DELETED_COMMENT':
             logging.info(
-                'Comment attempting to mark ID {} as done has been deleted'
-                ''.format(top_parent.fullname)
+                f'Comment attempting to mark ID {top_parent.fullname} as done has been deleted'
             )
             return
         raise  # Re-raise exception if not
