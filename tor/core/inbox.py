@@ -6,9 +6,7 @@ from praw.models import Comment as RedditComment
 from tor_core.helpers import send_to_slack
 
 from tor.core.admin_commands import process_override
-from tor.core.admin_commands import process_blacklist
-from tor.core.admin_commands import reload_config
-from tor.core.admin_commands import update_and_restart
+from tor.core.admin_commands import process_command
 from tor.core.mentions import process_mention
 from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_coc
@@ -103,11 +101,6 @@ def process_reply(reply, config):
         if '!override' in reply.body.lower():
             process_override(reply, config)
             reply.mark_read()
-            return  # Because overrides should stop the world and start fresh
-
-        if '!blacklist' in reply.subject.lower():
-            process_blacklist(reply, config)
-            reply.mark_read()
             return
 
         # If we made it this far, it's something we can't process automatically
@@ -172,23 +165,11 @@ def check_inbox(config):
         elif item.subject in ('comment reply', 'post reply'):
             process_reply(item, config)
 
-        elif 'reload' in item.subject.lower():
+        elif item.subject[0] == '!':
+            # Handle our special commands
+            process_command(item, config)
             item.mark_read()
-            reload_config(item, config)
-
-        elif 'update' in item.subject.lower():
-            item.mark_read()
-            update_and_restart(item, config)
-            # there's no reason to do anything else here because the process
-            # will terminate and respawn
-
-        # ARE YOU ALIVE?!
-        elif item.subject.lower() == 'ping':
-            item.mark_read()
-            logging.info(
-                'Received ping from {}. Pong!'.format(item.author.name)
-            )
-            item.reply('Pong!')
+            continue
 
         else:
             item.mark_read()
