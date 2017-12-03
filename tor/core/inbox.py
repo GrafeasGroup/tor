@@ -22,12 +22,15 @@ MOD_SUPPORT_PHRASES = [
 
 
 def forward_to_slack(item, config):
-    send_to_slack(
-        f'Unhandled inbox reply by *{item.author}* -- *{item.subject}*: '
-        f'{item.body}', config)
+    username = item.author.name
 
+    send_to_slack(
+        f'Unhandled message by '
+        f'<https://reddit.com/user/{username}|u/{username}> -- '
+        f'*{item.subject}*:\n{item.body}', config
+    )
     logging.info(
-        f'Received unhandled inbox message from {item.author}. \n Subject: '
+        f'Received unhandled inbox message from {username}. \n Subject: '
         f'{item.subject}\n\nBody: {item.body} '
     )
 
