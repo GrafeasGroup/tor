@@ -140,3 +140,6 @@ def set_meta_flair_on_other_posts(config):
                 f'Meta. '
             )
             flair_post(post, flair.meta)
+            send_to_slack(
+                f'New meta post: <{post.url}|{post.fullname}>'
+            )
