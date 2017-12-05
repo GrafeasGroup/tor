@@ -90,7 +90,7 @@ def process_command(reply, config):
             f' by {reply.author.name}.'
         )
 
-        result = globals()[command['pythonFunction']](reply.body, config)
+        result = globals()[command['pythonFunction']](reply, config)
 
         if result is not None:
             reply.reply(result)
