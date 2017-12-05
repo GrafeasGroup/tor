@@ -63,7 +63,7 @@ def process_command(reply, config):
         # Mods are allowed to do any command, and some people are whitelisted
         # per command to be able to use them
         if (
-            reply.author.name not in command['allowedNames'] or
+            reply.author.name not in command['allowedNames'] and
             not from_moderator(reply, config)
         ):
             logging.warning(
