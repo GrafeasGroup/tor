@@ -62,8 +62,10 @@ def process_command(reply, config):
 
         # Mods are allowed to do any command, and some people are whitelisted
         # per command to be able to use them
-        if reply.author.name not in command['allowedNames'] \
-                or not from_moderator(reply, config):
+        if (
+            reply.author.name not in command['allowedNames'] or
+            not from_moderator(reply, config)
+        ):
             logging.warning(
                 f"{reply.author.name} failed to run {requested_command},"
                 f"because they aren't a mod, or aren't whitelisted to use this"
@@ -204,4 +206,4 @@ def ping(reply, config):
     logging.info(
         f'Received ping from {reply.author.name}. Pong!'
     )
-    return "Pongity ping pong pong!"
+    return "Pong!"

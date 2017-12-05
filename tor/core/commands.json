@@ -1,10 +1,10 @@
 {
   "notAuthorizedResponses": [
-    "Ha, nope!\n\n{}",
-    "l0l no.\n\n{}",
+    "Nope, sorry!\n\n{}",
+    "Mmmm... no.\n\n{}",
     "{}",
     "Sorry!\n\n{}",
-    "Nada.\n\n{}"
+    "I'm sure you're a lovely person and all, but no.\n\n{}"
   ],
   "commands": {
     "blacklist": {
@@ -23,7 +23,7 @@
       "pythonFunction": "update_and_restart"
     },
     "ping": {
-      "description": "Ping the bot to see if it's alive - user receives 'Pongity ping pong pong!' response on success.",
+      "description": "Ping the bot to see if it's alive - user receives 'Pong!' response on success.",
       "allowedNames": [],
       "pythonFunction": "ping"
     }
