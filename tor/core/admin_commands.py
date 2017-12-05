@@ -30,7 +30,7 @@ def process_command(reply, config):
     requested_command = reply.subject[1:]
 
     with open('commands.json', newline='') as commands_file:
-        commands = json.loads(commands_file)
+        commands = json.load(commands_file)
         logging.info(
             f'Searching for command {requested_command}, '
             f'from {reply.author}.'
@@ -62,7 +62,7 @@ def process_command(reply, config):
         # per command to be able to use them
         if reply.author not in command['allowedNames'] \
                 or not from_moderator(reply, config):
-            logging.warn(
+            logging.warning(
                 f"{reply.author} failed to run {requested_command},"
                 f"because they aren't a mod, or aren't whitelisted to use this"
                 f" command"
