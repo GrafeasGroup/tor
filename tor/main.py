@@ -20,6 +20,7 @@ from tor.helpers.flair import set_meta_flair_on_other_posts
 # List is in date order.
 #
 # Jake L (2017-11-17)
+# Michael W (2017-11-27)
 
 # Musical Dedications:
 #

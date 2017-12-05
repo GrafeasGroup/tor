@@ -15,15 +15,17 @@ from tor.core.user_interaction import process_done
 def process_command(reply, config):
     """
     This function processes any commands send to the bot via PM with a subject
-    that stars with a !. The basic flow is read JSON file, look for key with same
-    subject, check if the caller is mod, or is in the list of allowed people, then
-    reply with the results of pythonFunction
+    that stars with a !. The basic flow is read JSON file, look for key with
+    same subject, check if the caller is mod, or is in the list of allowed
+    people, then reply with the results of pythonFunction.
 
-    To add a new command: add an entry to commands.json, (look at the other commands
-    already listed), and add your function to admin_commands.py.
-    :param reply:
-    :param config:
-    :return:
+    To add a new command: add an entry to commands.json, (look at the other
+    commands already listed), and add your function to admin_commands.py.
+
+    :param reply: Object, the message object that contains the requested
+        command
+    :param config: the global config object
+    :return: None
     """
 
     # Trim off the ! from the start of the string
