@@ -71,10 +71,11 @@ def process_command(reply, config):
                 f"because they aren't a mod, or aren't whitelisted to use this"
                 f" command"
             )
-
+            username = reply.author.name
             send_to_slack(
-                f":banhammer: Someone did something bad! *{reply.author.name}* "
-                f"tried to run {requested_command}!", config
+                f":banhammer: Someone did something bad! "
+                f"<https://reddit.com/user/{username}|u/{username}> tried to "
+                f"run {requested_command}!", config
             )
 
             reply.reply(
