@@ -35,7 +35,7 @@ def process_command(reply, config):
         commands = json.load(commands_file)
         logging.info(
             f'Searching for command {requested_command}, '
-            f'from {reply.author}.'
+            f'from {reply.author.name}.'
         )
 
         try:
@@ -50,28 +50,28 @@ def process_command(reply, config):
 
             logging.error(
                 f"Error, command: {requested_command} not found!"
-                f" (from {reply.author})"
+                f" (from {reply.author.name})"
             )
 
             return
 
         # command found
         logging.info(
-            f'{reply.author} is attempting to run {requested_command}'
+            f'{reply.author.name} is attempting to run {requested_command}'
         )
 
         # Mods are allowed to do any command, and some people are whitelisted
         # per command to be able to use them
-        if reply.author not in command['allowedNames'] \
+        if reply.author.name not in command['allowedNames'] \
                 or not from_moderator(reply, config):
             logging.warning(
-                f"{reply.author} failed to run {requested_command},"
+                f"{reply.author.name} failed to run {requested_command},"
                 f"because they aren't a mod, or aren't whitelisted to use this"
                 f" command"
             )
 
             send_to_slack(
-                f":banhammer: Someone did something bad! *{reply.author}* "
+                f":banhammer: Someone did something bad! *{reply.author.name}* "
                 f"tried to run {requested_command}!", config
             )
 
@@ -85,7 +85,7 @@ def process_command(reply, config):
 
         logging.info(
             f'Now executing command {requested_command},'
-            f' by {reply.author}.'
+            f' by {reply.author.name}.'
         )
 
         result = globals()[command['pythonFunction']](reply.body, config)
