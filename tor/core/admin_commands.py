@@ -71,9 +71,8 @@ def process_command(reply, config):
             )
 
             send_to_slack(
-                f"Someone did something bad! *{reply.author}* tried "
-                f"to run {requested_command}! Go give them a "
-                f"spanking!"
+                f":banhammer: Someone did something bad! *{reply.author}* "
+                f"tried to run {requested_command}!", config
             )
 
             reply.reply(
