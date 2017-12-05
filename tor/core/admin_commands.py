@@ -33,7 +33,7 @@ def process_command(reply, config):
 
     with open('commands.json', newline='') as commands_file:
         commands = json.load(commands_file)
-        logging.info(
+        logging.debug(
             f'Searching for command {requested_command}, '
             f'from {reply.author.name}.'
         )
@@ -48,7 +48,7 @@ def process_command(reply, config):
                     "\n\nMessage a dev to make your dream come true."
                 )
 
-            logging.error(
+            logging.warning(
                 f"Error, command: {requested_command} not found!"
                 f" (from {reply.author.name})"
             )
@@ -66,7 +66,7 @@ def process_command(reply, config):
             reply.author.name not in command['allowedNames'] and
             not from_moderator(reply, config)
         ):
-            logging.warning(
+            logging.info(
                 f"{reply.author.name} failed to run {requested_command},"
                 f"because they aren't a mod, or aren't whitelisted to use this"
                 f" command"
@@ -85,7 +85,7 @@ def process_command(reply, config):
 
             return
 
-        logging.info(
+        logging.debug(
             f'Now executing command {requested_command},'
             f' by {reply.author.name}.'
         )
