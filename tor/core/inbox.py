@@ -87,7 +87,10 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        if 'done' in reply.body.lower():
+        if (
+            'done' in reply.body.lower() or
+            'deno' in reply.body.lower()  # we <3 u/Lornescri
+        ):
             process_done(reply, config)
             reply.mark_read()
             return
