@@ -77,30 +77,33 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        if 'i accept' in reply.body.lower():
+        r_body = reply.body.lower()  # cache that thing
+
+        if 'i accept' in r_body:
             process_coc(reply, config)
             reply.mark_read()
             return
 
-        if 'claim' in reply.body.lower():
+        if 'claim' in r_body:
             process_claim(reply, config)
             reply.mark_read()
             return
 
         if (
-            'done' in reply.body.lower() or
-            'deno' in reply.body.lower()  # we <3 u/Lornescri
+            'done' in r_body or
+            'deno' in r_body  # we <3 u/Lornescri
         ):
-            process_done(reply, config)
+            alt_text = True if 'done' not in r_body else False
+            process_done(reply, config, alt_text_trigger=alt_text)
             reply.mark_read()
             return
 
-        if 'thank' in reply.body.lower():  # trigger on "thanks" and "thank you"
+        if 'thank' in r_body:  # trigger on "thanks" and "thank you"
             process_thanks(reply, config)
             reply.mark_read()
             return
 
-        if '!override' in reply.body.lower():
+        if '!override' in r_body:
             process_override(reply, config)
             reply.mark_read()
             return
