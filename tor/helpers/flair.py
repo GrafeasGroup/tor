@@ -2,6 +2,7 @@ import logging
 
 from tor_core.helpers import clean_id
 from tor_core.helpers import flair
+from tor_core.helpers import send_to_slack
 
 
 def flair_post(post, text):
