@@ -188,9 +188,6 @@ def reload_config(reply, config):
     logging.info(
         f'Reloading configs at the request of {reply.author.name}'
     )
-    reply.reply(
-        'Config reloaded!'
-    )
     initialize(config)
     logging.info('Reload complete.')
 
