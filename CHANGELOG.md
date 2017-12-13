@@ -5,7 +5,7 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## [Unreleased]
 
-...Nothing yet!
+- Handles common typo `deno` as `done` (by @itsthejoker)
 
 ## v3.3.0 (2017-11-22)
 
