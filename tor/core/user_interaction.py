@@ -204,6 +204,11 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                     f'Attempted to mark post {top_parent.fullname} '
                     f'as done... hit ClientException.'
                 )
+
+            config.redis.hdel(
+                'current_claims',
+                post.author.name
+            )
             flair_post(top_parent, flair.completed)
 
             config.redis.incr('total_completed', amount=1)
