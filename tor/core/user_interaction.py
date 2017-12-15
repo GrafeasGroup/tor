@@ -17,6 +17,7 @@ from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
 from tor.strings.responses import done_cannot_find_transcript
 from tor.strings.responses import done_completed_transcript
+from tor.strings.responses import done_did_not_claim_post
 from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
 from tor.strings.responses import thumbs_up_gifs
@@ -91,6 +92,11 @@ def process_claim(post, config):
             post.reply(_(claim_success))
 
             flair_post(top_parent, flair.in_progress)
+            config.redis.hset(
+                'current_claims',
+                post.author.name,
+                (post.id, post.permalink)
+            )
             logging.info(
                 f'Claim on ID {top_parent.fullname} by {post.author} successful'
             )
@@ -166,17 +172,30 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                 logging.info('Moderator override starting!')
             # noinspection PyUnresolvedReferences
             try:
-                if alt_text_trigger:
-                    post.reply(_(
-                        'I think you meant `done`, so here we go!\n\n' +
-                        done_completed_transcript
-                    ))
-                else:
-                    post.reply(_(done_completed_transcript))
-                update_user_flair(post, config)
-                logging.info(
-                    f'Post {top_parent.fullname} completed by {post.author}!'
+
+                redis_result = config.redis.hget(
+                        'current_claims',
+                        post.author.name
                 )
+
+                if redis_result[0] == post.id:
+
+                    if alt_text_trigger:
+                        post.reply(_(
+                            'I think you meant `done`, so here we go!\n\n' +
+                            done_completed_transcript
+                        ))
+                    else:
+                        post.reply(_(done_completed_transcript))
+                    update_user_flair(post, config)
+                    logging.info(
+                        f'Post {top_parent.fullname} '
+                        f'completed by {post.author}!'
+                    )
+                else:
+                    post.reply(_(
+                        done_did_not_claim_post.format(redis_result[1])
+                    ))
             except praw.exceptions.ClientException:
                 # If the butt deleted their comment and we're already this
                 # far into validation, just mark it as done. Clearly they

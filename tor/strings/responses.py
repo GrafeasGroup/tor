@@ -41,6 +41,11 @@ done_cannot_find_transcript = (
     'put the footer in your comment?'
 )
 
+done_did_not_claim_post = (
+    'I\'m sorry; It seems like someone else has claimed this post already. '
+    'You can view the comment [here.]({}).'
+)
+
 something_went_wrong = (
     'Something appears to have gone wrong. Please message the '
     'moderators of r/TranscribersOfReddit to have them look at '
