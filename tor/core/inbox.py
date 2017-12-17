@@ -112,7 +112,12 @@ def process_reply(reply, config):
         forward_to_slack(reply, config)
         reply.mark_read()  # no spamming the slack channel :)
 
-    except (AttributeError, RedditClientException):
+    except (RedditClientException, AttributeError) as e:
+        logging.warning(e)
+        logging.warning(
+            f"Unable to process comment {reply.submission.shortlink} "
+            f"by {reply.author}"
+        )
         # the only way we should hit this is if somebody comments and then
         # deletes their comment before the bot finished processing. It's
         # uncommon, but common enough that this is necessary.
@@ -121,14 +126,10 @@ def process_reply(reply, config):
 
 def check_inbox(config):
     """
-    Goes through all the unread messages in the inbox. It has two
-    loops within this section, each one dealing with a different type
-    of mail. Also deliberately leaves mail which does not fit into
-    either category so that it can be read manually at a later point.
+    Goes through all the unread messages in the inbox. It deliberately
+    leaves mail which does not fit into either category so that it can
+    be read manually at a later point.
 
-    The first loop handles username mentions.
-    The second loop sorts out and handles comments that include 'claim'
-        and 'done'.
     :return: None.
     """
     # Sort inbox, then act on it
