@@ -111,7 +111,7 @@ def process_claim(post, config):
         raise  # Re-raise exception if not
 
 
-def process_done(post, config, override=False):
+def process_done(post, config, override=False, alt_text_trigger=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -166,7 +166,13 @@ def process_done(post, config, override=False):
                 logging.info('Moderator override starting!')
             # noinspection PyUnresolvedReferences
             try:
-                post.reply(_(done_completed_transcript))
+                if alt_text_trigger:
+                    post.reply(_(
+                        'I think you meant `done`, so here we go!\n\n' +
+                        done_completed_transcript
+                    ))
+                else:
+                    post.reply(_(done_completed_transcript))
                 update_user_flair(post, config)
                 logging.info(
                     f'Post {top_parent.fullname} completed by {post.author}!'

@@ -1,6 +1,7 @@
 from tor.strings.urls import ToR_link
 from tor_core.helpers import get_parent_post_id
 from tor_core.helpers import send_to_slack
+from praw.models import Comment
 
 
 def _author_check(original_post, claimant_post):
@@ -77,7 +78,10 @@ def _author_history_check(post, config):
     :param config: the global config object.
     :return: True if the post is found in the history, False if not.
     """
-    for history_post in post.author.new(limit=5):
+    for history_post in post.author.new(limit=10):
+        if not isinstance(history_post, Comment):
+            continue
+
         if (
             history_post.is_root and
             _footer_check(history_post, config) and

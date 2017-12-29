@@ -11,6 +11,7 @@ means we will never make a backwards-incompatible change within a major version 
 - Add new command system (by @perryprog)
 - Use the same colors for subreddit flairs as on Discord, depending on number of completed transcriptions (by @itsthejoker)
 - Send message to Slack when flairing a post as Meta (by @arfie)
+- Handles common typo `deno` as `done` (by @itsthejoker)
 
 ## v3.3.0 (2017-11-22)
 

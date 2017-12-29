@@ -81,6 +81,7 @@ setup(
     install_requires=[
         'tor_core',
         'sh',
+        'praw',
     ],
     dependency_links=[
         'git+https://github.com/GrafeasGroup/tor_core.git@master#egg=tor_core-0',
