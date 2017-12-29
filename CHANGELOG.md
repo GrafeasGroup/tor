@@ -3,13 +3,19 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
-## [Unreleased]
+## v3.4.0 (2017-12-11)
 
+- Send inbox messages to Slack if they don't match any of the commands (by @arfie)
+- Send message to Slack on phrases that may need mod intervention (by @thelonelyghost)
+- Allow blacklisting of people (by @perryprog)
+- Add new command system (by @perryprog)
+- Use the same colors for subreddit flairs as on Discord, depending on number of completed transcriptions (by @itsthejoker)
+- Send message to Slack when flairing a post as Meta (by @arfie)
 - Handles common typo `deno` as `done` (by @itsthejoker)
 
 ## v3.3.0 (2017-11-22)
 
-- Enable alternate validation method to get around spam filter nuking posts
+- Enable alternate validation method to get around spam filter nuking posts (by @itsthejoker)
 
 ## v3.2.0 (2017-11-7)
 
