@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixes history check on users who have submissions stickied to their profile (by @arfie)
 - Fixes youtube auto-transcription attempts erroring out when unable to detect the video id (by @thelonelyghost)
+- Adds clearer indicator for post type to rules comment (by @itsthejoker)
 
 ## [3.10.0] - 2019-06-16
 
