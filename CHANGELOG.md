@@ -3,6 +3,10 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
+## Unreleased (2018-1-15)
+
+- Verbiage updates and other message improvements (by @itsthejoker)
+
 ## v3.4.0 (2017-12-11)
 
 - Send inbox messages to Slack if they don't match any of the commands (by @arfie)
