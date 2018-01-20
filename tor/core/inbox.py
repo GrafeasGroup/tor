@@ -75,7 +75,6 @@ def process_reply(reply, config):
         if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
             process_mod_intervention(reply, config)
             reply.mark_read()
-            return
 
         r_body = reply.body.lower()  # cache that thing
 
