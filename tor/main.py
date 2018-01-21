@@ -30,12 +30,14 @@ from tor.helpers.flair import set_meta_flair_on_other_posts
 #
 # Aramanthe
 # Caravan Palace
+# Celtic Woman
 # Girl Talk
 # Halsey
 # Hiromi
 # Icon for Hire
 # Lady Gaga
 # Maroon 5
+# Sigma
 #
 # Streams:
 # https://www.youtube.com/watch?v=hX3j0sQ7ot8
