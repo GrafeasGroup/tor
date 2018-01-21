@@ -72,43 +72,44 @@ def process_mod_intervention(post, config):
 def process_reply(reply, config):
     # noinspection PyUnresolvedReferences
     try:
+        r_body = reply.body.lower()  # cache that thing
+        handled = False
+
         if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
             process_mod_intervention(reply, config)
-            reply.mark_read()
+            handled = True
 
-        r_body = reply.body.lower()  # cache that thing
-
+        # False mod interventions might still need to be processed as another
+        # command
         if 'i accept' in r_body:
             process_coc(reply, config)
-            reply.mark_read()
-            return
+            handled = True
 
-        if 'claim' in r_body:
+        elif 'claim' in r_body:
             process_claim(reply, config)
-            reply.mark_read()
-            return
+            handled = True
 
-        if (
+        elif (
             'done' in r_body or
             'deno' in r_body  # we <3 u/Lornescri
         ):
             alt_text = True if 'done' not in r_body else False
             process_done(reply, config, alt_text_trigger=alt_text)
-            reply.mark_read()
-            return
+            handled = True
 
-        if 'thank' in r_body:  # trigger on "thanks" and "thank you"
+        elif 'thank' in r_body:  # trigger on "thanks" and "thank you"
             process_thanks(reply, config)
-            reply.mark_read()
-            return
+            handled = True
 
-        if '!override' in r_body:
+        elif '!override' in r_body:
             process_override(reply, config)
-            reply.mark_read()
-            return
+            handled = True
 
-        # If we made it this far, it's something we can't process automatically
-        forward_to_slack(reply, config)
+        if not handled:
+            # If we made it this far, it's something
+            # we can't process automatically
+            forward_to_slack(reply, config)
+
         reply.mark_read()  # no spamming the slack channel :)
 
     except (RedditClientException, AttributeError) as e:
