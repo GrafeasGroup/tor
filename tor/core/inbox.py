@@ -12,6 +12,7 @@ from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
+from tor.core.user_interaction import user_commands
 
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
@@ -77,38 +78,23 @@ def process_reply(reply, config):
 
         if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
             process_mod_intervention(reply, config)
+            # mark so it won't be sent to Slack as unrecognized message
             handled = True
 
         # False mod interventions might still need to be processed as another
         # command
-        if 'i accept' in r_body:
-            process_coc(reply, config)
-            handled = True
+        for triggers, cmd in user_commands.items():
+            if any(t in r_body for t in triggers):
+                cmd(reply, config)
+                break
+        else:  # if no user command matches
+            if '!override' in r_body:
+                process_override(reply, config)
 
-        elif 'claim' in r_body:
-            process_claim(reply, config)
-            handled = True
-
-        elif (
-            'done' in r_body or
-            'deno' in r_body  # we <3 u/Lornescri
-        ):
-            alt_text = True if 'done' not in r_body else False
-            process_done(reply, config, alt_text_trigger=alt_text)
-            handled = True
-
-        elif 'thank' in r_body:  # trigger on "thanks" and "thank you"
-            process_thanks(reply, config)
-            handled = True
-
-        elif '!override' in r_body:
-            process_override(reply, config)
-            handled = True
-
-        if not handled:
-            # If we made it this far, it's something
-            # we can't process automatically
-            forward_to_slack(reply, config)
+            elif not handled:
+                # If we made it this far, it's something
+                # we can't process automatically
+                forward_to_slack(reply, config)
 
         reply.mark_read()  # no spamming the slack channel :)
 

@@ -35,6 +35,24 @@ def coc_accepted(post, config):
     return config.redis.sismember('accepted_CoC', post.author.name) == 1
 
 
+user_commands = {}
+
+
+class user_command:
+    """
+    Decorator to mark a method as a user command. The decorator can take any
+    number of trigger strings as arguments. The command method should take a
+    reply and ToR config object as arguments.
+    """
+    def __init__(self, *args):
+        self.triggers = tuple(args)
+
+    def __call__(self, method):
+        user_commands[self.triggers] = method
+        return method
+
+
+@user_command('i accept')
 def process_coc(post, config):
     """
     Adds the username of the redditor to the db as accepting the code of
@@ -56,6 +74,7 @@ def process_coc(post, config):
     process_claim(post, config)
 
 
+@user_command('claim')
 def process_claim(post, config):
     """
     Handles comment replies containing the word 'claim' and routes
@@ -111,7 +130,8 @@ def process_claim(post, config):
         raise  # Re-raise exception if not
 
 
-def process_done(post, config, override=False, alt_text_trigger=False):
+@user_command('done', 'deno')  # we <3 u/Lornescri
+def process_done(post, config, override=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -124,6 +144,8 @@ def process_done(post, config, override=False, alt_text_trigger=False):
         and skips the validation check.
     :return: None.
     """
+
+    alt_text_trigger = 'done' not in post.body.lower()
 
     top_parent = get_parent_post_id(post, config.r)
 
@@ -199,6 +221,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
         raise  # Re-raise exception if not
 
 
+@user_command('thank')
 def process_thanks(post, config):
     try:
         post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
