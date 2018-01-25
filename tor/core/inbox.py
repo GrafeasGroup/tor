@@ -8,10 +8,6 @@ from tor_core.helpers import send_to_slack
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import process_command
 from tor.core.mentions import process_mention
-from tor.core.user_interaction import process_claim
-from tor.core.user_interaction import process_coc
-from tor.core.user_interaction import process_done
-from tor.core.user_interaction import process_thanks
 from tor.core.user_interaction import user_commands
 
 MOD_SUPPORT_PHRASES = [
