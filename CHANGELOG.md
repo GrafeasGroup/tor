@@ -3,6 +3,11 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
+## Unreleased
+
+- Fix mod interventions to not prevent normal user commands from being executed (by @arfie)
+- Change the user commands structure (by @arfie)
+
 ## v3.4.0 (2017-12-11)
 
 - Send inbox messages to Slack if they don't match any of the commands (by @arfie)
