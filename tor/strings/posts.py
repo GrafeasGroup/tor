@@ -10,7 +10,7 @@ rules_comment = (
     '\n\nWhen you\'re done, please comment again with `done`. Your flair will '
     'be updated to reflect the number of posts you\'ve transcribed and the '
     'will be marked as completed.'
-    '\n\nThis is a(n) {post_type} post, so please use the following formatting:'
+    '\n\nPost type: {post_type}. Please use the following formatting:'
     '\n\n---\n\n{formatting}\n\n---'
     '\n\nFooter\n---\n\nWhen you\'re done, please put the following footer at '
     'the **bottom** of your post:\n\n---\n\n{header}\n\n---'
