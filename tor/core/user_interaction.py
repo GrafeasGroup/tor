@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import logging
 import random
 
@@ -35,7 +36,7 @@ def coc_accepted(post, config):
     return config.redis.sismember('accepted_CoC', post.author.name) == 1
 
 
-user_commands = {}
+user_commands = OrderedDict()
 
 
 class user_command:
