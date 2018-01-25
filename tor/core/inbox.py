@@ -82,7 +82,7 @@ def process_reply(reply, config):
         for triggers, cmd in user_commands.items():
             if any(t in r_body for t in triggers):
                 cmd(reply, config)
-                break
+                break  # only execute the first match
         else:  # if no user command matches
             if '!override' in r_body:
                 process_override(reply, config)

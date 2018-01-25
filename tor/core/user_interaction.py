@@ -44,11 +44,37 @@ class user_command:
     Decorator to mark a method as a user command. The decorator can take any
     number of trigger strings as arguments. The command method should take a
     reply and ToR config object as arguments.
+
+    By applying this decorator, command methods will be automatically added to
+    user_commands, which is used by process_reply in tor.core.inbox. When
+    multiple commands match a message, only the one that was defined first
+    will be executed (that is, the one higher up in this file).
+
+    Example:
+
+        @user_command('foo', 'bar')
+        def some_command(msg, config):
+            msg.reply('Hello world!')
+
+    This command will be executed whenever someone replies with "foo" OR "bar".
     """
     def __init__(self, *args):
+        """
+        Register the triggers for this command.
+
+        :params: the strings upon which this command should be executed
+        """
         self.triggers = tuple(args)
 
     def __call__(self, method):
+        """
+        Apply the decorator to a method, adding the method with its triggers
+        (as defined in __init__) to the commands register.
+        The method should take a comment and a ToR config object as arguments.
+
+        :param method: the method that should be executed for this command
+        :returns: the method that was given
+        """
         user_commands[self.triggers] = method
         return method
 
