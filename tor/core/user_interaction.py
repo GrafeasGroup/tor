@@ -94,8 +94,8 @@ def process_claim(post, config):
             flair_post(top_parent, flair.in_progress)
             config.redis.hset(
                 'current_claims',
-                post.author.name,
-                (post.id, post.permalink)
+                top_parent.id,
+                (post.author.name, post.permalink)
             )
             logging.info(
                 f'Claim on ID {top_parent.fullname} by {post.author} successful'
@@ -175,10 +175,10 @@ def process_done(post, config, override=False, alt_text_trigger=False):
 
                 redis_result = config.redis.hget(
                         'current_claims',
-                        post.author.name
+                        top_parent.id
                 )
 
-                if redis_result[0] == post.id:
+                if redis_result[0] == post.author.name:
 
                     if alt_text_trigger:
                         post.reply(_(
@@ -207,7 +207,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
 
             config.redis.hdel(
                 'current_claims',
-                post.author.name
+                top_parent.id
             )
             flair_post(top_parent, flair.completed)
 
