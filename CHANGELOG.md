@@ -6,6 +6,7 @@ means we will never make a backwards-incompatible change within a major version 
 ## Unreleased (2018-1-15)
 
 - Verbiage updates and other message improvements (by @itsthejoker)
+- Fixes issue with YouTube transcription requested for video id `None` (by @thelonelyghost)
 
 ## v3.4.0 (2017-12-11)
 
