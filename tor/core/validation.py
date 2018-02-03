@@ -78,7 +78,7 @@ def _author_history_check(post, config):
     :param config: the global config object.
     :return: True if the post is found in the history, False if not.
     """
-    for history_post in post.author.new(limit=10):
+    for history_post in post.author.comments.new(limit=10):
         if not isinstance(history_post, Comment):
             continue
 

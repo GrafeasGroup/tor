@@ -7,6 +7,7 @@ means we will never make a backwards-incompatible change within a major version 
 
 - Verbiage updates and other message improvements (by @itsthejoker)
 - Fixes issue with YouTube transcription requested for video id `None` (by @thelonelyghost)
+- Fixes history check on users who have submissions stickied to their profile (by @arfie)
 
 ## v3.4.0 (2017-12-11)
 
