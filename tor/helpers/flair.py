@@ -2,7 +2,7 @@ import logging
 
 from tor_core.helpers import clean_id
 from tor_core.helpers import flair
-from tor_core.helpers import send_to_slack
+from tor_core.helpers import send_to_modchat
 
 
 def flair_post(post, text):
@@ -141,7 +141,7 @@ def set_meta_flair_on_other_posts(config):
                 f'Meta. '
             )
             flair_post(post, flair.meta)
-            send_to_slack(
-                f'New meta post: <{post.url}|{post.fullname}>',
+            send_to_modchat(
+                f'New meta post: [{post.title}]({post.url})',
                 config
             )
