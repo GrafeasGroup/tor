@@ -1,6 +1,6 @@
 from tor.strings.urls import ToR_link
 from tor_core.helpers import get_parent_post_id
-from tor_core.helpers import send_to_slack
+from tor_core.helpers import send_to_modchat
 from praw.models import Comment
 
 
@@ -126,7 +126,7 @@ def verified_posted_transcript(post, config):
 
     # Did their transcript get flagged by the spam filter? Check their history.
     if _author_history_check(post, config):
-        send_to_slack(
+        send_to_modchat(
             f'Found removed post: {post.submission.shortlink}',
             config,
             channel='#removed_posts'
