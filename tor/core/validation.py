@@ -1,4 +1,3 @@
-from praw.models import Comment
 from tor.core.helpers import get_parent_post_id, send_to_modchat
 from tor.strings import translation
 
@@ -81,15 +80,12 @@ def _author_history_check(post, cfg):
     :param cfg: the global config object.
     :return: True if the post is found in the history, False if not.
     """
-    for history_post in post.author.new(limit=10):
-        if not isinstance(history_post, Comment):
-            continue
-
+    for history_post in post.author.comments.new(limit=10):
         if (
-            history_post.is_root and
-            _footer_check(history_post, cfg) and
-            _thread_title_check(post, history_post) and
-            _thread_author_check(post, history_post, cfg)
+            history_post.is_root
+            and _footer_check(history_post, cfg)
+            and _thread_title_check(post, history_post)
+            and _thread_author_check(post, history_post, cfg)
         ):
             return True
     return False
