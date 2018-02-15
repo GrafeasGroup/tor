@@ -12,6 +12,7 @@ from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
+from tor.helpers.flair import get_user_flair_count
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
@@ -88,7 +89,10 @@ def process_claim(post, config):
 
         if flair.unclaimed in top_parent.link_flair_text:
             # need to get that "Summoned - Unclaimed" in there too
-            post.reply(_(claim_success))
+            if get_user_flair_count(post, config) == 0:
+                post.reply(_(first_claim_success))
+            else:
+                post.reply(_(claim_success))
 
             flair_post(top_parent, flair.in_progress)
             logging.info(

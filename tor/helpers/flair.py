@@ -119,6 +119,28 @@ def update_user_flair(post, config):
         # they're bot or a mod and have custom flair. Leave it alone.
         return
 
+def get_user_flair_count(post, config):
+    """
+    Returns the current post author's flair count.
+
+    :param post: The post which holds the author information.
+    :param config: The global config instance.
+    :return:
+    """
+
+    try:
+        # The post object is technically an inbox mention, even though it's
+        # a Comment object. In order to get the flair, we have to take the
+        # ID of our post object and re-request it from Reddit in order to
+        # get the *actual* object, even though they have the same ID. It's
+        # weird.
+        user_flair = config.r.comment(
+            id=clean_id(post.fullname)
+        ).author_flair_text
+    except AttributeError:
+        return 0;
+
+    return int(user_flair[:user_flair.index('Γ') - 1])
 
 def set_meta_flair_on_other_posts(config):
     """
