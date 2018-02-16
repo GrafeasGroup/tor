@@ -119,6 +119,7 @@ def update_user_flair(post, config):
         # they're bot or a mod and have custom flair. Leave it alone.
         return
 
+
 def set_meta_flair_on_other_posts(config):
     """
     Loops through the 10 newest posts on ToR and sets the flair to

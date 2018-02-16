@@ -9,7 +9,7 @@ bot_footer = (
 )
 
 claim_success = (
-    'The post is yours! Best of luck and thanks for helping!\n\n {} Please '
+    'The post is yours! Best of luck and thanks for helping!\n\n{}Please '
     'respond with "done" when complete so we can check this one off the list!'
 )
 
