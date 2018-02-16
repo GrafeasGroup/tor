@@ -91,7 +91,7 @@ def process_claim(post, config, first_claim=False):
             if first_claim:
                 post.reply(_(claim_success.format(first_claim_success)))
             else:
-                post.reply(_(claim_success))
+                post.reply(_(claim_success.format(''))
 
             flair_post(top_parent, flair.in_progress)
             logging.info(
