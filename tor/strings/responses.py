@@ -9,18 +9,16 @@ bot_footer = (
 )
 
 claim_success = (
-    'The post is yours! Best of luck and thanks for helping!\n\nPlease respond '
-    'with "done" when complete so we can check this one off the list!'
+    'The post is yours! Best of luck and thanks for helping!\n\n {} Please '
+    'respond with "done" when complete so we can check this one off the list!'
 )
 
 first_claim_success = (
-    'The post is yours! Best of luck and thanks for helping!\n\nSince this is '
-    'your first transcription, please make sure you are using the correct '
-    '[format](https://www.reddit.com/r/TranscribersOfReddit/wiki/format) and '
-    'to message the mods if you have any questions about the process (and / or'
-    'join our Discord (link in the sidebar) to talk to other volunteers). '
-    'We\'re here to help!\n\n Please respond with "done" when complete so we '
-    'can check this one off the list!'
+    'Since this is your first transcription, please make sure you are using the '
+    'correct [format](https://www.reddit.com/r/TranscribersOfReddit/wiki/format)'
+    'and to message the mods if you have any questions about the process (and / '
+    'or join our Discord (link in the sidebar) to talk to other volunteers). '
+    'We\'re here to help!\n\n'
 )
 
 already_claimed = (

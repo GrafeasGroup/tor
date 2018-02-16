@@ -12,7 +12,6 @@ from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
-from tor.helpers.flair import get_user_flair_count
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
@@ -54,10 +53,10 @@ def process_coc(post, config):
             f'<http://www.reddit.com/u/{post.author.name}|u/{post.author.name}>'
             f' has just accepted the CoC!', config
         )
-    process_claim(post, config)
+    process_claim(post, config, first_claim=True)
 
 
-def process_claim(post, config):
+def process_claim(post, config, first_claim=False):
     """
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
@@ -89,8 +88,8 @@ def process_claim(post, config):
 
         if flair.unclaimed in top_parent.link_flair_text:
             # need to get that "Summoned - Unclaimed" in there too
-            if get_user_flair_count(post, config) == 0:
-                post.reply(_(first_claim_success))
+            if first_claim:
+                post.reply(_(claim_success.format(first_claim_success)))
             else:
                 post.reply(_(claim_success))
 
