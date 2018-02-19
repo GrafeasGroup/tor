@@ -1,3 +1,4 @@
+import json
 import logging
 import random
 
@@ -95,7 +96,7 @@ def process_claim(post, config):
             config.redis.hset(
                 'current_claims',
                 top_parent.id,
-                (post.author.name, post.permalink)
+                json.dumps([post.author.name, post.permalink])
             )
             logging.info(
                 f'Claim on ID {top_parent.fullname} by {post.author} successful'
@@ -173,10 +174,10 @@ def process_done(post, config, override=False, alt_text_trigger=False):
             # noinspection PyUnresolvedReferences
             try:
 
-                redis_result = config.redis.hget(
+                redis_result = json.loads(config.redis.hget(
                         'current_claims',
                         top_parent.id
-                )
+                ))
 
                 if redis_result[0] == post.author.name:
 
@@ -187,11 +188,21 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                         ))
                     else:
                         post.reply(_(done_completed_transcript))
+
+                    # "done" was legit, so do the normal marking of stuff
                     update_user_flair(post, config)
                     logging.info(
                         f'Post {top_parent.fullname} '
                         f'completed by {post.author}!'
                     )
+
+                    config.redis.hdel(
+                        'current_claims',
+                        top_parent.id
+                    )
+                    flair_post(top_parent, flair.completed)
+
+                    config.redis.incr('total_completed', amount=1)
                 else:
                     post.reply(_(
                         done_did_not_claim_post.format(redis_result[1])
@@ -204,14 +215,6 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                     f'Attempted to mark post {top_parent.fullname} '
                     f'as done... hit ClientException.'
                 )
-
-            config.redis.hdel(
-                'current_claims',
-                top_parent.id
-            )
-            flair_post(top_parent, flair.completed)
-
-            config.redis.incr('total_completed', amount=1)
 
     except praw.exceptions.APIException as e:
         if e.error_type == 'DELETED_COMMENT':
