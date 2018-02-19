@@ -3,9 +3,11 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
-## Unreleased (2018-1-15)
+## Unreleased
 
 - Verbiage updates and other message improvements (by @itsthejoker)
+- Fix mod interventions to not prevent normal user commands from being executed (by @arfie)
+- Change the user commands structure (by @arfie)
 - Fixes issue with YouTube transcription requested for video id `None` (by @thelonelyghost)
 - Fixes history check on users who have submissions stickied to their profile (by @arfie)
 

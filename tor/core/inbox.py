@@ -8,10 +8,7 @@ from tor_core.helpers import send_to_slack
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import process_command
 from tor.core.mentions import process_mention
-from tor.core.user_interaction import process_claim
-from tor.core.user_interaction import process_coc
-from tor.core.user_interaction import process_done
-from tor.core.user_interaction import process_thanks
+from tor.core.user_interaction import user_commands
 
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
@@ -72,44 +69,29 @@ def process_mod_intervention(post, config):
 def process_reply(reply, config):
     # noinspection PyUnresolvedReferences
     try:
+        r_body = reply.body.lower()  # cache that thing
+        handled = False
+
         if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
             process_mod_intervention(reply, config)
-            reply.mark_read()
-            return
+            # mark so it won't be sent to Slack as unrecognized message
+            handled = True
 
-        r_body = reply.body.lower()  # cache that thing
+        # False mod interventions might still need to be processed as another
+        # command
+        for triggers, cmd in user_commands.items():
+            if any(t in r_body for t in triggers):
+                cmd(reply, config)
+                break  # only execute the first match
+        else:  # if no user command matches
+            if '!override' in r_body:
+                process_override(reply, config)
 
-        if 'i accept' in r_body:
-            process_coc(reply, config)
-            reply.mark_read()
-            return
+            elif not handled:
+                # If we made it this far, it's something
+                # we can't process automatically
+                forward_to_slack(reply, config)
 
-        if 'claim' in r_body:
-            process_claim(reply, config)
-            reply.mark_read()
-            return
-
-        if (
-            'done' in r_body or
-            'deno' in r_body  # we <3 u/Lornescri
-        ):
-            alt_text = True if 'done' not in r_body else False
-            process_done(reply, config, alt_text_trigger=alt_text)
-            reply.mark_read()
-            return
-
-        if 'thank' in r_body:  # trigger on "thanks" and "thank you"
-            process_thanks(reply, config)
-            reply.mark_read()
-            return
-
-        if '!override' in r_body:
-            process_override(reply, config)
-            reply.mark_read()
-            return
-
-        # If we made it this far, it's something we can't process automatically
-        forward_to_slack(reply, config)
         reply.mark_read()  # no spamming the slack channel :)
 
     except (RedditClientException, AttributeError) as e:
