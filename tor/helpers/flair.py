@@ -43,7 +43,7 @@ def _get_flair_css(transcription_count):
     elif transcription_count >= 251:
         return 'grafeas-purple'
     elif transcription_count >= 101:
-        return 'grafeas-orange'
+        return 'grafeas-teal'
     elif transcription_count >= 51:
         return 'grafeas-green'
     else:
