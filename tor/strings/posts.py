@@ -10,7 +10,7 @@ rules_comment = (
     '\n\nWhen you\'re done, please comment again with `done`. Your flair will '
     'be updated to reflect the number of posts you\'ve transcribed and the '
     'will be marked as completed.'
-    '\n\nHere\'s [a checklist](https://www.reddit.com/r/TranscribersOfReddit'
+    '\n\nHere\'s [a checklist](https://www.reddit.com/r/TranscribersOfReddit/'
     'wiki/checklist) that might help you out -- not just for newbies!'
     '\n\nThis is a(n) {post_type} post, so please use the following formatting:'
     '\n\n---\n\n{formatting}\n\n---'
