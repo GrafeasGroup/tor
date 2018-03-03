@@ -2,7 +2,7 @@ import logging
 
 from tor_core.helpers import clean_id
 from tor_core.helpers import flair
-from tor_core.helpers import send_to_slack
+from tor_core.helpers import send_to_modchat
 
 
 def flair_post(post, text):
@@ -43,7 +43,7 @@ def _get_flair_css(transcription_count):
     elif transcription_count >= 251:
         return 'grafeas-purple'
     elif transcription_count >= 101:
-        return 'grafeas-orange'
+        return 'grafeas-teal'
     elif transcription_count >= 51:
         return 'grafeas-green'
     else:
@@ -141,9 +141,7 @@ def set_meta_flair_on_other_posts(config):
                 f'Meta. '
             )
             flair_post(post, flair.meta)
-            send_to_slack(
-                f':thinking: '
-                f'New meta post: <{post.url}|{post.title}> '
-                f':thinking:',
+            send_to_modchat(
+                f'New meta post: [{post.title}]({post.url})',
                 config
             )

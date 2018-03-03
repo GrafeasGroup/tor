@@ -3,7 +3,7 @@ import re
 
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
-from tor_core.helpers import send_to_slack
+from tor_core.helpers import send_to_modchat
 
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import process_command
@@ -21,9 +21,9 @@ MOD_SUPPORT_PHRASES = [
 def forward_to_slack(item, config):
     username = item.author.name
 
-    send_to_slack(
+    send_to_modchat(
         f'Unhandled message by '
-        f'<https://reddit.com/user/{username}|u/{username}> -- '
+        f'[u/{username}](https://reddit.com/user/{username}) -- '
         f'*{item.subject}*:\n{item.body}', config
     )
     logging.info(
@@ -58,10 +58,10 @@ def process_mod_intervention(post, config):
     # Wrap each phrase in double-quotes (") and commas in between
     phrases = '"' + '", "'.join(phrases) + '"'
 
-    send_to_slack(
+    send_to_modchat(
         f':rotating_light::rotating_light: Mod Intervention Needed '
         f':rotating_light::rotating_light: '
-        f'\n\nDetected use of {phrases} <{post.submission.shortlink}>',
+        f'\n\nDetected use of {phrases} {post.submission.shortlink}',
         config
     )
 
@@ -120,7 +120,7 @@ def check_inbox(config):
         # Very rarely we may actually get a message from Reddit itself.
         # In this case, there will be no author attribute.
         if item.author is None:
-            send_to_slack(
+            send_to_modchat(
                 f'We received a message without an author. Subject: '
                 f'{item.subject}', config
             )
