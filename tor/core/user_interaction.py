@@ -15,6 +15,7 @@ from tor.helpers.flair import update_user_flair
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
+from tor.strings.responses import first_claim_success
 from tor.strings.responses import done_cannot_find_transcript
 from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
