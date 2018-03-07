@@ -6,7 +6,7 @@ from praw.exceptions import ClientException as RedditClientException
 # noinspection PyProtectedMember
 from tor_core.helpers import _
 from tor_core.helpers import clean_id
-from tor_core.helpers import send_to_slack
+from tor_core.helpers import send_to_modchat
 from tor_core.initialize import initialize
 
 from tor.core.user_interaction import process_done
@@ -72,9 +72,9 @@ def process_command(reply, config):
                 f" command"
             )
             username = reply.author.name
-            send_to_slack(
+            send_to_modchat(
                 f":banhammer: Someone did something bad! "
-                f"<https://reddit.com/user/{username}|u/{username}> tried to "
+                f"[u/{username}](https://reddit.com/user/{username}) tried to "
                 f"run {requested_command}!", config
             )
 

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import logging
 import random
 
@@ -6,7 +7,7 @@ import praw
 from tor_core.helpers import _
 from tor_core.helpers import get_parent_post_id
 from tor_core.helpers import get_wiki_page
-from tor_core.helpers import send_to_slack
+from tor_core.helpers import send_to_modchat
 
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair
@@ -36,6 +37,50 @@ def coc_accepted(post, config):
     return config.redis.sismember('accepted_CoC', post.author.name) == 1
 
 
+user_commands = OrderedDict()
+
+
+class user_command:
+    """
+    Decorator to mark a method as a user command. The decorator can take any
+    number of trigger strings as arguments. The command method should take a
+    reply and ToR config object as arguments.
+
+    By applying this decorator, command methods will be automatically added to
+    user_commands, which is used by process_reply in tor.core.inbox. When
+    multiple commands match a message, only the one that was defined first
+    will be executed (that is, the one higher up in this file).
+
+    Example:
+
+        @user_command('foo', 'bar')
+        def some_command(msg, config):
+            msg.reply('Hello world!')
+
+    This command will be executed whenever someone replies with "foo" OR "bar".
+    """
+    def __init__(self, *args):
+        """
+        Register the triggers for this command.
+
+        :params: the strings upon which this command should be executed
+        """
+        self.triggers = tuple(args)
+
+    def __call__(self, method):
+        """
+        Apply the decorator to a method, adding the method with its triggers
+        (as defined in __init__) to the commands register.
+        The method should take a comment and a ToR config object as arguments.
+
+        :param method: the method that should be executed for this command
+        :returns: the method that was given
+        """
+        user_commands[self.triggers] = method
+        return method
+
+
+@user_command('i accept')
 def process_coc(post, config):
     """
     Adds the username of the redditor to the db as accepting the code of
@@ -50,13 +95,15 @@ def process_coc(post, config):
     # Have they already been added? If 0, then just act like they said `claim`
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
-        send_to_slack(
-            f'<http://www.reddit.com/u/{post.author.name}|u/{post.author.name}>'
+        send_to_modchat(
+            f'[u/{post.author.name}](http://www.reddit.com/u/{post.author.name})'
             f' has just accepted the CoC!', config
         )
     process_claim(post, config, first_claim=True)
 
 
+
+@user_command('claim')
 def process_claim(post, config, first_claim=False):
     """
     Handles comment replies containing the word 'claim' and routes
@@ -115,7 +162,8 @@ def process_claim(post, config, first_claim=False):
         raise  # Re-raise exception if not
 
 
-def process_done(post, config, override=False, alt_text_trigger=False):
+@user_command('done', 'deno')  # we <3 u/Lornescri
+def process_done(post, config, override=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -128,6 +176,8 @@ def process_done(post, config, override=False, alt_text_trigger=False):
         and skips the validation check.
     :return: None.
     """
+
+    alt_text_trigger = 'done' not in post.body.lower()
 
     top_parent = get_parent_post_id(post, config.r)
 
@@ -203,6 +253,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
         raise  # Re-raise exception if not
 
 
+@user_command('thank')
 def process_thanks(post, config):
     try:
         post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
