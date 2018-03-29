@@ -103,7 +103,7 @@ def update_user_flair(post, config):
     except AttributeError:
         user_flair = flair_text
 
-    if user_flair is None:
+    if user_flair in ['', None]:
         user_flair = flair_text
 
     if 'Γ' in user_flair:
