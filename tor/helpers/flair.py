@@ -65,7 +65,9 @@ def _parse_existing_flair(user_flair):
     css = _get_flair_css(new_flair_count)
 
     # check to make sure we actually got something
-    if css is None:
+    # 3/28/2018, another unannounced API change. Empty flairs now return
+    # an empty string instead of None. Keeping None just in case, though.
+    if css in ['', None]:
         logging.error(
             f'Cannot find flair css for value {new_flair_count}. What happened?'
         )
@@ -101,7 +103,7 @@ def update_user_flair(post, config):
     except AttributeError:
         user_flair = flair_text
 
-    if user_flair is None:
+    if user_flair in ['', None]:
         user_flair = flair_text
 
     if 'Γ' in user_flair:

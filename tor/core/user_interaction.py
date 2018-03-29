@@ -80,7 +80,9 @@ def process_claim(post, config):
             ))
             return
 
-        if top_parent.link_flair_text is None:
+        # this can be either '' or None depending on how the API is feeling
+        # today
+        if top_parent.link_flair_text in ['', None]:
             # There exists the very small possibility that the post was
             # malformed and doesn't actually have flair on it. In that case,
             # let's set something so the next part doesn't crash.
