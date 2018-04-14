@@ -46,12 +46,33 @@ def process_coc(post, config):
     """
     result = config.redis.sadd('accepted_CoC', post.author.name)
 
+    modchat_emote = [
+        ':tada:',
+        ':confetti_ball:',
+        ':party-lexi:',
+        ':party-parrot:',
+        ':+1:',
+        ':trophy:',
+        ':heartpulse:',
+        ':beers:',
+        ':gold:',
+        ':upvote:',
+        ':coolio:',
+        ':derp:',
+        ':lenny1::lenny2:',
+        ':panic:',
+        ':fidget-spinner:',
+        ':fb-like:'
+    ]
+
     # Have they already been added? If 0, then just act like they said `claim`
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_modchat(
             f'[u/{post.author.name}](http://www.reddit.com/u/{post.author.name})'
-            f' has just accepted the CoC!', config
+            f' has just accepted the CoC! {modchat_emote}',
+            config,
+            channel='new_volunteers'
         )
     process_claim(post, config)
 
