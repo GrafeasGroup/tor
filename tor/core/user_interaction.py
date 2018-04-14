@@ -46,7 +46,7 @@ def process_coc(post, config):
     """
     result = config.redis.sadd('accepted_CoC', post.author.name)
 
-    modchat_emote = [
+    modchat_emote = random.choice([
         ':tada:',
         ':confetti_ball:',
         ':party-lexi:',
@@ -63,7 +63,7 @@ def process_coc(post, config):
         ':panic:',
         ':fidget-spinner:',
         ':fb-like:'
-    ]
+    ])
 
     # Have they already been added? If 0, then just act like they said `claim`
     # instead. If they're actually new, then send a message to slack.
