@@ -8,8 +8,8 @@
 # Transcribers of Reddit
 
 This is the source code for the bot moderating and managing several parts of the subreddit
-/r/TranscribersOfReddit, a community dedicated to transcribing images, audio, and video.
-It acts under the username "/u/TranscribersOfReddit".
+[/r/TranscribersOfReddit](https://reddit.com/r/TranscribersOfReddit) ("ToR"), a community dedicated to transcribing images, audio, and video.
+It acts under the username "[/u/TranscribersOfReddit](https://reddit.com/u/TranscribersOfReddit)".
 
 Among other things, this bot handles:
 
@@ -32,7 +32,7 @@ Reddit API keys
 
 Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/) and Python 3.6.
 
-```
+```sh
 $ git clone https://github.com/GrafeasGroup/tor.git tor
 $ cd tor/
 $ pip install --process-dependency-links .
@@ -40,7 +40,7 @@ $ pip install --process-dependency-links .
 
 OR
 
-```
+```sh
 $ pip install --process-dependency-links 'git+https://github.com/GrafeasGroup/tor.git@master#egg=tor-0'
 ```
 
@@ -64,7 +64,7 @@ Monitoring daemon (via subreddit's /new feed):
 
 ## Usage
 
-```
+```sh
 $ tor-moderator
 # => [daemon mode + logging]
 ```
