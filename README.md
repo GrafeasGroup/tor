@@ -1,7 +1,7 @@
 [![Waffle.io - Ready](https://img.shields.io/waffle/label/GrafeasGroup/tor/ready.svg?colorB=yellow&label=Available%20Issues)](https://waffle.io/GrafeasGroup/tor)
 [![Waffle.io - In Progress](https://img.shields.io/waffle/label/GrafeasGroup/tor/in%20progress.svg?colorB=green&label=Issues%20Being%20Worked%20On)](https://waffle.io/GrafeasGroup/tor)
-[![Codacy quality](https://img.shields.io/codacy/grade/3b7f08973a9644cc98faea4cbcd71eb2.svg)](https://www.codacy.com/app/GrafeasGroup/tor)
-[![Codacy coverage](https://img.shields.io/codacy/coverage/3b7f08973a9644cc98faea4cbcd71eb2.svg)](https://www.codacy.com/app/GrafeasGroup/tor)
+[![Codacy grade](https://img.shields.io/codacy/grade/e27821fb6289410b8f58338c7e0bc686.svg)](https://www.codacy.com/app/GrafeasGroup/tor)
+[![Codacy coverage](https://img.shields.io/codacy/coverage/c44df2d9c89a4809896914fd1a40bedd.svg)](https://www.codacy.com/app/GrafeasGroup/tor)
 [![Travis build status](https://img.shields.io/travis/GrafeasGroup/tor.svg)](https://travis-ci.org/GrafeasGroup/tor)
 [![BugSnag](https://img.shields.io/badge/errors--hosted--by-Bugsnag-blue.svg)](https://www.bugsnag.com/open-source/)
 
