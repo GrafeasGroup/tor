@@ -144,6 +144,6 @@ def set_meta_flair_on_other_posts(config):
             )
             flair_post(post, flair.meta)
             send_to_modchat(
-                f'New meta post: [{post.title}]({post.url})',
+                f'New meta post: <{post.url}|{post.title}>)',
                 config
             )

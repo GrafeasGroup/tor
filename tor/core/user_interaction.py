@@ -69,7 +69,7 @@ def process_coc(post, config):
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_modchat(
-            f'[u/{post.author.name}](http://www.reddit.com/u/{post.author.name})'
+            f'<http://www.reddit.com/u/{post.author.name}|u/{post.author.name}>'
             f' has just accepted the CoC! {modchat_emote}',
             config,
             channel='new_volunteers'

@@ -74,7 +74,7 @@ def process_command(reply, config):
             username = reply.author.name
             send_to_modchat(
                 f":banhammer: Someone did something bad! "
-                f"[u/{username}](https://reddit.com/user/{username}) tried to "
+                f"<https://reddit.com/user/{username}|u/{username}> tried to "
                 f"run {requested_command}!", config
             )
 
