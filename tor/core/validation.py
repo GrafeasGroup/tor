@@ -127,7 +127,7 @@ def verified_posted_transcript(post, config):
     # Did their transcript get flagged by the spam filter? Check their history.
     if _author_history_check(post, config):
         send_to_modchat(
-            f'Found removed post: {post.submission.shortlink}',
+            f'Found removed post: <{post.submission.shortlink}>',
             config,
             channel='#removed_posts'
         )

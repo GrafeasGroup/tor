@@ -26,7 +26,7 @@ def forward_to_slack(item, config):
 
     send_to_modchat(
         f'Unhandled message by '
-        f'[u/{username}](https://reddit.com/user/{username}) -- '
+        f'<https://reddit.com/user/{username}|u/{username}> -- '
         f'*{item.subject}*:\n{item.body}', config
     )
     logging.info(
