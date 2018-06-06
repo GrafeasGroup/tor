@@ -2,15 +2,9 @@ import logging
 import random
 
 import praw
-# noinspection PyProtectedMember
-from tor_core.helpers import _
-from tor_core.helpers import get_parent_post_id
-from tor_core.helpers import get_wiki_page
-from tor_core.helpers import send_to_modchat
-from tor_core.helpers import clean_id
 
-from tor.core.validation import verified_posted_transcript
 from tor.core.users import User
+from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
@@ -23,6 +17,12 @@ from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
 from tor.strings.responses import thumbs_up_gifs
 from tor.strings.responses import youre_welcome
+# noinspection PyProtectedMember
+from tor_core.helpers import _
+from tor_core.helpers import clean_id
+from tor_core.helpers import get_parent_post_id
+from tor_core.helpers import get_wiki_page
+from tor_core.helpers import send_to_modchat
 
 
 def coc_accepted(post, config):
