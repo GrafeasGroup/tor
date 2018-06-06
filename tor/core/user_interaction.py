@@ -145,6 +145,9 @@ def process_done(post, config, override=False, alt_text_trigger=False):
     :param config: the global config object.
     :param override: A parameter that can only come from process_override()
         and skips the validation check.
+    :param alt_text_trigger: a trigger that adds an extra piece of text onto
+        the response. Just something to help ease the number of
+        false-positives.
     :return: None.
     """
 
