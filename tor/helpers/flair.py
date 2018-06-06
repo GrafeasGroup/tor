@@ -1,7 +1,6 @@
 import logging
 
 from tor.core.users import User
-
 from tor_core.helpers import clean_id
 from tor_core.helpers import flair
 from tor_core.helpers import send_to_modchat
@@ -93,7 +92,7 @@ def update_user_flair(post, config):
     """
     flair_text = '{} Γ - Beta Tester'
 
-    post_author = User(str(post.author))
+    post_author = User(str(post.author), config.redis)
     current_transcription_count = post_author.get('transcriptions', 0)
 
     try:
