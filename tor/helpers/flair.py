@@ -1,5 +1,7 @@
 import logging
 
+from tor.core.users import User
+
 from tor_core.helpers import clean_id
 from tor_core.helpers import flair
 from tor_core.helpers import send_to_modchat
@@ -89,7 +91,10 @@ def update_user_flair(post, config):
     :param config: The global config instance.
     :return: None.
     """
-    flair_text = '0 Γ - Beta Tester'
+    flair_text = '{} Γ - Beta Tester'
+
+    post_author = User(str(post.author))
+    current_transcription_count = post_author.get('transcriptions', 0)
 
     try:
         # The post object is technically an inbox mention, even though it's
@@ -104,7 +109,12 @@ def update_user_flair(post, config):
         user_flair = flair_text
 
     if user_flair in ['', None]:
-        user_flair = flair_text
+        # HOLD ON. Do we have one saved? Maybe Reddit's screwing up.
+        if current_transcription_count != 0:
+            # we have a user object for them and shouldn't have landed here.
+            user_flair = flair_text.format(current_transcription_count)
+        else:
+            user_flair = flair_text.format('0')
 
     if 'Γ' in user_flair:
         new_count, flair_css = _parse_existing_flair(user_flair)
@@ -117,6 +127,10 @@ def update_user_flair(post, config):
 
         config.tor.flair.set(post.author, text=user_flair, css_class=flair_css)
         logging.info(f'Setting flair for {post.author}')
+
+        post_author.update('transcriptions', current_transcription_count + 1)
+        post_author.save()
+
     else:
         # they're bot or a mod and have custom flair. Leave it alone.
         return
