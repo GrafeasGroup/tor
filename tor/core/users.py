@@ -97,6 +97,11 @@ class User(object):
     def update(self, key, value):
         self.user_data[key] = value
 
+    def list_update(self, key, value):
+        if not self.user_data.get(key):
+            self.user_data[key] = list()
+        self.user_data[key] += [value]
+
     def _create_default_user_data(self):
         self.user_data = dict()
         self.user_data.update({'username': self.username})

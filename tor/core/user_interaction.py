@@ -7,8 +7,10 @@ from tor_core.helpers import _
 from tor_core.helpers import get_parent_post_id
 from tor_core.helpers import get_wiki_page
 from tor_core.helpers import send_to_modchat
+from tor_core.helpers import clean_id
 
 from tor.core.validation import verified_posted_transcript
+from tor.core.users import User
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
@@ -203,6 +205,11 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                 logging.info(
                     f'Post {top_parent.fullname} completed by {post.author}!'
                 )
+                # get that information saved for the user
+                author = User(str(post.author), config.redis)
+                author.list_update('posts_completed', clean_id(post.fullname))
+                author.save()
+
             except praw.exceptions.ClientException:
                 # If the butt deleted their comment and we're already this
                 # far into validation, just mark it as done. Clearly they
