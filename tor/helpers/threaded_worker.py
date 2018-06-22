@@ -102,9 +102,7 @@ def threaded_check_submissions(config):
                 data = f.result()
                 total_posts += data
             except Exception as exc:
-                print('an exception was generated: {}'.format(exc))
-            else:
-                print('retrieved {} posts'.format(len(data)))
+                logging.warning('an exception was generated: {}'.format(exc))
 
     for item in total_posts:
         if (
