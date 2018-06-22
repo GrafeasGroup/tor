@@ -8,6 +8,7 @@ from tor_core.initialize import build_bot
 from tor import __version__
 from tor.core.inbox import check_inbox
 from tor.core.posts import check_submissions
+from tor.helpers.threaded_worker import threaded_check_submissions
 from tor.helpers.flair import set_meta_flair_on_other_posts
 
 # Patreon Dedications:
@@ -48,8 +49,7 @@ def run(config):
     """
     check_inbox(config)
 
-    for sub in config.subreddits_to_check:
-        check_submissions(sub, config)
+    threaded_check_submissions(config)
 
     set_meta_flair_on_other_posts(config)
 
