@@ -16,7 +16,24 @@ from typing import Dict
 from typing import List
 
 from tor.core.posts import process_post
-from tor.core.posts import check_domain_filter
+
+
+def check_domain_filter(item: Dict, config) -> bool:
+    """
+    Validate that a given post is actually one that we can (or should) work on
+    by checking the domain of the post against our filters.
+
+    :param item: a dict which has the post information in it.
+    :param config: the config object.
+    :return: True if we can work on it, False otherwise.
+    """
+
+    return True if (
+        item['domain'] in config.image_domains or
+        item['domain'] in config.audio_domains or
+        item['domain'] in config.video_domains or
+        item['subreddit'] in config.subreddits_domain_filter_bypass
+    ) else False
 
 
 def get_subreddit_posts(sub: str) -> [List, None]:
@@ -58,7 +75,8 @@ def get_subreddit_posts(sub: str) -> [List, None]:
                     'ups': item['ups'],
                     'locked': item['locked'],
                     'archived': item['archived'],
-                    'author': item.get('author', None)
+                    'author': item.get('author', None),
+                    'url': item['url']
                 })
         return trimmed_links
 

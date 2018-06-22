@@ -1,11 +1,5 @@
 import logging
 
-from typing import Dict
-
-# noinspection PyProtectedMember
-from tor_core.helpers import _
-from tor_core.strings import reddit_url
-
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.reddit_ids import add_complete_post_id
@@ -17,24 +11,9 @@ from tor.strings.debug import id_already_handled_in_db
 from tor.strings.posts import discovered_submit_title
 from tor.strings.posts import rules_comment
 from tor.strings.posts import yt_already_has_transcripts
-
-
-def check_domain_filter(item: Dict, config) -> bool:
-    """
-    Validate that a given post is actually one that we can (or should) work on
-    by checking the domain of the post against our filters.
-
-    :param item: a dict which has the post information in it.
-    :param config: the config object.
-    :return: True if we can work on it, False otherwise.
-    """
-
-    return True if (
-        item['domain'] in config.image_domains or
-        item['domain'] in config.audio_domains or
-        item['domain'] in config.video_domains or
-        item['subreddit'] in config.subreddits_domain_filter_bypass
-    ) else False
+# noinspection PyProtectedMember
+from tor_core.helpers import _
+from tor_core.strings import reddit_url
 
 
 def process_post(new_post, config):
