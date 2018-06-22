@@ -2,7 +2,7 @@
 # fully expecting to completely throw away this codebase when we finish the
 # rewrite for celery. Therefore, ugly-ass hacks are allowed in the name of
 # making the current bots faster if at all possible. Is it maintainable?
-# Absolutely not, but that's a conscious decision on our part. Feast your eyes
+# Not really, but that's a conscious decision on our part. Feast your eyes
 # upon the ugliness... and know that we are sorry.
 
 import logging
@@ -16,6 +16,7 @@ from typing import Dict
 from typing import List
 
 from tor.core.posts import process_post
+from tor.core.posts import check_domain_filter
 
 
 def get_subreddit_posts(sub: str) -> [List, None]:
@@ -105,10 +106,5 @@ def threaded_check_submissions(config):
                 logging.warning('an exception was generated: {}'.format(exc))
 
     for item in total_posts:
-        if (
-            item['domain'] in config.image_domains or
-            item['domain'] in config.audio_domains or
-            item['domain'] in config.video_domains or
-            item['subreddit'] in config.subreddits_domain_filter_bypass
-        ):
+        if check_domain_filter(item, config):
             process_post(item, config)
