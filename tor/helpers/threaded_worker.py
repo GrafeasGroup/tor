@@ -98,10 +98,7 @@ def get_subreddit_posts(sub: str) -> [List, None]:
 
 
 def is_time_to_scan(config) -> bool:
-    if datetime.now() > config.last_post_scan_time + timedelta(seconds=45):
-        config.last_post_scan_time = datetime.now()
-        return True
-    return False
+    return datetime.now() > config.last_post_scan_time + timedelta(seconds=45)
 
 
 def threaded_check_submissions(config):
@@ -117,7 +114,11 @@ def threaded_check_submissions(config):
     """
 
     if not is_time_to_scan(config):
+        # we're still within the defined time window from the last time we
+        # looked for new posts. We'll try again later.
         return
+
+    config.last_post_scan_time = datetime.now()
 
     subreddits = config.subreddits_to_check
 
