@@ -8,6 +8,8 @@
 import logging
 import random
 import string
+from datetime import timedelta
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
 
@@ -95,6 +97,10 @@ def get_subreddit_posts(sub: str) -> [List, None]:
     return parse_json_posts(result)
 
 
+def is_time_to_scan(config) -> bool:
+    return datetime.now() > config.last_post_scan_time + timedelta(seconds=45)
+
+
 def threaded_check_submissions(config):
     """
     Single threaded PRAW performance:
@@ -106,6 +112,14 @@ def threaded_check_submissions(config):
     multi-threaded json performance:
     finished in 1.3632569313049316s
     """
+
+    if not is_time_to_scan(config):
+        # we're still within the defined time window from the last time we
+        # looked for new posts. We'll try again later.
+        return
+
+    config.last_post_scan_time = datetime.now()
+
     subreddits = config.subreddits_to_check
 
     total_posts = list()
