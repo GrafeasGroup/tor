@@ -14,7 +14,7 @@ def add_complete_post_id(post_id, config):
     :param config: the global config dict.
     :return: None.
     """
-    config.redis.sadd('complete_post_ids', post_id)
+    config.redis.sadd("complete_post_ids", post_id)
 
 
 def is_valid(post_id, config):
@@ -31,7 +31,7 @@ def is_valid(post_id, config):
     :return: True if the ID is successfully inserted into the set; False if
         it's already there.
     """
-    result = config.redis.sadd('post_ids', post_id)
+    result = config.redis.sadd("post_ids", post_id)
 
     if result == 1:
         # the post id was submitted successfully and it's good to work on.
@@ -40,12 +40,12 @@ def is_valid(post_id, config):
     else:
         # The post is already in post_ids, which is triggered when we start
         # the process. Let's see if we ever completed it.
-        member = config.redis.sismember('complete_post_ids', post_id)
+        member = config.redis.sismember("complete_post_ids", post_id)
         if member != 1:
             # It's in post_ids, which means we started it, but it's not
             # in complete_post_ids, which means we never finished it for
             # some reason. Let's try it again.
-            logging.warning(f'Incomplete post found! ID: {post_id}')
+            logging.warning(f"Incomplete post found! ID: {post_id}")
             return True
 
         else:

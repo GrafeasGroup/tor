@@ -3,6 +3,7 @@ import logging
 import random
 
 from praw.exceptions import ClientException as RedditClientException
+
 # noinspection PyProtectedMember
 from tor_core.helpers import _
 from tor_core.helpers import clean_id
@@ -31,15 +32,14 @@ def process_command(reply, config):
     # Trim off the ! from the start of the string
     requested_command = reply.subject[1:]
 
-    with open('commands.json', newline='') as commands_file:
+    with open("commands.json", newline="") as commands_file:
         commands = json.load(commands_file)
         logging.debug(
-            f'Searching for command {requested_command}, '
-            f'from {reply.author.name}.'
+            f"Searching for command {requested_command}, " f"from {reply.author.name}."
         )
 
         try:
-            command = commands['commands'][requested_command]
+            command = commands["commands"][requested_command]
 
         except KeyError:
             if from_moderator(reply, config):
@@ -56,15 +56,12 @@ def process_command(reply, config):
             return
 
         # command found
-        logging.info(
-            f'{reply.author.name} is attempting to run {requested_command}'
-        )
+        logging.info(f"{reply.author.name} is attempting to run {requested_command}")
 
         # Mods are allowed to do any command, and some people are whitelisted
         # per command to be able to use them
-        if (
-            reply.author.name not in command['allowedNames'] and
-            not from_moderator(reply, config)
+        if reply.author.name not in command["allowedNames"] and not from_moderator(
+            reply, config
         ):
             logging.info(
                 f"{reply.author.name} failed to run {requested_command},"
@@ -75,11 +72,12 @@ def process_command(reply, config):
             send_to_modchat(
                 f":banhammer: Someone did something bad! "
                 f"<https://reddit.com/user/{username}|u/{username}> tried to "
-                f"run {requested_command}!", config
+                f"run {requested_command}!",
+                config,
             )
 
             reply.reply(
-                random.choice(commands['notAuthorizedResponses']).format(
+                random.choice(commands["notAuthorizedResponses"]).format(
                     random.choice(config.no_gifs)
                 )
             )
@@ -87,11 +85,10 @@ def process_command(reply, config):
             return
 
         logging.debug(
-            f'Now executing command {requested_command},'
-            f' by {reply.author.name}.'
+            f"Now executing command {requested_command}," f" by {reply.author.name}."
         )
 
-        result = globals()[command['pythonFunction']](reply, config)
+        result = globals()[command["pythonFunction"]](reply, config)
 
         if result is not None:
             reply.reply(result)
@@ -117,9 +114,7 @@ def process_override(reply, config):
     # because it's used in reply to people, not as a PM
     if not from_moderator(reply, config):
         reply.reply(_(random.choice(config.no_gifs)))
-        logging.info(
-            f'{reply.author.name} just tried to override. Lolno.'
-        )
+        logging.info(f"{reply.author.name} just tried to override. Lolno.")
 
         return
 
@@ -128,14 +123,12 @@ def process_override(reply, config):
     # parent. That should be the comment with the `done` call in it.
     reply_parent = config.r.comment(id=clean_id(reply.parent_id))
     parents_parent = config.r.comment(id=clean_id(reply_parent.parent_id))
-    if 'done' in parents_parent.body.lower():
+    if "done" in parents_parent.body.lower():
         logging.info(
-            f'Starting validation override for post {parents_parent.fullname}, '
-            f'approved by {reply.author.name}'
+            f"Starting validation override for post {parents_parent.fullname}, "
+            f"approved by {reply.author.name}"
         )
-        process_done(
-            parents_parent, config, override=True
-        )
+        process_done(parents_parent, config, override=True)
 
 
 def process_blacklist(reply, config):
@@ -157,41 +150,39 @@ def process_blacklist(reply, config):
 
     for username in usernames:
         if username in config.tor_mods:
-            results += f'{username} is a mod! Don\'t blacklist mods!\n'
+            results += f"{username} is a mod! Don't blacklist mods!\n"
             failed.append(username)
             continue
 
         try:
             config.r.redditor(username)
         except RedditClientException:
-            results += f'{username} isn\'t a valid user\n'
+            results += f"{username} isn't a valid user\n"
             failed.append(username)
             continue
 
-        if not config.redis.sadd('blacklist', username):
-            results += f'{username} is already blacklisted, ya fool!\n'
+        if not config.redis.sadd("blacklist", username):
+            results += f"{username} is already blacklisted, ya fool!\n"
             already_added.append(username)
             continue
 
-        results += f'{username} is now blacklisted\n'
+        results += f"{username} is now blacklisted\n"
         successes.append(username)
 
         logging.info(
-            f'Blacklist: {repr(failed)} failed, {repr(successes)} succeeded, '
-            f'{repr(already_added)} were already blacklisted '
+            f"Blacklist: {repr(failed)} failed, {repr(successes)} succeeded, "
+            f"{repr(already_added)} were already blacklisted "
         )
 
         return results
 
 
 def reload_config(reply, config):
-    logging.info(
-        f'Reloading configs at the request of {reply.author.name}'
-    )
+    logging.info(f"Reloading configs at the request of {reply.author.name}")
     initialize(config)
-    logging.info('Reload complete.')
+    logging.info("Reload complete.")
 
-    return 'Config reloaded!'
+    return "Config reloaded!"
 
 
 def ping(reply, config):
@@ -201,7 +192,5 @@ def ping(reply, config):
     :param config: See reply param
     :return: The ping string, which in turn is given to Reddit's reply.reply()
     """
-    logging.info(
-        f'Received ping from {reply.author.name}. Pong!'
-    )
+    logging.info(f"Received ping from {reply.author.name}. Pong!")
     return "Pong!"

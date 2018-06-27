@@ -2,6 +2,7 @@ import logging
 
 from tor.strings.responses import pm_body
 from tor.strings.responses import pm_subject
+
 # noinspection PyProtectedMember
 from tor_core.helpers import _
 
@@ -17,4 +18,4 @@ def process_mention(mention):
 
     # message format is subject, then body
     mention.author.message(pm_subject, _(pm_body))
-    logging.info(f'Message sent to {mention.author.name}!')
+    logging.info(f"Message sent to {mention.author.name}!")

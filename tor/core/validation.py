@@ -38,10 +38,7 @@ def _thread_title_check(original_post, history_item):
     :param history_item: Comment object; comment pulled from user's history.
     """
     max_title_length = 250
-    return (
-        history_item.link_title[:max_title_length - 4] in
-        original_post.link_title
-    )
+    return history_item.link_title[: max_title_length - 4] in original_post.link_title
 
 
 def _thread_author_check(original_post, history_item, config):
@@ -58,9 +55,8 @@ def _thread_author_check(original_post, history_item, config):
         of the submission the transcription is on.
     """
     return (
-        history_item.submission.author == config.r.submission(
-            url=original_post.submission.url
-        ).author
+        history_item.submission.author
+        == config.r.submission(url=original_post.submission.url).author
     )
 
 
@@ -83,10 +79,10 @@ def _author_history_check(post, config):
             continue
 
         if (
-            history_post.is_root and
-            _footer_check(history_post, config) and
-            _thread_title_check(post, history_post) and
-            _thread_author_check(post, history_post, config)
+            history_post.is_root
+            and _footer_check(history_post, config)
+            and _thread_title_check(post, history_post)
+            and _thread_author_check(post, history_post, config)
         ):
             return True
     return False
@@ -112,24 +108,21 @@ def verified_posted_transcript(post, config):
     """
     top_parent = get_parent_post_id(post, config.r)
 
-    linked_resource = config.r.submission(
-        top_parent.id_from_url(top_parent.url)
-    )
+    linked_resource = config.r.submission(top_parent.id_from_url(top_parent.url))
     # get rid of the "See More Comments" crap
     linked_resource.comments.replace_more(limit=0)
     for top_level_comment in linked_resource.comments.list():
-        if (
-            _author_check(post, top_level_comment) and
-            _footer_check(top_level_comment, config)
+        if _author_check(post, top_level_comment) and _footer_check(
+            top_level_comment, config
         ):
             return True
 
     # Did their transcript get flagged by the spam filter? Check their history.
     if _author_history_check(post, config):
         send_to_modchat(
-            f'Found removed post: <{post.submission.shortlink}>',
+            f"Found removed post: <{post.submission.shortlink}>",
             config,
-            channel='#removed_posts'
+            channel="#removed_posts",
         )
         return True
     else:
