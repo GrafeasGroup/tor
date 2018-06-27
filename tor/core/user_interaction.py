@@ -1,7 +1,7 @@
 import logging
 import random
 
-import praw
+import praw  # type: ignore
 
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
@@ -18,7 +18,7 @@ from tor.strings.responses import please_accept_coc
 from tor.strings.responses import thumbs_up_gifs
 from tor.strings.responses import youre_welcome
 # noinspection PyProtectedMember
-from tor_core.helpers import _
+from tor_core.helpers import _  # type: ignore
 from tor_core.helpers import clean_id
 from tor_core.helpers import get_parent_post_id
 from tor_core.helpers import get_wiki_page
