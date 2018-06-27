@@ -1,7 +1,7 @@
 import logging
 import random
 
-import praw
+import praw  # type: ignore
 
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
@@ -18,7 +18,7 @@ from tor.strings.responses import please_accept_coc
 from tor.strings.responses import thumbs_up_gifs
 from tor.strings.responses import youre_welcome
 # noinspection PyProtectedMember
-from tor_core.helpers import _
+from tor_core.helpers import _  # type: ignore
 from tor_core.helpers import clean_id
 from tor_core.helpers import get_parent_post_id
 from tor_core.helpers import get_wiki_page
@@ -103,15 +103,18 @@ def process_claim(post, config):
             ))
             return
 
+        # Because praw doesn't cache this calculated property. We reload it each time.
+        flair_text = top_parent.link_flair_text
+
         # this can be either '' or None depending on how the API is feeling
         # today
-        if top_parent.link_flair_text in ['', None]:
+        if flair_text in ['', None]:
             # There exists the very small possibility that the post was
             # malformed and doesn't actually have flair on it. In that case,
             # let's set something so the next part doesn't crash.
             flair_post(top_parent, flair.unclaimed)
 
-        if flair.unclaimed in top_parent.link_flair_text:
+        if flair.unclaimed in flair_text:
             # need to get that "Summoned - Unclaimed" in there too
             post.reply(_(claim_success))
 
