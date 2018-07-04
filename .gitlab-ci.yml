@@ -1,0 +1,31 @@
+---
+image: 'python:3.7-alpine'
+
+variables:
+  GIT_DEPTH: "1"
+
+stages:
+  - linting
+  - tests
+
+black:
+  stage: linting
+  before_script:
+    - 'pip3 install black'
+  script:
+    - 'black --check setup.py tor'
+
+flake8:
+  stage: linting
+  before_script:
+    - 'pip3 install flake8'
+  script:
+    - 'flake8 tor'
+
+pytest:
+  stage: tests
+  before_script:
+    - 'pip3 install -e .[dev]'
+  script:
+    - 'pytest'
+...
