@@ -22,13 +22,6 @@ flake8:
   script:
     - 'flake8 tor'
 
-pylint:
-  stage: linting
-  before_script:
-    - 'pip3 install pylint'
-  script:
-    - 'pylint tor'
-
 pytest:
   stage: tests
   before_script:
