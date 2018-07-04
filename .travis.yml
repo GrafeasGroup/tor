@@ -12,7 +12,7 @@ addons:
       - curl
 
 install:
-  - curl -X POST --header "Private-Token: $GITLAB_TOKEN" 'https://gitlab.com/api/v4/projects/GrafeasGroup%2Ftor/mirror/pull'
+  - 'curl -X POST --header "Private-Token: $GITLAB_TOKEN" "https://gitlab.com/api/v4/projects/GrafeasGroup%2Ftor/mirror/pull"'
   - pip install --process-dependency-links .[dev]
   - pip install codacy-coverage
 
