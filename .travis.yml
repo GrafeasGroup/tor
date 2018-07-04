@@ -4,20 +4,17 @@ language: python
 dist: trusty
 
 python:
-  - "3.6"
-  - "3.6-dev"
-  - "3.7-dev"
-  - "nightly"
+  - "3.7"
 
-matrix:
-  allow_failures:
-    - python: 3.6-dev
-    - python: 3.7-dev
-    - python: nightly
+addons:
+  apt:
+    packages:
+      - curl
 
 install:
   - pip install --process-dependency-links .[dev]
   - pip install codacy-coverage
+  - curl -X POST --header "Private-Token: ${GITLAB_TOKEN:-PLEASE DO NOT HATE ME}" 'https://gitlab.com/api/v4/projects/GrafeasGroup%2Ftor/mirror/pull' || true
 
 script:
   - pytest --cov=tor
