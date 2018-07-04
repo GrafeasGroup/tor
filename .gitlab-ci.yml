@@ -1,5 +1,5 @@
 ---
-image: 'python:3.7-rc-alpine'
+image: 'python:3.7-alpine'
 
 variables:
   GIT_DEPTH: "1"
