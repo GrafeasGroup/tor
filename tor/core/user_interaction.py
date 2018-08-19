@@ -23,6 +23,7 @@ from tor_core.helpers import clean_id
 from tor_core.helpers import get_parent_post_id
 from tor_core.helpers import get_wiki_page
 from tor_core.helpers import send_to_modchat
+from tor_core.strings import reddit_url
 
 
 def coc_accepted(post, config):
@@ -71,8 +72,10 @@ def process_coc(post, config):
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_modchat(
-            f'<http://www.reddit.com/u/{post.author.name}|u/{post.author.name}>'
-            f' has just accepted the CoC! {modchat_emote}',
+            f'<{reddit_url.format(\'/user/\' + post.author.name)}|u/{post.author.name}>'
+            f' has just'
+            f'<{reddit_url.format(post.permalink)}|accepted the CoC!>'
+            f' {modchat_emote}',
             config,
             channel='new_volunteers'
         )
