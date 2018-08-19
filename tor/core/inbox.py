@@ -4,6 +4,7 @@ import re
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
 from tor_core.helpers import send_to_modchat
+from tor_core.strings import reddit_url
 
 from tor.core.admin_commands import process_override
 from tor.core.admin_commands import process_command
@@ -25,8 +26,9 @@ def forward_to_slack(item, config):
     username = item.author.name
 
     send_to_modchat(
-        f'Unhandled message by '
-        f'<https://reddit.com/user/{username}|u/{username}> -- '
+        f'<{reddit_url.format(item.context)}|Unhandled message>'
+        f' by'
+        f' <{reddit_url.format(username)}|u/{username}> -- '
         f'*{item.subject}*:\n{item.body}', config
     )
     logging.info(
