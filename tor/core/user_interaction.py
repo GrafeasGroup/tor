@@ -72,7 +72,7 @@ def process_coc(post, config):
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_modchat(
-            f'<{reddit_url.format('/user/' + post.author.name)}|u/{post.author.name}>'
+            f'<{reddit_url.format("/user/" + post.author.name)}|u/{post.author.name}>'
             f' has just'
             f'<{reddit_url.format(post.permalink)}|accepted the CoC!>'
             f' {modchat_emote}',
