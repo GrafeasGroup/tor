@@ -74,7 +74,7 @@ def process_coc(post, config):
         send_to_modchat(
             f'<{reddit_url.format("/user/" + post.author.name)}|u/{post.author.name}>'
             f' has just'
-            f'<{reddit_url.format(post.permalink)}|accepted the CoC!>'
+            f'<{reddit_url.format(post.context)}|accepted the CoC!>'
             f' {modchat_emote}',
             config,
             channel='new_volunteers'

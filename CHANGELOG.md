@@ -3,6 +3,15 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
+## v3.5.0 (2018-8-19)
+
+- Update Slack messages to include direct links (@pejmanpoh)
+- Remove check for incomplete posts (@itsthejoker)
+- Add threaded model to update the process of checking for new content (@itsthejoker)
+- Move volunteer notifications to their own channel (@itsthejoker)
+- Update detection of flair (@itsthejoker)
+- Add system to use history of volunteer to validate posts if comment is autoremoved (@itsthejoker)
+
 ## v3.4.0 (2017-12-11)
 
 - Send inbox messages to Slack if they don't match any of the commands (by @arfie)
