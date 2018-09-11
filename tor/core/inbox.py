@@ -86,15 +86,17 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        if 'claim' in r_body:
+        if (
+            'claim' in r_body or
+            'dibs' in r_body
+        ):
             process_claim(reply, config)
             reply.mark_read()
             return
 
         if (
             'done' in r_body or
-            'deno' in r_body or # we <3 u/Lornescri
-            'dibs' in r_body
+            'deno' in r_body # we <3 u/Lornescri
         ):
             alt_text = True if 'done' not in r_body else False
             process_done(reply, config, alt_text_trigger=alt_text)
