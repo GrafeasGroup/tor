@@ -96,7 +96,7 @@ def process_reply(reply, config):
 
         if (
             'done' in r_body or
-            'deno' in r_body # we <3 u/Lornescri
+            'deno' in r_body  # we <3 u/Lornescri
         ):
             alt_text = True if 'done' not in r_body else False
             process_done(reply, config, alt_text_trigger=alt_text)
