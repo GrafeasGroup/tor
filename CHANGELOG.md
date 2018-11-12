@@ -5,6 +5,7 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## v3.5.0 (2018-8-19)
 
+- Allow dibs to claim a post (@davidarchibald)
 - Update Slack messages to include direct links (@pejmanpoh)
 - Remove check for incomplete posts (@itsthejoker)
 - Add threaded model to update the process of checking for new content (@itsthejoker)
