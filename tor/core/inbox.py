@@ -86,7 +86,10 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        if 'claim' in r_body:
+        if (
+            'claim' in r_body or
+            'dibs' in r_body
+        ):
             process_claim(reply, config)
             reply.mark_read()
             return
