@@ -17,6 +17,7 @@ from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
 from tor.strings.responses import thumbs_up_gifs
 from tor.strings.responses import youre_welcome
+from tor.strings.responses import transcript_on_tor_post
 # noinspection PyProtectedMember
 from tor_core.helpers import _
 from tor_core.helpers import clean_id
@@ -243,3 +244,13 @@ def process_thanks(post, config):
             logging.debug('Comment requiring thanks was deleted')
             return
         raise
+
+
+def process_wrong_post_location(post):
+    try:
+        post.reply(_(transcript_on_tor_post))
+    except praw.exceptions.APIException:
+        logging.debug(
+            'Something went wrong with asking about a misplaced post; '
+            'ignoring.'
+        )
