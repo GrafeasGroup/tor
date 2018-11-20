@@ -14,6 +14,7 @@ from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
 from tor.core.user_interaction import process_wrong_post_location
+from tor.core import validation
 
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
@@ -82,6 +83,15 @@ def process_reply(reply, config):
 
         r_body = reply.body.lower()  # cache that thing
 
+        if (
+            '&#32;' in r_body or
+            'image transcription' in r_body or
+            validation._footer_check(reply, config)
+        ):
+            process_wrong_post_location(reply)
+            reply.mark_read()
+            return
+
         if 'i accept' in r_body:
             process_coc(reply, config)
             reply.mark_read()
@@ -111,15 +121,6 @@ def process_reply(reply, config):
 
         if '!override' in r_body:
             process_override(reply, config)
-            reply.mark_read()
-            return
-
-        if (
-            '&#32;' in r_body or
-            'reddit/wiki/index)' in r_body or  # the end of the footer
-            'image transcription' in r_body
-        ):
-            process_wrong_post_location(reply)
             reply.mark_read()
             return
 
