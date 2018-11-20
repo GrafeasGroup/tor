@@ -84,7 +84,6 @@ def process_reply(reply, config):
         r_body = reply.body.lower()  # cache that thing
 
         if (
-            '&#32;' in r_body or
             'image transcription' in r_body or
             validation._footer_check(reply, config)
         ):
