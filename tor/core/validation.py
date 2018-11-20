@@ -19,7 +19,7 @@ def _footer_check(reply, config, tor_link=ToR_link):
     :return: True / None.
     """
     if config.perform_header_check:
-        return tor_link in reply.body
+        return tor_link in reply.body and '&#32;' in reply.body
     else:
         # If we don't want the check to take place, we'll just return
         # true to negate it.
