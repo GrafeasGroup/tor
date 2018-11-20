@@ -6,19 +6,21 @@ from praw.models import Comment as RedditComment
 from tor_core.helpers import send_to_modchat
 from tor_core.strings import reddit_url
 
-from tor.core.admin_commands import process_override
+from tor.core import validation
 from tor.core.admin_commands import process_command
+from tor.core.admin_commands import process_override
 from tor.core.mentions import process_mention
 from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
+from tor.core.user_interaction import process_wrong_post_location
 
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
     re.compile('unclaim', re.IGNORECASE),
     re.compile('undo', re.IGNORECASE),
-    re.compile('(?:good|bad) bot', re.IGNORECASE),
+    # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
 
 
@@ -80,6 +82,14 @@ def process_reply(reply, config):
             return
 
         r_body = reply.body.lower()  # cache that thing
+
+        if (
+            'image transcription' in r_body or
+            validation._footer_check(reply, config)
+        ):
+            process_wrong_post_location(reply)
+            reply.mark_read()
+            return
 
         if 'i accept' in r_body:
             process_coc(reply, config)

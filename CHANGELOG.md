@@ -5,6 +5,7 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## v3.5.0 (2018-8-19)
 
+- Add check to verify the transcription goes to the right place (@itsthejoker)
 - Allow dibs to claim a post (@davidarchibald)
 - Update Slack messages to include direct links (@pejmanpoh)
 - Remove check for incomplete posts (@itsthejoker)
@@ -36,7 +37,7 @@ means we will never make a backwards-incompatible change within a major version 
 - Defers bot reference in `praw.ini` and whether in debug mode from environment variables (by @thelonelyghost)
 
 ## v3.1.1 (2017-10-25)
-- Minor bug fix, the bot would reply that the config was reloaded when it really wasn't.
+- Minor bug fix, the bot would reply that the config was reloaded when it really wasn't
 
 ## v3.1.0 (2017-10-14)
 - Now processing inbox messages in the correct order

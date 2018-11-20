@@ -1,5 +1,8 @@
 bot_footer = (
-    "{}\n\n---\n\n"
+    "{}"
+    "\n\n"
+    "---"
+    "\n\n"
     "v{version} | This message was posted by a bot. "
     "| [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) "
     "| [Source](https://github.com/GrafeasGroup/tor) "
@@ -9,8 +12,10 @@ bot_footer = (
 )
 
 claim_success = (
-    'The post is yours! Best of luck and thanks for helping!\n\nPlease respond '
-    'with "done" when complete so we can check this one off the list!'
+    'The post is yours! Best of luck and thanks for helping!'
+    '\n\n'
+    'Please respond with "done" when complete so we can check this one off the '
+    'list!'
 )
 
 already_claimed = (
@@ -37,8 +42,9 @@ done_completed_transcript = (
 
 done_cannot_find_transcript = (
     'Sorry; I can\'t find your transcript post on the link. Please message the '
-    'mods to have them look at this.\n\nAlternatively, did you remember to '
-    'put the footer in your comment?'
+    'mods to have them look at this.'
+    '\n\n'
+    'Alternatively, did you remember to put the footer in your comment?'
 )
 
 something_went_wrong = (
@@ -50,9 +56,13 @@ something_went_wrong = (
 please_accept_coc = (
     'Hi there! Please read and accept our Code of Conduct so that we can get '
     'you started with transcribing. Please read the Code of Conduct below, '
-    'then respond to this comment with `I accept`.\n\nAfter you respond, I\'ll '
-    'process your claim as normal.'
-    '\n\n---\n\n{}'
+    'then respond to this comment with `I accept`.'
+    '\n\n'
+    'After you respond, I\'ll process your claim as normal.'
+    '\n\n'
+    '---'
+    '\n\n'
+    '{}'
 )
 
 thumbs_up_gifs = [
@@ -76,12 +86,38 @@ pm_subject = (
 )
 
 pm_body = (
-    'Hi there! Thanks for pinging me!\n\n'
+    'Hi there! Thanks for pinging me!'
+    '\n\n'
     'Due to some changes with how Reddit and individual subreddits handle bots,'
     ' I can\'t be summoned directly to your comment anymore. If there\'s '
     'something that you would like assistance with, please post a link to that '
     'content on /r/DescriptionPlease, and one of our lovely volunteers will be '
-    'along shortly.\n\nThanks for using our services! We hope we can make your '
-    'day a little bit better :)\n\nCheers,\n\n'
+    'along shortly.'
+    '\n\n'
+    'Thanks for using our services! We hope we can make your day a little bit '
+    'better :)'
+    '\n\n'
+    'Cheers,'
+    '\n\n'
     'The Mods of /r/TranscribersOfReddit'
+)
+
+transcript_on_tor_post = (
+    'Hi there! I might be wrong, but I think you just posted a transcription '
+    'in reply to me. The transcription should be made as a top-level comment '
+    'on the material that you\'re working on transcribing; for example, if '
+    'the content is on r/nicegirls, then the transcription should be commented '
+    'as a reply to that submission on r/nicegirls. After you\'ve commented '
+    'there, come back to me and reply with `done` and I can process it!'
+    '\n\n'
+    'Want a handy checklist to help keep track of everything? Check it out '
+    '[HERE!](https://www.reddit.com/r/transcribersofreddit/wiki/checklist)'
+    '\n\n'
+    'Don\'t forget to follow the formatting that I link above, and don\'t be '
+    'shy to ask for assistance in either our '
+    '[Discord](https://discord.gg/b5DqZXq) or [message the mods!](https://'
+    'www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&'
+    'subject=Transcription%20Help&message=)'
+    '\n\n'
+    'Cheers!'
 )
