@@ -44,7 +44,9 @@ done_cannot_find_transcript = (
     'Sorry; I can\'t find your transcript post on the link. Please message the '
     'mods to have them look at this.'
     '\n\n'
-    'Alternatively, did you remember to put the footer in your comment?'
+    'Alternatively, did you remember to put the footer in your comment? _Make '
+    'sure_ that you\'re copying and pasting the footer as it\'s shown, complete '
+    'with all the special characters!'
 )
 
 something_went_wrong = (
