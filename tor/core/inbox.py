@@ -14,6 +14,7 @@ from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
+from tor.core.user_interaction import process_unclaim
 from tor.core.user_interaction import process_wrong_post_location
 
 MOD_SUPPORT_PHRASES = [
@@ -93,6 +94,11 @@ def process_reply(reply, config):
 
         if 'i accept' in r_body:
             process_coc(reply, config)
+            reply.mark_read()
+            return
+
+        if 'unclaim' in r_body:
+            process_unclaim(reply, config)
             reply.mark_read()
             return
 

@@ -3,30 +3,34 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
+## v3.6.0 (2018-12-2)
+
+- Add handling for `unclaim` comments (credit: @itsthejoker)
+
 ## v3.5.0 (2018-8-19)
 
-- Add check to verify the transcription goes to the right place (@itsthejoker)
-- Allow dibs to claim a post (@davidarchibald)
-- Update Slack messages to include direct links (@pejmanpoh)
-- Remove check for incomplete posts (@itsthejoker)
-- Add threaded model to update the process of checking for new content (@itsthejoker)
-- Move volunteer notifications to their own channel (@itsthejoker)
-- Update detection of flair (@itsthejoker)
-- Add system to use history of volunteer to validate posts if comment is autoremoved (@itsthejoker)
+- Add check to verify the transcription goes to the right place (credit: @itsthejoker)
+- Allow dibs to claim a post (credit: @davidarchibald)
+- Update Slack messages to include direct links (credit: @pejmanpoh)
+- Remove check for incomplete posts (credit: @itsthejoker)
+- Add threaded model to update the process of checking for new content (credit: @itsthejoker)
+- Move volunteer notifications to their own channel (credit: @itsthejoker)
+- Update detection of flair (credit: @itsthejoker)
+- Add system to use history of volunteer to validate posts if comment is autoremoved (credit: @itsthejoker)
 
 ## v3.4.0 (2017-12-11)
 
-- Send inbox messages to Slack if they don't match any of the commands (by @arfie)
-- Send message to Slack on phrases that may need mod intervention (by @thelonelyghost)
-- Allow blacklisting of people (by @perryprog)
-- Add new command system (by @perryprog)
-- Use the same colors for subreddit flairs as on Discord, depending on number of completed transcriptions (by @itsthejoker)
-- Send message to Slack when flairing a post as Meta (by @arfie)
-- Handles common typo `deno` as `done` (by @itsthejoker)
+- Send inbox messages to Slack if they don't match any of the commands (credit: @arfie)
+- Send message to Slack on phrases that may need mod intervention (credit: @thelonelyghost)
+- Allow blacklisting of people (credit: @perryprog)
+- Add new command system (credit: @perryprog)
+- Use the same colors for subreddit flairs as on Discord, depending on number of completed transcriptions (credit: @itsthejoker)
+- Send message to Slack when flairing a post as Meta (credit: @arfie)
+- Handles common typo `deno` as `done` (credit: @itsthejoker)
 
 ## v3.3.0 (2017-11-22)
 
-- Enable alternate validation method to get around spam filter nuking posts (by @itsthejoker)
+- Enable alternate validation method to get around spam filter nuking posts (credit: @itsthejoker)
 
 ## v3.2.0 (2017-11-7)
 
@@ -34,7 +38,7 @@ means we will never make a backwards-incompatible change within a major version 
 - Update inbox handler to increase legibility and modularity
 - Guard every comment reply in case it gets deleted
 - Prunes unneeded dependencies from before tor_core extraction
-- Defers bot reference in `praw.ini` and whether in debug mode from environment variables (by @thelonelyghost)
+- Defers bot reference in `praw.ini` and whether in debug mode from environment variables (credit: @thelonelyghost)
 
 ## v3.1.1 (2017-10-25)
 - Minor bug fix, the bot would reply that the config was reloaded when it really wasn't
@@ -86,7 +90,7 @@ means we will never make a backwards-incompatible change within a major version 
 ## v2.7.1 (2017-07-01)
 
 - Modify date logic and fix config loading for archivist bot
-- adds css_flair dict for easier interaction with css (by @itsthejoker)
+- adds css_flair dict for easier interaction with css (credit: @itsthejoker)
 
 ## v2.7.0 (2017-07-01)
 
@@ -96,8 +100,8 @@ means we will never make a backwards-incompatible change within a major version 
 - Adds automated testing, starting with configuration object
 - Significant rewording of `README.md` for clarity
 - Add `bin/run` as user-friendly editing for task runner (see [`.git/safe/../../bin` PATH protocol](https://twitter.com/tpope/status/165631968996900865))
-- Basics for a bot automatically removing and archiving old posts (by @arfie)
-- Updated `README.md` with information on u/ToR_archivist (by @arfie)
+- Basics for a bot automatically removing and archiving old posts (credit: @arfie)
+- Updated `README.md` with information on u/ToR_archivist (credit: @arfie)
 
 ## v2.6.14 (2017-06-07)
 

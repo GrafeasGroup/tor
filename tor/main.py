@@ -29,11 +29,14 @@ from tor.helpers.flair import set_meta_flair_on_other_posts
 # List is in alphabetical order.
 #
 # Aramanthe
+# Braxton Burks
 # Caravan Palace
 # Hiromi
 # Girl Talk
 # Icon for Hire
 # Lady Gaga
+# The Killers
+#
 #
 # Streams:
 # https://www.youtube.com/watch?v=hX3j0sQ7ot8
