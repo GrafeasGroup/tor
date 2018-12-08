@@ -7,6 +7,7 @@ from tor_core.helpers import _
 from tor_core.helpers import clean_id
 from tor_core.helpers import get_parent_post_id
 from tor_core.helpers import get_wiki_page
+from tor_core.helpers import reports
 from tor_core.helpers import send_to_modchat
 from tor_core.strings import reddit_url
 
@@ -15,6 +16,7 @@ from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
+from tor.helpers.reddit_ids import is_removed
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
@@ -254,7 +256,7 @@ def process_unclaim(post, config):
     #   If the linked post has been taken down or deleted, then remove the post
     #    on ToR's side and reply to the user.
 
-    top_parent = get_parent_post_id(post, config.r)
+    top_parent = post.submission
     # WAIT! Do we actually own this post?
     if top_parent.author.name != 'transcribersofreddit':
         logging.info('Received `unclaim` on post we do not own. Ignoring.')
@@ -266,10 +268,16 @@ def process_unclaim(post, config):
 
     for item in top_parent.user_reports:
         if (
-            'Original post has been deleted or locked' in item[0] or
-            'Post Violates Rules on Partner Subreddit' in item[0]
+            reports.original_post_deleted_or_locked in item[0] or
+            reports.post_violates_rules in item[0]
         ):
             top_parent.mod.remove()
+            send_to_modchat(
+                'I just removed the following post in response to an '
+                '`unclaim`: {}\n\nPlease check to make sure this was '
+                'accurate.'.format(top_parent.shortlink),
+                config
+            )
             post.reply(_(unclaim_success_with_report))
             return
 
@@ -278,8 +286,14 @@ def process_unclaim(post, config):
     linked_resource = config.r.submission(
         top_parent.id_from_url(top_parent.url)
     )
-    if linked_resource.removed:
+    if is_removed(linked_resource):
         top_parent.mod.remove()
+        send_to_modchat(
+            'Received `unclaim` on an unreported post, but it looks like it '
+            'was removed on the parent sub. I removed ours here: {}\n\nPlease '
+            'check to make sure this was accurate.'.format(top_parent.shortlink),
+            config
+        )
         post.reply(_(unclaim_success_without_report))
         return
 
