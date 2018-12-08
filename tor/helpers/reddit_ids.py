@@ -44,7 +44,7 @@ def is_valid(post_id: str, config: Config) -> bool:
     return add_complete_post_id(post_id, config, return_result=True)
 
 
-def is_removed(post: Submission) -> bool:
+def is_removed(post: Submission, full_check: bool = False) -> bool:
     """
     Reddit does not allow non-mods to tell whether or not a post has been
     removed, which understandably makes it a little difficult to figure out
@@ -64,9 +64,14 @@ def is_removed(post: Submission) -> bool:
 
     More information (and where this table is from): https://redd.it/7hfnew
 
+    Because we don't necessarily need to remove a post in certain situations
+    (e.g. the user account has been deleted), we can simplify the check. By
+    setting `full_check`, we can return True for any issue.
     :param post: The post that we are attempting to investigate.
-    :param config: the global config object.
     :return: True is the post looks like it has been removed, False otherwise.
     """
 
-    return False if post.is_crosspostable and post.can_gild else True
+    if full_check:
+        return False if post.is_crosspostable and post.can_gild else True
+    else:
+        return not post.is_crosspostable
