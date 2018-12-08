@@ -1,6 +1,6 @@
 import logging
-import re
 
+import re
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
 from tor_core.helpers import send_to_modchat
@@ -14,11 +14,12 @@ from tor.core.user_interaction import process_claim
 from tor.core.user_interaction import process_coc
 from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
+from tor.core.user_interaction import process_unclaim
 from tor.core.user_interaction import process_wrong_post_location
 
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
-    re.compile('unclaim', re.IGNORECASE),
+    # re.compile('unclaim', re.IGNORECASE),
     re.compile('undo', re.IGNORECASE),
     # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
@@ -93,6 +94,11 @@ def process_reply(reply, config):
 
         if 'i accept' in r_body:
             process_coc(reply, config)
+            reply.mark_read()
+            return
+
+        if 'unclaim' in r_body:
+            process_unclaim(reply, config)
             reply.mark_read()
             return
 

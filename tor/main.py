@@ -26,17 +26,28 @@ from tor.helpers.flair import set_meta_flair_on_other_posts
 #
 # This program is dedicated to the below artists; their music has
 # served as the soundtrack for the continued development of u/ToR.
-# List is in alphabetical order.
+# List is in alphabetical order. Anyone who contributes to this
+# codebase is invited to add their tunes!
 #
+# Alison Wonderland
 # Aramanthe
+# Braxton Burks
 # Caravan Palace
+# David Bowie
 # Hiromi
 # Girl Talk
 # Icon for Hire
+# Inverness
+# K-391
 # Lady Gaga
+# Neon Hitch
+# The Beatles
+# The Killers
+# Two Door Cinema Club
+#
 #
 # Streams:
-# https://www.youtube.com/watch?v=hX3j0sQ7ot8
+# https://www.youtube.com/watch?v=hX3j0sQ7ot8  # he's dead, Jim
 
 
 def run(config):

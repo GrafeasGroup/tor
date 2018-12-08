@@ -2,12 +2,21 @@ import logging
 import random
 
 import praw
+# noinspection PyProtectedMember
+from tor_core.helpers import _
+from tor_core.helpers import clean_id
+from tor_core.helpers import get_parent_post_id
+from tor_core.helpers import get_wiki_page
+from tor_core.helpers import reports
+from tor_core.helpers import send_to_modchat
+from tor_core.strings import reddit_url
 
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair
 from tor.helpers.flair import flair_post
 from tor.helpers.flair import update_user_flair
+from tor.helpers.reddit_ids import is_removed
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
@@ -16,15 +25,13 @@ from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
 from tor.strings.responses import please_accept_coc
 from tor.strings.responses import thumbs_up_gifs
-from tor.strings.responses import youre_welcome
 from tor.strings.responses import transcript_on_tor_post
-# noinspection PyProtectedMember
-from tor_core.helpers import _
-from tor_core.helpers import clean_id
-from tor_core.helpers import get_parent_post_id
-from tor_core.helpers import get_wiki_page
-from tor_core.helpers import send_to_modchat
-from tor_core.strings import reddit_url
+from tor.strings.responses import unclaim_failure_post_already_completed
+from tor.strings.responses import unclaim_still_unclaimed
+from tor.strings.responses import unclaim_success
+from tor.strings.responses import unclaim_success_with_report
+from tor.strings.responses import unclaim_success_without_report
+from tor.strings.responses import youre_welcome
 
 
 def coc_accepted(post, config):
@@ -234,6 +241,72 @@ def process_done(post, config, override=False, alt_text_trigger=False):
             )
             return
         raise  # Re-raise exception if not
+
+
+def process_unclaim(post, config):
+    # Sometimes people need to unclaim things. Usually this happens because of
+    # an issue with the post itself, like it's been locked or deleted. Either
+    # way, we should probably be able to handle it.
+
+    # Process:
+    # If the post has been reported, then remove it. No checks, just do it.
+    # If the post has not been reported, attempt to load the linked post.
+    #   If the linked post is still up, then reset the flair on ToR's side
+    #    and reply to the user.
+    #   If the linked post has been taken down or deleted, then remove the post
+    #    on ToR's side and reply to the user.
+
+    top_parent = post.submission
+    # WAIT! Do we actually own this post?
+    if top_parent.author.name != 'transcribersofreddit':
+        logging.info('Received `unclaim` on post we do not own. Ignoring.')
+        return
+
+    if flair.unclaimed in top_parent.link_flair_text:
+        post.reply(_(unclaim_still_unclaimed))
+        return
+
+    for item in top_parent.user_reports:
+        if (
+            reports.original_post_deleted_or_locked in item[0] or
+            reports.post_violates_rules in item[0]
+        ):
+            top_parent.mod.remove()
+            send_to_modchat(
+                'I just removed the following post in response to an '
+                '`unclaim`: {}\n\nPlease check to make sure this was '
+                'accurate.'.format(top_parent.shortlink),
+                config
+            )
+            post.reply(_(unclaim_success_with_report))
+            return
+
+    # Okay, so they commented with unclaim, but they didn't report it.
+    # Time to check to see if they should have.
+    linked_resource = config.r.submission(
+        top_parent.id_from_url(top_parent.url)
+    )
+    if is_removed(linked_resource):
+        top_parent.mod.remove()
+        send_to_modchat(
+            'Received `unclaim` on an unreported post, but it looks like it '
+            'was removed on the parent sub. I removed ours here: {}\n\nPlease '
+            'check to make sure this was accurate.'.format(top_parent.shortlink),
+            config
+        )
+        post.reply(_(unclaim_success_without_report))
+        return
+
+    # Finally, if none of the other options apply, we'll reset the flair and
+    # continue on as normal.
+    if top_parent.link_flair_text == flair.completed:
+        post.reply(_(unclaim_failure_post_already_completed))
+        return
+
+    if top_parent.link_flair_text == flair.in_progress:
+        flair_post(top_parent, flair.unclaimed)
+        post.reply(_(unclaim_success))
+        return
 
 
 def process_thanks(post, config):

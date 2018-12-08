@@ -49,6 +49,28 @@ done_cannot_find_transcript = (
     'with all the special characters!'
 )
 
+unclaim_still_unclaimed = (
+    'From what I can see, no one has claimed this post! Would you like to? All '
+    'you have to do is reply to me with `claim`.'
+)
+
+unclaim_success = (
+    'Roger that, unclaim processed!'
+)
+
+unclaim_success_with_report = (
+    'Thanks for reporting! This submission has been removed.'
+)
+
+unclaim_success_without_report = (
+    'Thanks for letting me know! It looks like the content to transcribe has '
+    'been removed, so I removed the post on our side. Cheers!'
+)
+
+unclaim_failure_post_already_completed = (
+    'I can\'t process an unclaim on a post that\'s already been completed!'
+)
+
 something_went_wrong = (
     'Something appears to have gone wrong. Please message the '
     'moderators of r/TranscribersOfReddit to have them look at '
