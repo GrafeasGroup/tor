@@ -160,8 +160,8 @@ def check_inbox(config):
         # In this case, there will be no author attribute.
         if item.author is None:
             send_to_modchat(
-                f'We received a message without an author. Subject: '
-                f'{item.subject}', config
+                f'We received a message without an author -- '
+                f'*{item.subject}*:\n{item.body}', config
             )
             item.mark_read()
 
