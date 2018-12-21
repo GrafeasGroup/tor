@@ -273,10 +273,10 @@ def process_unclaim(post, config):
         ):
             top_parent.mod.remove()
             send_to_modchat(
-                'I just removed the following post in response to an '
-                '`unclaim`: {}\n\nPlease check to make sure this was '
-                'accurate.'.format(top_parent.shortlink),
-                config
+                'Removed the following reported post in response to an '
+                '`unclaim`: {}'.format(top_parent.shortlink),
+                config,
+                channel='removed_posts'
             )
             post.reply(_(unclaim_success_with_report))
             return
@@ -290,9 +290,10 @@ def process_unclaim(post, config):
         top_parent.mod.remove()
         send_to_modchat(
             'Received `unclaim` on an unreported post, but it looks like it '
-            'was removed on the parent sub. I removed ours here: {}\n\nPlease '
-            'check to make sure this was accurate.'.format(top_parent.shortlink),
-            config
+                'was removed on the parent sub. I removed ours here: {}'
+                ''.format(top_parent.shortlink),
+            config,
+            channel='removed_posts'
         )
         post.reply(_(unclaim_success_without_report))
         return
