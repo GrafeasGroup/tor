@@ -3,6 +3,7 @@ import logging
 import re
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
+from praw.models import Message as RedditMessage
 from tor_core.helpers import send_to_modchat
 from tor_core.strings import reddit_url
 
@@ -16,6 +17,7 @@ from tor.core.user_interaction import process_done
 from tor.core.user_interaction import process_thanks
 from tor.core.user_interaction import process_unclaim
 from tor.core.user_interaction import process_wrong_post_location
+from tor.core.user_interaction import process_message
 
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
@@ -197,6 +199,10 @@ def check_inbox(config):
             process_command(item, config)
             item.mark_read()
             continue
+
+        elif isinstance(item, RedditMessage):
+            process_message(item, config)
+            item.mark_read()
 
         else:
             item.mark_read()

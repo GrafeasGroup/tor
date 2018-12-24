@@ -328,3 +328,19 @@ def process_wrong_post_location(post):
             'Something went wrong with asking about a misplaced post; '
             'ignoring.'
         )
+
+def process_message(message, config):
+    if not isinstance(message, praw.models.Message):
+        return
+
+    username = message.author.name
+
+    send_to_modchat(
+        f'DM from <{reddit_url.format("/u/" + username)}|u/{username}> -- '
+        f'*{message.subject}*:\n{message.body}', config
+    )
+
+    logging.info(
+        f'Received DM from {username}. \n Subject: '
+        f'{message.subject}\n\nBody: {message.body} '
+    )

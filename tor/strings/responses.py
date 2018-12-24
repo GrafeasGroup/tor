@@ -126,6 +126,22 @@ pm_body = (
     'The Mods of /r/TranscribersOfReddit'
 )
 
+dm_subject = (
+    'Direct Message'
+)
+
+dm_body = (
+    'Hi there! Thanks for messaging me!'
+    '\n\n'
+    'Unfortunately I\'m a bot and so I can\'t help you out myself. I\'ve '
+    'forwarded your message to a moderator so they can help you out! They '
+    'should message you shortly. In the future, you can [message the mods]'
+    '(https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&'
+    'subject=Transcription%20Help&message=) to talk to them directly.'
+    '\n\n'
+    'Cheers!'
+)
+
 transcript_on_tor_post = (
     'Hi there! I might be wrong, but I think you just posted a transcription '
     'in reply to me. The transcription should be made as a top-level comment '

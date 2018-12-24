@@ -5,6 +5,7 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## v3.6.0 (2018-12-2)
 
+- Add replies to DMs (credit: @davidarchibald)
 - Add handling for `unclaim` comments (credit: @itsthejoker)
 
 ## v3.5.0 (2018-8-19)
