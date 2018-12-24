@@ -14,7 +14,7 @@ rules_comment = (
     'wiki/checklist) that might help you out -- not just for newbies!'
     '\n\nThis is a(n) {post_type} post, so please use the following formatting:'
     '\n\n---\n\n{formatting}\n\n---'
-    '\n\nReporting\n---'  # this is a header
+    '\n\nReporting\n---'  # This is a header
     '\n\nPlease report this post if it contains personal information or otherwise '
     'breaks the rules of the subreddit we\'re linking to. The mods will check '
     'and remove it shortly.'
@@ -23,7 +23,7 @@ rules_comment = (
     'compose?to=%2Fr%2FTranscribersOfReddit&subject=General%20Question'
     '&message=)'
     '\n\n---'
-    '\n\nFooter\n---'  # this is a header
+    '\n\nFooter\n---'  # This is a header
     '\n\nWhen you\'re done, please put the following footer at '
     'the **bottom** of your post:\n\n---\n\n{header}\n\n---'
 )

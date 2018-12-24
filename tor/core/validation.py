@@ -15,7 +15,7 @@ def _footer_check(reply, config, tor_link=ToR_link):
     :param reply: Comment object; hopefully the one with the transcription in
         it.
     :param config: The global config object.
-    :param tor_link: String; The magical url key.
+    :param tor_link: String; the magical url key.
     :return: True / None.
     """
     if config.perform_header_check:

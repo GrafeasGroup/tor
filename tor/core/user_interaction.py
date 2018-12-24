@@ -38,7 +38,7 @@ def coc_accepted(post, config):
     """
     Verifies that the user is in the Redis set "accepted_CoC".
 
-    :param post: The comment object containing the claim.
+    :param post: The Comment object containing the claim.
     :param config: The global config dict.
     :return: True if the user has accepted the Code of Conduct, False if they
         haven't.
@@ -76,7 +76,7 @@ def process_coc(post, config):
         ':fb-like:'
     ])
 
-    # Have they already been added? If no, then just act like they said `claim`
+    # Have they already been added? If 0, then just act like they said `claim`
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_modchat(
@@ -95,7 +95,7 @@ def process_claim(post, config):
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
 
-    :param post: The comment object containing the claim.
+    :param post: The Comment object containing the claim.
     :param config: The global config dict.
     :return: None.
     """
@@ -115,9 +115,9 @@ def process_claim(post, config):
             return
 
         # This can be either '' or None depending on how the API is feeling
-        # today
+        # today.
         if top_parent.link_flair_text in ('', None):
-            # There exists the very small possibility that the post was
+            # There exists a very small possibility that the post was
             # malformed and doesn't actually have flair on it. In that case,
             # let's set something so the next part doesn't crash.
             flair_post(top_parent, flair.unclaimed)

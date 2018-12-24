@@ -15,14 +15,14 @@ from tor.core.user_interaction import process_done
 def process_command(reply, config):
     """
     This function processes any commands send to the bot via PM with a subject
-    that starts with "!". The basic flow is read JSON file, look for key with
-    same subject, check if the caller is mod or is in the list of allowed
-    people, then reply with the results of pythonFunction.
+    that starts with "!". The basic flow is read JSON file, look for a key with
+    the same subject, check if the caller is mod (or is in the list of allowed
+    people) then reply with the results of pythonFunction.
 
     To add a new command: add an entry to commands.json, (look at the other
     commands already listed), and add your function to admin_commands.py.
 
-    :param reply: Object, The message object that contains the requested
+    :param reply: Object; the message object that contains the requested
         command.
     :param config: The global config object
     :return: None
@@ -118,7 +118,7 @@ def process_override(reply, config):
     if not from_moderator(reply, config):
         reply.reply(_(random.choice(config.no_gifs)))
         logging.info(
-            f'{reply.author.name} just tried to override. Lol no.'
+            f'{reply.author.name} just tried to override. Lolno.'
         )
 
         return
@@ -196,7 +196,7 @@ def reload_config(reply, config):
 
 def ping(reply, config):
     """
-    Replies to the !ping command, and is used as a keep alive check
+    Replies to the !ping command, and is used as a kee-alive check
     :param reply: Not used, but it is here due to the way the function is called
     :param config: See reply param
     :return: The ping string, which in turn is given to Reddit's reply.reply()

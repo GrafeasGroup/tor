@@ -56,7 +56,7 @@ def _parse_existing_flair(user_flair):
     Take the flair string and identify the proper incremented score along with
     its matching CSS class.
 
-    :param user_flair: String; The existing flair string for the user.
+    :param user_flair: String; the existing flair string for the user.
     :return:
     """
 
@@ -131,7 +131,7 @@ def update_user_flair(post, config):
         post_author.save()
 
     else:
-        # they're bot or a mod and have custom flair. Leave it alone.
+        # They're a bot or a mod and have custom flair. Leave it alone.
         return
 
 

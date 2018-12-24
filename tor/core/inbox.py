@@ -64,7 +64,7 @@ def process_mod_intervention(post, config):
         return
 
     # Wrap each phrase in double-quotes (") and commas in between.
-    phrases = f'"{", ".join(phrases)}"'
+    phrases = '"' + '", "'.join(phrases) + '"'
 
     send_to_modchat(
         f':rotating_light::rotating_light: Mod Intervention Needed '
@@ -183,7 +183,7 @@ def check_inbox(config):
             try:
                 process_mention(item)
             except (AttributeError, RedditClientException):
-                # apparently this crashes with an AttributeError if someone
+                # Apparently this crashes with an AttributeError if someone
                 # calls the bot and immediately deletes their comment. This
                 # should fix that.
                 continue

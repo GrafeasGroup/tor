@@ -39,9 +39,9 @@ class User(object):
         Create our own Redis connection if one is not passed in.
         We also assume that there is already a logging object created.
 
-        :param username: String; The username we're looking for. No fuzzing
+        :param username: String; the username we're looking for. No fuzzing
             here; this must be exact.
-        :param redis: Object; A `redis` instance.
+        :param redis: Object; a `redis` instance.
         """
 
         super().__init__()
@@ -73,7 +73,7 @@ class User(object):
 
     def _load(self):
         """
-        :return: Dict or None; The loaded information from Redis.
+        :return: Dict or None; the loaded information from Redis.
         """
         result = self.r.get(self.redis_key.format(self.username))
         if not result:

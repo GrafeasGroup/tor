@@ -25,7 +25,7 @@ class reddit(MagicMock):
 
 
 def test_from_moderator_true():
-    # enable dot notation to match what it's looking for
+    # Enable dot notation to match what it's looking for.
     config = Object()
     config.tor_mods = ['asdf', 'qwer']
     reply = Object()
@@ -47,7 +47,7 @@ def test_from_moderator_false():
 @patch('tor.core.user_interaction.process_done')
 @patch('tor_core.helpers.clean_id', return_value='1234')
 def test_process_override_not_moderator(mock_clean_id, mock_process_done):
-    # for use with anything that requires a reply object
+    # For use with anything that requires a reply object.
 
     config = Object()
     config.no_gifs = ['asdf', 'qwer']
@@ -66,7 +66,7 @@ def test_process_override_not_moderator(mock_clean_id, mock_process_done):
 @patch('tor.core.admin_commands.from_moderator', return_value=True)
 @patch('tor.core.user_interaction.process_done')
 def test_process_override_not_moderator2(mock_process_done, asd):
-    # for use with anything that requires a reply object
+    # For use with anything that requires a reply object.
 
     config = Object()
     config.no_gifs = ['asdf', 'qwer']

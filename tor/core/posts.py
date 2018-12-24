@@ -80,7 +80,7 @@ def process_post(new_post, config):
         content_format = config.other_formatting
 
     # Truncate a post title if it exceeds 250 characters, so the added
-    # formatting still fits in Reddit's 300 char limit for post titles
+    # formatting still fits in Reddit's 300 char limit for post titles.
     post_title = new_post['title']
     max_title_length = 250
     if len(post_title) > max_title_length:
