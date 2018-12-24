@@ -29,9 +29,9 @@ def forward_to_slack(item, config):
     username = item.author.name
 
     send_to_modchat(
-        f'<{reddit_url.format(item.context)}|Unhandled message>'
-        f' by'
-        f' <{reddit_url.format("/u/" + username)}|u/{username}> -- '
+        f'<{reddit_url.format(item.context)}|Unhandled message> '
+        f'by '
+        f'<{reddit_url.format("/u/" + username)}|u/{username}> -- '
         f'*{item.subject}*:\n{item.body}', config
     )
     logging.info(
@@ -42,15 +42,15 @@ def forward_to_slack(item, config):
 
 def process_mod_intervention(post, config):
     """
-    Triggers an alert in slack with a link to the comment if there is something
-    offensive or in need of moderator intervention
+    Triggers an alert in Slack with a link to the comment if there is something
+    offensive or in need of moderator intervention.
     """
     if not isinstance(post, RedditComment):
         # Why are we here if it's not a comment?
         return
 
     # Collect all offenses (noted by the above regular expressions) from the
-    # original
+    # original.
     phrases = []
     for regex in MOD_SUPPORT_PHRASES:
         matches = regex.search(post.body)
@@ -63,8 +63,8 @@ def process_mod_intervention(post, config):
         # Nothing offensive here, why did this function get triggered?
         return
 
-    # Wrap each phrase in double-quotes (") and commas in between
-    phrases = '"' + '", "'.join(phrases) + '"'
+    # Wrap each phrase in double-quotes (") and commas in between.
+    phrases = f'"{", ".join(phrases)}"'
 
     send_to_modchat(
         f':rotating_light::rotating_light: Mod Intervention Needed '
@@ -82,7 +82,7 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        r_body = reply.body.lower()  # cache that thing
+        r_body = reply.body.lower()  # Cache that thing.
 
         if (
             'image transcription' in r_body or
@@ -112,14 +112,14 @@ def process_reply(reply, config):
 
         if (
             'done' in r_body or
-            'deno' in r_body  # we <3 u/Lornescri
+            'deno' in r_body  # We <3 u/Lornescri.
         ):
             alt_text = True if 'done' not in r_body else False
             process_done(reply, config, alt_text_trigger=alt_text)
             reply.mark_read()
             return
 
-        if 'thank' in r_body:  # trigger on "thanks" and "thank you"
+        if 'thank' in r_body:  # Trigger on "thanks" and "thank you."
             process_thanks(reply, config)
             reply.mark_read()
             return
@@ -129,17 +129,17 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        # If we made it this far, it's something we can't process automatically
+        # If we made it this far, it's something we can't process automatically.
         forward_to_slack(reply, config)
-        reply.mark_read()  # no spamming the slack channel :)
+        reply.mark_read()  # No spamming the Slack channel :)
 
     except (RedditClientException, AttributeError) as e:
         logging.warning(e)
         logging.warning(
-            f"Unable to process comment {reply.submission.shortlink} "
-            f"by {reply.author}"
+            f'Unable to process comment {reply.submission.shortlink} '
+            f'by {reply.author}.'
         )
-        # the only way we should hit this is if somebody comments and then
+        # The only way we should hit this is if somebody comments and then
         # deletes their comment before the bot finished processing. It's
         # uncommon, but common enough that this is necessary.
         pass
@@ -153,8 +153,8 @@ def check_inbox(config):
 
     :return: None.
     """
-    # Sort inbox, then act on it
-    # Invert the inbox so we're processing oldest first!
+    # Sort inbox, then act on it.
+    # Reverse the inbox so we're processing oldest first!
     for item in reversed(list(config.r.inbox.unread(limit=None))):
         # Very rarely we may actually get a message from Reddit itself.
         # In this case, there will be no author attribute.
@@ -171,13 +171,13 @@ def check_inbox(config):
         elif item.author.name in config.redis.smembers('blacklist'):
             logging.info(
                 f'Skipping inbox item from {item.author.name} who is on the '
-                f'blacklist '
+                f'blacklist.'
             )
             item.mark_read()
             continue
 
         elif item.subject == 'username mention':
-            logging.info(f'Received mention! ID {item}')
+            logging.info(f'Received mention! ID {item}.')
 
             # noinspection PyUnresolvedReferences
             try:

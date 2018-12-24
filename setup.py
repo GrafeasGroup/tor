@@ -13,7 +13,7 @@ from tor import __version__
 
 
 class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
+    user_options = [('pytest-args=', 'a', 'Arguments to pass to pytest')]
 
     def initialize_options(self):
         TestCommand.initialize_options(self)

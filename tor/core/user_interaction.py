@@ -38,8 +38,8 @@ def coc_accepted(post, config):
     """
     Verifies that the user is in the Redis set "accepted_CoC".
 
-    :param post: the Comment object containing the claim.
-    :param config: the global config dict.
+    :param post: The comment object containing the claim.
+    :param config: The global config dict.
     :return: True if the user has accepted the Code of Conduct, False if they
         haven't.
     """
@@ -76,14 +76,14 @@ def process_coc(post, config):
         ':fb-like:'
     ])
 
-    # Have they already been added? If 0, then just act like they said `claim`
+    # Have they already been added? If no, then just act like they said `claim`
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_modchat(
-            f'<{reddit_url.format("/user/" + post.author.name)}|u/{post.author.name}>'
-            f' has just'
-            f' <{reddit_url.format(post.context)}|accepted the CoC!>'
-            f' {modchat_emote}',
+            f'<{reddit_url.format("/user/" + post.author.name)}|u/{post.author.name}> '
+            f'has just '
+            f'<{reddit_url.format(post.context)}|accepted the CoC!> '
+            f'{modchat_emote}',
             config,
             channel='new_volunteers'
         )
@@ -95,8 +95,8 @@ def process_claim(post, config):
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
 
-    :param post: The Comment object containing the claim.
-    :param config: the global config dict.
+    :param post: The comment object containing the claim.
+    :param config: The global config dict.
     :return: None.
     """
     top_parent = get_parent_post_id(post, config.r)
@@ -108,22 +108,22 @@ def process_claim(post, config):
 
     try:
         if not coc_accepted(post, config):
-            # do not cache this page. We want to get it every time.
+            # Do not cache this page. We want to get it every time.
             post.reply(_(
                 please_accept_coc.format(get_wiki_page('codeofconduct', config))
             ))
             return
 
-        # this can be either '' or None depending on how the API is feeling
+        # This can be either '' or None depending on how the API is feeling
         # today
-        if top_parent.link_flair_text in ['', None]:
+        if top_parent.link_flair_text in ('', None):
             # There exists the very small possibility that the post was
             # malformed and doesn't actually have flair on it. In that case,
             # let's set something so the next part doesn't crash.
             flair_post(top_parent, flair.unclaimed)
 
         if flair.unclaimed in top_parent.link_flair_text:
-            # need to get that "Summoned - Unclaimed" in there too
+            # Need to get that "Summoned - Unclaimed" in there too.
             post.reply(_(claim_success))
 
             flair_post(top_parent, flair.in_progress)
@@ -131,7 +131,7 @@ def process_claim(post, config):
                 f'Claim on ID {top_parent.fullname} by {post.author} successful'
             )
 
-        # can't claim something that's already claimed
+        # Can't claim something that's already claimed
         elif top_parent.link_flair_text == flair.in_progress:
             post.reply(_(already_claimed))
         elif top_parent.link_flair_text == flair.completed:
@@ -154,11 +154,11 @@ def process_done(post, config, override=False, alt_text_trigger=False):
     the posts to try and make sure they actually posted a
     transcription.
 
-    :param post: the Comment object which contains the string 'done'.
-    :param config: the global config object.
+    :param post: The Comment object which contains the string 'done'.
+    :param config: The global config object.
     :param override: A parameter that can only come from process_override()
         and skips the validation check.
-    :param alt_text_trigger: a trigger that adds an extra piece of text onto
+    :param alt_text_trigger: A trigger that adds an extra piece of text onto
         the response. Just something to help ease the number of
         false-positives.
     :return: None.
@@ -176,8 +176,8 @@ def process_done(post, config, override=False, alt_text_trigger=False):
             post.reply(_(done_still_unclaimed))
         elif top_parent.link_flair_text == flair.in_progress:
             if not override and not verified_posted_transcript(post, config):
-                # we need to double-check these things to keep people
-                # from gaming the system
+                # We need to double-check these things to keep people
+                # from gaming the system.
                 logging.info(
                     f'Post {top_parent.fullname} does not appear to have a '
                     f'post by claimant {post.author}. Hrm... '
@@ -216,7 +216,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                 logging.info(
                     f'Post {top_parent.fullname} completed by {post.author}!'
                 )
-                # get that information saved for the user
+                # Get that information saved for the user.
                 author = User(str(post.author), config.redis)
                 author.list_update('posts_completed', clean_id(post.fullname))
                 author.save()
@@ -237,7 +237,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
         if e.error_type == 'DELETED_COMMENT':
             logging.info(
                 f'Comment attempting to mark ID {top_parent.fullname} '
-                f'as done has been deleted'
+                f'as done has been deleted.'
             )
             return
         raise  # Re-raise exception if not
@@ -315,7 +315,7 @@ def process_thanks(post, config):
         post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
     except praw.exceptions.APIException as e:
         if e.error_type == 'DELETED_COMMENT':
-            logging.debug('Comment requiring thanks was deleted')
+            logging.debug('Comment requiring thanks was deleted.')
             return
         raise
 

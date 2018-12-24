@@ -27,7 +27,7 @@ def get_yt_video_id(url):
     # by Mikhail Kashkin (http://stackoverflow.com/users/85739/mikhail-kashkin)
 
     if url.startswith(('youtu', 'www')):
-        url = 'http://' + url
+        url = f'http://{url}'
 
     query = urlparse(url)
 

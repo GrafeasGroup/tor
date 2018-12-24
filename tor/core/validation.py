@@ -14,8 +14,8 @@ def _footer_check(reply, config, tor_link=ToR_link):
 
     :param reply: Comment object; hopefully the one with the transcription in
         it.
-    :param config: the global config object.
-    :param tor_link: String; the magical url key.
+    :param config: The global config object.
+    :param tor_link: String; The magical url key.
     :return: True / None.
     """
     if config.perform_header_check:
@@ -115,7 +115,7 @@ def verified_posted_transcript(post, config):
     linked_resource = config.r.submission(
         top_parent.id_from_url(top_parent.url)
     )
-    # get rid of the "See More Comments" crap
+    # Get rid of the "See More Comments" crap.
     linked_resource.comments.replace_more(limit=0)
     for top_level_comment in linked_resource.comments.list():
         if (

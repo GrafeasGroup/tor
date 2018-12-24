@@ -1,14 +1,14 @@
 bot_footer = (
-    "{}"
-    "\n\n"
-    "---"
-    "\n\n"
-    "v{version} | This message was posted by a bot. "
-    "| [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) "
-    "| [Source](https://github.com/GrafeasGroup/tor) "
-    "| Questions? [Message the mods!](https://www.reddit.com/message/"
-    "compose?to=%2Fr%2FTranscribersOfReddit&subject=Bot%20Question"
-    "&message=)"
+    '{}'
+    '\n\n'
+    '---'
+    '\n\n'
+    'v{version} | This message was posted by a bot. '
+    '| [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) '
+    '| [Source](https://github.com/GrafeasGroup/tor) '
+    '| Questions? [Message the mods!](https://www.reddit.com/message/'
+    'compose?to=%2Fr%2FTranscribersOfReddit&subject=Bot%20Question'
+    '&message=)'
 )
 
 claim_success = (
@@ -31,8 +31,8 @@ claim_already_complete = (
 )
 
 done_still_unclaimed = (
-    'This post is still unclaimed! Please claim it first or message the mods to'
-    ' take care of this.'
+    'This post is still unclaimed! Please claim it first or message the mods to '
+    'take care of this.'
 )
 
 done_completed_transcript = (

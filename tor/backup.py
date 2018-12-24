@@ -12,7 +12,7 @@ from tor import __version__
 def run(cfg):
     for flair_obj in config.tor.flair(limit=None):
         username = str(flair_obj['user'])
-        logging.info(f'Backing up transcription count for {username}')
+        logging.info(f'Backing up transcription count for {username}.')
         u = User(username, redis_conn=config.redis)
         count, flair_css = _parse_existing_flair(flair_obj['flair_text'])
         u.update('transcriptions', count)

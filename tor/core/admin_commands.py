@@ -15,16 +15,16 @@ from tor.core.user_interaction import process_done
 def process_command(reply, config):
     """
     This function processes any commands send to the bot via PM with a subject
-    that stars with a !. The basic flow is read JSON file, look for key with
-    same subject, check if the caller is mod, or is in the list of allowed
+    that starts with "!". The basic flow is read JSON file, look for key with
+    same subject, check if the caller is mod or is in the list of allowed
     people, then reply with the results of pythonFunction.
 
     To add a new command: add an entry to commands.json, (look at the other
     commands already listed), and add your function to admin_commands.py.
 
-    :param reply: Object, the message object that contains the requested
-        command
-    :param config: the global config object
+    :param reply: Object, The message object that contains the requested
+        command.
+    :param config: The global config object
     :return: None
     """
 
@@ -44,38 +44,38 @@ def process_command(reply, config):
         except KeyError:
             if from_moderator(reply, config):
                 reply.reply(
-                    "That command hasn't been implemented yet ):"
-                    "\n\nMessage a dev to make your dream come true."
+                    'That command hasn\'t been implemented yet ):'
+                    '\n\nMessage a dev to make your dream come true.'
                 )
 
             logging.warning(
-                f"Error, command: {requested_command} not found!"
-                f" (from {reply.author.name})"
+                f'Error, command: {requested_command} not found! '
+                f'(from {reply.author.name}).'
             )
 
             return
 
-        # command found
+        # Command found.
         logging.info(
-            f'{reply.author.name} is attempting to run {requested_command}'
+            f'{reply.author.name} is attempting to run {requested_command}.'
         )
 
         # Mods are allowed to do any command, and some people are whitelisted
-        # per command to be able to use them
+        # per command to be able to use them.
         if (
             reply.author.name not in command['allowedNames'] and
             not from_moderator(reply, config)
         ):
             logging.info(
-                f"{reply.author.name} failed to run {requested_command},"
-                f"because they aren't a mod, or aren't whitelisted to use this"
-                f" command"
+                f'{reply.author.name} failed to run {requested_command}, '
+                f'because they aren\'t a mod, or aren\'t whitelisted to use this '
+                f'command.'
             )
             username = reply.author.name
             send_to_modchat(
-                f":banhammer: Someone did something bad! "
-                f"<https://reddit.com/user/{username}|u/{username}> tried to "
-                f"run {requested_command}!", config
+                f':banhammer: Someone did something bad! '
+                f'<https://reddit.com/user/{username}|u/{username}> tried to '
+                f'run {requested_command}!', config
             )
 
             reply.reply(
@@ -87,8 +87,8 @@ def process_command(reply, config):
             return
 
         logging.debug(
-            f'Now executing command {requested_command},'
-            f' by {reply.author.name}.'
+            f'Now executing command {requested_command}, '
+            f'by {reply.author.name}.'
         )
 
         result = globals()[command['pythonFunction']](reply, config)
@@ -108,22 +108,22 @@ def process_override(reply, config):
     `done` claim. The comment containing "!override" must be in response to
     the bot's comment saying that it cannot find the transcript.
 
-    :param reply: the comment reply object from the moderator.
-    :param config: the global config object.
+    :param reply: The comment reply object from the moderator.
+    :param config: The global config object.
     :return: None.
     """
 
-    # don't remove this check, it's not covered like other admin_commands
-    # because it's used in reply to people, not as a PM
+    # Don't remove this check, it's not covered like other admin_commands
+    # because it's used in reply to people, not as a PM.
     if not from_moderator(reply, config):
         reply.reply(_(random.choice(config.no_gifs)))
         logging.info(
-            f'{reply.author.name} just tried to override. Lolno.'
+            f'{reply.author.name} just tried to override. Lol no.'
         )
 
         return
 
-    # okay, so the parent of the reply should be the bot's comment
+    # Okay, so the parent of the reply should be the bot's comment
     # saying it can't find it. In that case, we need the parent's
     # parent. That should be the comment with the `done` call in it.
     reply_parent = config.r.comment(id=clean_id(reply.parent_id))
@@ -144,13 +144,13 @@ def process_blacklist(reply, config):
     Format is:
     Subject: !blacklist
     body: <username1>\n<username2>...
-    :param reply: the comment reply object from the inbox
-    :param config: the global config object
+    :param reply: The comment reply object from the inbox.
+    :param config: The global config object.
     :return: None
     """
 
     usernames = reply.body.splitlines()
-    results = ""
+    results = ''
     failed = []
     successes = []
     already_added = []
@@ -164,7 +164,7 @@ def process_blacklist(reply, config):
         try:
             config.r.redditor(username)
         except RedditClientException:
-            results += f'{username} isn\'t a valid user\n'
+            results += f'{username} isn\'t a valid user.\n'
             failed.append(username)
             continue
 
@@ -173,12 +173,12 @@ def process_blacklist(reply, config):
             already_added.append(username)
             continue
 
-        results += f'{username} is now blacklisted\n'
+        results += f'{username} is now blacklisted.\n'
         successes.append(username)
 
         logging.info(
             f'Blacklist: {repr(failed)} failed, {repr(successes)} succeeded, '
-            f'{repr(already_added)} were already blacklisted '
+            f'{repr(already_added)} were already blacklisted.'
         )
 
         return results
@@ -186,7 +186,7 @@ def process_blacklist(reply, config):
 
 def reload_config(reply, config):
     logging.info(
-        f'Reloading configs at the request of {reply.author.name}'
+        f'Reloading configs at the request of {reply.author.name}.'
     )
     initialize(config)
     logging.info('Reload complete.')
@@ -204,4 +204,4 @@ def ping(reply, config):
     logging.info(
         f'Received ping from {reply.author.name}. Pong!'
     )
-    return "Pong!"
+    return 'Pong!'

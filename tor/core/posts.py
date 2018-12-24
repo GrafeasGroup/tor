@@ -27,8 +27,8 @@ def process_post(new_post, config):
     """
 
     if new_post['subreddit'] in config.upvote_filter_subs:
-        # ignore posts if they don't meet the threshold for karma and the sub
-        # is in our list of upvoted filtered ones
+        # Ignore posts if they don't meet the threshold for karma and the sub
+        # is in our list of upvoted filtered ones.
         if new_post['ups'] < config.upvote_filter_subs[new_post['subreddit']]:
             return
 
@@ -40,7 +40,7 @@ def process_post(new_post, config):
         return
 
     if new_post['author'] is None:
-        # we don't want to handle deleted posts, that's just silly
+        # We don't want to handle deleted posts, that's just silly.
         return
 
     logging.info(
@@ -68,8 +68,8 @@ def process_post(new_post, config):
                 ))
                 add_complete_post_id(new_post['name'], config)
                 logging.info(
-                    f'Found YouTube video, {get_yt_video_id(new_post["url"])},'
-                    f' with good transcripts.'
+                    f'Found YouTube video, {get_yt_video_id(new_post["url"])}, '
+                    f'with good transcripts.'
                 )
                 return
         content_type = 'video'
@@ -84,7 +84,7 @@ def process_post(new_post, config):
     post_title = new_post['title']
     max_title_length = 250
     if len(post_title) > max_title_length:
-        post_title = post_title[:max_title_length - 3] + '...'
+        post_title = f"{post_title[:max_title_length - 3]}..."
 
     # noinspection PyBroadException
     try:
@@ -111,7 +111,7 @@ def process_post(new_post, config):
         config.redis.incr('total_posted', amount=1)
 
         if config.OCR and content_type == 'image':
-            # hook for OCR bot; in order to avoid race conditions, we add the
+            # Hook for OCR bot; in order to avoid race conditions, we add the
             # key / value pair that the bot isn't looking for before adding
             # to the set that it's monitoring.
             config.redis.set(new_post['name'], result.fullname)

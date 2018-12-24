@@ -15,7 +15,7 @@ def flair_post(post, text):
     :param text: String. The name of the flair template to apply.
     :return: None.
     """
-    # Flair looks like this:
+    # A flair looks like this:
     # {
     #   'flair_css_class': 'unclaimed-flair',
     #   'flair_template_id': 'fe9d6950-142a-11e7-901e-0ecc947f9ff4',
@@ -30,7 +30,7 @@ def flair_post(post, text):
             )
             return
 
-    # if the flairing is successful, we won't hit this line.
+    # If the flairing is successful, we won't hit this line.
     logging.error(
         f'Cannot find requested flair {text}. Not flairing.'
     )
@@ -56,23 +56,23 @@ def _parse_existing_flair(user_flair):
     Take the flair string and identify the proper incremented score along with
     its matching CSS class.
 
-    :param user_flair: String; the existing flair string for the user.
+    :param user_flair: String; The existing flair string for the user.
     :return:
     """
 
-    # extract their current flair and add one to it
-    new_flair_count = int(user_flair[:user_flair.index('Γ') - 1]) + 1
+    # Extract their current flair and add one to it.
+    new_flair_count = int(user_flair.split(' Γ', 1)[0]) + 1
 
     css = _get_flair_css(new_flair_count)
 
-    # check to make sure we actually got something
+    # Check to make sure we actually got something.
     # 3/28/2018, another unannounced API change. Empty flairs now return
     # an empty string instead of None. Keeping None just in case, though.
-    if css in ['', None]:
+    if css in ('', None):
         logging.error(
             f'Cannot find flair css for value {new_flair_count}. What happened?'
         )
-        # set to the default with no special looks on the subreddit
+        # Set to the default with no special looks on the subreddit.
         css = 'grafeas'
 
     return new_flair_count, css
@@ -107,7 +107,7 @@ def update_user_flair(post, config):
     except AttributeError:
         user_flair = flair_text
 
-    if user_flair in ['', None]:
+    if user_flair in ('', None):
         # HOLD ON. Do we have one saved? Maybe Reddit's screwing up.
         if current_transcription_count != 0:
             # we have a user object for them and shouldn't have landed here.
