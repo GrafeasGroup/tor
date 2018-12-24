@@ -20,6 +20,8 @@ from tor.helpers.reddit_ids import is_removed
 from tor.strings.responses import already_claimed
 from tor.strings.responses import claim_already_complete
 from tor.strings.responses import claim_success
+from tor.strings.responses import dm_body
+from tor.strings.responses import dm_subject
 from tor.strings.responses import done_cannot_find_transcript
 from tor.strings.responses import done_completed_transcript
 from tor.strings.responses import done_still_unclaimed
@@ -329,11 +331,11 @@ def process_wrong_post_location(post):
             'ignoring.'
         )
 
-def process_message(message, config):
-    if not isinstance(message, praw.models.Message):
-        return
+def process_message(message: praw.models.Message, config):
+    author = message.author
+    username = author.name
 
-    username = message.author.name
+    author.message(dm_subject, dm_body)
 
     send_to_modchat(
         f'DM from <{reddit_url.format("/u/" + username)}|u/{username}> -- '

@@ -134,10 +134,10 @@ dm_body = (
     'Hi there! Thanks for messaging me!'
     '\n\n'
     'Unfortunately I\'m a bot and so I can\'t help you out myself. I\'ve '
-    'forwarded your message to a moderator so they can help you out! They '
-    'should message you shortly. In the future, you can [message the mods]'
+    'forwarded your message to the moderators so they can help you out! They '
+    'should message you shortly. In the future, you can [message the mods at this link]'
     '(https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&'
-    'subject=Transcription%20Help&message=) to talk to them directly.'
+    'subject=Transcription%20Help&message=) to reach them directly.'
     '\n\n'
     'Cheers!'
 )
