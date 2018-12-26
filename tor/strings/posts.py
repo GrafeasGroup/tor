@@ -8,7 +8,7 @@ rules_comment = (
     'automatically update the flair so that only one person is working on a '
     'post at any given time.'
     '\n\nWhen you\'re done, please comment again with `done`. Your flair will '
-    'be updated to reflect the number of posts you\'ve transcribed and the '
+    'be updated to reflect the number of posts you\'ve transcribed and the post '
     'will be marked as completed.'
     '\n\nHere\'s [a checklist](https://www.reddit.com/r/TranscribersOfReddit/'
     'wiki/checklist) that might help you out -- not just for newbies!'
