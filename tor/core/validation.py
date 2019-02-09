@@ -1,7 +1,7 @@
-from tor.strings.urls import ToR_link
-from tor_core.helpers import get_parent_post_id
-from tor_core.helpers import send_to_modchat
 from praw.models import Comment
+
+from tor.core.helpers import get_parent_post_id, send_to_modchat
+from tor.strings.urls import ToR_link
 
 
 def _author_check(original_post, claimant_post):

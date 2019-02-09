@@ -1,9 +1,8 @@
 import logging
 
-from tor.strings.responses import pm_body
-from tor.strings.responses import pm_subject
 # noinspection PyProtectedMember
-from tor_core.helpers import _
+from tor.core.helpers import _
+from tor.strings.responses import pm_body, pm_subject
 
 
 def process_mention(mention):

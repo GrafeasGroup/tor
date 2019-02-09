@@ -79,9 +79,11 @@ setup(
     tests_require=testing_deps,
     install_requires=[
         'sh',
+        'cherrypy',
+        'requests',
+        'slackclient',
+        'redis<3.0.0',
+        'bugsnag',
         'praw ~= 5.0.1',
-    ],
-    dependency_links=[
-        'git+https://github.com/GrafeasGroup/tor_core.git@master#egg=tor_core-0',
     ],
 )

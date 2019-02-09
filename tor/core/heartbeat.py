@@ -80,7 +80,7 @@ def stop_heartbeat_server():
     """
     Stops the cherrypy heartbeat server. I guess you can call this one
     directly if you need to, but I recommend using
-    tor_core.helpers.stop_heartbeat() instead, since any other items relevant
+    tor.core.helpers.stop_heartbeat() instead, since any other items relevant
     to shutting down the heartbeat will go there.
 
     :return: None
