@@ -177,9 +177,6 @@ class Config(object):
     subreddits_to_check = []
     subreddits_domain_filter_bypass = []
 
-    # API keys for later overwriting based on contents of filesystem
-    bugsnag_api_key = None
-
     # Templating string for the header of the bot post
     header = ""
     modchat = None  # The actual modchat instance
@@ -203,6 +200,13 @@ class Config(object):
     heartbeat_logging = False
 
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
+
+    @cached_property
+    def bugsnag_api_key(self):
+        try:
+            return open("bugsnag.key").readline().strip()
+        except OSError:
+            return os.environ.get("BUGSNAG_API_KEY", None)
 
     @cached_property
     def redis(self):
@@ -249,11 +253,6 @@ class Config(object):
 
                 return port
 
-
-try:
-    Config.bugsnag_api_key = open("bugsnag.key").readline().strip()
-except OSError:
-    Config.bugsnag_api_key = os.environ.get("BUGSNAG_API_KEY", None)
 
 if bugsnag and Config.bugsnag_api_key:
     bugsnag.configure(api_key=Config.bugsnag_api_key, app_version=__version__)
