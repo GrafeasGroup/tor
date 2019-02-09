@@ -1,0 +1,7 @@
+
+# Redirect stderr
+exec 2>&1
+
+exec tor-moderator --noop
+
+# vim: ft=bash syn=bash.sh

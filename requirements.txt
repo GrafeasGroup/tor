@@ -1,0 +1,3 @@
+git+https://github.com/GrafeasGroup/tor_core.git@master#egg=tor_core
+
+.

@@ -78,7 +78,6 @@ setup(
     },
     tests_require=testing_deps,
     install_requires=[
-        'tor_core',
         'sh',
         'praw ~= 5.0.1',
     ],
