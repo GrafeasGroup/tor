@@ -4,23 +4,36 @@ import random
 import praw
 
 # noinspection PyProtectedMember
-from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
-                              reports, send_to_modchat)
+from tor.core.helpers import (
+    _,
+    clean_id,
+    get_parent_post_id,
+    get_wiki_page,
+    reports,
+    send_to_modchat,
+)
 from tor.core.strings import reddit_url
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair, flair_post, update_user_flair
 from tor.helpers.reddit_ids import is_removed
-from tor.strings.responses import (already_claimed, claim_already_complete,
-                                   claim_success, done_cannot_find_transcript,
-                                   done_completed_transcript,
-                                   done_still_unclaimed, please_accept_coc,
-                                   thumbs_up_gifs, transcript_on_tor_post,
-                                   unclaim_failure_post_already_completed,
-                                   unclaim_still_unclaimed, unclaim_success,
-                                   unclaim_success_with_report,
-                                   unclaim_success_without_report,
-                                   youre_welcome)
+from tor.strings.responses import (
+    already_claimed,
+    claim_already_complete,
+    claim_success,
+    done_cannot_find_transcript,
+    done_completed_transcript,
+    done_still_unclaimed,
+    please_accept_coc,
+    thumbs_up_gifs,
+    transcript_on_tor_post,
+    unclaim_failure_post_already_completed,
+    unclaim_still_unclaimed,
+    unclaim_success,
+    unclaim_success_with_report,
+    unclaim_success_without_report,
+    youre_welcome,
+)
 
 
 def coc_accepted(post, config):
@@ -32,7 +45,7 @@ def coc_accepted(post, config):
     :return: True if the user has accepted the Code of Conduct, False if they
         haven't.
     """
-    return config.redis.sismember('accepted_CoC', post.author.name) == 1
+    return config.redis.sismember("accepted_CoC", post.author.name) == 1
 
 
 def process_coc(post, config):
@@ -44,37 +57,39 @@ def process_coc(post, config):
     :param config: the global config dict.
     :return: None.
     """
-    result = config.redis.sadd('accepted_CoC', post.author.name)
+    result = config.redis.sadd("accepted_CoC", post.author.name)
 
-    modchat_emote = random.choice([
-        ':tada:',
-        ':confetti_ball:',
-        ':party-lexi:',
-        ':party-parrot:',
-        ':+1:',
-        ':trophy:',
-        ':heartpulse:',
-        ':beers:',
-        ':gold:',
-        ':upvote:',
-        ':coolio:',
-        ':derp:',
-        ':lenny1::lenny2:',
-        ':panic:',
-        ':fidget-spinner:',
-        ':fb-like:'
-    ])
+    modchat_emote = random.choice(
+        [
+            ":tada:",
+            ":confetti_ball:",
+            ":party-lexi:",
+            ":party-parrot:",
+            ":+1:",
+            ":trophy:",
+            ":heartpulse:",
+            ":beers:",
+            ":gold:",
+            ":upvote:",
+            ":coolio:",
+            ":derp:",
+            ":lenny1::lenny2:",
+            ":panic:",
+            ":fidget-spinner:",
+            ":fb-like:",
+        ]
+    )
 
     # Have they already been added? If 0, then just act like they said `claim`
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_modchat(
             f'<{reddit_url.format("/user/" + post.author.name)}|u/{post.author.name}>'
-            f' has just'
-            f' <{reddit_url.format(post.context)}|accepted the CoC!>'
-            f' {modchat_emote}',
+            f" has just"
+            f" <{reddit_url.format(post.context)}|accepted the CoC!>"
+            f" {modchat_emote}",
             config,
-            channel='new_volunteers'
+            channel="new_volunteers",
         )
     process_claim(post, config)
 
@@ -91,21 +106,21 @@ def process_claim(post, config):
     top_parent = get_parent_post_id(post, config.r)
 
     # WAIT! Do we actually own this post?
-    if top_parent.author.name != 'transcribersofreddit':
-        logging.debug('Received `claim` on post we do not own. Ignoring.')
+    if top_parent.author.name != "transcribersofreddit":
+        logging.debug("Received `claim` on post we do not own. Ignoring.")
         return
 
     try:
         if not coc_accepted(post, config):
             # do not cache this page. We want to get it every time.
-            post.reply(_(
-                please_accept_coc.format(get_wiki_page('codeofconduct', config))
-            ))
+            post.reply(
+                _(please_accept_coc.format(get_wiki_page("codeofconduct", config)))
+            )
             return
 
         # this can be either '' or None depending on how the API is feeling
         # today
-        if top_parent.link_flair_text in ['', None]:
+        if top_parent.link_flair_text in ["", None]:
             # There exists the very small possibility that the post was
             # malformed and doesn't actually have flair on it. In that case,
             # let's set something so the next part doesn't crash.
@@ -117,7 +132,7 @@ def process_claim(post, config):
 
             flair_post(top_parent, flair.in_progress)
             logging.info(
-                f'Claim on ID {top_parent.fullname} by {post.author} successful'
+                f"Claim on ID {top_parent.fullname} by {post.author} successful"
             )
 
         # can't claim something that's already claimed
@@ -127,10 +142,10 @@ def process_claim(post, config):
             post.reply(_(claim_already_complete))
 
     except praw.exceptions.APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
+        if e.error_type == "DELETED_COMMENT":
             logging.info(
-                f'Comment attempting to claim ID {top_parent.fullname} has '
-                f'been deleted. Back up for grabs! '
+                f"Comment attempting to claim ID {top_parent.fullname} has "
+                f"been deleted. Back up for grabs! "
             )
             return
         raise  # Re-raise exception if not
@@ -156,8 +171,8 @@ def process_done(post, config, override=False, alt_text_trigger=False):
     top_parent = get_parent_post_id(post, config.r)
 
     # WAIT! Do we actually own this post?
-    if top_parent.author.name != 'transcribersofreddit':
-        logging.info('Received `done` on post we do not own. Ignoring.')
+    if top_parent.author.name != "transcribersofreddit":
+        logging.info("Received `done` on post we do not own. Ignoring.")
         return
 
     try:
@@ -168,8 +183,8 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                 # we need to double-check these things to keep people
                 # from gaming the system
                 logging.info(
-                    f'Post {top_parent.fullname} does not appear to have a '
-                    f'post by claimant {post.author}. Hrm... '
+                    f"Post {top_parent.fullname} does not appear to have a "
+                    f"post by claimant {post.author}. Hrm... "
                 )
                 # noinspection PyUnresolvedReferences
                 try:
@@ -191,23 +206,23 @@ def process_done(post, config, override=False, alt_text_trigger=False):
             # If the validation succeeds, come down here.
 
             if override:
-                logging.info('Moderator override starting!')
+                logging.info("Moderator override starting!")
             # noinspection PyUnresolvedReferences
             try:
                 if alt_text_trigger:
-                    post.reply(_(
-                        'I think you meant `done`, so here we go!\n\n' +
-                        done_completed_transcript
-                    ))
+                    post.reply(
+                        _(
+                            "I think you meant `done`, so here we go!\n\n"
+                            + done_completed_transcript
+                        )
+                    )
                 else:
                     post.reply(_(done_completed_transcript))
                 update_user_flair(post, config)
-                logging.info(
-                    f'Post {top_parent.fullname} completed by {post.author}!'
-                )
+                logging.info(f"Post {top_parent.fullname} completed by {post.author}!")
                 # get that information saved for the user
                 author = User(str(post.author), config.redis)
-                author.list_update('posts_completed', clean_id(post.fullname))
+                author.list_update("posts_completed", clean_id(post.fullname))
                 author.save()
 
             except praw.exceptions.ClientException:
@@ -215,18 +230,18 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                 # far into validation, just mark it as done. Clearly they
                 # already passed.
                 logging.info(
-                    f'Attempted to mark post {top_parent.fullname} '
-                    f'as done... hit ClientException.'
+                    f"Attempted to mark post {top_parent.fullname} "
+                    f"as done... hit ClientException."
                 )
             flair_post(top_parent, flair.completed)
 
-            config.redis.incr('total_completed', amount=1)
+            config.redis.incr("total_completed", amount=1)
 
     except praw.exceptions.APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
+        if e.error_type == "DELETED_COMMENT":
             logging.info(
-                f'Comment attempting to mark ID {top_parent.fullname} '
-                f'as done has been deleted'
+                f"Comment attempting to mark ID {top_parent.fullname} "
+                f"as done has been deleted"
             )
             return
         raise  # Re-raise exception if not
@@ -247,8 +262,8 @@ def process_unclaim(post, config):
 
     top_parent = post.submission
     # WAIT! Do we actually own this post?
-    if top_parent.author.name != 'transcribersofreddit':
-        logging.info('Received `unclaim` on post we do not own. Ignoring.')
+    if top_parent.author.name != "transcribersofreddit":
+        logging.info("Received `unclaim` on post we do not own. Ignoring.")
         return
 
     if flair.unclaimed in top_parent.link_flair_text:
@@ -257,32 +272,30 @@ def process_unclaim(post, config):
 
     for item in top_parent.user_reports:
         if (
-            reports.original_post_deleted_or_locked in item[0] or
-            reports.post_violates_rules in item[0]
+            reports.original_post_deleted_or_locked in item[0]
+            or reports.post_violates_rules in item[0]
         ):
             top_parent.mod.remove()
             send_to_modchat(
-                'Removed the following reported post in response to an '
-                '`unclaim`: {}'.format(top_parent.shortlink),
+                "Removed the following reported post in response to an "
+                "`unclaim`: {}".format(top_parent.shortlink),
                 config,
-                channel='removed_posts'
+                channel="removed_posts",
             )
             post.reply(_(unclaim_success_with_report))
             return
 
     # Okay, so they commented with unclaim, but they didn't report it.
     # Time to check to see if they should have.
-    linked_resource = config.r.submission(
-        top_parent.id_from_url(top_parent.url)
-    )
+    linked_resource = config.r.submission(top_parent.id_from_url(top_parent.url))
     if is_removed(linked_resource):
         top_parent.mod.remove()
         send_to_modchat(
-            'Received `unclaim` on an unreported post, but it looks like it '
-                'was removed on the parent sub. I removed ours here: {}'
-                ''.format(top_parent.shortlink),
+            "Received `unclaim` on an unreported post, but it looks like it "
+            "was removed on the parent sub. I removed ours here: {}"
+            "".format(top_parent.shortlink),
             config,
-            channel='removed_posts'
+            channel="removed_posts",
         )
         post.reply(_(unclaim_success_without_report))
         return
@@ -303,8 +316,8 @@ def process_thanks(post, config):
     try:
         post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
     except praw.exceptions.APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
-            logging.debug('Comment requiring thanks was deleted')
+        if e.error_type == "DELETED_COMMENT":
+            logging.debug("Comment requiring thanks was deleted")
             return
         raise
 
@@ -314,6 +327,5 @@ def process_wrong_post_location(post):
         post.reply(_(transcript_on_tor_post))
     except praw.exceptions.APIException:
         logging.debug(
-            'Something went wrong with asking about a misplaced post; '
-            'ignoring.'
+            "Something went wrong with asking about a misplaced post; ignoring."
         )

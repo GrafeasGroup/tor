@@ -17,43 +17,37 @@ class Object(object):
     pass
 
 
-subreddit_regex = re.compile(
-    'reddit.com\/r\/([a-z0-9\-\_\+]+)',
-    flags=re.IGNORECASE
-)
+subreddit_regex = re.compile("reddit.com\/r\/([a-z0-9\-\_\+]+)", flags=re.IGNORECASE)
 
 default_exceptions = (
     prawcore.exceptions.RequestException,
     prawcore.exceptions.ServerError,
-    prawcore.exceptions.Forbidden
+    prawcore.exceptions.Forbidden,
 )
 
 flair = Object()
-flair.unclaimed = 'Unclaimed'
-flair.summoned_unclaimed = 'Summoned - Unclaimed'
-flair.completed = 'Completed!'
-flair.in_progress = 'In Progress'
-flair.meta = 'Meta'
-flair.disregard = 'Disregard'
+flair.unclaimed = "Unclaimed"
+flair.summoned_unclaimed = "Summoned - Unclaimed"
+flair.completed = "Completed!"
+flair.in_progress = "In Progress"
+flair.meta = "Meta"
+flair.disregard = "Disregard"
 
 css_flair = Object()
-css_flair.unclaimed = 'unclaimed'
-css_flair.completed = 'transcriptioncomplete'
-css_flair.in_progress = 'inprogress'
-css_flair.meta = 'meta'
-css_flair.disregard = 'disregard'
+css_flair.unclaimed = "unclaimed"
+css_flair.completed = "transcriptioncomplete"
+css_flair.in_progress = "inprogress"
+css_flair.meta = "meta"
+css_flair.disregard = "disregard"
 
 reports = Object()
-reports.original_post_deleted_or_locked = (
-    'Original post has been deleted or locked'
-)
-reports.post_should_be_marked_nsfw = 'Post should be marked as NSFW'
-reports.no_bot_accounts = 'No bot accounts but our own'
-reports.post_violates_rules = 'Post Violates Rules on Partner Subreddit'
+reports.original_post_deleted_or_locked = "Original post has been deleted or locked"
+reports.post_should_be_marked_nsfw = "Post should be marked as NSFW"
+reports.no_bot_accounts = "No bot accounts but our own"
+reports.post_violates_rules = "Post Violates Rules on Partner Subreddit"
 
 # error message for an API timeout
-_pattern = re.compile('again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$',
-                      re.IGNORECASE)
+_pattern = re.compile("again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$", re.IGNORECASE)
 
 # CTRL+C handler variable
 running = True
@@ -71,9 +65,9 @@ def _(message):
 
 
 def log_header(message):
-    logging.info('*' * 50)
+    logging.info("*" * 50)
     logging.info(message)
-    logging.info('*' * 50)
+    logging.info("*" * 50)
 
 
 def clean_list(items):
@@ -85,13 +79,13 @@ def clean_list(items):
     """
     cleaned = []
     for item in items:
-        if item.strip() != '':
+        if item.strip() != "":
             cleaned.append(item)
 
     return cleaned
 
 
-def send_to_modchat(message, config, channel='general'):
+def send_to_modchat(message, config, channel="general"):
     """
     Sends a message to the ToR mod chat.
 
@@ -102,14 +96,11 @@ def send_to_modchat(message, config, channel='general'):
     """
     if config.modchat:
         try:
-            config.modchat.api_call(
-                'chat.postMessage',
-                channel=channel,
-                text=message
-            )
+            config.modchat.api_call("chat.postMessage", channel=channel, text=message)
         except Exception as e:
-            logging.error(f'Failed to send message to modchat #{channel}: '
-                          f'\'{message}\'')
+            logging.error(
+                f"Failed to send message to modchat #{channel}: " f"'{message}'"
+            )
             logging.error(e)
 
 
@@ -148,7 +139,7 @@ def clean_id(post_id):
     :param post_id: String. Post fullname (ID)
     :return: String. Post fullname minus the first three characters.
     """
-    return post_id[post_id.index('_') + 1:]
+    return post_id[post_id.index("_") + 1 :]
 
 
 def get_parent_post_id(post, r):
@@ -186,10 +177,10 @@ def get_wiki_page(pagename, config, return_on_fail=None, subreddit=None):
     """
     if not subreddit:
         subreddit = config.tor
-    logging.debug(f'Retrieving wiki page {pagename}')
+    logging.debug(f"Retrieving wiki page {pagename}")
     try:
         result = subreddit.wiki[pagename].content_md
-        return result if result != '' else return_on_fail
+        return result if result != "" else return_on_fail
     except prawcore.exceptions.NotFound:
         return return_on_fail
 
@@ -206,7 +197,7 @@ def update_wiki_page(pagename, content, config, subreddit=None):
     :return: None.
     """
 
-    logging.debug(f'Updating wiki page {pagename}')
+    logging.debug(f"Updating wiki page {pagename}")
 
     if not subreddit:
         subreddit = config.tor
@@ -214,9 +205,7 @@ def update_wiki_page(pagename, content, config, subreddit=None):
     try:
         return subreddit.wiki[pagename].edit(content)
     except prawcore.exceptions.NotFound as e:
-        logging.error(
-            f'{e} - Requested wiki page {pagename} not found. Cannot update.'
-        )
+        logging.error(f"{e} - Requested wiki page {pagename} not found. Cannot update.")
 
 
 def deactivate_heartbeat_port(port):
@@ -229,8 +218,8 @@ def deactivate_heartbeat_port(port):
     :param port: int, the port number
     :return: None
     """
-    config.redis.srem('active_heartbeat_ports', port)
-    logging.info('Removed port from set of heartbeats.')
+    config.redis.srem("active_heartbeat_ports", port)
+    logging.info("Removed port from set of heartbeats.")
 
 
 def stop_heartbeat(config):
@@ -244,15 +233,11 @@ def stop_heartbeat(config):
     :return: None
     """
     stop_heartbeat_server()
-    logging.info('Stopped heartbeat!')
+    logging.info("Stopped heartbeat!")
 
 
 def handle_rate_limit(exc):
-    time_map = {
-        'second': 1,
-        'minute': 60,
-        'hour': 60 * 60,
-    }
+    time_map = {"second": 1, "minute": 60, "hour": 60 * 60}
     matches = re.search(_pattern, exc.message)
     delay = matches[0] * time_map[matches[1]]
     time.sleep(delay + 1)
@@ -272,13 +257,12 @@ def signal_handler(signal, frame):
     global running
 
     if not running:
-        logging.critical('User pressed CTRL+C twice!!! Killing!')
+        logging.critical("User pressed CTRL+C twice!!! Killing!")
         stop_heartbeat(config)
         sys.exit(1)
 
     logging.info(
-        '\rUser triggered command line shutdown. Will terminate after current '
-        'loop.'
+        "\rUser triggered command line shutdown. Will terminate after current loop."
     )
     running = False
 
@@ -306,19 +290,19 @@ def run_until_dead(func, exceptions=default_exceptions):
             try:
                 func(config)
             except praw.exceptions.APIException as e:
-                if e.error_type == 'RATELIMIT':
+                if e.error_type == "RATELIMIT":
                     logging.warning(
-                        'Ratelimit - artificially limited by Reddit. Sleeping'
-                        ' for requested time!'
+                        "Ratelimit - artificially limited by Reddit. Sleeping"
+                        " for requested time!"
                     )
                     handle_rate_limit(e)
             except exceptions as e:
                 logging.warning(
-                    f'{e} - Issue communicating with Reddit. Sleeping for 60s!'
+                    f"{e} - Issue communicating with Reddit. Sleeping for 60s!"
                 )
                 time.sleep(60)
 
-        logging.info('User triggered shutdown. Shutting down.')
+        logging.info("User triggered shutdown. Shutting down.")
         stop_heartbeat(config)
         sys.exit(0)
 

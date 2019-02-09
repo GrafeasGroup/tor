@@ -26,10 +26,10 @@ def configure_tor(config):
     :return: the Subreddit object for the chosen subreddit.
     """
     if config.debug_mode:
-        tor = config.r.subreddit('ModsOfToR')
+        tor = config.r.subreddit("ModsOfToR")
     else:
         # normal operation, our primary subreddit
-        tor = config.r.subreddit('transcribersofreddit')
+        tor = config.r.subreddit("transcribersofreddit")
 
     return tor
 
@@ -42,7 +42,7 @@ def configure_redis():
     :return: object: the active Redis object.
     """
     try:
-        url = os.getenv('REDIS_CONNECTION_URL', 'redis://localhost:6379/0')
+        url = os.getenv("REDIS_CONNECTION_URL", "redis://localhost:6379/0")
         redis_server = redis.StrictRedis.from_url(url)
         redis_server.ping()
     except redis.exceptions.ConnectionError:
@@ -52,28 +52,28 @@ def configure_redis():
     return redis_server
 
 
-def configure_logging(config, log_name='transcribersofreddit.log'):
+def configure_logging(config, log_name="transcribersofreddit.log"):
     logging.basicConfig(
         level=logging.INFO,
-        format='%(levelname)s | %(funcName)s | %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S',
+        format="%(levelname)s | %(funcName)s | %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S",
     )
 
     # will intercept anything error level or above
     if config.bugsnag_api_key:
         bs_handler = BugsnagHandler()
         bs_handler.setLevel(logging.ERROR)
-        logging.getLogger('').addHandler(bs_handler)
-        logging.info('Bugsnag enabled!')
+        logging.getLogger("").addHandler(bs_handler)
+        logging.info("Bugsnag enabled!")
     else:
-        logging.info('Not running with Bugsnag!')
+        logging.info("Not running with Bugsnag!")
 
-    log_header('Starting!')
+    log_header("Starting!")
 
 
 def populate_header(config):
-    config.header = ''
-    config.header = get_wiki_page('format/header', config)
+    config.header = ""
+    config.header = get_wiki_page("format/header", config)
 
 
 def populate_formatting(config):
@@ -84,15 +84,15 @@ def populate_formatting(config):
     :return: None.
     """
     # zero out everything so we can reinitialize later
-    config.audio_formatting = ''
-    config.video_formatting = ''
-    config.image_formatting = ''
-    config.other_formatting = ''
+    config.audio_formatting = ""
+    config.video_formatting = ""
+    config.image_formatting = ""
+    config.other_formatting = ""
 
-    config.audio_formatting = get_wiki_page('format/audio', config)
-    config.video_formatting = get_wiki_page('format/video', config)
-    config.image_formatting = get_wiki_page('format/images', config)
-    config.other_formatting = get_wiki_page('format/other', config)
+    config.audio_formatting = get_wiki_page("format/audio", config)
+    config.video_formatting = get_wiki_page("format/video", config)
+    config.image_formatting = get_wiki_page("format/images", config)
+    config.other_formatting = get_wiki_page("format/other", config)
 
 
 def populate_domain_lists(config):
@@ -107,22 +107,22 @@ def populate_domain_lists(config):
     config.image_domains = []
     config.audio_domains = []
 
-    domains = get_wiki_page('domains', config)
-    domains = ''.join(domains.splitlines()).split('---')
+    domains = get_wiki_page("domains", config)
+    domains = "".join(domains.splitlines()).split("---")
 
     for domainset in domains:
-        domain_list = domainset[domainset.index('['):].strip('[]').split(', ')
+        domain_list = domainset[domainset.index("[") :].strip("[]").split(", ")
         current_domain_list = []
-        if domainset.startswith('video'):
+        if domainset.startswith("video"):
             current_domain_list = config.video_domains
-        elif domainset.startswith('audio'):
+        elif domainset.startswith("audio"):
             current_domain_list = config.audio_domains
-        elif domainset.startswith('images'):
+        elif domainset.startswith("images"):
             current_domain_list = config.image_domains
 
         current_domain_list += domain_list
         # [current_domain_list.append(x) for x in domain_list]
-        logging.debug(f'Domain list populated: {current_domain_list}')
+        logging.debug(f"Domain list populated: {current_domain_list}")
 
 
 def populate_moderators(config):
@@ -148,73 +148,68 @@ def populate_subreddit_lists(config):
     config.upvote_filter_subs = {}
     config.no_link_header_subs = []
 
-    config.subreddits_to_check = get_wiki_page('subreddits',
-                                               config).splitlines()
+    config.subreddits_to_check = get_wiki_page("subreddits", config).splitlines()
     config.subreddits_to_check = clean_list(config.subreddits_to_check)
-    logging.debug(
-        f'Created list of subreddits from wiki: {config.subreddits_to_check}'
-    )
+    logging.debug(f"Created list of subreddits from wiki: {config.subreddits_to_check}")
 
-    for line in get_wiki_page(
-        'subreddits/upvote-filtered', config
-    ).splitlines():
-        if ',' in line:
-            sub, threshold = line.split(',')
+    for line in get_wiki_page("subreddits/upvote-filtered", config).splitlines():
+        if "," in line:
+            sub, threshold = line.split(",")
             config.upvote_filter_subs[sub] = int(threshold)
 
     logging.debug(
-        f'Retrieved subreddits subject to the upvote filter: '
-        f'{config.upvote_filter_subs} '
+        f"Retrieved subreddits subject to the upvote filter: "
+        f"{config.upvote_filter_subs} "
     )
 
     config.subreddits_domain_filter_bypass = get_wiki_page(
-        'subreddits/domain-filter-bypass', config
-    ).split('\r\n')
+        "subreddits/domain-filter-bypass", config
+    ).split("\r\n")
     config.subreddits_domain_filter_bypass = clean_list(
         config.subreddits_domain_filter_bypass
     )
     logging.debug(
-        f'Retrieved subreddits that bypass the domain filter: '
-        f'{config.subreddits_domain_filter_bypass} '
+        f"Retrieved subreddits that bypass the domain filter: "
+        f"{config.subreddits_domain_filter_bypass} "
     )
 
     config.no_link_header_subs = get_wiki_page(
-        'subreddits/no-link-header', config
-    ).split('\r\n')
+        "subreddits/no-link-header", config
+    ).split("\r\n")
     config.no_link_header_subs = clean_list(config.no_link_header_subs)
     logging.debug(
-        f'Retrieved subreddits subject to the upvote filter: '
-        f'{config.no_link_header_subs} '
+        f"Retrieved subreddits subject to the upvote filter: "
+        f"{config.no_link_header_subs} "
     )
 
-    lines = get_wiki_page('subreddits/archive-time', config).splitlines()
+    lines = get_wiki_page("subreddits/archive-time", config).splitlines()
     config.archive_time_default = int(lines[0])
     config.archive_time_subreddits = {}
     for line in lines[1:]:
-        if ',' in line:
-            sub, time = line.split(',')
+        if "," in line:
+            sub, time = line.split(",")
             config.archive_time_subreddits[sub.lower()] = int(time)
 
 
 def populate_gifs(config):
     # zero it out so we can load more
     config.no_gifs = []
-    config.no_gifs = get_wiki_page('usefulgifs/no', config).split('\r\n')
+    config.no_gifs = get_wiki_page("usefulgifs/no", config).split("\r\n")
 
 
 def initialize(config):
     populate_domain_lists(config)
-    logging.debug('Domains loaded.')
+    logging.debug("Domains loaded.")
     populate_subreddit_lists(config)
-    logging.debug('Subreddits loaded.')
+    logging.debug("Subreddits loaded.")
     populate_formatting(config)
-    logging.debug('Formatting loaded.')
+    logging.debug("Formatting loaded.")
     populate_header(config)
-    logging.debug('Header loaded.')
+    logging.debug("Header loaded.")
     populate_moderators(config)
-    logging.debug('Mod list loaded.')
+    logging.debug("Mod list loaded.")
     populate_gifs(config)
-    logging.debug('Gifs loaded.')
+    logging.debug("Gifs loaded.")
 
 
 def get_heartbeat_port(config):
@@ -228,22 +223,22 @@ def get_heartbeat_port(config):
     """
     try:
         # have we already reserved a port for this process?
-        with open(__HEARTBEAT_FILE__, 'r') as port_file:
+        with open(__HEARTBEAT_FILE__, "r") as port_file:
             port = int(port_file.readline().strip())
-        logging.debug('Found existing port saved on disk')
+        logging.debug("Found existing port saved on disk")
         return port
     except OSError:
         pass
 
     while True:
         port = random.randrange(40000, 40200)  # is 200 ports too much?
-        if config.redis.sismember('active_heartbeat_ports', port) == 0:
-            config.redis.sadd('active_heartbeat_ports', port)
+        if config.redis.sismember("active_heartbeat_ports", port) == 0:
+            config.redis.sadd("active_heartbeat_ports", port)
 
             # create that file we looked for earlier
-            with open(__HEARTBEAT_FILE__, 'w') as port_file:
+            with open(__HEARTBEAT_FILE__, "w") as port_file:
                 port_file.write(str(port))
-            logging.debug(f'generated port {port} and saved to disk')
+            logging.debug(f"generated port {port} and saved to disk")
 
             return port
 
@@ -251,18 +246,16 @@ def get_heartbeat_port(config):
 def configure_modchat(config):
     # Instead of worrying about creating a connection every time we need
     # to send a message, we'll just make one here and pass it around.
-    config.modchat = SlackClient(
-        os.environ.get('SLACK_API_KEY', None)
-    )
+    config.modchat = SlackClient(os.environ.get("SLACK_API_KEY", None))
 
 
 def build_bot(
     name,
     version,
     full_name=None,
-    log_name='transcribersofreddit.log',
+    log_name="transcribersofreddit.log",
     require_redis=True,
-    heartbeat_logging=False
+    heartbeat_logging=False,
 ):
     """
     Shortcut for setting up a bot instance. Runs all configuration and returns
@@ -291,8 +284,11 @@ def build_bot(
 
     if not require_redis:
         # I'm sorry
-        type(config).redis = property(lambda x: (_ for _ in ()).throw(
-            NotImplementedError('Redis was disabled during building!')))
+        type(config).redis = property(
+            lambda x: (_ for _ in ()).throw(
+                NotImplementedError("Redis was disabled during building!")
+            )
+        )
 
     initialize(config)
 
@@ -301,4 +297,4 @@ def build_bot(
         # and for this version, heartbeat requires db access
         configure_heartbeat(config)
 
-    logging.info('Bot built and initialized!')
+    logging.info("Bot built and initialized!")

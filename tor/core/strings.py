@@ -8,4 +8,4 @@ bot_footer = (
     "&message=)"
 )
 
-reddit_url = 'https://reddit.com{}'
+reddit_url = "https://reddit.com{}"

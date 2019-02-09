@@ -1,3 +1,3 @@
-yt_transcript_url = 'http://video.google.com/timedtext?lang=en&v={}'
+yt_transcript_url = "http://video.google.com/timedtext?lang=en&v={}"
 
-ToR_link = 'www.reddit.com/r/TranscribersOfReddit'
+ToR_link = "www.reddit.com/r/TranscribersOfReddit"

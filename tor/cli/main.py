@@ -14,9 +14,19 @@ from tor.helpers.threaded_worker import threaded_check_submissions
 
 def parse_arguments():
     parser = argparse.ArgumentParser(allow_abbrev=False)
-    parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('--debug', action='store_true', default=bool(os.environ.get('DEBUG_MODE', False)), help='Puts bot in dev-mode using non-prod credentials')
-    parser.add_argument('--noop', action='store_true', default=False, help='Just run the daemon, but take no action (helpful for testing infrastructure changes)')
+    parser.add_argument("--version", action="version", version=__version__)
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        default=bool(os.environ.get("DEBUG_MODE", False)),
+        help="Puts bot in dev-mode using non-prod credentials",
+    )
+    parser.add_argument(
+        "--noop",
+        action="store_true",
+        default=False,
+        help="Just run the daemon, but take no action (helpful for testing infrastructure changes)",
+    )
 
     return parser.parse_args()
 
@@ -47,20 +57,20 @@ def main():
     config.debug_mode = opt.debug
 
     if config.debug_mode:
-        bot_name = 'debug'
+        bot_name = "debug"
     else:
-        bot_name = os.environ.get('BOT_NAME', 'bot')
+        bot_name = os.environ.get("BOT_NAME", "bot")
 
     if not opt.noop:
-        build_bot(bot_name, __version__, full_name='u/ToR')
+        build_bot(bot_name, __version__, full_name="u/ToR")
         config.perform_header_check = True
 
-        sys.stderr.write('Starting ToR bot\n')
+        sys.stderr.write("Starting ToR bot\n")
         run_until_dead(run)
     else:
-        sys.stderr.write('Starting ToR bot (noop mode)\n')
+        sys.stderr.write("Starting ToR bot (noop mode)\n")
         run_until_dead(noop)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

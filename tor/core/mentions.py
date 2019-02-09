@@ -16,4 +16,4 @@ def process_mention(mention):
 
     # message format is subject, then body
     mention.author.message(pm_subject, _(pm_body))
-    logging.info(f'Message sent to {mention.author.name}!')
+    logging.info(f"Message sent to {mention.author.name}!")
