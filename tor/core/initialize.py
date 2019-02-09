@@ -6,12 +6,17 @@ import sys
 import redis
 from bugsnag.handlers import BugsnagHandler
 from praw import Reddit
-from slackclient import SlackClient
 
 from tor.core import __HEARTBEAT_FILE__
 from tor.core.config import config
 from tor.core.heartbeat import configure_heartbeat
 from tor.core.helpers import clean_list, get_wiki_page, log_header
+
+try:
+    from slackclient import SlackClient
+except ImportError:
+    # Optional dependency fallback
+    SlackClient = None
 
 
 def configure_tor(config):
@@ -246,7 +251,9 @@ def get_heartbeat_port(config):
 def configure_modchat(config):
     # Instead of worrying about creating a connection every time we need
     # to send a message, we'll just make one here and pass it around.
-    config.modchat = SlackClient(os.environ.get("SLACK_API_KEY", None))
+    api_key = os.environ.get("SLACK_API_KEY")
+    if SlackClient and api_key:
+        config.modchat = SlackClient(api_key)
 
 
 def build_bot(

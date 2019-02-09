@@ -75,15 +75,17 @@ setup(
     },
     extras_require={
         'dev': testing_deps + dev_helper_deps,
+        'prod': [
+            'bugsnag',
+            'slackclient',
+        ],
     },
     tests_require=testing_deps,
     install_requires=[
         'sh',
         'cherrypy',
         'requests',
-        'slackclient',
         'redis<3.0.0',
-        'bugsnag',
         'praw ~= 5.0.1',
     ],
 )
