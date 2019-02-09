@@ -17,6 +17,9 @@ class Object(object):
     pass
 
 
+semaphores = {}
+
+
 subreddit_regex = re.compile("reddit.com\/r\/([a-z0-9\-\_\+]+)", flags=re.IGNORECASE)
 
 default_exceptions = (
@@ -102,6 +105,14 @@ def send_to_modchat(message, config, channel="general"):
                 f"Failed to send message to modchat #{channel}: " f"'{message}'"
             )
             logging.error(e)
+    else:
+        if "modchat_warning" not in semaphores:
+            logging.warning("Modchat not configured")
+            semaphores["modchat_warning"] = True
+
+        logging.debug(
+            "Modchat Message ({channel}): {msg}".format(msg=message, channel=channel)
+        )
 
 
 def explode_gracefully(error, config):
