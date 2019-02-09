@@ -1,12 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+import codecs
 import os
 import sys
-import codecs
-from setuptools import (
-    setup,
-    find_packages,
-)
+
+from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 from tor import __version__
@@ -71,7 +69,7 @@ setup(
     test_suite='test',
     entry_points={
         'console_scripts': [
-            'tor-moderator = tor.main:main',
+            'tor-moderator = tor.cli.main:main',
             'tor-flair-backup = tor.backup:main',
         ],
     },
