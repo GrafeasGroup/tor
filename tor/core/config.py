@@ -182,6 +182,7 @@ class Config(object):
 
     # Templating string for the header of the bot post
     header = ""
+    modchat = None  # The actual modchat instance
 
     no_gifs = []
 
