@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import random
 
 from praw.exceptions import ClientException as RedditClientException
@@ -28,8 +29,9 @@ def process_command(reply, config):
 
     # Trim off the ! from the start of the string
     requested_command = reply.subject[1:]
+    commands_json = os.path.join(os.path.dirname(__file__), "..", "commands.json")
 
-    with open("commands.json", newline="") as commands_file:
+    with open(commands_json, newline="") as commands_file:
         commands = json.load(commands_file)
         logging.debug(
             f"Searching for command {requested_command}, " f"from {reply.author.name}."
@@ -46,8 +48,7 @@ def process_command(reply, config):
                 )
 
             logging.warning(
-                f"Error, command: {requested_command} not found!"
-                f" (from {reply.author.name})"
+                f"Error, command: {requested_command} not found! (from {reply.author.name})"
             )
 
             return
@@ -82,7 +83,7 @@ def process_command(reply, config):
             return
 
         logging.debug(
-            f"Now executing command {requested_command}," f" by {reply.author.name}."
+            f"Now executing command {requested_command}, by {reply.author.name}."
         )
 
         result = globals()[command["pythonFunction"]](reply, config)
