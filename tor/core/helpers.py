@@ -3,9 +3,10 @@ import re
 import signal
 import sys
 import time
+from typing import Any, Dict
 
-import praw
-import prawcore
+import praw  # type: ignore
+import prawcore  # type: ignore
 
 from tor import __version__
 from tor.core.config import config
@@ -17,7 +18,7 @@ class Object(object):
     pass
 
 
-semaphores = {}
+semaphores: Dict[str, Any] = {}
 
 
 subreddit_regex = re.compile("reddit.com\/r\/([a-z0-9\-\_\+]+)", flags=re.IGNORECASE)
@@ -28,26 +29,30 @@ default_exceptions = (
     prawcore.exceptions.Forbidden,
 )
 
-flair = Object()
-flair.unclaimed = "Unclaimed"
-flair.summoned_unclaimed = "Summoned - Unclaimed"
-flair.completed = "Completed!"
-flair.in_progress = "In Progress"
-flair.meta = "Meta"
-flair.disregard = "Disregard"
 
-css_flair = Object()
-css_flair.unclaimed = "unclaimed"
-css_flair.completed = "transcriptioncomplete"
-css_flair.in_progress = "inprogress"
-css_flair.meta = "meta"
-css_flair.disregard = "disregard"
+class flair:
+    unclaimed = "Unclaimed"
+    summoned_unclaimed = "Summoned - Unclaimed"
+    completed = "Completed!"
+    in_progress = "In Progress"
+    meta = "Meta"
+    disregard = "Disregard"
 
-reports = Object()
-reports.original_post_deleted_or_locked = "Original post has been deleted or locked"
-reports.post_should_be_marked_nsfw = "Post should be marked as NSFW"
-reports.no_bot_accounts = "No bot accounts but our own"
-reports.post_violates_rules = "Post Violates Rules on Partner Subreddit"
+
+class css_flair:
+    unclaimed = "unclaimed"
+    completed = "transcriptioncomplete"
+    in_progress = "inprogress"
+    meta = "meta"
+    disregard = "disregard"
+
+
+class reports:
+    original_post_deleted_or_locked = "Original post has been deleted or locked"
+    post_should_be_marked_nsfw = "Post should be marked as NSFW"
+    no_bot_accounts = "No bot accounts but our own"
+    post_violates_rules = "Post Violates Rules on Partner Subreddit"
+
 
 # error message for an API timeout
 _pattern = re.compile("again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$", re.IGNORECASE)
@@ -150,7 +155,7 @@ def clean_id(post_id):
     :param post_id: String. Post fullname (ID)
     :return: String. Post fullname minus the first three characters.
     """
-    return post_id[post_id.index("_") + 1 :]
+    return post_id[post_id.index("_") + 1:]
 
 
 def get_parent_post_id(post, r):

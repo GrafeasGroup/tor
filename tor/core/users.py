@@ -7,7 +7,7 @@ import json
 import logging
 import os
 
-import redis
+import redis  # type: ignore
 
 
 class UserError(Exception):

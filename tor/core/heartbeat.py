@@ -1,6 +1,6 @@
 import logging
 
-import cherrypy
+import cherrypy  # type: ignore
 
 from tor.core.config import config
 

@@ -10,7 +10,7 @@ import random
 import string
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import requests
 
@@ -39,7 +39,7 @@ def check_domain_filter(item: Dict, config) -> bool:
     )
 
 
-def get_subreddit_posts(sub: str) -> [List, None]:
+def get_subreddit_posts(sub: str) -> Optional[List]:
     def generate_user_agent() -> str:
         """
         Reddit routinely blocks / throttles common user agents. The easiest way

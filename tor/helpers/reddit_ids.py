@@ -1,11 +1,11 @@
-from praw.models import Submission
+from praw.models import Submission  # type: ignore
 
 from tor.core.config import Config
 
 
 def add_complete_post_id(
     post_id: str, config: Config, return_result: bool = False
-) -> [None, bool]:
+) -> bool:
     """
     Adds the post id to the complete_post_ids set in Redis. This is used to keep
     track of which posts we've worked on and which ones we haven't.
@@ -20,8 +20,7 @@ def add_complete_post_id(
         we don't care.
     """
     result = config.redis.sadd("complete_post_ids", post_id)
-    if return_result:
-        return True if result == 1 else False
+    return result == 1
 
 
 def is_valid(post_id: str, config: Config) -> bool:

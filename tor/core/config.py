@@ -2,13 +2,14 @@ import datetime
 import logging
 import os
 import random
+from typing import Dict, List
 
 from tor import __version__
 from tor.core import __HEARTBEAT_FILE__
 
 # Load configuration regardless of if bugsnag is setup correctly
 try:
-    import bugsnag
+    import bugsnag  # type: ignore
 except ImportError:
     # If loading from setup.py or bugsnag isn't installed, we
     # don't want to bomb out completely
@@ -79,7 +80,7 @@ class BaseConfig:
     """
 
     # Whitelisted domains
-    domains = []
+    domains: List[str] = []
 
     formatting = ""
 
@@ -157,6 +158,17 @@ class Config(object):
     anywhere in the application
     """
 
+    core_version = __version__
+    video_domains: List[str] = []
+    audio_domains: List[str] = []
+    image_domains: List[str] = []
+    video_formatting = ""
+    audio_formatting = ""
+    image_formatting = ""
+    upvote_filter_subs: Dict = {}
+    no_link_header_subs: List = []
+    tor_mods: List[str] = []
+
     # Media-specific rules, which are fetchable by a dict key. These
     # are intended to be programmatically accessible based on a
     # parameter given instead of hardcoding the media type in a
@@ -169,26 +181,26 @@ class Config(object):
     }
 
     # List of mods of ToR, fetched later using PRAW
-    mods = []
+    mods: List[str] = []
 
     # A collection of Subreddit objects, injected later based on
     # subreddit-specific rules
-    subreddits = []
-    subreddits_to_check = []
-    subreddits_domain_filter_bypass = []
+    subreddits: List = []
+    subreddits_to_check: List = []
+    subreddits_domain_filter_bypass: List = []
 
     # Templating string for the header of the bot post
     header = ""
     modchat = None  # The actual modchat instance
 
-    no_gifs = []
+    no_gifs: List = []
 
     perform_header_check = True
     debug_mode = False
 
     # delay times for removing posts; these are used by u/ToR_archivist
-    archive_time_default = None
-    archive_time_subreddits = {}
+    archive_time_default = 0
+    archive_time_subreddits: Dict = {}
 
     # Global flag to enable/disable placing the triggers
     # for the OCR bot
@@ -197,7 +209,7 @@ class Config(object):
     # Name of the bot
     name = None
     bot_version = "0.0.0"  # this should get overwritten by the bot process
-    heartbeat_logging = False
+    heartbeat_logging = False  # enables debug information for the cherrypy heartbeat server
 
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
 
@@ -213,8 +225,8 @@ class Config(object):
         """
         Lazy-loaded redis connection
         """
-        from redis import StrictRedis
-        import redis.exceptions
+        from redis import StrictRedis  # type: ignore
+        import redis.exceptions  # type: ignore
 
         try:
             url = os.environ.get("REDIS_CONNECTION_URL", "redis://localhost:6379/0")
@@ -259,26 +271,3 @@ if bugsnag and Config.bugsnag_api_key:
 
 # ----- Compatibility -----
 config = Config()
-config.core_version = __version__
-config.video_domains = []
-config.audio_domains = []
-config.image_domains = []
-
-config.video_formatting = ""
-config.audio_formatting = ""
-config.image_formatting = ""
-
-config.subreddits_to_check = []
-config.upvote_filter_subs = {}
-config.no_link_header_subs = []
-
-config.archive_time_default = 0
-config.archive_time_subreddits = {}
-
-config.tor_mods = []
-
-# section for gifs
-config.no_gifs = []
-
-# enables debug information for the cherrypy heartbeat server
-config.heartbeat_logging = False

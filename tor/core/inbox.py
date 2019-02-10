@@ -1,8 +1,8 @@
 import logging
 import re
 
-from praw.exceptions import ClientException as RedditClientException
-from praw.models import Comment as RedditComment
+from praw.exceptions import ClientException as RedditClientException  # type: ignore
+from praw.models import Comment as RedditComment  # type: ignore
 
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override

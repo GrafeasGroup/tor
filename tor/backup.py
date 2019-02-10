@@ -2,8 +2,8 @@ import logging
 import os
 
 from tor import __version__
-from tor.core.config import config  # type: ignore
-from tor.core.initialize import build_bot  # type: ignore
+from tor.core.config import config
+from tor.core.initialize import build_bot
 from tor.core.users import User
 from tor.helpers.flair import _parse_existing_flair
 

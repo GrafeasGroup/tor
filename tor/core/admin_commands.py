@@ -3,7 +3,7 @@ import logging
 import os
 import random
 
-from praw.exceptions import ClientException as RedditClientException
+from praw.exceptions import ClientException as RedditClientException  # type: ignore
 
 # noinspection PyProtectedMember
 from tor.core.helpers import _, clean_id, send_to_modchat
