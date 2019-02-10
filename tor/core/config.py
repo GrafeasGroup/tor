@@ -4,6 +4,9 @@ import os
 import random
 from typing import Dict, List
 
+import redis.exceptions  # type: ignore
+from redis import StrictRedis  # type: ignore
+
 from tor import __version__
 from tor.core import __HEARTBEAT_FILE__
 
@@ -209,7 +212,8 @@ class Config(object):
     # Name of the bot
     name = None
     bot_version = "0.0.0"  # this should get overwritten by the bot process
-    heartbeat_logging = False  # enables debug information for the cherrypy heartbeat server
+    # enables debug information for the cherrypy heartbeat server
+    heartbeat_logging = False
 
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
 
@@ -225,9 +229,6 @@ class Config(object):
         """
         Lazy-loaded redis connection
         """
-        from redis import StrictRedis  # type: ignore
-        import redis.exceptions  # type: ignore
-
         try:
             url = os.environ.get("REDIS_CONNECTION_URL", "redis://localhost:6379/0")
             conn = StrictRedis.from_url(url)

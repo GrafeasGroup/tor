@@ -155,7 +155,7 @@ def clean_id(post_id):
     :param post_id: String. Post fullname (ID)
     :return: String. Post fullname minus the first three characters.
     """
-    return post_id[post_id.index("_") + 1:]
+    return post_id[post_id.index("_") + 1 :]
 
 
 def get_parent_post_id(post, r):
