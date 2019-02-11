@@ -5,22 +5,28 @@ dist: trusty
 
 python:
   - "3.6"
-  - "3.6-dev"
-  - "3.7-dev"
+  - "3.6.5"
+  - "3.7.2"
   - "nightly"
 
 matrix:
   allow_failures:
-    - python: 3.6-dev
-    - python: 3.7-dev
+    - python: 3.6.5
+    - python: 3.7.2
     - python: nightly
 
+before_install:
+  - pip install poetry
+
 install:
-  - pip install --process-dependency-links .[dev]
-  - pip install codacy-coverage
+  - poetry install --no-dev --extras ci
+  # - poetry add mypy
+  # - poetry add black --allow-prereleases
 
 script:
   - pytest --cov=tor
+  # - mypy .
+  # - black .
 
 after_success:
   - coverage xml
