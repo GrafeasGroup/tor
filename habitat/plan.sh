@@ -27,16 +27,34 @@ do_before() {
 
 do_setup_environment() {
   HAB_ENV_LD_LIBRARY_PATH_TYPE="aggregate"
+
+  # Add all of the python deps we install to the PYTHONPATH
+  # so we can `import` them at runtime. With Habitat we need
+  # to specify the PYTHONPATH since it doesn't do that for us
   push_runtime_env   'PYTHONPATH'      "${pkg_prefix}/lib/python${python_major_version}/site-packages"
+
+  # Some magic compile-time stuff to make sure GCC and FFI
+  # are auto-discovered when python native deps need them
   push_buildtime_env 'LD_LIBRARY_PATH' "$(pkg_path_for core/gcc)/lib"
   push_buildtime_env 'LD_LIBRARY_PATH' "$(pkg_path_for core/libffi)/lib"
   # push_buildtime_env 'LD_LIBRARY_PATH' "$(pkg_path_for core/pcre)/lib"
+
   return $?
 }
 
 do_prepare() {
+  # Virtualenv (venv) is a nicer way of redirecting where python
+  # packages are installed. It works for Habitat especially since
+  # there is no real "global" installation of python. This also
+  # makes it much more self-contained by including the version of
+  # python in the `bin/` directory we generate for this package.
+  #
+  # Additionally, virtualenv rewrites the shebangs at the top of
+  # the executables for those installed packages to use the python
+  # executable in the virtualenv, so no funky patching needs to
+  # occur for this to work with Habitat.
   python -m venv "${pkg_prefix}"
-  source "${pkg_prefix}/bin/activate"
+  . "${pkg_prefix}/bin/activate"
   return $?
 }
 
@@ -47,28 +65,51 @@ do_build() {
 do_install() {
   pushd /src 1>/dev/null
 
+  # This is the install step
   pip install --quiet --no-cache-dir -r requirements.txt
-  export module_version="$(python -c "import ${pkg_name}; print(${pkg_name}.__version__)")"
+
+  # Dynamically fetch the version
+  module_version="$(python -c "import ${pkg_name}; print(${pkg_name}.__version__)")"
+  export module_version
   build_line "${pkg_name} version: ${module_version}"
 
   popd 1>/dev/null
 }
 
 do_strip() {
-  # for module in $(pip freeze | grep -v "${pkg_name}==${pkg_version}" | grep -v 'tor-core'); do
-  #   pip uninstall --yes "$module"
-  # done
-
+  # We don't need `pip`, `setuptools`, or `easy_install` after the package is installed
   rm -rf "${pkg_prefix}/lib/python${python_major_version}"/site-packages/pip*
   rm -rf "${pkg_prefix}/lib64/python${python_major_version}"/site-packages/pip*
   rm -rf "${pkg_prefix}/lib/python${python_major_version}"/site-packages/setuptools*
   rm -rf "${pkg_prefix}/lib64/python${python_major_version}"/site-packages/setuptools*
   rm -rf "${pkg_prefix}/bin"/pip*
   rm -rf "${pkg_prefix}/bin"/easy_install*
+
+  # Any other trimming down steps between installation and runtime can happen here.
   return $?
 }
 
+do_clean() {
+  # This trigger is invoked if we're in the Habitat Studio and need
+  # to cleanup between attempted builds. This makes sure one build
+  # attempt does not taint the next one by cleaning up all of the
+  # prior build attempt remnants. The best way to do that is still
+  # the scorched earth approach and starting fresh, but for doing
+  # "dirty upgrades" where it's not a clean environment, we can
+  # optimize by only removing the stuff we _think_ would poison
+  # things for the next build and otherwise reuse the cache for,
+  # e.g., dependencies that have not changed between builds.
+  
+  # That said, we keep things pretty sandboxed in the `$pkg_prefix`,
+  # thanks to virtualenv, but if there are additional remnants from
+  # the prior build, here is where we'd clean them up.
+  rm -rf "${pkg_prefix:?}"/*
+  return 0
+}
+
 do_end() {
+  # since we're dynamically setting these in the build, let's export
+  # them so Habitat can write the artifact information out nicely
   export pkg_origin
   export pkg_name
   export pkg_version
@@ -85,7 +126,6 @@ do_end() {
 #   return $?
 # }
 
-
 # Opting out of all of these since the source code is in the same repo
 do_download() {
   return 0
@@ -93,49 +133,5 @@ do_download() {
 do_verify() {
   return 0
 }
-do_clean() {
-  rm -rf "${pkg_prefix}"/*
-  return 0
-}
 
-# do_unpack() {
-#   # Because our habitat files live under `<project-root>/habitat/`
-#   PROJECT_ROOT="${PLAN_CONTEXT}/.."
-# 
-#   mkdir -p "$pkg_prefix"
-#   build_line "Copying project data to $pkg_prefix/"
-# 
-#   cp "$PROJECT_ROOT/setup.py" "$pkg_prefix/setup.py"
-#   cp "$PROJECT_ROOT/commands.json" "$pkg_prefix/commands.json"
-#   cp "$PROJECT_ROOT/requirements.txt" "$pkg_prefix/requirements.txt"
-#   cp -r "$PROJECT_ROOT/tor" "$pkg_prefix/tor"
-# }
-
-# pkg_filename="${pkg_name}-${pkg_version}.tar.gz"
-# pkg_shasum="TODO"
-# pkg_deps=(core/glibc)
-# pkg_lib_dirs=(lib)
-# pkg_include_dirs=(include)
-# pkg_bin_dirs=(bin)
-# pkg_pconfig_dirs=(lib/pconfig)
-# pkg_svc_run="haproxy -f $pkg_svc_config_path/haproxy.conf"
-# pkg_exports=(
-#   [host]=srv.address
-#   [port]=srv.port
-#   [ssl-port]=srv.ssl.port
-# )
-# pkg_exposes=(port ssl-port)
-# pkg_binds=(
-#   [database]="port host"
-# )
-# pkg_binds_optional=(
-#   [storage]="port host"
-# )
-# pkg_interpreters=(bin/bash)
-# pkg_svc_user="hab"
-# pkg_svc_group="$pkg_svc_user"
-# pkg_description="Some description."
-# pkg_upstream_url="http://example.com/project-name"
-
-
-# vim: ft=bash.sh
+# vim: ft=bash syn=sh
