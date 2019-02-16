@@ -20,6 +20,7 @@ pkg_deps=(
   core/coreutils
 )
 
+# Credit to `bixu` for this approach in https://forums.habitat.sh/t/advice-regarding-building-python-modules/785/2
 
 do_before() {
   update_pkg_version
