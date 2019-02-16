@@ -4,13 +4,19 @@ import random
 import sys
 
 import redis  # type: ignore
-from bugsnag.handlers import BugsnagHandler  # type: ignore
 from praw import Reddit  # type: ignore
 
 from tor.core import __HEARTBEAT_FILE__
 from tor.core.config import config
 from tor.core.heartbeat import configure_heartbeat
 from tor.core.helpers import clean_list, get_wiki_page, log_header
+
+try:
+    from bugsnag.handlers import BugsnagHandler  # type: ignore
+except ImportError:
+    class BugsnagHandler(object):  # some stub
+        pass
+
 
 try:
     from slackclient import SlackClient  # type: ignore
