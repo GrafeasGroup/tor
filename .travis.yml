@@ -19,7 +19,7 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install --process-dependency-links .[dev]
+  - pip install .[dev]
   - pip install codacy-coverage
 
 script:
