@@ -1,10 +1,8 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import MagicMock
-from unittest.mock import patch
 
-from tor.core.admin_commands import from_moderator
-from tor.core.admin_commands import process_override
-
+from tor.core.admin_commands import from_moderator, process_override
 
 tor = MagicMock()
 
