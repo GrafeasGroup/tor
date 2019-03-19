@@ -33,7 +33,7 @@
 
 **15.** We distinguish between our personal convictions and professional duties and do not allow our personal beliefs to interfere with fair representation of the aims of our institutions or the ability to contribute to shared endeavors.
 
-tl;dr: We support everyone and encourage everyone to contribute. However, if you are a shitbird to other contributors during your work on the project, or if you're found to be inciting violence with your work (must have IRREFUTABLE PROOF for this), then you'll be kicked out of the project.
+tl;dr: We support everyone and encourage everyone to contribute. However, if you are a shitbird to other contributors during your work on the project, or if you're found to be inciting violence with your work, then you'll be kicked out of the project.
 
 ---
 
