@@ -5,13 +5,13 @@ dist: xenial
 
 python:
   - "3.6"
-  - "3.7"
-  - "nightly"
-
-matrix:
-  allow_failures:
-    - python: 3.7
-    - python: nightly
+#   - "3.7"
+#   - "nightly"
+#
+# matrix:
+#   allow_failures:
+#     - python: 3.7
+#     - python: nightly
 
 before_install:
   - pip install poetry
