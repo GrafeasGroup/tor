@@ -1,18 +1,16 @@
 ---
 language: python
 
-dist: trusty
+dist: xenial
 
 python:
   - "3.6"
-  - "3.6.5"
-  - "3.7.2"
+  - "3.7"
   - "nightly"
 
 matrix:
   allow_failures:
-    - python: 3.6.5
-    - python: 3.7.2
+    - python: 3.7
     - python: nightly
 
 before_install:
@@ -20,14 +18,12 @@ before_install:
 
 install:
   - poetry install --no-dev --extras ci
-  # - poetry add mypy
-  # - poetry add black --allow-prereleases
 
 script:
   - poetry run pytest --cov=tor
-  # - mypy .
-  # - black .
+  # - poetry run mypy .
+  # - poetry run black .
 
 after_success:
-  - coverage xml
-  - python-codacy-coverage -r coverage.xml
+  - poetry run coverage xml
+  - poetry run python-codacy-coverage -r coverage.xml
