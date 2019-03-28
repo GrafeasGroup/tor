@@ -24,7 +24,7 @@ install:
   # - poetry add black --allow-prereleases
 
 script:
-  - pytest --cov=tor
+  - poetry run pytest --cov=tor
   # - mypy .
   # - black .
 
