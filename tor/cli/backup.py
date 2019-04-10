@@ -29,7 +29,3 @@ def main():
     build_bot(bot_name, __version__, full_name='u/ToR')
     config.perform_header_check = True
     run(config)
-
-
-if __name__ == '__main__':
-    main()
