@@ -1,14 +1,13 @@
 import os
 import time
 
-from tor_core.config import config
-from tor_core.helpers import run_until_dead
-from tor_core.initialize import build_bot
-
 from tor import __version__
+from tor.core.config import config
+from tor.core.helpers import run_until_dead
 from tor.core.inbox import check_inbox
-from tor.helpers.threaded_worker import threaded_check_submissions
+from tor.core.initialize import build_bot
 from tor.helpers.flair import set_meta_flair_on_other_posts
+from tor.helpers.threaded_worker import threaded_check_submissions
 
 # Patreon Dedications:
 #
@@ -54,7 +53,7 @@ def run(config):
     """
     Primary routine.
 
-    :param config: Global config dict, supplied by tor_core.
+    :param config: Global config dict, supplied by tor.core.
     :return: None.
     """
     check_inbox(config)

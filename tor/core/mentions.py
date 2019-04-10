@@ -3,7 +3,7 @@ import logging
 from tor.strings.responses import pm_body
 from tor.strings.responses import pm_subject
 # noinspection PyProtectedMember
-from tor_core.helpers import _
+from tor.core.helpers import _
 
 
 def process_mention(mention):

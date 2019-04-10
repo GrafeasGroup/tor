@@ -1,10 +1,8 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import MagicMock
-from unittest.mock import patch
 
-from tor.core.admin_commands import from_moderator
-from tor.core.admin_commands import process_override
-
+from tor.core.admin_commands import from_moderator, process_override
 
 tor = MagicMock()
 
@@ -45,7 +43,7 @@ def test_from_moderator_false():
 
 @pytest.mark.xfail(reason='Unmaintained test')
 @patch('tor.core.user_interaction.process_done')
-@patch('tor_core.helpers.clean_id', return_value='1234')
+@patch('tor.core.helpers.clean_id', return_value='1234')
 def test_process_override_not_moderator(mock_clean_id, mock_process_done):
     # for use with anything that requires a reply object
 
@@ -55,7 +53,7 @@ def test_process_override_not_moderator(mock_clean_id, mock_process_done):
     config.r = reddit
     config.tor = tor
 
-    with patch('tor_core.helpers.clean_id'):
+    with patch('tor.core.helpers.clean_id'):
         process_override(message(), config)
 
     message.reply.assert_called_once()
@@ -73,7 +71,7 @@ def test_process_override_not_moderator2(mock_process_done, asd):
     config.tor_mods = ['asdf']
     config.r = reddit
     config.tor = tor
-    with patch('tor_core.helpers.clean_id'):
+    with patch('tor.core.helpers.clean_id'):
         # pytest.set_trace()
         process_override(message(), config)
 

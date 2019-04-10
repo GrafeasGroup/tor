@@ -4,10 +4,10 @@ import random
 
 from praw.exceptions import ClientException as RedditClientException
 # noinspection PyProtectedMember
-from tor_core.helpers import _
-from tor_core.helpers import clean_id
-from tor_core.helpers import send_to_modchat
-from tor_core.initialize import initialize
+from tor.core.helpers import _
+from tor.core.helpers import clean_id
+from tor.core.helpers import send_to_modchat
+from tor.core.initialize import initialize
 
 from tor.core.user_interaction import process_done
 
