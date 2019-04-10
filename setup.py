@@ -70,7 +70,7 @@ setup(
     entry_points={
         'console_scripts': [
             'tor-moderator = tor.cli.moderator:main',
-            'tor-flair-backup = tor.backup:main',
+            'tor-flair-backup = tor.cli.backup:main',
         ],
     },
     extras_require={
