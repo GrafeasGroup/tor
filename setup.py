@@ -69,7 +69,7 @@ setup(
     test_suite='test',
     entry_points={
         'console_scripts': [
-            'tor-moderator = tor.main:main',
+            'tor-moderator = tor.cli.moderator:main',
             'tor-flair-backup = tor.backup:main',
         ],
     },
