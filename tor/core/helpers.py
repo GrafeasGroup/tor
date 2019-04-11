@@ -7,10 +7,13 @@ import time
 import praw
 import prawcore
 
+import tor.strings.translation
 from tor.core import __version__
 from tor.core.config import config
 from tor.core.heartbeat import stop_heartbeat_server
-from tor.core.strings import bot_footer
+
+db = tor.strings.translation(lang='en_US')
+bot_footer = db['responses']['bot_footer'].strip()
 
 
 class Object(object):

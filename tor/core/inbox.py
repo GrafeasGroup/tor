@@ -5,11 +5,11 @@ import re
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
 
+import tor.strings.translation
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
 from tor.core.helpers import send_to_modchat
 from tor.core.mentions import process_mention
-from tor.core.strings import reddit_url
 from tor.core.user_interaction import (process_claim, process_coc,
                                        process_done, process_thanks,
                                        process_unclaim,
@@ -17,11 +17,13 @@ from tor.core.user_interaction import (process_claim, process_coc,
 
 # fmt: on
 
+db = tor.strings.translation(lang='en_US')
+reddit_url = db['urls']['reddit_url'].strip()
+
+
 MOD_SUPPORT_PHRASES = [
     re.compile("fuck", re.IGNORECASE),
-    # re.compile('unclaim', re.IGNORECASE),
     re.compile("undo", re.IGNORECASE),
-    # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
 
 
