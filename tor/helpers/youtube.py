@@ -1,4 +1,5 @@
 import logging
+
 # noinspection PyCompatibility
 from urllib.parse import parse_qs, urlparse
 
@@ -26,17 +27,17 @@ def get_yt_video_id(url):
     # initial version: http://stackoverflow.com/a/7936523/617185
     # by Mikhail Kashkin (http://stackoverflow.com/users/85739/mikhail-kashkin)
 
-    if url.startswith(('youtu', 'www')):
-        url = 'http://' + url
+    if url.startswith(("youtu", "www")):
+        url = "http://" + url
 
     query = urlparse(url)
 
-    if 'youtube' in query.hostname:
-        if query.path == '/watch':
-            return parse_qs(query.query)['v'][0]
-        elif query.path.startswith(('/embed/', '/v/')):
-            return query.path.split('/')[2]
-    elif 'youtu.be' in query.hostname:
+    if "youtube" in query.hostname:
+        if query.path == "/watch":
+            return parse_qs(query.query)["v"][0]
+        elif query.path.startswith(("/embed/", "/v/")):
+            return query.path.split("/")[2]
+    elif "youtu.be" in query.hostname:
         return query.path[1:]
     else:
         raise ValueError
@@ -54,22 +55,16 @@ def get_yt_transcript(url, yt_transcript_url=youtube_transcription_url):
         if there's an error.
     """
     try:
-        result = requests.get(
-            yt_transcript_url.format(
-                get_yt_video_id(url)
-            )
-        )
+        result = requests.get(yt_transcript_url.format(get_yt_video_id(url)))
         result.raise_for_status()
         if result.text.startswith(
-                '<?xml version="1.0" encoding="utf-8" ?><transcript><text'
+            '<?xml version="1.0" encoding="utf-8" ?><transcript><text'
         ):
             return result
         else:
             return None
     except requests.exceptions.HTTPError as e:
-        logging.error(
-            f'{e} - Cannot retrieve transcript for {url}'
-        )
+        logging.error(f"{e} - Cannot retrieve transcript for {url}")
         return None
 
 
@@ -82,7 +77,7 @@ def valid_youtube_video(url):
     :return: True if it's a video; false if it's a channel,
     user, or playlist.
     """
-    banned_keywords = ['user', 'channel', 'playlist']
+    banned_keywords = ["user", "channel", "playlist"]
     for keyword in banned_keywords:
         if keyword in url:
             return False

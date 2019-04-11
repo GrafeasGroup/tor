@@ -5,12 +5,10 @@ import cherrypy
 from tor.core.config import config
 
 conf = {
-    '/': {
-        'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
-        'tools.response_headers.on': True,
-        'tools.response_headers.headers': [
-            ('Content-Type', 'application/json')
-        ],
+    "/": {
+        "request.dispatch": cherrypy.dispatch.MethodDispatcher(),
+        "tools.response_headers.on": True,
+        "tools.response_headers.headers": [("Content-Type", "application/json")],
     }
 }
 
@@ -34,12 +32,8 @@ def configure_heartbeat(config):
     """
 
     # update the global config (separate from the application config above)
-    cherrypy.config.update(
-        {
-            'server.socket_port': config.heartbeat_port
-        }
-    )
-    logging.info(f'Heartbeat port: {config.heartbeat_port}')
+    cherrypy.config.update({"server.socket_port": config.heartbeat_port})
+    logging.info(f"Heartbeat port: {config.heartbeat_port}")
 
     if config.heartbeat_logging is False:  # defaults to false
         # disable logging of hits from the heartbeat checker
@@ -57,9 +51,9 @@ class heartbeat(object):
     @cherrypy.tools.json_out()
     def GET(self):
         return {
-            'bot_name': config.name,
-            'bot_version': config.bot_version,
-            'core_version': config.core_version,
+            "bot_name": config.name,
+            "bot_version": config.bot_version,
+            "core_version": config.core_version,
         }
 
 
@@ -70,10 +64,10 @@ def start_heartbeat_server():
 
     :return: None
     """
-    cherrypy.tree.mount(heartbeat(), '/', conf)
+    cherrypy.tree.mount(heartbeat(), "/", conf)
     cherrypy.server.socket_host = "127.0.0.1"
     cherrypy.engine.start()
-    logging.info('Cherrypy heartbeat started!')
+    logging.info("Cherrypy heartbeat started!")
 
 
 def stop_heartbeat_server():

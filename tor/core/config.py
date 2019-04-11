@@ -80,7 +80,7 @@ class BaseConfig:
     # Whitelisted domains
     domains = []
 
-    formatting = ''
+    formatting = ""
 
 
 class VideoConfig(BaseConfig):
@@ -161,10 +161,10 @@ class Config(object):
     # parameter given instead of hardcoding the media type in a
     # switch-case style of control structure
     media = {
-        'audio': AudioConfig(),
-        'video': VideoConfig(),
-        'image': ImageConfig(),
-        'other': OtherContentConfig(),
+        "audio": AudioConfig(),
+        "video": VideoConfig(),
+        "image": ImageConfig(),
+        "other": OtherContentConfig(),
     }
 
     # List of mods of ToR, fetched later using PRAW
@@ -181,7 +181,7 @@ class Config(object):
     sentry_api_url = None
 
     # Templating string for the header of the bot post
-    header = ''
+    header = ""
     modchat_api_url = None
     modchat = None  # the actual modchat instance
 
@@ -200,7 +200,7 @@ class Config(object):
 
     # Name of the bot
     name = None
-    bot_version = '0.0.0'  # this should get overwritten by the bot process
+    bot_version = "0.0.0"  # this should get overwritten by the bot process
     heartbeat_logging = False
 
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
@@ -214,8 +214,7 @@ class Config(object):
         import redis.exceptions
 
         try:
-            url = os.environ.get('REDIS_CONNECTION_URL',
-                                 'redis://localhost:6379/0')
+            url = os.environ.get("REDIS_CONNECTION_URL", "redis://localhost:6379/0")
             conn = StrictRedis.from_url(url)
             conn.ping()
         except redis.exceptions.ConnectionError:
@@ -226,53 +225,50 @@ class Config(object):
     @cached_property
     def tor(self):
         if self.debug_mode:
-            return self.r.subreddit('ModsOfTor')
+            return self.r.subreddit("ModsOfTor")
         else:
-            return self.r.subreddit('transcribersofreddit')
+            return self.r.subreddit("transcribersofreddit")
 
     @cached_property
     def heartbeat_port(self):
         try:
-            with open(__HEARTBEAT_FILE__, 'r') as port_file:
+            with open(__HEARTBEAT_FILE__, "r") as port_file:
                 port = int(port_file.readline().strip())
-            logging.debug('Found existing port saved on disk')
+            logging.debug("Found existing port saved on disk")
             return port
         except OSError:
             pass
 
         while True:
             port = random.randrange(40000, 40200)  # is 200 ports too much?
-            if self.redis.sismember('active_heartbeat_ports', port) == 0:
-                self.redis.sadd('active_heartbeat_ports', port)
+            if self.redis.sismember("active_heartbeat_ports", port) == 0:
+                self.redis.sadd("active_heartbeat_ports", port)
 
-                with open(__HEARTBEAT_FILE__, 'w') as port_file:
+                with open(__HEARTBEAT_FILE__, "w") as port_file:
                     port_file.write(str(port))
-                logging.debug(f'generated port {port} and saved to disk')
+                logging.debug(f"generated port {port} and saved to disk")
 
                 return port
 
 
 try:
-    Config.bugsnag_api_key = open('bugsnag.key').readline().strip()
+    Config.bugsnag_api_key = open("bugsnag.key").readline().strip()
 except OSError:
-    Config.bugsnag_api_key = os.environ.get('BUGSNAG_API_KEY', None)
+    Config.bugsnag_api_key = os.environ.get("BUGSNAG_API_KEY", None)
 
 if bugsnag and Config.bugsnag_api_key:
-    bugsnag.configure(
-        api_key=Config.bugsnag_api_key,
-        app_version=__version__
-    )
+    bugsnag.configure(api_key=Config.bugsnag_api_key, app_version=__version__)
 
 try:
-    Config.modchat_api_url = open('modchat.key').readline().strip()
+    Config.modchat_api_url = open("modchat.key").readline().strip()
 except OSError:
-    Config.modchat_api_url = os.environ.get('MODCHAT_API_URL', None)
+    Config.modchat_api_url = os.environ.get("MODCHAT_API_URL", None)
 
 
 try:
-    Config.sentry_api_url = open('sentry.key').readline().strip()
+    Config.sentry_api_url = open("sentry.key").readline().strip()
 except OSError:
-    Config.sentry_api_url = os.environ.get('SENTRY_API_URL', None)
+    Config.sentry_api_url = os.environ.get("SENTRY_API_URL", None)
 
 # ----- Compatibility -----
 config = Config()
@@ -281,9 +277,9 @@ config.video_domains = []
 config.audio_domains = []
 config.image_domains = []
 
-config.video_formatting = ''
-config.audio_formatting = ''
-config.image_formatting = ''
+config.video_formatting = ""
+config.audio_formatting = ""
+config.image_formatting = ""
 
 config.subreddits_to_check = []
 config.upvote_filter_subs = {}

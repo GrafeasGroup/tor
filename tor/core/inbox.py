@@ -1,3 +1,4 @@
+# fmt: off
 import logging
 import re
 
@@ -14,10 +15,12 @@ from tor.core.user_interaction import (process_claim, process_coc,
                                        process_unclaim,
                                        process_wrong_post_location)
 
+# fmt: on
+
 MOD_SUPPORT_PHRASES = [
-    re.compile('fuck', re.IGNORECASE),
+    re.compile("fuck", re.IGNORECASE),
     # re.compile('unclaim', re.IGNORECASE),
-    re.compile('undo', re.IGNORECASE),
+    re.compile("undo", re.IGNORECASE),
     # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
 
@@ -26,14 +29,15 @@ def forward_to_slack(item, config):
     username = item.author.name
 
     send_to_modchat(
-        f'<{reddit_url.format(item.context)}|Unhandled message>'
-        f' by'
+        f"<{reddit_url.format(item.context)}|Unhandled message>"
+        f" by"
         f' <{reddit_url.format("/u/" + username)}|u/{username}> -- '
-        f'*{item.subject}*:\n{item.body}', config
+        f"*{item.subject}*:\n{item.body}",
+        config,
     )
     logging.info(
-        f'Received unhandled inbox message from {username}. \n Subject: '
-        f'{item.subject}\n\nBody: {item.body} '
+        f"Received unhandled inbox message from {username}. \n Subject: "
+        f"{item.subject}\n\nBody: {item.body}"
     )
 
 
@@ -64,15 +68,15 @@ def process_mod_intervention(post, config):
     phrases = '"' + '", "'.join(phrases) + '"'
 
     send_to_modchat(
-        f':rotating_light::rotating_light: Mod Intervention Needed '
-        f':rotating_light::rotating_light: '
-        f'\n\nDetected use of {phrases} {post.submission.shortlink}',
-        config
+        f":rotating_light::rotating_light: Mod Intervention Needed "
+        f":rotating_light::rotating_light: "
+        f"\n\nDetected use of {phrases} {post.submission.shortlink}",
+        config,
     )
 
 
 def is_transcription(reply, config):
-    if 'image transcription' in reply.body.lower():
+    if "image transcription" in reply.body.lower():
         return True
     if validation._footer_check(reply, config):
         return True
@@ -82,9 +86,9 @@ def is_transcription(reply, config):
 
 def is_claim(reply):
     body = reply.body.lower()
-    if 'claim' in body:
+    if "claim" in body:
         return True
-    if 'dibs' in body:
+    if "dibs" in body:
         return True
 
     return False
@@ -92,9 +96,9 @@ def is_claim(reply):
 
 def is_done(reply):
     body = reply.body.lower()
-    if 'done' in body:
+    if "done" in body:
         return True
-    if 'deno' in body:  # we <3 u/Lornescri
+    if "deno" in body:  # we <3 u/Lornescri
         return True
 
     return False
@@ -115,12 +119,12 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        if 'i accept' in r_body:
+        if "i accept" in r_body:
             process_coc(reply, config)
             reply.mark_read()
             return
 
-        if 'unclaim' in r_body:
+        if "unclaim" in r_body:
             process_unclaim(reply, config)
             reply.mark_read()
             return
@@ -131,17 +135,17 @@ def process_reply(reply, config):
             return
 
         if is_done(reply):
-            alt_text = True if 'done' not in r_body else False
+            alt_text = True if "done" not in r_body else False
             process_done(reply, config, alt_text_trigger=alt_text)
             reply.mark_read()
             return
 
-        if 'thank' in r_body:  # trigger on "thanks" and "thank you"
+        if "thank" in r_body:  # trigger on "thanks" and "thank you"
             process_thanks(reply, config)
             reply.mark_read()
             return
 
-        if '!override' in r_body:
+        if "!override" in r_body:
             process_override(reply, config)
             reply.mark_read()
             return
@@ -177,24 +181,23 @@ def check_inbox(config):
         # In this case, there will be no author attribute.
         if item.author is None:
             send_to_modchat(
-                f'We received a message without an author -- '
-                f'*{item.subject}*:\n{item.body}', config
+                f"We received a message without an author -- *{item.subject}*:\n{item.body}",
+                config,
             )
             item.mark_read()
 
-        elif item.author.name == 'transcribot':
+        elif item.author.name == "transcribot":
             item.mark_read()
 
-        elif item.author.name in config.redis.smembers('blacklist'):
+        elif item.author.name in config.redis.smembers("blacklist"):
             logging.info(
-                f'Skipping inbox item from {item.author.name} who is on the '
-                f'blacklist '
+                f"Skipping inbox item from {item.author.name} who is on the blacklist"
             )
             item.mark_read()
             continue
 
-        elif item.subject == 'username mention':
-            logging.info(f'Received mention! ID {item}')
+        elif item.subject == "username mention":
+            logging.info(f"Received mention! ID {item}")
 
             # noinspection PyUnresolvedReferences
             try:
@@ -206,10 +209,10 @@ def check_inbox(config):
                 continue
             item.mark_read()
 
-        elif item.subject in ('comment reply', 'post reply'):
+        elif item.subject in ("comment reply", "post reply"):
             process_reply(item, config)
 
-        elif item.subject[0] == '!':
+        elif item.subject[0] == "!":
             # Handle our special commands
             process_command(item, config)
             item.mark_read()
