@@ -1,18 +1,22 @@
 # fmt: off
 import logging
 
-# noinspection PyProtectedMember
+import tor.strings.translation
 from tor.core.helpers import _
-from tor.core.strings import reddit_url
 from tor.helpers.flair import flair, flair_post
 from tor.helpers.reddit_ids import add_complete_post_id, is_valid
 from tor.helpers.youtube import (get_yt_transcript, get_yt_video_id,
                                  valid_youtube_video)
-from tor.strings.debug import id_already_handled_in_db
-from tor.strings.posts import (discovered_submit_title, rules_comment,
-                               yt_already_has_transcripts)
 
 # fmt: on
+
+db = tor.strings.translation(lang='en_US')
+
+id_already_handled_in_db = db['debug']['id_already_handled_in_db'].strip()
+discovered_submit_title = db['posts']['discovered_submit_title'].strip()
+rules_comment = db['posts']['rules_comment'].strip()
+yt_already_has_transcripts = db['posts']['yt_already_has_transcripts'].strip()
+reddit_url = db['urls']['reddit_url'].strip()
 
 
 def process_post(new_post, config):
@@ -83,7 +87,6 @@ def process_post(new_post, config):
     if len(post_title) > max_title_length:
         post_title = post_title[: max_title_length - 3] + "..."
 
-    # noinspection PyBroadException
     try:
         result = config.tor.submit(
             title=discovered_submit_title.format(

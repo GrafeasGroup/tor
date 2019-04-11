@@ -1,9 +1,6 @@
-import os
+import tor.strings.translation
 
-import yaml
-
-with open(os.path.join(os.path.dirname(__file__), '..', 'strings', 'en_US.yml'), 'r') as f:
-    db = yaml.safe_load(f)
+db = tor.strings.translation(lang='en_US')
 
 
 bot_footer = db['responses']['bot_footer'].strip()

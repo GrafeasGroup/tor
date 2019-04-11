@@ -105,7 +105,6 @@ def is_done(reply):
 
 
 def process_reply(reply, config):
-    # noinspection PyUnresolvedReferences
     try:
         if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
             process_mod_intervention(reply, config)
@@ -199,7 +198,6 @@ def check_inbox(config):
         elif item.subject == "username mention":
             logging.info(f"Received mention! ID {item}")
 
-            # noinspection PyUnresolvedReferences
             try:
                 process_mention(item)
             except (AttributeError, RedditClientException):

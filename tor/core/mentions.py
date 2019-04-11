@@ -1,7 +1,11 @@
 import logging
 
+import tor.strings.translation
 from tor.core.helpers import _
-from tor.strings.responses import pm_body, pm_subject
+
+text = tor.strings.translation(lang='en_US')
+pm_body = text['responses']['direct_message']['body'].strip()
+pm_subject = text['responses']['direct_message']['subject'].strip()
 
 
 def process_mention(mention):

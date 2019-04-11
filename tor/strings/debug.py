@@ -1,6 +1,4 @@
-import os
+import tor.strings.translation
 
-import yaml
-
-with open(os.path.join(os.path.dirname(__file__), 'en_US.yml'), 'r') as f:
-    id_already_handled_in_db = yaml.safe_load(f)['debug']['id_already_handled_in_db'].strip()
+db = tor.strings.translation(lang='en_US')
+id_already_handled_in_db = db['debug']['id_already_handled_in_db'].strip()

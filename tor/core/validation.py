@@ -1,7 +1,10 @@
 from praw.models import Comment
 
+import tor.strings.translation
 from tor.core.helpers import get_parent_post_id, send_to_modchat
-from tor.strings.urls import ToR_link
+
+db = tor.strings.translation(lang='en_US')
+ToR_link = db['urls']['ToR_link'].strip()
 
 
 def _author_check(original_post, claimant_post):

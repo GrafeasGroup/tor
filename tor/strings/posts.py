@@ -1,9 +1,7 @@
-import os
+import tor.strings.translation
 
-import yaml
+db = tor.strings.translation(lang='en_US')
 
-with open(os.path.join(os.path.dirname(__file__), 'en_US.yml'), 'r') as f:
-    db = yaml.safe_load(f)
 
 discovered_submit_title = db['posts']['discovered_submit_title'].strip()
 rules_comment = db['posts']['rules_comment'].strip()

@@ -4,26 +4,33 @@ import random
 
 import praw
 
-# noinspection PyProtectedMember
+import tor.strings.translation
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
                               reports, send_to_modchat)
-from tor.core.strings import reddit_url
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair, flair_post, update_user_flair
 from tor.helpers.reddit_ids import is_removed
-from tor.strings.responses import (already_claimed, claim_already_complete,
-                                   claim_success, done_cannot_find_transcript,
-                                   done_completed_transcript,
-                                   done_still_unclaimed, please_accept_coc,
-                                   thumbs_up_gifs, transcript_on_tor_post,
-                                   unclaim_failure_post_already_completed,
-                                   unclaim_still_unclaimed, unclaim_success,
-                                   unclaim_success_with_report,
-                                   unclaim_success_without_report,
-                                   youre_welcome)
 
 # fmt: on
+
+db = tor.strings.translation(lang='en_US')
+already_claimed = db['responses']['claim']['already_claimed'].strip()
+claim_already_complete = db['responses']['claim']['already_complete'].strip()
+claim_success = db['responses']['claim']['success'].strip()
+done_cannot_find_transcript = db['responses']['done']['cannot_find_transcript'].strip()
+done_completed_transcript = db['responses']['done']['completed_transcript'].strip()
+done_still_unclaimed = db['responses']['done']['still_unclaimed'].strip()
+please_accept_coc = db['responses']['general']['coc_not_accepted'].strip()
+thumbs_up_gifs = db['urls']['thumbs_up_gifs']
+transcript_on_tor_post = db['responses']['general']['transcript_on_tor_post'].strip()
+unclaim_failure_post_already_completed = db['responses']['unclaim']['post_already_completed'].strip()
+unclaim_still_unclaimed = db['responses']['unclaim']['still_unclaimed'].strip()
+unclaim_success = db['responses']['unclaim']['success'].strip()
+unclaim_success_with_report = db['responses']['unclaim']['success_with_report'].strip()
+unclaim_success_without_report = db['responses']['unclaim']['success_without_report'].strip()
+youre_welcome = db['responses']['general']['youre_welcome'].strip()
+reddit_url = db['urls']['reddit_url'].strip()
 
 
 def coc_accepted(post, config):
@@ -174,7 +181,6 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                 logging.info(
                     f"Post {top_parent.fullname} does not appear to have a post by claimant {post.author}. Hrm..."
                 )
-                # noinspection PyUnresolvedReferences
                 try:
                     post.reply(_(done_cannot_find_transcript))
                 except praw.exceptions.ClientException as e:
@@ -195,7 +201,6 @@ def process_done(post, config, override=False, alt_text_trigger=False):
 
             if override:
                 logging.info("Moderator override starting!")
-            # noinspection PyUnresolvedReferences
             try:
                 if alt_text_trigger:
                     post.reply(
