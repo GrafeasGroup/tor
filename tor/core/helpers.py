@@ -6,7 +6,6 @@ import time
 
 import praw
 import prawcore
-import requests
 
 from tor.core import __version__
 from tor.core.config import config
