@@ -5,17 +5,18 @@ import random
 import sys
 
 import redis
-from praw import Reddit
-
 from bugsnag.handlers import BugsnagHandler
+from praw import Reddit
 from raven import Client
 from raven.conf import setup_logging
 from raven.handlers.logging import SentryHandler
 from slackclient import SlackClient
+
 from tor.core import __HEARTBEAT_FILE__
 from tor.core.config import config
 from tor.core.heartbeat import configure_heartbeat
 from tor.core.helpers import clean_list, get_wiki_page, log_header
+
 # fmt: on
 
 
@@ -264,6 +265,15 @@ def configure_modchat(config):
     config.modchat = SlackClient(os.environ.get("SLACK_API_KEY", None))
 
 
+def has_praw_environment_vars():
+    for var in ['praw_username', 'praw_password', 'praw_client_id', 'praw_client_secret', 'praw_user_agent']:
+        if not os.getenv(var):
+            logging.debug(f'Loading settings from praw.ini. Missing `{var}` from execution environment.')
+            return False
+
+    return True
+
+
 def build_bot(
     name,
     version,
@@ -289,7 +299,10 @@ def build_bot(
     :return: None
     """
 
-    config.r = Reddit(name)
+    if has_praw_environment_vars():
+        config.r = Reddit()
+    else:
+        config.r = Reddit(name)
     # this is used to power messages, so please add a full name if you can
     config.name = full_name if full_name else name
     config.bot_version = version

@@ -7,7 +7,7 @@ import time
 import praw
 import prawcore
 
-import tor.strings.translation
+import tor.strings
 from tor.core import __version__
 from tor.core.config import config
 from tor.core.heartbeat import stop_heartbeat_server

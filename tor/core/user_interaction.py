@@ -4,7 +4,7 @@ import random
 
 import praw
 
-import tor.strings.translation
+import tor.strings
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
                               reports, send_to_modchat)
 from tor.core.users import User

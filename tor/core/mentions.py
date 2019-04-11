@@ -1,6 +1,6 @@
 import logging
 
-import tor.strings.translation
+import tor.strings
 from tor.core.helpers import _
 
 text = tor.strings.translation(lang='en_US')

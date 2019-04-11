@@ -1,7 +1,7 @@
 # fmt: off
 import logging
 
-import tor.strings.translation
+import tor.strings
 from tor.core.helpers import _
 from tor.helpers.flair import flair, flair_post
 from tor.helpers.reddit_ids import add_complete_post_id, is_valid

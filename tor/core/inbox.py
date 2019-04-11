@@ -5,7 +5,7 @@ import re
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
 
-import tor.strings.translation
+import tor.strings
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
 from tor.core.helpers import send_to_modchat

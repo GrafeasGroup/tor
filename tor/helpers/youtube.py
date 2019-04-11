@@ -3,7 +3,7 @@ from urllib.parse import parse_qs, urlparse
 
 import requests
 
-import tor.strings.translation
+import tor.strings
 
 db = tor.strings.translation(lang='en_US')
 youtube_transcription_url = db['urls']['yt_transcript_url'].strip()

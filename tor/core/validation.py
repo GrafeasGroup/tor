@@ -1,6 +1,6 @@
 from praw.models import Comment
 
-import tor.strings.translation
+import tor.strings
 from tor.core.helpers import get_parent_post_id, send_to_modchat
 
 db = tor.strings.translation(lang='en_US')
