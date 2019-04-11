@@ -1,8 +1,8 @@
-import json
 import logging
 import os
 import random
 
+import yaml
 from praw.exceptions import ClientException as RedditClientException
 
 from tor.core.helpers import _, clean_id, send_to_modchat
@@ -26,7 +26,7 @@ def process_command(reply, config):
     same subject, check if the caller is mod, or is in the list of allowed
     people, then reply with the results of pythonFunction.
 
-    To add a new command: add an entry to commands.json, (look at the other
+    To add a new command: add an entry to commands.yml, (look at the other
     commands already listed), and add your function to admin_commands.py.
 
     :param reply: Object, the message object that contains the requested
@@ -38,8 +38,8 @@ def process_command(reply, config):
     # Trim off the ! from the start of the string
     requested_command = reply.subject[1:]
 
-    with open(os.path.join(os.path.dirname(__file__), "commands.json"), newline="") as commands_file:
-        commands = json.load(commands_file)
+    with open(os.path.join(os.path.dirname(__file__), "commands.yml"), newline="") as commands_file:
+        commands = yaml.safe_load(commands_file)
         logging.debug(
             f"Searching for command {requested_command}, from {reply.author.name}."
         )
