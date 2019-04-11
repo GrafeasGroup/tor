@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import random
 
 from praw.exceptions import ClientException as RedditClientException
@@ -37,7 +38,7 @@ def process_command(reply, config):
     # Trim off the ! from the start of the string
     requested_command = reply.subject[1:]
 
-    with open("commands.json", newline="") as commands_file:
+    with open(os.path.join(os.path.dirname(__file__), "commands.json"), newline="") as commands_file:
         commands = json.load(commands_file)
         logging.debug(
             f"Searching for command {requested_command}, from {reply.author.name}."
