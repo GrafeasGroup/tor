@@ -5,6 +5,9 @@ means we will never make a backwards-incompatible change within a major version 
 
 ## UNRELEASED
 
+- Adds `--help` and `--version` flags for expected CLI interactivity
+- Adds `--bot-name` arg and `--debug` flag for option to pass the values as environment variables or on invocation
+- Adds `--dry-run` flag for doing nothing
 - Merges in `tor_core` library again under `tor.core`
 
 ## v3.6.0 (2018-12-2)

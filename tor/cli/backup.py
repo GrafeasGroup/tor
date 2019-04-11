@@ -26,6 +26,8 @@ def get_args():
     p.add_argument('--debug', action='store_true', dest='debug_mode', default=os.getenv('DEBUG_MODE', False), help='Enter a sandbox mode so it will not affect production')
     p.add_argument('--bot-name', action='store', dest='bot_name', default=os.getenv('BOT_NAME', 'bot'), help='Name of the PRAW config section to use for the Reddit API client')
 
+    p.add_argument('--dry-run', action='store_true', dest='dry_run', default=False, help='A safe, no write way of running the bot')
+
     return p.parse_args()
 
 
@@ -40,4 +42,6 @@ def main():
 
     build_bot(bot_name, __version__, full_name='u/ToR')
     config.perform_header_check = True
-    run(config)
+
+    if not opts.dry_run:
+        run(config)
