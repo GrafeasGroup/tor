@@ -2,6 +2,7 @@ import logging
 import os
 
 from tor import __version__
+from tor.cli._base import MyParser
 from tor.core.config import config  # type: ignore
 from tor.core.initialize import build_bot  # type: ignore
 from tor.core.users import User
@@ -18,13 +19,24 @@ def run(cfg):
         u.save()
 
 
+def get_args():
+    p = MyParser()
+    p.add_argument('--version', '-v', action='version', help='Prints the program version and exits', version=f'%(prog)s {__version__}')
+
+    p.add_argument('--debug', action='store_true', dest='debug_mode', default=os.getenv('DEBUG_MODE', False), help='Enter a sandbox mode so it will not affect production')
+    p.add_argument('--bot-name', action='store', dest='bot_name', default=os.getenv('BOT_NAME', 'bot'), help='Name of the PRAW config section to use for the Reddit API client')
+
+    return p.parse_args()
+
+
 def main():
-    config.debug_mode = bool(os.environ.get('DEBUG_MODE', False))
+    opts = get_args()
+    config.debug_mode = opts.debug_mode
 
     if config.debug_mode:
         bot_name = 'debug'
     else:
-        bot_name = os.environ.get('BOT_NAME', 'bot')
+        bot_name = opts.bot_name
 
     build_bot(bot_name, __version__, full_name='u/ToR')
     config.perform_header_check = True
