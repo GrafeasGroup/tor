@@ -10,7 +10,9 @@ means we will never make a backwards-incompatible change within a major version 
 - Adds `--dry-run` flag for doing nothing
 - Uses `black` as the official formatter and style cop for `tor` modules
 - Merges in `tor_core` library again under `tor.core`
+- Fixes need for local `commands.json` file wherever the `tor-moderator` command is called
 - Transfers all strings into a locale-based YAML file for easy changes to bot messages and templates
+- Translates admin commands manifest from JSON to YAML format
 
 ## v3.6.0 (2018-12-2)
 
