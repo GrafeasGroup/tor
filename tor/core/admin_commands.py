@@ -12,6 +12,15 @@ from tor.core.initialize import initialize
 from tor.core.user_interaction import process_done
 
 
+def allowed_execute_command(command, reply, config):
+    if from_moderator(reply, config):
+        return True
+    if reply.author.name in command['allowedNames']:
+        return True
+
+    return False
+
+
 def process_command(reply, config):
     """
     This function processes any commands send to the bot via PM with a subject
@@ -62,20 +71,12 @@ def process_command(reply, config):
 
         # Mods are allowed to do any command, and some people are whitelisted
         # per command to be able to use them
-        if (
-            reply.author.name not in command['allowedNames'] and
-            not from_moderator(reply, config)
-        ):
-            logging.info(
-                f"{reply.author.name} failed to run {requested_command},"
-                f"because they aren't a mod, or aren't whitelisted to use this"
-                f" command"
-            )
+        if not allowed_execute_command(command, reply, config):
+            logging.info(f"{reply.author.name} failed to run {requested_command}, because they aren't a mod, or aren't whitelisted to use this command")
             username = reply.author.name
             send_to_modchat(
-                f":banhammer: Someone did something bad! "
-                f"<https://reddit.com/user/{username}|u/{username}> tried to "
-                f"run {requested_command}!", config
+                f":banhammer: Someone did something bad! <https://reddit.com/user/{username}|u/{username}> tried to run {requested_command}!",
+                config
             )
 
             reply.reply(

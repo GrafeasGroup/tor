@@ -42,7 +42,7 @@ def test_config_structure():
         SITE_CONFIG.bugsnag_api_key is None
 
     assert isinstance(SITE_CONFIG.modchat_api_url, str) or \
-           SITE_CONFIG.modchat_api_url is None
+        SITE_CONFIG.modchat_api_url is None
 
 
 def test_redis_config_property():

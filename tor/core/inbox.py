@@ -71,6 +71,35 @@ def process_mod_intervention(post, config):
     )
 
 
+def is_transcription(reply, config):
+    if 'image transcription' in reply.body.lower():
+        return True
+    if validation._footer_check(reply, config):
+        return True
+
+    return False
+
+
+def is_claim(reply):
+    body = reply.body.lower()
+    if 'claim' in body:
+        return True
+    if 'dibs' in body:
+        return True
+
+    return False
+
+
+def is_done(reply):
+    body = reply.body.lower()
+    if 'done' in body:
+        return True
+    if 'deno' in body:  # we <3 u/Lornescri
+        return True
+
+    return False
+
+
 def process_reply(reply, config):
     # noinspection PyUnresolvedReferences
     try:
@@ -81,10 +110,7 @@ def process_reply(reply, config):
 
         r_body = reply.body.lower()  # cache that thing
 
-        if (
-            'image transcription' in r_body or
-            validation._footer_check(reply, config)
-        ):
+        if is_transcription(reply, config):
             process_wrong_post_location(reply)
             reply.mark_read()
             return
@@ -99,18 +125,12 @@ def process_reply(reply, config):
             reply.mark_read()
             return
 
-        if (
-            'claim' in r_body or
-            'dibs' in r_body
-        ):
+        if is_claim(reply):
             process_claim(reply, config)
             reply.mark_read()
             return
 
-        if (
-            'done' in r_body or
-            'deno' in r_body  # we <3 u/Lornescri
-        ):
+        if is_done(reply):
             alt_text = True if 'done' not in r_body else False
             process_done(reply, config, alt_text_trigger=alt_text)
             reply.mark_read()

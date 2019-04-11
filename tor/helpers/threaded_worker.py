@@ -30,12 +30,16 @@ def check_domain_filter(item: Dict, config) -> bool:
     :return: True if we can work on it, False otherwise.
     """
 
-    return True if (
-        item['domain'] in config.image_domains or
-        item['domain'] in config.audio_domains or
-        item['domain'] in config.video_domains or
-        item['subreddit'] in config.subreddits_domain_filter_bypass
-    ) else False
+    if item['domain'] in config.image_domains:
+        return True
+    if item['domain'] in config.audio_domains:
+        return True
+    if item['domain'] in config.video_domains:
+        return True
+    if item['subreddit'] in config.subreddits_domain_fileter_bypass:
+        return True
+
+    return False
 
 
 def get_subreddit_posts(sub: str) -> [List, None]:

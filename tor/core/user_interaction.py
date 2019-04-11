@@ -196,8 +196,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
             try:
                 if alt_text_trigger:
                     post.reply(_(
-                        'I think you meant `done`, so here we go!\n\n' +
-                        done_completed_transcript
+                        f'I think you meant `done`, so here we go!\n\n{done_completed_transcript}'
                     ))
                 else:
                     post.reply(_(done_completed_transcript))
@@ -256,10 +255,7 @@ def process_unclaim(post, config):
         return
 
     for item in top_parent.user_reports:
-        if (
-            reports.original_post_deleted_or_locked in item[0] or
-            reports.post_violates_rules in item[0]
-        ):
+        if reports.original_post_deleted_or_locked in item[0] or reports.post_violates_rules in item[0]:
             top_parent.mod.remove()
             send_to_modchat(
                 'Removed the following reported post in response to an '
@@ -278,9 +274,7 @@ def process_unclaim(post, config):
     if is_removed(linked_resource):
         top_parent.mod.remove()
         send_to_modchat(
-            'Received `unclaim` on an unreported post, but it looks like it '
-                'was removed on the parent sub. I removed ours here: {}'
-                ''.format(top_parent.shortlink),
+            f'Received `unclaim` on an unreported post, but it looks like it was removed on the parent sub. I removed ours here: {top_parent.shortlink}',
             config,
             channel='removed_posts'
         )

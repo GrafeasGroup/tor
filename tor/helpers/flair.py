@@ -143,18 +143,16 @@ def set_meta_flair_on_other_posts(config):
     :return: None.
     """
     for post in config.tor.new(limit=10):
+        if post.author == config.r.redditor('transcribersofreddit'):
+            continue
+        if post.author in config.tor_mods:
+            continue
+        if post.link_flair_text == flair.meta:
+            continue
 
-        if (
-            post.author != config.r.redditor('transcribersofreddit') and
-            post.author not in config.tor_mods and
-            post.link_flair_text != flair.meta
-        ):
-            logging.info(
-                f'Flairing post {post.fullname} by author {post.author} with '
-                f'Meta. '
-            )
-            flair_post(post, flair.meta)
-            send_to_modchat(
-                f'New meta post: <{post.shortlink}|{post.title}>',
-                config
-            )
+        logging.info(f'Flairing post {post.fullname} by author {post.author} with Meta.')
+        flair_post(post, flair.meta)
+        send_to_modchat(
+            f'New meta post: <{post.shortlink}|{post.title}>',
+            config
+        )

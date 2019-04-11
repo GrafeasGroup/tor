@@ -82,13 +82,17 @@ def _author_history_check(post, config):
         if not isinstance(history_post, Comment):
             continue
 
-        if (
-            history_post.is_root and
-            _footer_check(history_post, config) and
-            _thread_title_check(post, history_post) and
-            _thread_author_check(post, history_post, config)
-        ):
-            return True
+        if not history_post.is_root:
+            continue
+        if not _footer_check(history_post, config):
+            continue
+        if not _thread_title_check(post, history_post):
+            continue
+        if not _thread_author_check(post, history_post, config):
+            continue
+
+        return True
+
     return False
 
 
@@ -118,11 +122,12 @@ def verified_posted_transcript(post, config):
     # get rid of the "See More Comments" crap
     linked_resource.comments.replace_more(limit=0)
     for top_level_comment in linked_resource.comments.list():
-        if (
-            _author_check(post, top_level_comment) and
-            _footer_check(top_level_comment, config)
-        ):
-            return True
+        if not _author_check(post, top_level_comment):
+            continue
+        if not _footer_check(top_level_comment, config):
+            continue
+
+        return True
 
     # Did their transcript get flagged by the spam filter? Check their history.
     if _author_history_check(post, config):
