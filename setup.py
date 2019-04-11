@@ -81,6 +81,7 @@ setup(
         'praw==5.0.1',
         'redis<3.0.0',
         'sh',
+        'PyYaml',
         'cherrypy',
         'bugsnag',
         'raven',  # Sentry client

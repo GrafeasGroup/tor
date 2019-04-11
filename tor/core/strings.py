@@ -1,11 +1,10 @@
-bot_footer = (
-    "{}\n\n---\n\n"
-    "v{version} | This message was posted by a bot. "
-    "| [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) "
-    "| [Source](https://github.com/GrafeasGroup/tor) "
-    "| Questions? [Message the mods!](https://www.reddit.com/message/"
-    "compose?to=%2Fr%2FTranscribersOfReddit&subject=Bot%20Question"
-    "&message=)"
-)
+import os
 
-reddit_url = "https://reddit.com{}"
+import yaml
+
+with open(os.path.join(os.path.dirname(__file__), '..', 'strings', 'en_US.yml'), 'r') as f:
+    db = yaml.safe_load(f)
+
+
+bot_footer = db['responses']['bot_footer'].strip()
+reddit_url = db['urls']['reddit_url'].strip()
