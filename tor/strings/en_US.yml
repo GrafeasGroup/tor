@@ -53,6 +53,8 @@ responses:
       The post is yours! Best of luck and thanks for helping!
 
       Please respond with `done` when complete so we can check this one off the list!
+      
+      If you wish to unclaim the post (because it has been deleted on the parent subreddit or for any other reason), respond with `unclaim` and we will handle it!
     already_claimed: |
       I'm sorry, but it looks like someone else has already claimed this post! You can check in with them to see if they need any help, but otherwise I suggest sticking around to see if another post pops up here in a little bit.
     already_complete: |
