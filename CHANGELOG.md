@@ -3,6 +3,12 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
+## v3.6.1 (2019-06-07)
+
+- HOTFIX release:
+  - Makes the (protected) bot names an environment variable we can override in case usernames need to suddenly change
+  - Add reference to the currently running bot's username, as determined by Reddit's API
+
 ## v3.6.0 (2018-12-2)
 
 - Add handling for `unclaim` comments (credit: @itsthejoker)
