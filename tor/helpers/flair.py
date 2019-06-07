@@ -1,5 +1,6 @@
 import logging
 
+from tor import __BOT_NAMES__
 from tor.core.users import User
 from tor_core.helpers import clean_id
 from tor_core.helpers import flair
@@ -147,7 +148,7 @@ def set_meta_flair_on_other_posts(config):
     for post in config.tor.new(limit=10):
 
         if (
-            post.author != config.r.redditor('transcribersofreddit') and
+            post.author.name not in __BOT_NAMES__ and
             post.author not in config.tor_mods and
             post.link_flair_text != flair.meta
         ):

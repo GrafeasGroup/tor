@@ -2,6 +2,8 @@ import logging
 import random
 
 import praw
+
+from tor import __BOT_NAMES__
 # noinspection PyProtectedMember
 from tor_core.helpers import _
 from tor_core.helpers import clean_id
@@ -102,7 +104,7 @@ def process_claim(post, config):
     top_parent = get_parent_post_id(post, config.r)
 
     # WAIT! Do we actually own this post?
-    if top_parent.author.name != 'transcribersofreddit':
+    if top_parent.author.name not in __BOT_NAMES__:
         logging.debug('Received `claim` on post we do not own. Ignoring.')
         return
 
@@ -167,7 +169,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
     top_parent = get_parent_post_id(post, config.r)
 
     # WAIT! Do we actually own this post?
-    if top_parent.author.name != 'transcribersofreddit':
+    if top_parent.author.name not in __BOT_NAMES__:
         logging.info('Received `done` on post we do not own. Ignoring.')
         return
 
@@ -258,7 +260,7 @@ def process_unclaim(post, config):
 
     top_parent = post.submission
     # WAIT! Do we actually own this post?
-    if top_parent.author.name != 'transcribersofreddit':
+    if top_parent.author.name not in __BOT_NAMES__:
         logging.info('Received `unclaim` on post we do not own. Ignoring.')
         return
 
