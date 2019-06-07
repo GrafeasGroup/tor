@@ -5,6 +5,7 @@ from tor_core.config import config
 from tor_core.helpers import run_until_dead
 from tor_core.initialize import build_bot
 
+import tor
 from tor import __version__
 from tor.core.inbox import check_inbox
 from tor.helpers.threaded_worker import threaded_check_submissions
@@ -78,9 +79,9 @@ def main():
     build_bot(bot_name, __version__, full_name='u/ToR')
     config.perform_header_check = True
 
-    me = config.r.user.me.name
-    if me not in tor.__BOT_NAMES__:
-        tor.__BOT_NAMES__.append(me)
+    tor.__SELF_NAME__ = config.r.user.me.name
+    if tor.__SELF_NAME__ not in tor.__BOT_NAMES__:
+        tor.__BOT_NAMES__.append(tor.__SELF_NAME__)
 
     run_until_dead(run)
 
