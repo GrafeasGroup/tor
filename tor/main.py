@@ -5,6 +5,8 @@ from tor_core.config import config
 from tor_core.helpers import run_until_dead
 from tor_core.initialize import build_bot
 
+# The `import tor` lines is necessary because `tor.__SELF_NAME__` is
+# set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1
 import tor
 from tor import __version__
 from tor.core.inbox import check_inbox
