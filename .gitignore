@@ -10,4 +10,6 @@ __pycache__
 .coverage
 .cache
 /venv
-.venv/
+/.venv
+/build
+/dist

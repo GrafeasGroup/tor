@@ -1,15 +1,10 @@
-[![Waffle.io - Ready](https://img.shields.io/waffle/label/GrafeasGroup/tor/ready.svg?colorB=yellow&label=Available%20Issues)](https://waffle.io/GrafeasGroup/tor)
-[![Waffle.io - In Progress](https://img.shields.io/waffle/label/GrafeasGroup/tor/in%20progress.svg?colorB=green&label=Issues%20Being%20Worked%20On)](https://waffle.io/GrafeasGroup/tor)
-[![Codacy grade](https://img.shields.io/codacy/grade/e27821fb6289410b8f58338c7e0bc686.svg)](https://www.codacy.com/app/GrafeasGroup/tor)
-[![Codacy coverage](https://img.shields.io/codacy/coverage/c44df2d9c89a4809896914fd1a40bedd.svg)](https://www.codacy.com/app/GrafeasGroup/tor)
 [![Travis build status](https://img.shields.io/travis/GrafeasGroup/tor.svg)](https://travis-ci.org/GrafeasGroup/tor)
 [![BugSnag](https://img.shields.io/badge/errors--hosted--by-Bugsnag-blue.svg)](https://www.bugsnag.com/open-source/)
 
 # Transcribers of Reddit
 
 This is the source code for the bot moderating and managing several parts of the subreddit
-[/r/TranscribersOfReddit](https://reddit.com/r/TranscribersOfReddit) ("ToR"), a community dedicated to transcribing images, audio, and video.
-It acts under the username "[/u/TranscribersOfReddit](https://reddit.com/u/TranscribersOfReddit)".
+[/r/TranscribersOfReddit](https://reddit.com/r/TranscribersOfReddit) ("ToR"), a community dedicated to transcribing images, audio, and video. It acts under the username "[/u/TranscribersOfReddit](https://reddit.com/u/TranscribersOfReddit)".
 
 Among other things, this bot handles:
 
@@ -19,8 +14,8 @@ Among other things, this bot handles:
 
 ## Requirements
 
-Redis (tracking completed posts and queue system)
-Reddit API keys
+- Redis (tracking completed posts and queue system)
+- Reddit API keys
 
 > **NOTE:**
 >
@@ -30,18 +25,22 @@ Reddit API keys
 
 ## Installation
 
+### From release
+
+Given a release in <https://github.com/GrafeasGroup/tor/releases>, download the attached `.tar.gz` file for your platform/architecture and `pip install` it directly like so:
+
+```sh
+$ pip install ./path/to/tor-3.6.1-linux-x86_64.tar.gz
+```
+
+### From source
+
 Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/) and Python 3.6.
 
 ```sh
 $ git clone https://github.com/GrafeasGroup/tor.git tor
 $ cd tor/
-$ pip install --process-dependency-links .
-```
-
-OR
-
-```sh
-$ pip install --process-dependency-links 'git+https://github.com/GrafeasGroup/tor.git@master#egg=tor-0'
+$ pip install .
 ```
 
 ## Big Picture
@@ -61,6 +60,16 @@ Monitoring daemon (via subreddit's /new feed):
   - Search for audio, video, and image content:
     - Check against whitelist of domain filters
     - Post url to the content back to /r/TranscribersOfReddit
+
+## Build
+
+To build the package from source, start in the base of the repository and run:
+
+```sh
+$ python setup.py bdist --format=gztar
+```
+
+When building is complete, upload everything in the `dist/` directory that was just created as part of the GitHub release.
 
 ## Usage
 
