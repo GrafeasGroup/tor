@@ -1,19 +1,14 @@
 import logging
 
-from tor.helpers.flair import flair
-from tor.helpers.flair import flair_post
-from tor.helpers.reddit_ids import add_complete_post_id
-from tor.helpers.reddit_ids import is_valid
-from tor.helpers.youtube import get_yt_transcript
-from tor.helpers.youtube import get_yt_video_id
-from tor.helpers.youtube import valid_youtube_video
+from tor.core.helpers import _
+from tor.core.strings import reddit_url
+from tor.helpers.flair import flair, flair_post
+from tor.helpers.reddit_ids import add_complete_post_id, is_valid
+from tor.helpers.youtube import (get_yt_transcript, get_yt_video_id,
+                                 valid_youtube_video)
 from tor.strings.debug import id_already_handled_in_db
-from tor.strings.posts import discovered_submit_title
-from tor.strings.posts import rules_comment
-from tor.strings.posts import yt_already_has_transcripts
-# noinspection PyProtectedMember
-from tor_core.helpers import _
-from tor_core.strings import reddit_url
+from tor.strings.posts import (discovered_submit_title, rules_comment,
+                               yt_already_has_transcripts)
 
 
 def process_post(new_post, config):

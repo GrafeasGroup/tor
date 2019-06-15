@@ -1,21 +1,18 @@
 import logging
-
 import re
+
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
-from tor_core.helpers import send_to_modchat
-from tor_core.strings import reddit_url
 
 from tor.core import validation
-from tor.core.admin_commands import process_command
-from tor.core.admin_commands import process_override
+from tor.core.admin_commands import process_command, process_override
+from tor.core.helpers import send_to_modchat
 from tor.core.mentions import process_mention
-from tor.core.user_interaction import process_claim
-from tor.core.user_interaction import process_coc
-from tor.core.user_interaction import process_done
-from tor.core.user_interaction import process_thanks
-from tor.core.user_interaction import process_unclaim
-from tor.core.user_interaction import process_wrong_post_location
+from tor.core.strings import reddit_url
+from tor.core.user_interaction import (process_claim, process_coc,
+                                       process_done, process_thanks,
+                                       process_unclaim,
+                                       process_wrong_post_location)
 
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),

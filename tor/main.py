@@ -1,17 +1,16 @@
 import os
 import time
 
-from tor_core.config import config
-from tor_core.helpers import run_until_dead
-from tor_core.initialize import build_bot
-
 # The `import tor` lines is necessary because `tor.__SELF_NAME__` is
 # set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1
 import tor
 from tor import __version__
+from tor.core.config import config
+from tor.core.helpers import run_until_dead
 from tor.core.inbox import check_inbox
-from tor.helpers.threaded_worker import threaded_check_submissions
+from tor.core.initialize import build_bot
 from tor.helpers.flair import set_meta_flair_on_other_posts
+from tor.helpers.threaded_worker import threaded_check_submissions
 
 # Patreon Dedications:
 #

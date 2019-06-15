@@ -1,6 +1,6 @@
 from praw.models import Submission
 
-from tor_core.config import Config
+from tor.core.config import Config
 
 
 def add_complete_post_id(

@@ -1,10 +1,8 @@
 import logging
 
 from tor import __BOT_NAMES__
+from tor.core.helpers import clean_id, flair, send_to_modchat
 from tor.core.users import User
-from tor_core.helpers import clean_id
-from tor_core.helpers import flair
-from tor_core.helpers import send_to_modchat
 
 
 def flair_post(post, text):

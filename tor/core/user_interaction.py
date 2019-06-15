@@ -4,36 +4,23 @@ import random
 import praw
 
 from tor import __BOT_NAMES__
-# noinspection PyProtectedMember
-from tor_core.helpers import _
-from tor_core.helpers import clean_id
-from tor_core.helpers import get_parent_post_id
-from tor_core.helpers import get_wiki_page
-from tor_core.helpers import reports
-from tor_core.helpers import send_to_modchat
-from tor_core.strings import reddit_url
-
+from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
+                              reports, send_to_modchat)
+from tor.core.strings import reddit_url
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
-from tor.helpers.flair import flair
-from tor.helpers.flair import flair_post
-from tor.helpers.flair import update_user_flair
+from tor.helpers.flair import flair, flair_post, update_user_flair
 from tor.helpers.reddit_ids import is_removed
-from tor.strings.responses import already_claimed
-from tor.strings.responses import claim_already_complete
-from tor.strings.responses import claim_success
-from tor.strings.responses import done_cannot_find_transcript
-from tor.strings.responses import done_completed_transcript
-from tor.strings.responses import done_still_unclaimed
-from tor.strings.responses import please_accept_coc
-from tor.strings.responses import thumbs_up_gifs
-from tor.strings.responses import transcript_on_tor_post
-from tor.strings.responses import unclaim_failure_post_already_completed
-from tor.strings.responses import unclaim_still_unclaimed
-from tor.strings.responses import unclaim_success
-from tor.strings.responses import unclaim_success_with_report
-from tor.strings.responses import unclaim_success_without_report
-from tor.strings.responses import youre_welcome
+from tor.strings.responses import (already_claimed, claim_already_complete,
+                                   claim_success, done_cannot_find_transcript,
+                                   done_completed_transcript,
+                                   done_still_unclaimed, please_accept_coc,
+                                   thumbs_up_gifs, transcript_on_tor_post,
+                                   unclaim_failure_post_already_completed,
+                                   unclaim_still_unclaimed, unclaim_success,
+                                   unclaim_success_with_report,
+                                   unclaim_success_without_report,
+                                   youre_welcome)
 
 
 def coc_accepted(post, config):
