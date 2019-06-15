@@ -81,7 +81,7 @@ def main():
     build_bot(bot_name, __version__, full_name='u/ToR')
     config.perform_header_check = True
 
-    tor.__SELF_NAME__ = config.r.user.me.name
+    tor.__SELF_NAME__ = config.r.user.me().name
     if tor.__SELF_NAME__ not in tor.__BOT_NAMES__:
         tor.__BOT_NAMES__.append(tor.__SELF_NAME__)
 
