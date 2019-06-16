@@ -6,6 +6,7 @@ means we will never make a backwards-incompatible change within a major version 
 ## UNRELEASED
 
 - Removes Sentry client and dependency
+- Replaces strings.py references with YAML
 
 ## v3.7.0 (2019-06-16)
 

@@ -64,6 +64,7 @@ setup(
         'sh',
         'cherrypy',
         'bugsnag',
+        'PyYAML',
         'requests',
         'slackclient<2.0.0'
     ],

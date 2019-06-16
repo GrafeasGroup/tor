@@ -6,9 +6,9 @@ from tor.helpers.flair import flair, flair_post
 from tor.helpers.reddit_ids import add_complete_post_id, is_valid
 from tor.helpers.youtube import (get_yt_transcript, get_yt_video_id,
                                  valid_youtube_video)
-from tor.strings.debug import id_already_handled_in_db
-from tor.strings.posts import (discovered_submit_title, rules_comment,
-                               yt_already_has_transcripts)
+from tor.strings import translation
+
+i18n = translation()
 
 
 def process_post(new_post, cfg):
@@ -20,6 +20,10 @@ def process_post(new_post, cfg):
     :param cfg: the config object.
     :return: None.
     """
+    id_already_handled_in_db = i18n['debug']['id_already_handled_in_db']
+    discovered_submit_title = i18n['posts']['discovered_submit_title']
+    rules_comment = i18n['posts']['rules_comment']
+    yt_already_has_transcripts = i18n['posts']['yt_already_has_transcripts']
 
     if new_post['subreddit'] in cfg.upvote_filter_subs:
         # ignore posts if they don't meet the threshold for karma and the sub

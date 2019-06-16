@@ -2,7 +2,6 @@ import logging
 import random
 
 import praw
-
 from tor import __BOT_NAMES__
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
                               reports, send_to_modchat)
@@ -11,16 +10,9 @@ from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair, flair_post, update_user_flair
 from tor.helpers.reddit_ids import is_removed
-from tor.strings.responses import (already_claimed, claim_already_complete,
-                                   claim_success, done_cannot_find_transcript,
-                                   done_completed_transcript,
-                                   done_still_unclaimed, please_accept_coc,
-                                   thumbs_up_gifs, transcript_on_tor_post,
-                                   unclaim_failure_post_already_completed,
-                                   unclaim_still_unclaimed, unclaim_success,
-                                   unclaim_success_with_report,
-                                   unclaim_success_without_report,
-                                   youre_welcome)
+from tor.strings import translation
+
+i18n = translation()
 
 
 def coc_accepted(post, cfg):
@@ -90,6 +82,11 @@ def process_claim(post, cfg):
     """
     top_parent = get_parent_post_id(post, cfg.r)
 
+    already_claimed = i18n['responses']['claim']['already_claimed']
+    claim_already_complete = i18n['responses']['claim']['already_complete']
+    claim_success = i18n['responses']['claim']['success']
+    please_accept_coc = i18n['responses']['general']['coc_not_accepted']
+
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
         logging.debug('Received `claim` on post we do not own. Ignoring.')
@@ -155,6 +152,10 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
 
     top_parent = get_parent_post_id(post, cfg.r)
 
+    done_cannot_find_transcript = i18n['responses']['done']['cannot_find_transcript']
+    done_completed_transcript = i18n['responses']['done']['completed_transcript']
+    done_still_unclaimed = i18n['responses']['done']['still_unclaimed']
+
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
         logging.info('Received `done` on post we do not own. Ignoring.')
@@ -196,8 +197,8 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
             try:
                 if alt_text_trigger:
                     post.reply(_(
-                        'I think you meant `done`, so here we go!\n\n' +
-                        done_completed_transcript
+                        'I think you meant `done`, so here we go!\n\n'
+                        f'{done_completed_transcript}'
                     ))
                 else:
                     post.reply(_(done_completed_transcript))
@@ -246,6 +247,13 @@ def process_unclaim(post, cfg):
     #    on ToR's side and reply to the user.
 
     top_parent = post.submission
+
+    unclaim_failure_post_already_completed = i18n['responses']['unclaim']['post_already_claimed']
+    unclaim_still_unclaimed = i18n['responses']['unclaim']['still_unclaimed']
+    unclaim_success = i18n['responses']['unclaim']['success']
+    unclaim_success_with_report = i18n['responses']['unclaim']['success_with_report']
+    unclaim_success_without_report = i18n['responses']['unclaim']['success_without_report']
+
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
         logging.info('Received `unclaim` on post we do not own. Ignoring.')
@@ -257,8 +265,7 @@ def process_unclaim(post, cfg):
 
     for item in top_parent.user_reports:
         if (
-            reports.original_post_deleted_or_locked in item[0] or
-            reports.post_violates_rules in item[0]
+            reports.original_post_deleted_or_locked in item[0] or reports.post_violates_rules in item[0]
         ):
             top_parent.mod.remove()
             send_to_modchat(
@@ -279,8 +286,8 @@ def process_unclaim(post, cfg):
         top_parent.mod.remove()
         send_to_modchat(
             'Received `unclaim` on an unreported post, but it looks like it '
-                'was removed on the parent sub. I removed ours here: {}'
-                ''.format(top_parent.shortlink),
+            'was removed on the parent sub. I removed ours here: {}'
+            ''.format(top_parent.shortlink),
             cfg,
             channel='removed_posts'
         )
@@ -300,6 +307,8 @@ def process_unclaim(post, cfg):
 
 
 def process_thanks(post, cfg):
+    thumbs_up_gifs = i18n['urls']['thumbs_up_gifs']
+    youre_welcome = i18n['responses']['general']['youre_welcome']
     try:
         post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
     except praw.exceptions.APIException as e:
@@ -310,6 +319,7 @@ def process_thanks(post, cfg):
 
 
 def process_wrong_post_location(post):
+    transcript_on_tor_post = i18n['responses']['general']['transcript_on_tor_post']
     try:
         post.reply(_(transcript_on_tor_post))
     except praw.exceptions.APIException:

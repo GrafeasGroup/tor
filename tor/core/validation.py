@@ -1,14 +1,15 @@
 from praw.models import Comment
-
 from tor.core.helpers import get_parent_post_id, send_to_modchat
-from tor.strings.urls import ToR_link
+from tor.strings import translation
+
+i18n = translation()
 
 
 def _author_check(original_post, claimant_post):
     return original_post.author == claimant_post.author
 
 
-def _footer_check(reply, cfg, tor_link=ToR_link):
+def _footer_check(reply, cfg, tor_link=None):
     """
     Is the footer in there?
 
@@ -18,6 +19,8 @@ def _footer_check(reply, cfg, tor_link=ToR_link):
     :param tor_link: String; the magical url key.
     :return: True / None.
     """
+    if tor_link is None:
+        tor_link = i18n['urls']['ToR_link']
     if cfg.perform_header_check:
         return tor_link in reply.body and '&#32;' in reply.body
     else:

@@ -1,10 +1,10 @@
 import logging
-# noinspection PyCompatibility
 from urllib.parse import parse_qs, urlparse
 
 import requests
+from tor.strings import translation
 
-from tor.strings.urls import yt_transcript_url as youtube_transcription_url
+youtube_transcription_url = translation()['urls']['yt_transcript_url']
 
 
 def get_yt_video_id(url):
