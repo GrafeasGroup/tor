@@ -7,6 +7,7 @@ means we will never make a backwards-incompatible change within a major version 
 
 - Adds No Operation (NOOP) mode
 - Merges in `tor_core` as `tor.core` (Fixes [#150](https://github.com/GrafeasGroup/tor/issues/150))
+- Uses `tox` as the default testing mechanism (easier CI and enforces virtualenv sandbox testing)
 
 ## v3.6.2 (2019-06-15)
 
