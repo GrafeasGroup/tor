@@ -1,38 +1,38 @@
 # Changelog
+All notable changes to this project will be documented in this file.
 
-We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
-means we will never make a backwards-incompatible change within a major version of the project.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## UNRELEASED
+## [UNRELEASED]
 
 - Removes remaining references to RocketChat
 
-## v3.8.0 (2019-06-16)
+## [3.8.0] - 2019-06-16
 
 - Removes Sentry client and dependency
 - Replaces strings.py references with YAML
 
-## v3.7.0 (2019-06-16)
+## [3.7.0] - 2019-06-16
 
 - Adds No Operation (NOOP) mode
 - Merges in `tor_core` as `tor.core` (Fixes [#150](https://github.com/GrafeasGroup/tor/issues/150))
 - Uses `tox` as the default testing mechanism (easier CI and enforces virtualenv sandbox testing)
 
-## v3.6.2 (2019-06-15)
+## [3.6.2] - 2019-06-15
 
 - FIX: `Reddit.user.me` is a method not a property, resulting in stack traces on every attempt to run the bot
 
-## v3.6.1 (2019-06-07)
+## [3.6.1] - 2019-06-07
 
 - HOTFIX release:
   - Makes the (protected) bot names an environment variable we can override in case usernames need to suddenly change
   - Add reference to the currently running bot's username, as determined by Reddit's API
 
-## v3.6.0 (2018-12-2)
+## [3.6.0] - 2018-12-02
 
 - Add handling for `unclaim` comments (credit: @itsthejoker)
 
-## v3.5.0 (2018-8-19)
+## [3.5.0] - 2018-08-19
 
 - Add check to verify the transcription goes to the right place (credit: @itsthejoker)
 - Allow dibs to claim a post (credit: @davidarchibald)
@@ -43,7 +43,7 @@ means we will never make a backwards-incompatible change within a major version 
 - Update detection of flair (credit: @itsthejoker)
 - Add system to use history of volunteer to validate posts if comment is autoremoved (credit: @itsthejoker)
 
-## v3.4.0 (2017-12-11)
+## [3.4.0] - 2017-12-11
 
 - Send inbox messages to Slack if they don't match any of the commands (credit: @arfie)
 - Send message to Slack on phrases that may need mod intervention (credit: @thelonelyghost)
@@ -53,11 +53,11 @@ means we will never make a backwards-incompatible change within a major version 
 - Send message to Slack when flairing a post as Meta (credit: @arfie)
 - Handles common typo `deno` as `done` (credit: @itsthejoker)
 
-## v3.3.0 (2017-11-22)
+## [3.3.0] - 2017-11-22
 
 - Enable alternate validation method to get around spam filter nuking posts (credit: @itsthejoker)
 
-## v3.2.0 (2017-11-7)
+## [3.2.0] - 2017-11-07
 
 - Update inbox handler to increase handling speed
 - Update inbox handler to increase legibility and modularity
@@ -65,28 +65,30 @@ means we will never make a backwards-incompatible change within a major version 
 - Prunes unneeded dependencies from before tor_core extraction
 - Defers bot reference in `praw.ini` and whether in debug mode from environment variables (credit: @thelonelyghost)
 
-## v3.1.1 (2017-10-25)
+## [3.1.1] - 2017-10-25
+
 - Minor bug fix, the bot would reply that the config was reloaded when it really wasn't
 
-## v3.1.0 (2017-10-14)
+## [3.1.0] - 2017-10-14
+
 - Now processing inbox messages in the correct order
 - Adds support for pulling all submissions from specific subreddits
 
-## v3.0.4 (2017-10-12)
+## [3.0.4] - 2017-10-12
 
 - Handle top-level post replies the same as comment replies
 
-## v3.0.3 (2017-10-01)
+## [3.0.3] - 2017-10-01
 
 - Removes ability to summon across Reddit
 - Adds ability to PM users with stock message
 - Updates Slack notification messages
 
-## v3.0.2 (2017-09-20)
+## [3.0.2] - 2017-09-20
 
 - Fixes bug with parsing messages from Reddit itself
 
-## v3.0.1 (2017-09-05)
+## [3.0.1] - 2017-09-05
 
 - Adds Travis CI support, enforcing support for python 3.6
 - Updates docs for `pip install` using a git url
@@ -99,7 +101,7 @@ means we will never make a backwards-incompatible change within a major version 
 - Post title is truncated if longer than 250 characters
 - Better method dependency tracking (e.g., passing `config.r` instead of whole `config`)
 
-## v3.0.0 (2017-08-20)
+## [3.0.0] - 2017-08-20
 
 - Updates PRAW (Reddit API) library: v4.4.0 -> v5.0.1
 - Extracts major parts of `tor.core` into [`tor_core`](https://github.com/GrafeasGroup/tor_core)
@@ -112,12 +114,12 @@ means we will never make a backwards-incompatible change within a major version 
 - Rewrite `tor-moderator` to use bot framework in `tor_core`
 - Rule change to have user transcript require footer instead of header
 
-## v2.7.1 (2017-07-01)
+## [2.7.1] - 2017-07-01
 
 - Modify date logic and fix config loading for archivist bot
 - adds css_flair dict for easier interaction with css (credit: @itsthejoker)
 
-## v2.7.0 (2017-07-01)
+## [2.7.0] - 2017-07-01
 
 - Adds `setup.py` for pip packaging
 - Fixes linting errors
@@ -128,7 +130,7 @@ means we will never make a backwards-incompatible change within a major version 
 - Basics for a bot automatically removing and archiving old posts (credit: @arfie)
 - Updated `README.md` with information on u/ToR_archivist (credit: @arfie)
 
-## v2.6.14 (2017-06-07)
+## [2.6.14] - 2017-06-07
 
 - Started logging changes into CHANGELOG.md
 - [Some changes before this point may not be included]
