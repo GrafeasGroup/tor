@@ -181,7 +181,6 @@ class Config(object):
 
     # Templating string for the header of the bot post
     header = ''
-    modchat_api_url = None
     modchat = None  # the actual modchat instance
 
     no_gifs = []
@@ -261,11 +260,6 @@ if bugsnag and Config.bugsnag_api_key:
         api_key=Config.bugsnag_api_key,
         app_version=__version__
     )
-
-try:
-    Config.modchat_api_url = open('modchat.key').readline().strip()
-except OSError:
-    Config.modchat_api_url = os.environ.get('MODCHAT_API_URL', None)
 
 
 # ----- Compatibility -----
