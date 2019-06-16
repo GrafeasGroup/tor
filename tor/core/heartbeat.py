@@ -1,7 +1,6 @@
 import logging
 
 import cherrypy
-
 from tor.core.config import config
 
 conf = {
@@ -15,7 +14,7 @@ conf = {
 }
 
 
-def configure_heartbeat(config):
+def configure_heartbeat(cfg):
     """
     Sets up and starts the cherrypy server that operates the json api endpoint
     for the heartbeat. Usage:
@@ -29,19 +28,19 @@ def configure_heartbeat(config):
         'core_version': '0.2.0'
     }
 
-    :param config: the global config object
+    :param cfg: the global config object
     :return: None
     """
 
     # update the global config (separate from the application config above)
     cherrypy.config.update(
         {
-            'server.socket_port': config.heartbeat_port
+            'server.socket_port': cfg.heartbeat_port
         }
     )
-    logging.info(f'Heartbeat port: {config.heartbeat_port}')
+    logging.info(f'Heartbeat port: {cfg.heartbeat_port}')
 
-    if config.heartbeat_logging is False:  # defaults to false
+    if cfg.heartbeat_logging is False:  # defaults to false
         # disable logging of hits from the heartbeat checker
         cherrypy.log.error_log.propagate = False
         cherrypy.log.access_log.propagate = False

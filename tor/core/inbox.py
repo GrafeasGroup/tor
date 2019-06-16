@@ -3,7 +3,6 @@ import re
 
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
-
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
 from tor.core.helpers import send_to_modchat
@@ -22,14 +21,14 @@ MOD_SUPPORT_PHRASES = [
 ]
 
 
-def forward_to_slack(item, config):
+def forward_to_slack(item, cfg):
     username = item.author.name
 
     send_to_modchat(
         f'<{reddit_url.format(item.context)}|Unhandled message>'
         f' by'
         f' <{reddit_url.format("/u/" + username)}|u/{username}> -- '
-        f'*{item.subject}*:\n{item.body}', config
+        f'*{item.subject}*:\n{item.body}', cfg
     )
     logging.info(
         f'Received unhandled inbox message from {username}. \n Subject: '
@@ -37,7 +36,7 @@ def forward_to_slack(item, config):
     )
 
 
-def process_mod_intervention(post, config):
+def process_mod_intervention(post, cfg):
     """
     Triggers an alert in slack with a link to the comment if there is something
     offensive or in need of moderator intervention
@@ -67,15 +66,15 @@ def process_mod_intervention(post, config):
         f':rotating_light::rotating_light: Mod Intervention Needed '
         f':rotating_light::rotating_light: '
         f'\n\nDetected use of {phrases} {post.submission.shortlink}',
-        config
+        cfg
     )
 
 
-def process_reply(reply, config):
+def process_reply(reply, cfg):
     # noinspection PyUnresolvedReferences
     try:
         if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
-            process_mod_intervention(reply, config)
+            process_mod_intervention(reply, cfg)
             reply.mark_read()
             return
 
@@ -83,19 +82,19 @@ def process_reply(reply, config):
 
         if (
             'image transcription' in r_body or
-            validation._footer_check(reply, config)
+            validation._footer_check(reply, cfg)
         ):
             process_wrong_post_location(reply)
             reply.mark_read()
             return
 
         if 'i accept' in r_body:
-            process_coc(reply, config)
+            process_coc(reply, cfg)
             reply.mark_read()
             return
 
         if 'unclaim' in r_body:
-            process_unclaim(reply, config)
+            process_unclaim(reply, cfg)
             reply.mark_read()
             return
 
@@ -103,7 +102,7 @@ def process_reply(reply, config):
             'claim' in r_body or
             'dibs' in r_body
         ):
-            process_claim(reply, config)
+            process_claim(reply, cfg)
             reply.mark_read()
             return
 
@@ -112,22 +111,22 @@ def process_reply(reply, config):
             'deno' in r_body  # we <3 u/Lornescri
         ):
             alt_text = True if 'done' not in r_body else False
-            process_done(reply, config, alt_text_trigger=alt_text)
+            process_done(reply, cfg, alt_text_trigger=alt_text)
             reply.mark_read()
             return
 
         if 'thank' in r_body:  # trigger on "thanks" and "thank you"
-            process_thanks(reply, config)
+            process_thanks(reply, cfg)
             reply.mark_read()
             return
 
         if '!override' in r_body:
-            process_override(reply, config)
+            process_override(reply, cfg)
             reply.mark_read()
             return
 
         # If we made it this far, it's something we can't process automatically
-        forward_to_slack(reply, config)
+        forward_to_slack(reply, cfg)
         reply.mark_read()  # no spamming the slack channel :)
 
     except (RedditClientException, AttributeError) as e:
@@ -142,7 +141,7 @@ def process_reply(reply, config):
         pass
 
 
-def check_inbox(config):
+def check_inbox(cfg):
     """
     Goes through all the unread messages in the inbox. It deliberately
     leaves mail which does not fit into either category so that it can
@@ -152,20 +151,20 @@ def check_inbox(config):
     """
     # Sort inbox, then act on it
     # Invert the inbox so we're processing oldest first!
-    for item in reversed(list(config.r.inbox.unread(limit=None))):
+    for item in reversed(list(cfg.r.inbox.unread(limit=None))):
         # Very rarely we may actually get a message from Reddit itself.
         # In this case, there will be no author attribute.
         if item.author is None:
             send_to_modchat(
                 f'We received a message without an author -- '
-                f'*{item.subject}*:\n{item.body}', config
+                f'*{item.subject}*:\n{item.body}', cfg
             )
             item.mark_read()
 
         elif item.author.name == 'transcribot':
             item.mark_read()
 
-        elif item.author.name in config.redis.smembers('blacklist'):
+        elif item.author.name in cfg.redis.smembers('blacklist'):
             logging.info(
                 f'Skipping inbox item from {item.author.name} who is on the '
                 f'blacklist '
@@ -187,14 +186,14 @@ def check_inbox(config):
             item.mark_read()
 
         elif item.subject in ('comment reply', 'post reply'):
-            process_reply(item, config)
+            process_reply(item, cfg)
 
         elif item.subject[0] == '!':
             # Handle our special commands
-            process_command(item, config)
+            process_command(item, cfg)
             item.mark_read()
             continue
 
         else:
             item.mark_read()
-            forward_to_slack(item, config)
+            forward_to_slack(item, cfg)

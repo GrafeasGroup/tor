@@ -3,13 +3,12 @@ import logging
 import random
 
 from praw.exceptions import ClientException as RedditClientException
-
 from tor.core.helpers import _, clean_id, send_to_modchat
 from tor.core.initialize import initialize
 from tor.core.user_interaction import process_done
 
 
-def process_command(reply, config):
+def process_command(reply, cfg):
     """
     This function processes any commands send to the bot via PM with a subject
     that stars with a !. The basic flow is read JSON file, look for key with
@@ -21,7 +20,7 @@ def process_command(reply, config):
 
     :param reply: Object, the message object that contains the requested
         command
-    :param config: the global config object
+    :param cfg: the global config object
     :return: None
     """
 
@@ -39,7 +38,7 @@ def process_command(reply, config):
             command = commands['commands'][requested_command]
 
         except KeyError:
-            if from_moderator(reply, config):
+            if from_moderator(reply, cfg):
                 reply.reply(
                     "That command hasn't been implemented yet ):"
                     "\n\nMessage a dev to make your dream come true."
@@ -61,7 +60,7 @@ def process_command(reply, config):
         # per command to be able to use them
         if (
             reply.author.name not in command['allowedNames'] and
-            not from_moderator(reply, config)
+            not from_moderator(reply, cfg)
         ):
             logging.info(
                 f"{reply.author.name} failed to run {requested_command},"
@@ -72,12 +71,12 @@ def process_command(reply, config):
             send_to_modchat(
                 f":banhammer: Someone did something bad! "
                 f"<https://reddit.com/user/{username}|u/{username}> tried to "
-                f"run {requested_command}!", config
+                f"run {requested_command}!", cfg
             )
 
             reply.reply(
                 random.choice(commands['notAuthorizedResponses']).format(
-                    random.choice(config.no_gifs)
+                    random.choice(cfg.no_gifs)
                 )
             )
 
@@ -88,17 +87,17 @@ def process_command(reply, config):
             f' by {reply.author.name}.'
         )
 
-        result = globals()[command['pythonFunction']](reply, config)
+        result = globals()[command['pythonFunction']](reply, cfg)
 
         if result is not None:
             reply.reply(result)
 
 
-def from_moderator(reply, config):
-    return reply.author in config.tor_mods
+def from_moderator(reply, cfg):
+    return reply.author in cfg.tor_mods
 
 
-def process_override(reply, config):
+def process_override(reply, cfg):
     """
     This process is for moderators of ToR to force u/transcribersofreddit
     to mark a post as complete and award flair when the bot refutes a
@@ -106,14 +105,14 @@ def process_override(reply, config):
     the bot's comment saying that it cannot find the transcript.
 
     :param reply: the comment reply object from the moderator.
-    :param config: the global config object.
+    :param cfg: the global config object.
     :return: None.
     """
 
     # don't remove this check, it's not covered like other admin_commands
     # because it's used in reply to people, not as a PM
-    if not from_moderator(reply, config):
-        reply.reply(_(random.choice(config.no_gifs)))
+    if not from_moderator(reply, cfg):
+        reply.reply(_(random.choice(cfg.no_gifs)))
         logging.info(
             f'{reply.author.name} just tried to override. Lolno.'
         )
@@ -123,26 +122,26 @@ def process_override(reply, config):
     # okay, so the parent of the reply should be the bot's comment
     # saying it can't find it. In that case, we need the parent's
     # parent. That should be the comment with the `done` call in it.
-    reply_parent = config.r.comment(id=clean_id(reply.parent_id))
-    parents_parent = config.r.comment(id=clean_id(reply_parent.parent_id))
+    reply_parent = cfg.r.comment(id=clean_id(reply.parent_id))
+    parents_parent = cfg.r.comment(id=clean_id(reply_parent.parent_id))
     if 'done' in parents_parent.body.lower():
         logging.info(
             f'Starting validation override for post {parents_parent.fullname}, '
             f'approved by {reply.author.name}'
         )
         process_done(
-            parents_parent, config, override=True
+            parents_parent, cfg, override=True
         )
 
 
-def process_blacklist(reply, config):
+def process_blacklist(reply, cfg):
     """
     This is used to basically "shadow-ban" people from the bot.
     Format is:
     Subject: !blacklist
     body: <username1>\n<username2>...
     :param reply: the comment reply object from the inbox
-    :param config: the global config object
+    :param cfg: the global config object
     :return: None
     """
 
@@ -153,19 +152,19 @@ def process_blacklist(reply, config):
     already_added = []
 
     for username in usernames:
-        if username in config.tor_mods:
+        if username in cfg.tor_mods:
             results += f'{username} is a mod! Don\'t blacklist mods!\n'
             failed.append(username)
             continue
 
         try:
-            config.r.redditor(username)
+            cfg.r.redditor(username)
         except RedditClientException:
             results += f'{username} isn\'t a valid user\n'
             failed.append(username)
             continue
 
-        if not config.redis.sadd('blacklist', username):
+        if not cfg.redis.sadd('blacklist', username):
             results += f'{username} is already blacklisted, ya fool!\n'
             already_added.append(username)
             continue
@@ -181,21 +180,21 @@ def process_blacklist(reply, config):
         return results
 
 
-def reload_config(reply, config):
+def reload_config(reply, cfg):
     logging.info(
         f'Reloading configs at the request of {reply.author.name}'
     )
-    initialize(config)
+    initialize(cfg)
     logging.info('Reload complete.')
 
     return 'Config reloaded!'
 
 
-def ping(reply, config):
+def ping(reply, cfg):
     """
     Replies to the !ping command, and is used as a keep alive check
     :param reply: Not used, but it is here due to the way the function is called
-    :param config: See reply param
+    :param cfg: See reply param
     :return: The ping string, which in turn is given to Reddit's reply.reply()
     """
     logging.info(

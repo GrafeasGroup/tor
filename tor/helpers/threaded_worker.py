@@ -8,33 +8,29 @@
 import logging
 import random
 import string
-from datetime import timedelta
-from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta
+from typing import Dict, List
 
 import requests
-from typing import Dict
-from typing import List
-
 from tor.core.posts import process_post
 
 
-def check_domain_filter(item: Dict, config) -> bool:
+def check_domain_filter(item: Dict, cfg) -> bool:
     """
     Validate that a given post is actually one that we can (or should) work on
     by checking the domain of the post against our filters.
 
     :param item: a dict which has the post information in it.
-    :param config: the config object.
+    :param cfg: the config object.
     :return: True if we can work on it, False otherwise.
     """
 
     return True if (
-        item['domain'] in config.image_domains or
-        item['domain'] in config.audio_domains or
-        item['domain'] in config.video_domains or
-        item['subreddit'] in config.subreddits_domain_filter_bypass
+        item['domain'] in cfg.image_domains or
+        item['domain'] in cfg.audio_domains or
+        item['domain'] in cfg.video_domains or
+        item['subreddit'] in cfg.subreddits_domain_filter_bypass
     ) else False
 
 
@@ -97,11 +93,11 @@ def get_subreddit_posts(sub: str) -> [List, None]:
     return parse_json_posts(result)
 
 
-def is_time_to_scan(config) -> bool:
-    return datetime.now() > config.last_post_scan_time + timedelta(seconds=45)
+def is_time_to_scan(cfg) -> bool:
+    return datetime.now() > cfg.last_post_scan_time + timedelta(seconds=45)
 
 
-def threaded_check_submissions(config):
+def threaded_check_submissions(cfg):
     """
     Single threaded PRAW performance:
     finished in 56.75446701049805s
@@ -113,14 +109,14 @@ def threaded_check_submissions(config):
     finished in 1.3632569313049316s
     """
 
-    if not is_time_to_scan(config):
+    if not is_time_to_scan(cfg):
         # we're still within the defined time window from the last time we
         # looked for new posts. We'll try again later.
         return
 
-    config.last_post_scan_time = datetime.now()
+    cfg.last_post_scan_time = datetime.now()
 
-    subreddits = config.subreddits_to_check
+    subreddits = cfg.subreddits_to_check
 
     total_posts = list()
     # by not specifying a maximum number of threads, ThreadPoolExecutor will
@@ -138,5 +134,5 @@ def threaded_check_submissions(config):
                 logging.warning('an exception was generated: {}'.format(exc))
 
     for item in total_posts:
-        if check_domain_filter(item, config):
-            process_post(item, config)
+        if check_domain_filter(item, cfg):
+            process_post(item, cfg)

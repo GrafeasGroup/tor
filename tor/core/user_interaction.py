@@ -23,28 +23,28 @@ from tor.strings.responses import (already_claimed, claim_already_complete,
                                    youre_welcome)
 
 
-def coc_accepted(post, config):
+def coc_accepted(post, cfg):
     """
     Verifies that the user is in the Redis set "accepted_CoC".
 
     :param post: the Comment object containing the claim.
-    :param config: the global config dict.
+    :param cfg: the global config dict.
     :return: True if the user has accepted the Code of Conduct, False if they
         haven't.
     """
-    return config.redis.sismember('accepted_CoC', post.author.name) == 1
+    return cfg.redis.sismember('accepted_CoC', post.author.name) == 1
 
 
-def process_coc(post, config):
+def process_coc(post, cfg):
     """
     Adds the username of the redditor to the db as accepting the code of
     conduct.
 
     :param post: The Comment object containing the claim.
-    :param config: the global config dict.
+    :param cfg: the global config dict.
     :return: None.
     """
-    result = config.redis.sadd('accepted_CoC', post.author.name)
+    result = cfg.redis.sadd('accepted_CoC', post.author.name)
 
     modchat_emote = random.choice([
         ':tada:',
@@ -73,22 +73,22 @@ def process_coc(post, config):
             f' has just'
             f' <{reddit_url.format(post.context)}|accepted the CoC!>'
             f' {modchat_emote}',
-            config,
+            cfg,
             channel='new_volunteers'
         )
-    process_claim(post, config)
+    process_claim(post, cfg)
 
 
-def process_claim(post, config):
+def process_claim(post, cfg):
     """
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
 
     :param post: The Comment object containing the claim.
-    :param config: the global config dict.
+    :param cfg: the global config dict.
     :return: None.
     """
-    top_parent = get_parent_post_id(post, config.r)
+    top_parent = get_parent_post_id(post, cfg.r)
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
@@ -96,10 +96,10 @@ def process_claim(post, config):
         return
 
     try:
-        if not coc_accepted(post, config):
+        if not coc_accepted(post, cfg):
             # do not cache this page. We want to get it every time.
             post.reply(_(
-                please_accept_coc.format(get_wiki_page('codeofconduct', config))
+                please_accept_coc.format(get_wiki_page('codeofconduct', cfg))
             ))
             return
 
@@ -136,7 +136,7 @@ def process_claim(post, config):
         raise  # Re-raise exception if not
 
 
-def process_done(post, config, override=False, alt_text_trigger=False):
+def process_done(post, cfg, override=False, alt_text_trigger=False):
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -144,7 +144,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
     transcription.
 
     :param post: the Comment object which contains the string 'done'.
-    :param config: the global config object.
+    :param cfg: the global config object.
     :param override: A parameter that can only come from process_override()
         and skips the validation check.
     :param alt_text_trigger: a trigger that adds an extra piece of text onto
@@ -153,7 +153,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
     :return: None.
     """
 
-    top_parent = get_parent_post_id(post, config.r)
+    top_parent = get_parent_post_id(post, cfg.r)
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
@@ -164,7 +164,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
         if flair.unclaimed in top_parent.link_flair_text:
             post.reply(_(done_still_unclaimed))
         elif top_parent.link_flair_text == flair.in_progress:
-            if not override and not verified_posted_transcript(post, config):
+            if not override and not verified_posted_transcript(post, cfg):
                 # we need to double-check these things to keep people
                 # from gaming the system
                 logging.info(
@@ -201,12 +201,12 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                     ))
                 else:
                     post.reply(_(done_completed_transcript))
-                update_user_flair(post, config)
+                update_user_flair(post, cfg)
                 logging.info(
                     f'Post {top_parent.fullname} completed by {post.author}!'
                 )
                 # get that information saved for the user
-                author = User(str(post.author), config.redis)
+                author = User(str(post.author), cfg.redis)
                 author.list_update('posts_completed', clean_id(post.fullname))
                 author.save()
 
@@ -220,7 +220,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
                 )
             flair_post(top_parent, flair.completed)
 
-            config.redis.incr('total_completed', amount=1)
+            cfg.redis.incr('total_completed', amount=1)
 
     except praw.exceptions.APIException as e:
         if e.error_type == 'DELETED_COMMENT':
@@ -232,7 +232,7 @@ def process_done(post, config, override=False, alt_text_trigger=False):
         raise  # Re-raise exception if not
 
 
-def process_unclaim(post, config):
+def process_unclaim(post, cfg):
     # Sometimes people need to unclaim things. Usually this happens because of
     # an issue with the post itself, like it's been locked or deleted. Either
     # way, we should probably be able to handle it.
@@ -264,7 +264,7 @@ def process_unclaim(post, config):
             send_to_modchat(
                 'Removed the following reported post in response to an '
                 '`unclaim`: {}'.format(top_parent.shortlink),
-                config,
+                cfg,
                 channel='removed_posts'
             )
             post.reply(_(unclaim_success_with_report))
@@ -272,7 +272,7 @@ def process_unclaim(post, config):
 
     # Okay, so they commented with unclaim, but they didn't report it.
     # Time to check to see if they should have.
-    linked_resource = config.r.submission(
+    linked_resource = cfg.r.submission(
         top_parent.id_from_url(top_parent.url)
     )
     if is_removed(linked_resource):
@@ -281,7 +281,7 @@ def process_unclaim(post, config):
             'Received `unclaim` on an unreported post, but it looks like it '
                 'was removed on the parent sub. I removed ours here: {}'
                 ''.format(top_parent.shortlink),
-            config,
+            cfg,
             channel='removed_posts'
         )
         post.reply(_(unclaim_success_without_report))
@@ -299,7 +299,7 @@ def process_unclaim(post, config):
         return
 
 
-def process_thanks(post, config):
+def process_thanks(post, cfg):
     try:
         post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
     except praw.exceptions.APIException as e:

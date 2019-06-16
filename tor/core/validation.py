@@ -8,17 +8,17 @@ def _author_check(original_post, claimant_post):
     return original_post.author == claimant_post.author
 
 
-def _footer_check(reply, config, tor_link=ToR_link):
+def _footer_check(reply, cfg, tor_link=ToR_link):
     """
     Is the footer in there?
 
     :param reply: Comment object; hopefully the one with the transcription in
         it.
-    :param config: the global config object.
+    :param cfg: the global config object.
     :param tor_link: String; the magical url key.
     :return: True / None.
     """
-    if config.perform_header_check:
+    if cfg.perform_header_check:
         return tor_link in reply.body and '&#32;' in reply.body
     else:
         # If we don't want the check to take place, we'll just return
@@ -44,7 +44,7 @@ def _thread_title_check(original_post, history_item):
     )
 
 
-def _thread_author_check(original_post, history_item, config):
+def _thread_author_check(original_post, history_item, cfg):
     """
     This allows us to check whether the author of the thread that the
     transcription is posted in is the same as the author of the linked
@@ -53,18 +53,18 @@ def _thread_author_check(original_post, history_item, config):
 
     :param original_post: Comment object; comment that says "done".
     :param history_item: Comment object; comment pulled from user's history.
-    :param config: the global config object.
+    :param cfg: the global config object.
     :return: True if the author of the original submission matches the author
         of the submission the transcription is on.
     """
     return (
-        history_item.submission.author == config.r.submission(
+        history_item.submission.author == cfg.r.submission(
             url=original_post.submission.url
         ).author
     )
 
 
-def _author_history_check(post, config):
+def _author_history_check(post, cfg):
     """
     Pull the five latest items from the user's history. Chances are that's
     enough to see if they've actually done the post or not without slowing
@@ -75,7 +75,7 @@ def _author_history_check(post, config):
     we're going to have to circle back to when we separate out the jobs.
 
     :param post: The Comment object that contains the string 'done'.
-    :param config: the global config object.
+    :param cfg: the global config object.
     :return: True if the post is found in the history, False if not.
     """
     for history_post in post.author.new(limit=10):
@@ -84,15 +84,15 @@ def _author_history_check(post, config):
 
         if (
             history_post.is_root and
-            _footer_check(history_post, config) and
+            _footer_check(history_post, cfg) and
             _thread_title_check(post, history_post) and
-            _thread_author_check(post, history_post, config)
+            _thread_author_check(post, history_post, cfg)
         ):
             return True
     return False
 
 
-def verified_posted_transcript(post, config):
+def verified_posted_transcript(post, cfg):
     """
     Because we're using basic gamification, we need to put in at least
     a few things to make it difficult to game the system. When a user
@@ -107,12 +107,12 @@ def verified_posted_transcript(post, config):
     Return True if found, False if not.
 
     :param post: The Comment object that contains the string 'done'.
-    :param config: the global config object.
+    :param cfg: the global config object.
     :return: True if a post is found, False if not.
     """
-    top_parent = get_parent_post_id(post, config.r)
+    top_parent = get_parent_post_id(post, cfg.r)
 
-    linked_resource = config.r.submission(
+    linked_resource = cfg.r.submission(
         top_parent.id_from_url(top_parent.url)
     )
     # get rid of the "See More Comments" crap
@@ -120,15 +120,15 @@ def verified_posted_transcript(post, config):
     for top_level_comment in linked_resource.comments.list():
         if (
             _author_check(post, top_level_comment) and
-            _footer_check(top_level_comment, config)
+            _footer_check(top_level_comment, cfg)
         ):
             return True
 
     # Did their transcript get flagged by the spam filter? Check their history.
-    if _author_history_check(post, config):
+    if _author_history_check(post, cfg):
         send_to_modchat(
             f'Found removed post: <{post.submission.shortlink}>',
-            config,
+            cfg,
             channel='#removed_posts'
         )
         return True

@@ -77,7 +77,7 @@ def _parse_existing_flair(user_flair):
     return new_flair_count, css
 
 
-def update_user_flair(post, config):
+def update_user_flair(post, cfg):
     """
     On a successful transcription, this takes the user's current flair,
     increments the counter by one, and stores it back to the subreddit.
@@ -86,12 +86,12 @@ def update_user_flair(post, config):
     class and write that back too.
 
     :param post: The post which holds the author information.
-    :param config: The global config instance.
+    :param cfg: The global config instance.
     :return: None.
     """
     flair_text = '{} Γ - Beta Tester'
 
-    post_author = User(str(post.author), config.redis)
+    post_author = User(str(post.author), cfg.redis)
     current_transcription_count = post_author.get('transcriptions', 0)
 
     try:
@@ -100,7 +100,7 @@ def update_user_flair(post, config):
         # ID of our post object and re-request it from Reddit in order to
         # get the *actual* object, even though they have the same ID. It's
         # weird.
-        user_flair = config.r.comment(
+        user_flair = cfg.r.comment(
             id=clean_id(post.fullname)
         ).author_flair_text
     except AttributeError:
@@ -123,7 +123,7 @@ def update_user_flair(post, config):
         # add in that special flair bit back in to keep their flair intact
         user_flair += additional_flair_text
 
-        config.tor.flair.set(post.author, text=user_flair, css_class=flair_css)
+        cfg.tor.flair.set(post.author, text=user_flair, css_class=flair_css)
         logging.info(f'Setting flair for {post.author}')
 
         post_author.update('transcriptions', current_transcription_count + 1)
@@ -134,20 +134,20 @@ def update_user_flair(post, config):
         return
 
 
-def set_meta_flair_on_other_posts(config):
+def set_meta_flair_on_other_posts(cfg):
     """
     Loops through the 10 newest posts on ToR and sets the flair to
     'Meta' for any post that is not authored by the bot or any of
     the moderators.
 
-    :param config: the active config object.
+    :param cfg: the active config object.
     :return: None.
     """
-    for post in config.tor.new(limit=10):
+    for post in cfg.tor.new(limit=10):
 
         if (
             post.author.name not in __BOT_NAMES__ and
-            post.author not in config.tor_mods and
+            post.author not in cfg.tor_mods and
             post.link_flair_text != flair.meta
         ):
             logging.info(
@@ -157,5 +157,5 @@ def set_meta_flair_on_other_posts(config):
             flair_post(post, flair.meta)
             send_to_modchat(
                 f'New meta post: <{post.shortlink}|{post.title}>',
-                config
+                cfg
             )

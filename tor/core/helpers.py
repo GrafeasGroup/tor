@@ -6,7 +6,6 @@ import time
 
 import praw
 import prawcore
-
 from tor.core import __version__
 from tor.core.config import config
 from tor.core.heartbeat import stop_heartbeat_server
@@ -91,18 +90,18 @@ def clean_list(items):
     return cleaned
 
 
-def send_to_modchat(message, config, channel='general'):
+def send_to_modchat(message, cfg, channel='general'):
     """
     Sends a message to the ToR mod chat.
 
     :param message: String; the message that is to be encoded
-    :param config: the global config dict.
+    :param cfg: the global config dict.
     :param channel: String; the name of the channel to send to. '#' optional.
     :return: None.
     """
-    if config.modchat:
+    if cfg.modchat:
         try:
-            config.modchat.api_call(
+            cfg.modchat.api_call(
                 'chat.postMessage',
                 channel=channel,
                 text=message
@@ -113,14 +112,12 @@ def send_to_modchat(message, config, channel='general'):
             logging.error(e)
 
 
-def explode_gracefully(error, config):
+def explode_gracefully(error):
     """
     A last-ditch effort to try to raise a few more flags as it goes down.
     Only call in times of dire need.
 
-    :param bot_name: string; the name of the bot calling the method.
     :param error: an exception object.
-    :param tor: the r/ToR helper object
     :return: Nothing. Everything dies here.
     """
     logging.error(error)
@@ -170,12 +167,12 @@ def get_parent_post_id(post, r):
             return r.submission(id=clean_id(post.parent_id))
 
 
-def get_wiki_page(pagename, config, return_on_fail=None, subreddit=None):
+def get_wiki_page(pagename, cfg, return_on_fail=None, subreddit=None):
     """
     Return the contents of a given wiki page.
 
     :param pagename: String. The name of the page to be requested.
-    :param config: Dict. Global config object.
+    :param cfg: Dict. Global config object.
     :param return_on_fail: Any value to return when nothing is found
         at the requested page. This allows us to specify returns for
         easier work in debug mode.
@@ -185,7 +182,7 @@ def get_wiki_page(pagename, config, return_on_fail=None, subreddit=None):
         present else None.
     """
     if not subreddit:
-        subreddit = config.tor
+        subreddit = cfg.tor
     logging.debug(f'Retrieving wiki page {pagename}')
     try:
         result = subreddit.wiki[pagename].content_md
@@ -194,13 +191,13 @@ def get_wiki_page(pagename, config, return_on_fail=None, subreddit=None):
         return return_on_fail
 
 
-def update_wiki_page(pagename, content, config, subreddit=None):
+def update_wiki_page(pagename, content, cfg, subreddit=None):
     """
     Sends new content to the requested wiki page.
 
     :param pagename: String. The name of the page to be edited.
     :param content: String. New content for the wiki page.
-    :param config: Dict. Global config object.
+    :param cfg: Dict. Global config object.
     :param subreddit: Object. A specific PRAW Subreddit object if we
         want to interact with a different sub.
     :return: None.
@@ -209,7 +206,7 @@ def update_wiki_page(pagename, content, config, subreddit=None):
     logging.debug(f'Updating wiki page {pagename}')
 
     if not subreddit:
-        subreddit = config.tor
+        subreddit = cfg.tor
 
     try:
         return subreddit.wiki[pagename].edit(content)
@@ -233,14 +230,14 @@ def deactivate_heartbeat_port(port):
     logging.info('Removed port from set of heartbeats.')
 
 
-def stop_heartbeat(config):
+def stop_heartbeat():
     """
     Any logic that goes along with stopping the cherrypy heartbeat server goes
     here. This is called on exit of `run_until_dead()`, either through keyboard
     or crash. The heartbeat server will terminate if the process dies anyway,
     but this allows for a clean shutdown.
 
-    :param config: the global config object
+    :param cfg: the global config object
     :return: None
     """
     stop_heartbeat_server()
@@ -273,7 +270,7 @@ def signal_handler(signal, frame):
 
     if not running:
         logging.critical('User pressed CTRL+C twice!!! Killing!')
-        stop_heartbeat(config)
+        stop_heartbeat()
         sys.exit(1)
 
     logging.info(
@@ -319,9 +316,9 @@ def run_until_dead(func, exceptions=default_exceptions):
                 time.sleep(60)
 
         logging.info('User triggered shutdown. Shutting down.')
-        stop_heartbeat(config)
+        stop_heartbeat()
         sys.exit(0)
 
     except Exception as e:
-        stop_heartbeat(config)
-        explode_gracefully(e, config)
+        stop_heartbeat()
+        explode_gracefully(e)

@@ -17,7 +17,7 @@ from tor.core.heartbeat import configure_heartbeat
 from tor.core.helpers import clean_list, get_wiki_page, log_header
 
 
-def configure_tor(config):
+def configure_tor(cfg):
     """
     Assembles the tor object based on whether or not we've enabled debug mode
     and returns it. There's really no reason to put together a Subreddit
@@ -25,14 +25,14 @@ def configure_tor(config):
     a little easier to type.
 
     :param r: the active Reddit object.
-    :param config: the global config object.
+    :param cfg: the global config object.
     :return: the Subreddit object for the chosen subreddit.
     """
-    if config.debug_mode:
-        tor = config.r.subreddit('ModsOfToR')
+    if cfg.debug_mode:
+        tor = cfg.r.subreddit('ModsOfToR')
     else:
         # normal operation, our primary subreddit
-        tor = config.r.subreddit('transcribersofreddit')
+        tor = cfg.r.subreddit('transcribersofreddit')
 
     return tor
 
@@ -55,7 +55,7 @@ def configure_redis():
     return redis_server
 
 
-def configure_logging(config, log_name='transcribersofreddit.log'):
+def configure_logging(cfg, log_name='transcribersofreddit.log'):
     logging.basicConfig(
         level=logging.INFO,
         format='%(levelname)s | %(funcName)s | %(message)s',
@@ -63,7 +63,7 @@ def configure_logging(config, log_name='transcribersofreddit.log'):
     )
 
     # will intercept anything error level or above
-    if config.bugsnag_api_key:
+    if cfg.bugsnag_api_key:
         bs_handler = BugsnagHandler()
         bs_handler.setLevel(logging.ERROR)
         logging.getLogger('').addHandler(bs_handler)
@@ -71,8 +71,8 @@ def configure_logging(config, log_name='transcribersofreddit.log'):
     else:
         logging.info('Not running with Bugsnag!')
 
-    if config.sentry_api_url:
-        sentry_handler = SentryHandler(Client(config.sentry_api_url))
+    if cfg.sentry_api_url:
+        sentry_handler = SentryHandler(Client(cfg.sentry_api_url))
         sentry_handler.setLevel(logging.ERROR)
         # I don't know what this line does but it seems required by raven
         setup_logging(sentry_handler)
@@ -84,31 +84,31 @@ def configure_logging(config, log_name='transcribersofreddit.log'):
     log_header('Starting!')
 
 
-def populate_header(config):
-    config.header = ''
-    config.header = get_wiki_page('format/header', config)
+def populate_header(cfg):
+    cfg.header = ''
+    cfg.header = get_wiki_page('format/header', cfg)
 
 
-def populate_formatting(config):
+def populate_formatting(cfg):
     """
     Grabs the contents of the three wiki pages that contain the
-    formatting examples and stores them in the config object.
+    formatting examples and stores them in the cfg object.
 
     :return: None.
     """
     # zero out everything so we can reinitialize later
-    config.audio_formatting = ''
-    config.video_formatting = ''
-    config.image_formatting = ''
-    config.other_formatting = ''
+    cfg.audio_formatting = ''
+    cfg.video_formatting = ''
+    cfg.image_formatting = ''
+    cfg.other_formatting = ''
 
-    config.audio_formatting = get_wiki_page('format/audio', config)
-    config.video_formatting = get_wiki_page('format/video', config)
-    config.image_formatting = get_wiki_page('format/images', config)
-    config.other_formatting = get_wiki_page('format/other', config)
+    cfg.audio_formatting = get_wiki_page('format/audio', cfg)
+    cfg.video_formatting = get_wiki_page('format/video', cfg)
+    cfg.image_formatting = get_wiki_page('format/images', cfg)
+    cfg.other_formatting = get_wiki_page('format/other', cfg)
 
 
-def populate_domain_lists(config):
+def populate_domain_lists(cfg):
     """
     Loads the approved content domains into the config object from the
     wiki page.
@@ -116,127 +116,127 @@ def populate_domain_lists(config):
     :return: None.
     """
 
-    config.video_domains = []
-    config.image_domains = []
-    config.audio_domains = []
+    cfg.video_domains = []
+    cfg.image_domains = []
+    cfg.audio_domains = []
 
-    domains = get_wiki_page('domains', config)
+    domains = get_wiki_page('domains', cfg)
     domains = ''.join(domains.splitlines()).split('---')
 
     for domainset in domains:
         domain_list = domainset[domainset.index('['):].strip('[]').split(', ')
         current_domain_list = []
         if domainset.startswith('video'):
-            current_domain_list = config.video_domains
+            current_domain_list = cfg.video_domains
         elif domainset.startswith('audio'):
-            current_domain_list = config.audio_domains
+            current_domain_list = cfg.audio_domains
         elif domainset.startswith('images'):
-            current_domain_list = config.image_domains
+            current_domain_list = cfg.image_domains
 
         current_domain_list += domain_list
         # [current_domain_list.append(x) for x in domain_list]
         logging.debug(f'Domain list populated: {current_domain_list}')
 
 
-def populate_moderators(config):
+def populate_moderators(cfg):
     # Praw doesn't cache this information, so it requests it every damn time
     # we ask about the moderators. Let's cache this so we can drastically cut
     # down on the number of calls for the mod list.
 
     # nuke the existing list
-    config.tor_mods = []
+    cfg.tor_mods = []
 
     # this call returns a full list rather than a generator. Praw is weird.
-    config.tor_mods = config.tor.moderator()
+    cfg.tor_mods = cfg.tor.moderator()
 
 
-def populate_subreddit_lists(config):
+def populate_subreddit_lists(cfg):
     """
     Gets the list of subreddits to monitor and loads it into memory.
 
     :return: None.
     """
 
-    config.subreddits_to_check = []
-    config.upvote_filter_subs = {}
-    config.no_link_header_subs = []
+    cfg.subreddits_to_check = []
+    cfg.upvote_filter_subs = {}
+    cfg.no_link_header_subs = []
 
-    config.subreddits_to_check = get_wiki_page('subreddits',
-                                               config).splitlines()
-    config.subreddits_to_check = clean_list(config.subreddits_to_check)
+    cfg.subreddits_to_check = get_wiki_page('subreddits',
+                                               cfg).splitlines()
+    cfg.subreddits_to_check = clean_list(cfg.subreddits_to_check)
     logging.debug(
-        f'Created list of subreddits from wiki: {config.subreddits_to_check}'
+        f'Created list of subreddits from wiki: {cfg.subreddits_to_check}'
     )
 
     for line in get_wiki_page(
-        'subreddits/upvote-filtered', config
+        'subreddits/upvote-filtered', cfg
     ).splitlines():
         if ',' in line:
             sub, threshold = line.split(',')
-            config.upvote_filter_subs[sub] = int(threshold)
+            cfg.upvote_filter_subs[sub] = int(threshold)
 
     logging.debug(
         f'Retrieved subreddits subject to the upvote filter: '
-        f'{config.upvote_filter_subs} '
+        f'{cfg.upvote_filter_subs} '
     )
 
-    config.subreddits_domain_filter_bypass = get_wiki_page(
-        'subreddits/domain-filter-bypass', config
+    cfg.subreddits_domain_filter_bypass = get_wiki_page(
+        'subreddits/domain-filter-bypass', cfg
     ).split('\r\n')
-    config.subreddits_domain_filter_bypass = clean_list(
-        config.subreddits_domain_filter_bypass
+    cfg.subreddits_domain_filter_bypass = clean_list(
+        cfg.subreddits_domain_filter_bypass
     )
     logging.debug(
         f'Retrieved subreddits that bypass the domain filter: '
-        f'{config.subreddits_domain_filter_bypass} '
+        f'{cfg.subreddits_domain_filter_bypass} '
     )
 
-    config.no_link_header_subs = get_wiki_page(
-        'subreddits/no-link-header', config
+    cfg.no_link_header_subs = get_wiki_page(
+        'subreddits/no-link-header', cfg
     ).split('\r\n')
-    config.no_link_header_subs = clean_list(config.no_link_header_subs)
+    cfg.no_link_header_subs = clean_list(cfg.no_link_header_subs)
     logging.debug(
         f'Retrieved subreddits subject to the upvote filter: '
-        f'{config.no_link_header_subs} '
+        f'{cfg.no_link_header_subs} '
     )
 
-    lines = get_wiki_page('subreddits/archive-time', config).splitlines()
-    config.archive_time_default = int(lines[0])
-    config.archive_time_subreddits = {}
+    lines = get_wiki_page('subreddits/archive-time', cfg).splitlines()
+    cfg.archive_time_default = int(lines[0])
+    cfg.archive_time_subreddits = {}
     for line in lines[1:]:
         if ',' in line:
             sub, time = line.split(',')
-            config.archive_time_subreddits[sub.lower()] = int(time)
+            cfg.archive_time_subreddits[sub.lower()] = int(time)
 
 
-def populate_gifs(config):
+def populate_gifs(cfg):
     # zero it out so we can load more
-    config.no_gifs = []
-    config.no_gifs = get_wiki_page('usefulgifs/no', config).split('\r\n')
+    cfg.no_gifs = []
+    cfg.no_gifs = get_wiki_page('usefulgifs/no', cfg).split('\r\n')
 
 
-def initialize(config):
-    populate_domain_lists(config)
+def initialize(cfg):
+    populate_domain_lists(cfg)
     logging.debug('Domains loaded.')
-    populate_subreddit_lists(config)
+    populate_subreddit_lists(cfg)
     logging.debug('Subreddits loaded.')
-    populate_formatting(config)
+    populate_formatting(cfg)
     logging.debug('Formatting loaded.')
-    populate_header(config)
+    populate_header(cfg)
     logging.debug('Header loaded.')
-    populate_moderators(config)
+    populate_moderators(cfg)
     logging.debug('Mod list loaded.')
-    populate_gifs(config)
+    populate_gifs(cfg)
     logging.debug('Gifs loaded.')
 
 
-def get_heartbeat_port(config):
+def get_heartbeat_port(cfg):
     """
     Attempts to pull an existing port number from the filesystem, and if it
     doesn't find one then it generates the port number and saves it to a key
     file.
 
-    :param config: the global config object
+    :param cfg: the global config object
     :return: int; the port number to use.
     """
     try:
@@ -250,8 +250,8 @@ def get_heartbeat_port(config):
 
     while True:
         port = random.randrange(40000, 40200)  # is 200 ports too much?
-        if config.redis.sismember('active_heartbeat_ports', port) == 0:
-            config.redis.sadd('active_heartbeat_ports', port)
+        if cfg.redis.sismember('active_heartbeat_ports', port) == 0:
+            cfg.redis.sadd('active_heartbeat_ports', port)
 
             # create that file we looked for earlier
             with open(__HEARTBEAT_FILE__, 'w') as port_file:
@@ -261,10 +261,10 @@ def get_heartbeat_port(config):
             return port
 
 
-def configure_modchat(config):
+def configure_modchat(cfg):
     # Instead of worrying about creating a connection every time we need
     # to send a message, we'll just make one here and pass it around.
-    config.modchat = SlackClient(
+    cfg.modchat = SlackClient(
         os.environ.get('SLACK_API_KEY', None)
     )
 

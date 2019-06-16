@@ -12,7 +12,6 @@ from tor.core.initialize import build_bot
 from tor.helpers.flair import set_meta_flair_on_other_posts
 from tor.helpers.threaded_worker import threaded_check_submissions
 
-
 ##############################
 NOOP_MODE = bool(os.getenv('NOOP_MODE', ''))
 DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
@@ -62,20 +61,20 @@ def noop(cfg):
     pass
 
 
-def run(config):
+def run(cfg):
     """
     Primary routine.
 
-    :param config: Global config dict, supplied by tor_core.
+    :param cfg: Global config dict, supplied by tor_core.
     :return: None.
     """
-    check_inbox(config)
+    check_inbox(cfg)
 
-    threaded_check_submissions(config)
+    threaded_check_submissions(cfg)
 
-    set_meta_flair_on_other_posts(config)
+    set_meta_flair_on_other_posts(cfg)
 
-    if config.debug_mode:
+    if cfg.debug_mode:
         time.sleep(60)
 
 
