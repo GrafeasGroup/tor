@@ -6,11 +6,7 @@ import sys
 import redis
 from bugsnag.handlers import BugsnagHandler
 from praw import Reddit
-from raven import Client
-from raven.conf import setup_logging
-from raven.handlers.logging import SentryHandler
 from slackclient import SlackClient
-
 from tor.core import __HEARTBEAT_FILE__
 from tor.core.config import config
 from tor.core.heartbeat import configure_heartbeat
@@ -70,16 +66,6 @@ def configure_logging(cfg, log_name='transcribersofreddit.log'):
         logging.info('Bugsnag enabled!')
     else:
         logging.info('Not running with Bugsnag!')
-
-    if cfg.sentry_api_url:
-        sentry_handler = SentryHandler(Client(cfg.sentry_api_url))
-        sentry_handler.setLevel(logging.ERROR)
-        # I don't know what this line does but it seems required by raven
-        setup_logging(sentry_handler)
-        logging.getLogger('').addHandler(sentry_handler)
-        logging.info('Sentry enabled!')
-    else:
-        logging.info('Not running with Sentry!')
 
     log_header('Starting!')
 
@@ -162,7 +148,7 @@ def populate_subreddit_lists(cfg):
     cfg.no_link_header_subs = []
 
     cfg.subreddits_to_check = get_wiki_page('subreddits',
-                                               cfg).splitlines()
+                                            cfg).splitlines()
     cfg.subreddits_to_check = clean_list(cfg.subreddits_to_check)
     logging.debug(
         f'Created list of subreddits from wiki: {cfg.subreddits_to_check}'

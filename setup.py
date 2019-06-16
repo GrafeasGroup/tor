@@ -64,7 +64,6 @@ setup(
         'sh',
         'cherrypy',
         'bugsnag',
-        'raven',  # Sentry client
         'requests',
         'slackclient<2.0.0'
     ],

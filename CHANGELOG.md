@@ -3,6 +3,10 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
+## UNRELEASED
+
+- Removes Sentry client and dependency
+
 ## v3.7.0 (2019-06-16)
 
 - Adds No Operation (NOOP) mode
