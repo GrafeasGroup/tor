@@ -1,11 +1,12 @@
 ---
 language: python
 
-dist: trusty
+dist: xenial
 
 python:
   - "3.6"
   - "3.6-dev"
+  - "3.7"
   - "3.7-dev"
   - "nightly"
 
@@ -16,11 +17,12 @@ matrix:
     - python: nightly
 
 install:
-  - pip install --process-dependency-links .[dev]
+  - pip install tox
+  - pip install tox-travis
   - pip install codacy-coverage
 
 script:
-  - pytest --cov=tor
+  - tox
 
 after_success:
   - coverage xml
