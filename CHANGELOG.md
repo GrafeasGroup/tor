@@ -3,6 +3,11 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
+## UNRELEASED
+
+- Adds No Operation (NOOP) mode
+- Merges in `tor_core` as `tor.core` (Fixes [#150](https://github.com/GrafeasGroup/tor/issues/150))
+
 ## v3.6.2 (2019-06-15)
 
 - FIX: `Reddit.user.me` is a method not a property, resulting in stack traces on every attempt to run the bot
