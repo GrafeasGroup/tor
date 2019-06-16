@@ -51,7 +51,7 @@ reports.no_bot_accounts = 'No bot accounts but our own'
 reports.post_violates_rules = 'Post Violates Rules on Partner Subreddit'
 
 # error message for an API timeout
-_pattern = re.compile('again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$',
+_pattern = re.compile(r'again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$',
                       re.IGNORECASE)
 
 # CTRL+C handler variable
