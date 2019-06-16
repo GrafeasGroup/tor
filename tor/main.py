@@ -12,6 +12,12 @@ from tor.core.initialize import build_bot
 from tor.helpers.flair import set_meta_flair_on_other_posts
 from tor.helpers.threaded_worker import threaded_check_submissions
 
+
+##############################
+NOOP_MODE = bool(os.getenv('NOOP_MODE', ''))
+DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
+##############################
+
 # Patreon Dedications:
 #
 # Through our work supported by Grafeas Group Ltd., some people see
@@ -52,6 +58,10 @@ from tor.helpers.threaded_worker import threaded_check_submissions
 # https://www.youtube.com/watch?v=hX3j0sQ7ot8  # he's dead, Jim
 
 
+def noop(cfg):
+    pass
+
+
 def run(config):
     """
     Primary routine.
@@ -70,7 +80,7 @@ def run(config):
 
 
 def main():
-    config.debug_mode = bool(os.environ.get('DEBUG_MODE', False))
+    config.debug_mode = DEBUG_MODE
 
     if config.debug_mode:
         bot_name = 'debug'
@@ -84,7 +94,10 @@ def main():
     if tor.__SELF_NAME__ not in tor.__BOT_NAMES__:
         tor.__BOT_NAMES__.append(tor.__SELF_NAME__)
 
-    run_until_dead(run)
+    if NOOP_MODE:
+        run_until_dead(noop)
+    else:
+        run_until_dead(run)
 
 
 if __name__ == '__main__':
