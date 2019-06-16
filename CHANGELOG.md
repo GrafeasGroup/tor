@@ -3,7 +3,7 @@
 We follow [Semantic Versioning](http://semver.org/) as a way of measuring stability of an update. This
 means we will never make a backwards-incompatible change within a major version of the project.
 
-## UNRELEASED
+## v3.8.0 (2019-06-16)
 
 - Removes Sentry client and dependency
 - Replaces strings.py references with YAML
