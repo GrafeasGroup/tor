@@ -54,10 +54,13 @@ def get_yt_transcript(url, yt_transcript_url=youtube_transcription_url):
         if there's an error.
     """
     try:
+        video_id = get_yt_video_id(url)
+        if video_id is None:
+            # If not able to get video id, no point in continuing
+            return None
+
         result = requests.get(
-            yt_transcript_url.format(
-                get_yt_video_id(url)
-            )
+            yt_transcript_url.format(video_id)
         )
         result.raise_for_status()
         if result.text.startswith(
