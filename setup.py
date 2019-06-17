@@ -50,8 +50,8 @@ setup(
     zip_safe=True,
     entry_points={
         'console_scripts': [
-            'tor-moderator = tor.main:main',
-            'tor-flair-backup = tor.backup:main',
+            'tor-moderator = tor.cli.main:main',
+            'tor-flair-backup = tor.cli.backup:main',
         ],
     },
     extras_require={

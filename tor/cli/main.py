@@ -1,3 +1,4 @@
+import argparse
 import os
 import time
 
@@ -55,6 +56,15 @@ DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
 #
 # Streams:
 # https://www.youtube.com/watch?v=hX3j0sQ7ot8  # he's dead, Jim
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(allow_abbrev=False)
+    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('--debug', action='store_true', default=DEBUG_MODE, help='Puts bot in dev-mode using non-prod credentials')
+    parser.add_argument('--noop', action='store_true', default=NOOP_MODE, help='Just run the daemon, but take no action (helpful for testing infrastructure changes)')
+
+    return parser.parse_args()
 
 
 def noop(cfg):

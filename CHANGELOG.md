@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [UNRELEASED]
 
 - Fixes [#102](https://github.com/GrafeasGroup/tor/issues/102), adding better guidance for first-time transcribers
+- Allows CLI flags like `--help`, `--version`, `--debug`, and `--noop` on `tor-moderator`
 
 ## [3.9.0] - 2019-06-16
 
