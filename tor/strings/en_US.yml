@@ -49,6 +49,12 @@ responses:
 
     v{version} | This message was posted by a bot. | [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) | [Source](https://github.com/GrafeasGroup/tor) | Questions? [Message the mods!](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Bot%20Question&message=)
   claim:
+    first_claim_success: |
+      The post is yours! Best of luck and thanks for helping!
+
+      Since this is your first one, please make sure to message the mods if you have any questions about the process (and / or join our [Discord](https://discord.gg/ZDDE3Pj) to talk to other volunteers). We're here to help!
+
+      Please respond with `done` when complete so we can check this one off the list!
     success: |
       The post is yours! Best of luck and thanks for helping!
 

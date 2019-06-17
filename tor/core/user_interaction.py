@@ -68,10 +68,10 @@ def process_coc(post, cfg):
             cfg,
             channel='new_volunteers'
         )
-    process_claim(post, cfg)
+    process_claim(post, cfg, first_time=True)
 
 
-def process_claim(post, cfg):
+def process_claim(post, cfg, first_time=False):
     """
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
@@ -84,8 +84,12 @@ def process_claim(post, cfg):
 
     already_claimed = i18n['responses']['claim']['already_claimed']
     claim_already_complete = i18n['responses']['claim']['already_complete']
-    claim_success = i18n['responses']['claim']['success']
     please_accept_coc = i18n['responses']['general']['coc_not_accepted']
+
+    if first_time:
+        claim_success = i18n['responses']['claim']['first_claim_success']
+    else:
+        claim_success = i18n['responses']['claim']['success']
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
