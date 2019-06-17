@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [3.10.0] - 2019-06-16
 
 - Fixes [#102](https://github.com/GrafeasGroup/tor/issues/102), adding better guidance for first-time transcribers
 - Allows CLI flags like `--help`, `--version`, `--debug`, and `--noop` on `tor-moderator`
