@@ -38,13 +38,13 @@ def flair_post(post, text):
 def _get_flair_css(transcription_count):
     if transcription_count >= 1000:
         return 'grafeas-diamond'
-    elif transcription_count >= 501:
+    elif transcription_count >= 500:
         return 'grafeas-golden'
-    elif transcription_count >= 251:
+    elif transcription_count >= 250:
         return 'grafeas-purple'
-    elif transcription_count >= 101:
+    elif transcription_count >= 100:
         return 'grafeas-teal'
-    elif transcription_count >= 51:
+    elif transcription_count >= 50:
         return 'grafeas-green'
     else:
         return 'grafeas'

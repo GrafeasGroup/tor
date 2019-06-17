@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [UNRELEASED]
 
 - Fixes typo in capitalization of one of the user-facing messages
+- Fixes flair colors to level up at (e.g.) 50, not 51 (#96)
 
 ## [3.11.0] - 2019-06-17
 
