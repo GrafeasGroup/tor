@@ -2,6 +2,7 @@ import logging
 import random
 
 import praw
+from praw.models import Message as RedditMessage
 from tor import __BOT_NAMES__
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
                               reports, send_to_modchat)
@@ -331,3 +332,23 @@ def process_wrong_post_location(post):
             'Something went wrong with asking about a misplaced post; '
             'ignoring.'
         )
+
+
+def process_message(message: RedditMessage, cfg):
+    dm_subject = i18n['responses']['direct_message']['dm_subject']
+    dm_body = i18n['responses']['direct_message']['dm_body']
+
+    author = message.author
+    username = author.name
+
+    author.message(dm_subject, dm_body)
+
+    send_to_modchat(
+        f'DM from <{reddit_url.format("/u/" + username)}|u/{username}> -- '
+        f'*{message.subject}*:\n{message.body}', cfg
+    )
+
+    logging.info(
+        f'Received DM from {username}. \n Subject: '
+        f'{message.subject}\n\nBody: {message.body} '
+    )

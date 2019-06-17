@@ -117,6 +117,14 @@ responses:
       Cheers,
 
       The Mods of /r/TranscribersOfReddit
+    dm_subject: |
+      Direct Message
+    dm_body: |
+      Hi there! THanks for messaging me!
+
+      Unfortunately I'm a bot and so I can't help you out myself. I've forwarded your message to the moderators so they can help you out! They should message you shortly. In the future, you can [message the mods at this link](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Help&message=) to reach them directly.
+
+      Cheers!
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
