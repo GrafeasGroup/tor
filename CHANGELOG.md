@@ -3,9 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [3.9.0] - 2019-06-16
 
 - Removes remaining references to RocketChat
+- Fixes typo in YAML dict name
+- Adds more context to Bugsnag events
+- Corrects version reported to Bugsnag to be `tor`'s, not `tor.core`'s
 
 ## [3.8.0] - 2019-06-16
 

@@ -248,7 +248,7 @@ def process_unclaim(post, cfg):
 
     top_parent = post.submission
 
-    unclaim_failure_post_already_completed = i18n['responses']['unclaim']['post_already_claimed']
+    unclaim_failure_post_already_completed = i18n['responses']['unclaim']['post_already_completed']
     unclaim_still_unclaimed = i18n['responses']['unclaim']['still_unclaimed']
     unclaim_success = i18n['responses']['unclaim']['success']
     unclaim_success_with_report = i18n['responses']['unclaim']['success_with_report']

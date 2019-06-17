@@ -3,7 +3,8 @@ import logging
 import os
 import random
 
-from tor.core import __HEARTBEAT_FILE__, __version__
+from tor import __root__, __version__
+from tor.core import __HEARTBEAT_FILE__
 
 # Load configuration regardless of if bugsnag is setup correctly
 try:
@@ -258,7 +259,8 @@ except OSError:
 if bugsnag and Config.bugsnag_api_key:
     bugsnag.configure(
         api_key=Config.bugsnag_api_key,
-        app_version=__version__
+        app_version=__version__,
+        project_root=__root__,
     )
 
 
