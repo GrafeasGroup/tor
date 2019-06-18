@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [UNRELEASED]
 
 - Replaces `setup.py` with Poetry tooling for development and packaging ease
+- Adds flair level: Ruby (2,500+ transcriptions)
 
 ## [3.11.2] - 2019-09-14
 
