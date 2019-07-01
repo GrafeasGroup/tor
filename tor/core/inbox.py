@@ -83,9 +83,10 @@ def process_reply(reply, cfg):
 
         if (
             'image transcription' in r_body or
-            validation._footer_check(reply, cfg)
+            validation._footer_check(reply, cfg) or
+            validation._footer_check(reply, cfg, new_reddit=True)
         ):
-            process_wrong_post_location(reply)
+            process_wrong_post_location(reply, cfg)
             reply.mark_read()
             return
 
@@ -109,7 +110,8 @@ def process_reply(reply, cfg):
 
         if (
             'done' in r_body or
-            'deno' in r_body  # we <3 u/Lornescri
+            'deno' in r_body or  # we <3 u/Lornescri
+            'doen' in r_body
         ):
             alt_text = True if 'done' not in r_body else False
             process_done(reply, cfg, alt_text_trigger=alt_text)
