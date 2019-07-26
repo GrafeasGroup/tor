@@ -9,6 +9,7 @@ from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
 from tor.core.strings import reddit_url
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
+from tor.core.validation import _footer_check
 from tor.helpers.flair import flair, flair_post, update_user_flair
 from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
@@ -323,8 +324,10 @@ def process_thanks(post, cfg):
         raise
 
 
-def process_wrong_post_location(post):
+def process_wrong_post_location(post, cfg):
     transcript_on_tor_post = i18n['responses']['general']['transcript_on_tor_post']
+    if _footer_check(post, cfg, new_reddit=True):
+        transcript_on_tor_post += i18n['responses']['general']['new_reddit_transcript']
     try:
         post.reply(_(transcript_on_tor_post))
     except praw.exceptions.APIException:

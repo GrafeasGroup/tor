@@ -8,7 +8,7 @@ def _author_check(original_post, claimant_post):
     return original_post.author == claimant_post.author
 
 
-def _footer_check(reply, cfg, tor_link=None):
+def _footer_check(reply, cfg, tor_link=None, new_reddit=False):
     """
     Is the footer in there?
 
@@ -16,12 +16,19 @@ def _footer_check(reply, cfg, tor_link=None):
         it.
     :param cfg: the global config object.
     :param tor_link: String; the magical url key.
+    :param new_reddit: Bool; whether to check for the markdown (old reddit)
+        footer or the WYSIWYG (new reddit) malformed footer.
     :return: True / None.
     """
     if tor_link is None:
         tor_link = i18n['urls']['ToR_link']
+
     if cfg.perform_header_check:
-        return tor_link in reply.body and '&#32;' in reply.body
+        if new_reddit:
+            return tor_link in reply.body and "^(I'm a" in reply.body
+
+        else:
+            return tor_link in reply.body and '&#32;' in reply.body
     else:
         # If we don't want the check to take place, we'll just return
         # true to negate it.
@@ -68,9 +75,9 @@ def _thread_author_check(original_post, history_item, cfg):
 
 def _author_history_check(post, cfg):
     """
-    Pull the five latest items from the user's history. Chances are that's
+    Pull the ten latest comments from the user's history. Chances are that's
     enough to see if they've actually done the post or not without slowing
-    everything down _too_ much. See if any of those five items look right
+    everything down _too_ much. See if any of those ten items look right
     and complete the post if it's the transcript we're looking for.
 
     Warning: this is not very fast, but it does the job. Definitely something

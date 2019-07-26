@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixes typo in capitalization of one of the user-facing messages
 - Fixes flair colors to level up at (e.g.) 50, not 51 (#96)
+- Extend check for transcription in the right place to handle New Reddit editor (credit @itsthejoker)
 
 ## [3.11.0] - 2019-06-17
 
@@ -14,9 +15,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [3.10.1] - 2019-06-17
 
-- Fixes history check on users who have submissions stickied to their profile (by @arfie)
-- Fixes youtube auto-transcription attempts erroring out when unable to detect the video id (by @thelonelyghost)
-- Adds clearer indicator for post type to rules comment (by @itsthejoker)
+- Fixes history check on users who have submissions stickied to their profile (credit @arfie)
+- Fixes youtube auto-transcription attempts erroring out when unable to detect the video id (credit @thelonelyghost)
+- Adds clearer indicator for post type to rules comment (credit @itsthejoker)
 
 ## [3.10.0] - 2019-06-16
 
