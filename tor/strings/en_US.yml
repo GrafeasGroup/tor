@@ -6,11 +6,12 @@ posts:
   discovered_submit_title: |
     {sub} | {type} | "{title}"
   rules_comment: |
-    If you would like to transcribe this post, please respond to this comment with the word `claiming` or `claim` in your response. I will automatically update the flair so that only one person is working on a post at any given time.
+    If you would like to transcribe this post, please respond to this comment with `claiming` or `claim`. I will automatically mark this post as in progress so that only one person is working on a post at any given time. **Please check that the post does not break the parent sub’s rules before claiming.**
+
 
     When you're done, please comment again with `done`. Your flair will be updated to reflect the number of posts you've transcribed and the post will be marked as completed.
 
-    Here's [a checklist](https://www.reddit.com/r/TranscribersOfReddit/wiki/checklist) that might help you out -- not just for newbies!
+    Here's [a checklist](https://www.reddit.com/r/TranscribersOfReddit/wiki/checklist) that might help you out!
 
     Post type: {post_type}. Please use the following formatting:
 
@@ -23,7 +24,7 @@ posts:
     Reporting
     ---
 
-    Please report this post if it contains personal information or otherwise breaks the rules of the subreddit we're linking to. The mods will check and remove it shortly.
+    Please report this post if it contains personal information or otherwise breaks the rules of the partner subreddit. The mods will check and remove it shortly.
 
     If you have any questions, feel free to [message the mods!](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=General%20Question&message=)
 
@@ -89,7 +90,7 @@ responses:
     coc_not_accepted: |
       Hi there! Please read and accept our Code of Conduct so that we can get you started with transcribing. Please read the Code of Conduct below, then respond to this comment with `I accept`.
 
-      After you respond, I'll process your claim as normal.
+      After you respond, I'll process your claim as normal. A mod will check in and give you feedback when you’re finished!
 
       ---
 
