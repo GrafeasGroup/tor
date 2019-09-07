@@ -1,5 +1,4 @@
 [![Travis build status](https://img.shields.io/travis/GrafeasGroup/tor.svg)](https://travis-ci.org/GrafeasGroup/tor)
-[![BugSnag](https://img.shields.io/badge/errors--hosted--by-Bugsnag-blue.svg)](https://www.bugsnag.com/open-source/)
 
 # Transcribers of Reddit
 
@@ -81,3 +80,8 @@ $ tor-moderator
 ## Contributing
 
 See [`CONTRIBUTING.md`](/CONTRIBUTING.md) for more.
+
+## Sponsors
+
+<a href="https://bugsnag.com"><img src="https://raw.githubusercontent.com/GrafeasGroup/tor/master/images/bugsnag_logo_navy.png" alt="Bugsnag logo" width=130></a>
+- For providing free error handling through [their open source program](https://www.bugsnag.com/open-source/)
