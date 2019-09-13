@@ -1,0 +1,2 @@
+include tor/strings/*.yml
+include commands.json
