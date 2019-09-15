@@ -47,6 +47,10 @@ setup(
     ],
     keywords='',
     packages=find_packages(exclude=['test', 'test.*', '*.test', '*.test.*']),
+    package_data={
+        '': ['commands.json'],
+        'tor.strings': ['*.yml', '*.yaml'],
+    },
     zip_safe=True,
     entry_points={
         'console_scripts': [
