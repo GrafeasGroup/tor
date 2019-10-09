@@ -1,0 +1,31 @@
+name: Upload assets on new Release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
+    - name: Build wheel
+      run: |
+        python -m venv ./venv
+        source ./venv/bin/activate
+        pip install --upgrade pip
+        pip install wheel
+        
+        python setup.py bdist_wheel sdist
+    - name: GitHub Releases
+      uses: fnkr/github-action-ghr@v1.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GHR_PATH: dist/
