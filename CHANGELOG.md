@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [UNRELEASED]
+
+- Replaces `setup.py` with Poetry tooling for development and packaging ease
+
 ## [3.11.2] - 2019-09-14
 
 - Adds missing `package_data` manifest to `setup.py` so it will actually be included when packaging the module (credit @thelonelyghost)

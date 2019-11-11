@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "tor"
+version = "3.11.2"
+description = "A bot that handles moderating and scoring in /r/TranscribersOfReddit"
+authors = ["Grafeas Group <devs@grafeas.org>"]
+license = "MIT"
+classifiers = [
+    'Development Status :: 1 - Planning',
+    'Intended Audience :: End Users/Desktop',
+    'Topic :: Communications :: BBS'
+]
+repository = "https://github.com/GrafeasGroup/tor"
+homepage = "https://github.com/GrafeasGroup/tor"
+exclude = ['test', 'test.*', '*.test.*', '*.test']
+include = ["commands.json", "tor/strings/*.yml"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+praw = "=5.0.1"
+redis = "^2"
+sh = "^1.12"
+cherrypy = "^18.2"
+bugsnag = "^3.6"
+requests = "^2.22"
+slackclient = "^1"
+PyYaml = "^5.1"
+
+[tool.poetry.dev-dependencies]
+better-exceptions = "^0.2.2"
+pytest = "^5.1"
+pytest-cov = "^2.7"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+tor-moderator = "tor.cli.main:main"
+tor-flair-backup = "tor.cli.backup:main"
+
+[tool.poetry.extras]
+ci = ['pytest', 'pytest-cov']
