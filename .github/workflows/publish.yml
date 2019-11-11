@@ -21,9 +21,9 @@ jobs:
         python -m venv ./venv
         source ./venv/bin/activate
         pip install --upgrade pip
-        pip install wheel
+        pip install poetry
         
-        python setup.py bdist_wheel sdist
+        poetry build
     - name: GitHub Releases
       uses: fnkr/github-action-ghr@v1.1
       env:
