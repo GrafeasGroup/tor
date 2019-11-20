@@ -95,7 +95,7 @@ def process_reply(reply, cfg):
             reply.mark_read()
             return
 
-        if 'unclaim' in r_body:
+        if 'unclaim' in r_body or 'cancel' in r_body:
             process_unclaim(reply, cfg)
             reply.mark_read()
             return
