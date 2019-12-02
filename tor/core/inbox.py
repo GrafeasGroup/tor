@@ -157,19 +157,20 @@ def check_inbox(cfg):
     for item in reversed(list(cfg.r.inbox.unread(limit=None))):
         # Very rarely we may actually get a message from Reddit itself.
         # In this case, there will be no author attribute.
-        if item.author is None:
+        author_name = item.author.name if item.author else None
+        if author_name is None:
             send_to_modchat(
                 f'We received a message without an author -- '
                 f'*{item.subject}*:\n{item.body}', cfg
             )
             item.mark_read()
 
-        elif item.author.name == 'transcribot':
+        elif author_name == 'transcribot':
             item.mark_read()
 
-        elif item.author.name in cfg.redis.smembers('blacklist'):
+        elif author_name in cfg.redis.smembers('blacklist'):
             logging.info(
-                f'Skipping inbox item from {item.author.name} who is on the '
+                f'Skipping inbox item from {author_name!r} who is on the '
                 f'blacklist '
             )
             item.mark_read()
