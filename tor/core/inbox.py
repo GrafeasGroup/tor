@@ -174,34 +174,37 @@ def check_inbox(cfg):
                 f'blacklist '
             )
             item.mark_read()
-            continue
 
-        elif item.subject == 'username mention':
-            logging.info(f'Received mention! ID {item}')
+        elif isinstance(item, RedditComment):
+            if str(item.subreddit.name).casefold() == str(cfg.tor.name).casefold():
+                # This should make it consistent behavior even if we're testing
+                # See: https://docs.python.org/3/library/stdtypes.html#str.casefold
+                process_reply(item, cfg)
+            else:
+                # Must be a username mention
+                logging.info(f'Received mention! ID {item}')
 
-            # noinspection PyUnresolvedReferences
-            try:
-                process_mention(item)
-            except (AttributeError, RedditClientException):
-                # apparently this crashes with an AttributeError if someone
-                # calls the bot and immediately deletes their comment. This
-                # should fix that.
-                continue
-            item.mark_read()
-
-        elif item.subject in ('comment reply', 'post reply'):
-            process_reply(item, cfg)
-
-        elif item.subject[0] == '!':
-            # Handle our special commands
-            process_command(item, cfg)
-            item.mark_read()
-            continue
+                # noinspection PyUnresolvedReferences
+                try:
+                    process_mention(item)
+                except (AttributeError, RedditClientException):
+                    # apparently this crashes with an AttributeError if someone
+                    # calls the bot and immediately deletes their comment. This
+                    # should fix that.
+                    continue
+                item.mark_read()
 
         elif isinstance(item, RedditMessage):
-            process_message(item, cfg)
-            item.mark_read()
+            if item.subject[0] == '!':
+                # Handle our special commands
+                process_command(item, cfg)
+                item.mark_read()
+            else:
+                process_message(item, cfg)
+                item.mark_read()
 
         else:
-            item.mark_read()
+            # We don't know what the heck this is, so just send it onto
+            # slack for manual triage.
             forward_to_slack(item, cfg)
+            item.mark_read()

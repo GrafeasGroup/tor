@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Replaces `setup.py` with Poetry tooling for development and packaging ease
 - Fixes no-author condition if the mods message the bot
 - Adds `cancel` as an alias for `unclaim` for user directives to the bot
+- Makes inbox triage less English-language dependent
 - Offloads more work to Redis instead of Python
 
 ## [3.11.2] - 2019-09-14
