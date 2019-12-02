@@ -168,7 +168,7 @@ def check_inbox(cfg):
         elif author_name == 'transcribot':
             item.mark_read()
 
-        elif author_name in cfg.redis.smembers('blacklist'):
+        elif cfg.redis.sismember('blacklist', author_name):
             logging.info(
                 f'Skipping inbox item from {author_name!r} who is on the '
                 f'blacklist '
