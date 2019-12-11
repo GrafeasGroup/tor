@@ -74,54 +74,40 @@ def process_mod_intervention(post, cfg):
 def process_reply(reply, cfg):
     # noinspection PyUnresolvedReferences
     try:
-        if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
-            process_mod_intervention(reply, cfg)
-            return
-
         r_body = reply.body.lower()  # cache that thing
 
-        if (
-            'image transcription' in r_body or
-            validation._footer_check(reply, cfg) or
-            validation._footer_check(reply, cfg, new_reddit=True)
+        if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
+            process_mod_intervention(reply, cfg)
+
+        elif (
+            'image transcription' in r_body
+            or validation._footer_check(reply, cfg)
+            or validation._footer_check(reply, cfg, new_reddit=True)
         ):
             process_wrong_post_location(reply, cfg)
-            return
 
-        if 'i accept' in r_body:
+        elif 'i accept' in r_body:
             process_coc(reply, cfg)
-            return
 
-        if 'unclaim' in r_body or 'cancel' in r_body:
+        elif 'unclaim' in r_body or 'cancel' in r_body:
             process_unclaim(reply, cfg)
-            return
 
-        if (
-            'claim' in r_body or
-            'dibs' in r_body
-        ):
+        elif 'claim' in r_body or 'dibs' in r_body:
             process_claim(reply, cfg)
-            return
 
-        if (
-            'done' in r_body or
-            'deno' in r_body or  # we <3 u/Lornescri
-            'doen' in r_body
-        ):
+        elif 'done' in r_body or 'deno' in r_body or 'doen' in r_body:
             alt_text = True if 'done' not in r_body else False
             process_done(reply, cfg, alt_text_trigger=alt_text)
-            return
 
-        if 'thank' in r_body:  # trigger on "thanks" and "thank you"
+        elif 'thank' in r_body:  # trigger on "thanks" and "thank you"
             process_thanks(reply, cfg)
-            return
 
-        if '!override' in r_body:
+        elif '!override' in r_body:
             process_override(reply, cfg)
-            return
 
-        # If we made it this far, it's something we can't process automatically
-        forward_to_slack(reply, cfg)
+        else:
+            # If we made it this far, it's something we can't process automatically
+            forward_to_slack(reply, cfg)
 
     except (RedditClientException, AttributeError) as e:
         logging.warning(e)
