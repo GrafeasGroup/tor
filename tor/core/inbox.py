@@ -155,24 +155,22 @@ def check_inbox(cfg):
                 f'We received a message without an author -- '
                 f'*{item.subject}*:\n{item.body}', cfg
             )
-            item.mark_read()
 
         elif author_name == 'transcribot':
-            item.mark_read()
+            # bot responses shouldn't trigger workflows in other bots
+            logging.info('Skipping response from our OCR bot')
 
         elif cfg.redis.sismember('blacklist', author_name):
             logging.info(
                 f'Skipping inbox item from {author_name!r} who is on the '
                 f'blacklist'
             )
-            item.mark_read()
 
         elif isinstance(item, RedditComment):
             if str(item.subreddit.name).casefold() == str(cfg.tor.name).casefold():
                 # This should make it consistent behavior even if we're testing
                 # See: https://docs.python.org/3/library/stdtypes.html#str.casefold
                 process_reply(item, cfg)
-                item.mark_read()
             else:
                 # Must be a username mention
                 logging.info(f'Received mention! ID {item}')
@@ -185,19 +183,18 @@ def check_inbox(cfg):
                     # calls the bot and immediately deletes their comment. This
                     # should fix that.
                     continue
-                item.mark_read()
 
         elif isinstance(item, RedditMessage):
             if item.subject[0] == '!':
                 # Handle our special commands
                 process_command(item, cfg)
-                item.mark_read()
             else:
                 process_message(item, cfg)
-                item.mark_read()
 
         else:
             # We don't know what the heck this is, so just send it onto
             # slack for manual triage.
             forward_to_slack(item, cfg)
-            item.mark_read()
+
+        # No matter what, we want to mark this as read so we don't re-process it.
+        item.mark_read()
