@@ -159,16 +159,8 @@ def check_inbox(cfg):
                 process_reply(item, cfg)
             else:
                 # Must be a username mention
-                logging.info(f'Received mention! ID {item}')
-
-                # noinspection PyUnresolvedReferences
-                try:
-                    process_mention(item)
-                except (AttributeError, RedditClientException):
-                    # apparently this crashes with an AttributeError if someone
-                    # calls the bot and immediately deletes their comment. This
-                    # should fix that.
-                    continue
+                logging.info(f'Received username mention! ID {item}')
+                process_mention(item)
 
         elif isinstance(item, RedditMessage):
             if item.subject[0] == '!':
