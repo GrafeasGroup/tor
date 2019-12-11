@@ -6,7 +6,7 @@ from praw.models import Comment as RedditComment
 from praw.models import Message as RedditMessage
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
-from tor.core.helpers import send_to_modchat
+from tor.core.helpers import send_to_modchat, is_our_subreddit
 from tor.core.mentions import process_mention
 from tor.core.strings import reddit_url
 from tor.core.user_interaction import (process_claim, process_coc,
@@ -152,15 +152,11 @@ def check_inbox(cfg):
                 f'blacklist'
             )
 
+        elif isinstance(item, RedditComment) and is_our_subreddit(item.subreddit.name, cfg):
+            process_reply(item, cfg)
         elif isinstance(item, RedditComment):
-            if str(item.subreddit.name).casefold() == str(cfg.tor.name).casefold():
-                # This should make it consistent behavior even if we're testing
-                # See: https://docs.python.org/3/library/stdtypes.html#str.casefold
-                process_reply(item, cfg)
-            else:
-                # Must be a username mention
-                logging.info(f'Received username mention! ID {item}')
-                process_mention(item)
+            logging.info(f'Received username mention! ID {item}')
+            process_mention(item)
 
         elif isinstance(item, RedditMessage):
             if item.subject[0] == '!':

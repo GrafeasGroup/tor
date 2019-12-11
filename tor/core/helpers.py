@@ -112,6 +112,21 @@ def send_to_modchat(message, cfg, channel='general'):
             logging.error(e)
 
 
+def is_our_subreddit(subreddit_name, cfg):
+    """
+    Compares given subreddit to the one we're operating out of
+
+    :param subreddit_name: String; the questioned subreddit
+    :param cfg: the global config object
+    :return: Boolean for if they are the same subreddit
+    """
+    # We're referring to `cfg.tor.name` in case of testing environment, and
+    # using `.casefold()` to provide cross-characterset, case-insensitive
+    # string comparisons.
+    # @see https://docs.python.org/3/library/stdtypes.html#str.casefold
+    return str(subreddit_name).casefold() == str(cfg.tor.name).casefold()
+
+
 def explode_gracefully(error):
     """
     A last-ditch effort to try to raise a few more flags as it goes down.
