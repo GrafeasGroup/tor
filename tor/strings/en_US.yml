@@ -57,7 +57,7 @@ responses:
 
       Please respond with `done` when complete so we can check this one off the list!
       
-      We have a complete tutorial that shows how to transcribe step-by-step and how to fix the most common issues. We suggest you to look at it [here](https://www.reddit.com/r/TranscribersOfReddit/about/wiki/tutorial)!
+      We have a complete tutorial that shows how to transcribe step-by-step and how to fix the most common issues. We suggest you to look at it [here](https://www.reddit.com/r/TranscribersOfReddit/wiki/tutorial)!
     success: |
       The post is yours! Best of luck and thanks for helping!
 
