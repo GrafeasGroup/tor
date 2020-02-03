@@ -62,6 +62,11 @@ def is_removed(post: Submission, full_check: bool = False) -> bool:
     deleted post            N           N                   [deleted]
 
     More information (and where this table is from): https://redd.it/7hfnew
+    It's worth noting that since reddit has allowed subreddits to turn off
+    crossposting, the above table may not be perfectly accurate. It's more
+    likely to trigger false positives in subs where this has been turned off.
+    At present, this functionality is turned off by default, so lacking
+    anything better we will continue to use this for now.
 
     Because we don't necessarily need to remove a post in certain situations
     (e.g. the user account has been deleted), we can simplify the check. By

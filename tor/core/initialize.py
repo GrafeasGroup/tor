@@ -11,7 +11,7 @@ from tor.core import __HEARTBEAT_FILE__
 from tor.core.config import config
 from tor.core.heartbeat import configure_heartbeat
 from tor.core.helpers import clean_list, get_wiki_page, log_header
-
+from tor.core.blossom import BlossomAPI
 
 def configure_tor(cfg):
     """
@@ -255,6 +255,16 @@ def configure_modchat(cfg):
     )
 
 
+def configure_blossom(cfg):
+    cfg.blossom = BlossomAPI(
+        email=os.environ.get("BLOSSOM_EMAIL"),
+        password=os.environ.get("BLOSSOM_PASSWORD"),
+        api_key=os.environ.get("BLOSSOM_API_KEY"),
+        api_base_url=os.environ.get("BLOSSOM_API_BASE_URL"),
+        login_url=os.environ.get("BLOSSOM_LOGIN_URL")
+    )
+
+
 def build_bot(
     name,
     version,
@@ -287,6 +297,7 @@ def build_bot(
     config.heartbeat_logging = heartbeat_logging
     configure_logging(config, log_name=log_name)
     configure_modchat(config)
+    configure_blossom(config)
 
     if not require_redis:
         # I'm sorry

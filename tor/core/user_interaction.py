@@ -19,27 +19,36 @@ i18n = translation()
 
 def coc_accepted(post, cfg):
     """
-    Verifies that the user is in the Redis set "accepted_CoC".
+    Verifies that the user is has accepted the Code of Conduct as listed
+    at https://www.reddit.com/r/transcribersofreddit/wiki/codeofconduct
 
     :param post: the Comment object containing the claim.
     :param cfg: the global config dict.
     :return: True if the user has accepted the Code of Conduct, False if they
         haven't.
     """
-    return cfg.redis.sismember('accepted_CoC', post.author.name) == 1
+    result = cfg.blossom.get(
+        '/volunteer/', params={'username', post.author.name}
+    ).json()
+    if not result.get('results'):
+        # We have a new volunteer. They definitely haven't accepted the CoC.
+        return False
+    else:
+        return result['results'][0]['accepted_coc']
 
 
 def process_coc(post, cfg):
     """
-    Adds the username of the redditor to the db as accepting the code of
-    conduct.
+    Creates a user on Blossom and sets the code of conduct flag to True.
+    Because this function is called anytime a user uses the phrase
+    "I accept", we include an escape hatch if they've already accepted
+    the code of conduct (we just assume that they wanted to claim instead
+    and process appropriately).
 
     :param post: The Comment object containing the claim.
     :param cfg: the global config dict.
     :return: None.
     """
-    result = cfg.redis.sadd('accepted_CoC', post.author.name)
-
     modchat_emote = random.choice([
         ':tada:',
         ':confetti_ball:',
@@ -59,9 +68,23 @@ def process_coc(post, cfg):
         ':fb-like:'
     ])
 
-    # Have they already been added? If 0, then just act like they said `claim`
-    # instead. If they're actually new, then send a message to slack.
-    if result == 1:
+    result = cfg.blossom.get(
+        '/volunteer/', params={'username', post.author.name}
+    ).json()
+    if not result.get('results'):
+        usercreate = cfg.blossom.post('/volunteer/', data={"username"})
+        if usercreate.status_code != 200:
+            raise Exception(
+                f'Something went wrong with user creation: {usercreate.json()}'
+            )
+        # f strings don't like dictionary lookups for some reason
+        user_id = usercreate.json()['data']['id']
+        resp = cfg.blossom.patch(f'/volunteer/{user_id}', data={'accepted_coc': True})
+        if resp.status_code != 200:
+            raise Exception(
+                f"Something went wrong while marking volunteer with 'accepted_coc':"
+                f" {resp.json()}"
+            )
         send_to_modchat(
             f'<{reddit_url.format("/user/" + post.author.name)}|u/{post.author.name}>'
             f' has just'
@@ -70,7 +93,18 @@ def process_coc(post, cfg):
             cfg,
             channel='new_volunteers'
         )
-    process_claim(post, cfg, first_time=True)
+        process_claim(post, cfg, first_time=True)
+    else:
+        # We've seen them before. No need to give them the welcome experience.
+        if result['results'][0].get('accepted_coc') is False:
+            # So... we got a user in the response but they don't have
+            # `accepted_coc` set. We should never hit this state; basically
+            # the only way to do so is if the patch call above errors out.
+            # Unlikely, but worth planning for. Just mark them again and move on.
+            user_id = result['results'][0]['id']
+            cfg.blossom.patch(f'/volunteer/{user_id}', data={'accepted_coc': True})
+
+        process_claim(post, cfg)
 
 
 def process_claim(post, cfg, first_time=False):
