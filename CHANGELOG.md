@@ -3,11 +3,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [3.12.0] - 2019-12-12
+
+- Replaces `setup.py` with Poetry tooling for development and packaging ease
+- Fixes no-author condition if the mods message the bot
+- Adds `cancel` as an alias for `unclaim` for user directives to the bot
+- Makes inbox triage less English-language dependent
+- Offloads more work to Redis instead of Python
+
+## [3.11.2] - 2019-09-14
+
+- Adds missing `package_data` manifest to `setup.py` so it will actually be included when packaging the module (credit @thelonelyghost)
+
+## [3.11.1] - 2019-09-14
 
 - Fixes typo in capitalization of one of the user-facing messages
 - Fixes flair colors to level up at (e.g.) 50, not 51 (#96)
 - Extend check for transcription in the right place to handle New Reddit editor (credit @itsthejoker)
+- Fixes packaging of python module to include data files and up-to-date methods (credit @thelonelyghost)
 
 ## [3.11.0] - 2019-06-17
 

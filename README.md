@@ -1,5 +1,4 @@
 [![Travis build status](https://img.shields.io/travis/GrafeasGroup/tor.svg)](https://travis-ci.org/GrafeasGroup/tor)
-[![BugSnag](https://img.shields.io/badge/errors--hosted--by-Bugsnag-blue.svg)](https://www.bugsnag.com/open-source/)
 
 # Transcribers of Reddit
 
@@ -27,10 +26,10 @@ Among other things, this bot handles:
 
 ### From release
 
-Given a release in <https://github.com/GrafeasGroup/tor/releases>, download the attached `.tar.gz` file for your platform/architecture and `pip install` it directly like so:
+Given a release in <https://github.com/GrafeasGroup/tor/releases>, download the attached `.whl` file for your platform/architecture and `pip install` it directly like so:
 
 ```sh
-$ pip install ./path/to/tor-3.6.1-linux-x86_64.tar.gz
+$ pip install ./path/to/tor-3.6.1-py3-any-none.whl
 ```
 
 ### From source
@@ -66,7 +65,8 @@ Monitoring daemon (via subreddit's /new feed):
 To build the package from source, start in the base of the repository and run:
 
 ```sh
-$ python setup.py bdist --format=gztar
+$ pip install wheel
+$ python setup.py bdist_wheel
 ```
 
 When building is complete, upload everything in the `dist/` directory that was just created as part of the GitHub release.
@@ -81,3 +81,8 @@ $ tor-moderator
 ## Contributing
 
 See [`CONTRIBUTING.md`](/CONTRIBUTING.md) for more.
+
+## Sponsors
+
+<a href="https://bugsnag.com"><img src="https://raw.githubusercontent.com/GrafeasGroup/tor/master/images/bugsnag_logo_navy.png" alt="Bugsnag logo" width=130></a>
+- For providing free error handling through [their open source program](https://www.bugsnag.com/open-source/)

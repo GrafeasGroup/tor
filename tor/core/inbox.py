@@ -6,7 +6,7 @@ from praw.models import Comment as RedditComment
 from praw.models import Message as RedditMessage
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
-from tor.core.helpers import send_to_modchat
+from tor.core.helpers import send_to_modchat, is_our_subreddit
 from tor.core.mentions import process_mention
 from tor.core.strings import reddit_url
 from tor.core.user_interaction import (process_claim, process_coc,
@@ -74,63 +74,40 @@ def process_mod_intervention(post, cfg):
 def process_reply(reply, cfg):
     # noinspection PyUnresolvedReferences
     try:
-        if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
-            process_mod_intervention(reply, cfg)
-            reply.mark_read()
-            return
-
         r_body = reply.body.lower()  # cache that thing
 
-        if (
-            'image transcription' in r_body or
-            validation._footer_check(reply, cfg) or
-            validation._footer_check(reply, cfg, new_reddit=True)
+        if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
+            process_mod_intervention(reply, cfg)
+
+        elif (
+            'image transcription' in r_body
+            or validation._footer_check(reply, cfg)
+            or validation._footer_check(reply, cfg, new_reddit=True)
         ):
             process_wrong_post_location(reply, cfg)
-            reply.mark_read()
-            return
 
-        if 'i accept' in r_body:
+        elif 'i accept' in r_body:
             process_coc(reply, cfg)
-            reply.mark_read()
-            return
 
-        if 'unclaim' in r_body:
+        elif 'unclaim' in r_body or 'cancel' in r_body:
             process_unclaim(reply, cfg)
-            reply.mark_read()
-            return
 
-        if (
-            'claim' in r_body or
-            'dibs' in r_body
-        ):
+        elif 'claim' in r_body or 'dibs' in r_body:
             process_claim(reply, cfg)
-            reply.mark_read()
-            return
 
-        if (
-            'done' in r_body or
-            'deno' in r_body or  # we <3 u/Lornescri
-            'doen' in r_body
-        ):
+        elif 'done' in r_body or 'deno' in r_body or 'doen' in r_body:
             alt_text = True if 'done' not in r_body else False
             process_done(reply, cfg, alt_text_trigger=alt_text)
-            reply.mark_read()
-            return
 
-        if 'thank' in r_body:  # trigger on "thanks" and "thank you"
+        elif 'thank' in r_body:  # trigger on "thanks" and "thank you"
             process_thanks(reply, cfg)
-            reply.mark_read()
-            return
 
-        if '!override' in r_body:
+        elif '!override' in r_body:
             process_override(reply, cfg)
-            reply.mark_read()
-            return
 
-        # If we made it this far, it's something we can't process automatically
-        forward_to_slack(reply, cfg)
-        reply.mark_read()  # no spamming the slack channel :)
+        else:
+            # If we made it this far, it's something we can't process automatically
+            forward_to_slack(reply, cfg)
 
     except (RedditClientException, AttributeError) as e:
         logging.warning(e)
@@ -157,50 +134,41 @@ def check_inbox(cfg):
     for item in reversed(list(cfg.r.inbox.unread(limit=None))):
         # Very rarely we may actually get a message from Reddit itself.
         # In this case, there will be no author attribute.
-        if item.author is None:
+        author_name = item.author.name if item.author else None
+
+        if author_name is None:
             send_to_modchat(
                 f'We received a message without an author -- '
                 f'*{item.subject}*:\n{item.body}', cfg
             )
-            item.mark_read()
 
-        elif item.author.name == 'transcribot':
-            item.mark_read()
+        elif author_name == 'transcribot':
+            # bot responses shouldn't trigger workflows in other bots
+            logging.info('Skipping response from our OCR bot')
 
-        elif item.author.name in cfg.redis.smembers('blacklist'):
+        elif cfg.redis.sismember('blacklist', author_name):
             logging.info(
-                f'Skipping inbox item from {item.author.name} who is on the '
-                f'blacklist '
+                f'Skipping inbox item from {author_name!r} who is on the '
+                f'blacklist'
             )
-            item.mark_read()
-            continue
 
-        elif item.subject == 'username mention':
-            logging.info(f'Received mention! ID {item}')
-
-            # noinspection PyUnresolvedReferences
-            try:
-                process_mention(item)
-            except (AttributeError, RedditClientException):
-                # apparently this crashes with an AttributeError if someone
-                # calls the bot and immediately deletes their comment. This
-                # should fix that.
-                continue
-            item.mark_read()
-
-        elif item.subject in ('comment reply', 'post reply'):
+        elif isinstance(item, RedditComment) and is_our_subreddit(item.subreddit.name, cfg):
             process_reply(item, cfg)
-
-        elif item.subject[0] == '!':
-            # Handle our special commands
-            process_command(item, cfg)
-            item.mark_read()
-            continue
+        elif isinstance(item, RedditComment):
+            logging.info(f'Received username mention! ID {item}')
+            process_mention(item)
 
         elif isinstance(item, RedditMessage):
-            process_message(item, cfg)
-            item.mark_read()
+            if item.subject[0] == '!':
+                # Handle our special commands
+                process_command(item, cfg)
+            else:
+                process_message(item, cfg)
 
         else:
-            item.mark_read()
+            # We don't know what the heck this is, so just send it onto
+            # slack for manual triage.
             forward_to_slack(item, cfg)
+
+        # No matter what, we want to mark this as read so we don't re-process it.
+        item.mark_read()

@@ -376,16 +376,25 @@ def process_message(message: RedditMessage, cfg):
     dm_body = i18n['responses']['direct_message']['dm_body']
 
     author = message.author
-    username = author.name
+    username = author.name if author else None
 
     author.message(dm_subject, dm_body)
 
-    send_to_modchat(
-        f'DM from <{reddit_url.format("/u/" + username)}|u/{username}> -- '
-        f'*{message.subject}*:\n{message.body}', cfg
-    )
-
-    logging.info(
-        f'Received DM from {username}. \n Subject: '
-        f'{message.subject}\n\nBody: {message.body} '
-    )
+    if username:
+        send_to_modchat(
+            f'DM from <{reddit_url.format("/u/" + username)}|u/{username}> -- '
+            f'*{message.subject}*:\n{message.body}', cfg
+        )
+        logging.info(
+            f'Received DM from {username}. \n Subject: '
+            f'{message.subject}\n\nBody: {message.body} '
+        )
+    else:
+        send_to_modchat(
+            f'DM with no author -- '
+            f'*{message.subject}*:\n{message.body}', cfg
+        )
+        logging.info(
+            f'Received DM with no author. \n Subject: '
+            f'{message.subject}\n\nBody: {message.body} '
+        )
