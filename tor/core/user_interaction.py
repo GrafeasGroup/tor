@@ -295,82 +295,93 @@ def process_unclaim(post, cfg):
     unclaim_success = i18n['responses']['unclaim']['success']
     unclaim_success_with_report = i18n['responses']['unclaim']['success_with_report']
     unclaim_success_without_report = i18n['responses']['unclaim']['success_without_report']
+    unclaim_failure_post_you_didnt_claim = i18n['responses']['unclaim']['post_you_didnt_claim']
+    something_went_wrong = i18n['responses']['general']['oops']
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
         logging.info('Received `unclaim` on post we do not own. Ignoring.')
         return
 
-    if flair.unclaimed in top_parent.link_flair_text:
-        post.reply(_(unclaim_still_unclaimed))
-        return
+    blossom_response = cfg.blossom.get("/submission/", params={
+        "submission_id": clean_id(top_parent.fullname)
+    })
 
-    for item in top_parent.user_reports:
-        if (
-                reports.original_post_deleted_or_locked in item[0] or reports.post_violates_rules in item[0]
-        ):
+    blossom_post = get_or_create_blossom_post_from_response(blossom_response, top_parent, cfg)
+
+    unclaim_response = cfg.blossom.post(
+        f"/submission/{blossom_post['id']}/unclaim/",
+        data={"username": post.author.name}
+    )
+
+    if unclaim_response.status_code == 412:
+        post.reply(_(unclaim_still_unclaimed))
+        flair_post(top_parent, flair.unclaimed)
+    elif unclaim_response.status_code == 406:
+        send_reddit_reply(post, unclaim_failure_post_you_didnt_claim)
+        flair_post(top_parent, flair.in_progress)
+    elif unclaim_response.status_code == 409:
+        send_reddit_reply(post, unclaim_failure_post_already_completed)
+    elif unclaim_response.status_code == 200:
+        # the unclaim was successful, we just need to figure out what message
+        # to respond with
+        for item in top_parent.user_reports:
+            if (
+                    reports.original_post_deleted_or_locked in item[0] or reports.post_violates_rules in item[0]
+            ):
+                top_parent.mod.remove()
+                send_to_modchat(
+                    'Removed the following reported post in response to an '
+                    '`unclaim`: {}'.format(top_parent.shortlink),
+                    cfg,
+                    channel='removed_posts'
+                )
+                send_reddit_reply(post, unclaim_success_with_report)
+                return
+
+        # Okay, so they commented with unclaim, but they didn't report it.
+        # Time to check to see if they should have.
+        linked_resource = cfg.r.submission(
+            top_parent.id_from_url(top_parent.url)
+        )
+        if is_removed(linked_resource):
             top_parent.mod.remove()
             send_to_modchat(
-                'Removed the following reported post in response to an '
-                '`unclaim`: {}'.format(top_parent.shortlink),
+                'Received `unclaim` on an unreported post, but it looks like it '
+                'was removed on the parent sub. I removed ours here: {}'
+                ''.format(top_parent.shortlink),
                 cfg,
                 channel='removed_posts'
             )
-            post.reply(_(unclaim_success_with_report))
+            send_reddit_reply(post, unclaim_success_without_report)
             return
 
-    # Okay, so they commented with unclaim, but they didn't report it.
-    # Time to check to see if they should have.
-    linked_resource = cfg.r.submission(
-        top_parent.id_from_url(top_parent.url)
-    )
-    if is_removed(linked_resource):
-        top_parent.mod.remove()
-        send_to_modchat(
-            'Received `unclaim` on an unreported post, but it looks like it '
-            'was removed on the parent sub. I removed ours here: {}'
-            ''.format(top_parent.shortlink),
-            cfg,
-            channel='removed_posts'
-        )
-        post.reply(_(unclaim_success_without_report))
-        return
-
-    # Finally, if none of the other options apply, we'll reset the flair and
-    # continue on as normal.
-    if top_parent.link_flair_text == flair.completed:
-        post.reply(_(unclaim_failure_post_already_completed))
-        return
-
-    if top_parent.link_flair_text == flair.in_progress:
+        # guess there's nothing special, just give them the regular line
         flair_post(top_parent, flair.unclaimed)
-        post.reply(_(unclaim_success))
+        send_reddit_reply(post, unclaim_success)
         return
+
+    # if we hit this, we fell through the other options and something went wrong.
+    send_reddit_reply(post, something_went_wrong)
+    bugsnag.notify(
+        Exception("Failed to finish unclaim!"),
+        context="process_unclaim",
+        meta_data={"blossom_response": blossom_response}
+    )
 
 
 def process_thanks(post, cfg):
     thumbs_up_gifs = i18n['urls']['thumbs_up_gifs']
     youre_welcome = i18n['responses']['general']['youre_welcome']
-    try:
-        post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
-    except praw.exceptions.APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
-            logging.debug('Comment requiring thanks was deleted')
-            return
-        raise
+    send_reddit_reply(post, youre_welcome.format(random.choice(thumbs_up_gifs)))
 
 
 def process_wrong_post_location(post, cfg):
     transcript_on_tor_post = i18n['responses']['general']['transcript_on_tor_post']
     if _footer_check(post, cfg, new_reddit=True):
         transcript_on_tor_post += i18n['responses']['general']['new_reddit_transcript']
-    try:
-        post.reply(_(transcript_on_tor_post))
-    except praw.exceptions.APIException:
-        logging.debug(
-            'Something went wrong with asking about a misplaced post; '
-            'ignoring.'
-        )
+
+    send_reddit_reply(post, transcript_on_tor_post)
 
 
 def process_message(message: RedditMessage, cfg):
