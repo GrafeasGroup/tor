@@ -257,13 +257,11 @@ def configure_modchat(cfg):
 
 def configure_blossom(cfg):
     cfg.blossom = BlossomAPI(
-        email=os.environ.get("BLOSSOM_EMAIL", "blossom@grafeas.org"),
-        password=os.environ.get("BLOSSOM_PASSWORD", "asdf"),
-        api_key=os.environ.get(
-            "BLOSSOM_API_KEY", "t6S1hGh0.49XceN2LtaUXkWbFyv2gjqNPOTxxF2QQ"
-        ),
-        # api_base_url=os.environ.get("BLOSSOM_API_BASE_URL"),
-        # login_url=os.environ.get("BLOSSOM_LOGIN_URL")
+        email=os.environ.get("BLOSSOM_EMAIL"),
+        password=os.environ.get("BLOSSOM_PASSWORD"),
+        api_key=os.environ.get("BLOSSOM_API_KEY"),
+        api_base_url=os.environ.get("BLOSSOM_API_BASE_URL"),
+        login_url=os.environ.get("BLOSSOM_LOGIN_URL")
     )
 
 
