@@ -9,7 +9,8 @@ from tor import __BOT_NAMES__
 from tor.core.blossom import get_blossom_volunteer_from_post
 from tor.core.config import Config
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
-                              reports, send_to_modchat, send_reddit_reply)
+                              reports, send_to_modchat, send_reddit_reply,
+                              get_or_create_blossom_post_from_response)
 from tor.core.strings import reddit_url
 from tor.core.users import User
 from tor.core.validation import _footer_check
@@ -146,27 +147,10 @@ def process_claim(post, cfg, first_time=False):
     blossom_post = cfg.blossom.get("/submission/", params={
         "submission_id": clean_id(top_parent.fullname)
     })
-    # We _should_ have a record of this post, but especially as we
-    # transition over to the new system it's likely that we won't.
-    # in that case, let's create it real quick so the system knows
-    # what we're talking about.
-    if not blossom_post.get('results'):
-        logging.info(f"Missing post id {top_parent.fullname}, sending to Blossom.")
-        resp = cfg.blossom.post('/submission/', data={
-            "submission_id": clean_id(top_parent.fullname),
-            "source": "transcribersofreddit",
-            "url": top_parent.url,
-            "tor_url": reddit_url.format(top_parent.permalink)
-        })
 
-        # Post object 12345 created!
-        post_id = int(resp['message'].strip("Post object ").strip(" created!"))
-        # now grab the post we just created
-        blossom_post = cfg.blossom.get(f"/submission/{post_id}/")
-    else:
-        # we got the information through a search call, so we need to drill
-        # down to the actual content
-        blossom_post = blossom_post['results'][0]
+    blossom_post = get_or_create_blossom_post_from_response(
+        blossom_post, top_parent, cfg
+    )
 
     # both of these fields need to be empty before we can process.
     if blossom_post.get('claimed_by') is not None:
@@ -226,6 +210,7 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
     done_completed_transcript = i18n['responses']['done']['completed_transcript']
     done_still_unclaimed = i18n['responses']['done']['still_unclaimed']
     done_already_completed = i18n['responses']['done']['already_completed']
+    done_not_claimed_by_you = i18n['responses']['done']['not_claimed_by_you']
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
@@ -236,37 +221,9 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
         "submission_id": clean_id(top_parent.fullname)
     })
 
-    if not blossom_post.get('results'):
-        # NORMALLY we should never hit this. If this is called on any pre-Blossom
-        # posts that are marked as in-progress, then we expect to hit this state.
-        # Basically we should keep this code in for six-ish months, then feel
-        # free to rip it out because it shouldn't be necessary anymore.
-        logging.info(f"Missing post id {top_parent.fullname}, sending to Blossom.")
-        resp = cfg.blossom.post('/submission/', data={
-            "submission_id": clean_id(top_parent.fullname),
-            "source": "transcribersofreddit",
-            "url": top_parent.url,
-            "tor_url": reddit_url.format(top_parent.permalink)
-        })
-
-        # Post object 12345 created!
-        post_id = int(resp['message'].strip("Post object ").strip(" created!"))
-        # now grab the post we just created
-        blossom_post = cfg.blossom.get(f"/submission/{post_id}/")
-    else:
-        # we got the information through a search call, so we need to drill
-        # down to the actual content
-        blossom_post = blossom_post['results'][0]
-
-    if blossom_post['claimed_by'] is None:
-        send_reddit_reply(post, done_still_unclaimed)
-        flair_post(top_parent, flair.unclaimed)
-        return
-
-    if blossom_post['completed_by'] is not None:
-        send_reddit_reply(post, done_already_completed)
-        flair_post(top_parent, flair.completed)
-        return
+    blossom_post = get_or_create_blossom_post_from_response(
+        blossom_post, top_parent, cfg
+    )
 
     if not override and not verified_posted_transcript(post, cfg):
         # we need to double-check these things to keep people
@@ -284,23 +241,38 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
     # If the validation fails, post the apology and return.
     # If the validation succeeds, come down here.
 
-    if override:
-        logging.info('Moderator override starting!')
-    # noinspection PyUnresolvedReferences
-    if alt_text_trigger:
-        send_reddit_reply(
-            post,
-            'I think you meant `done`, so here we go!\n\n'
-            f'{done_completed_transcript}'
+    resp = cfg.blossom.post(f"/submission/{blossom_post['id']}/done/", data={
+        "username": post.author.name,
+        "mod_override": override
+    })
+    if resp.status_code == 200:
+        if override:
+            logging.info('Moderator override starting!')
+        # noinspection PyUnresolvedReferences
+        if alt_text_trigger:
+            send_reddit_reply(
+                post,
+                'I think you meant `done`, so here we go!\n\n'
+                f'{done_completed_transcript}'
+            )
+        else:
+            send_reddit_reply(post, done_completed_transcript)
+        update_user_flair(post, cfg)
+        logging.info(
+            f'Post {top_parent.fullname} completed by {post.author}!'
         )
-    else:
-        send_reddit_reply(post, done_completed_transcript)
-    update_user_flair(post, cfg)
-    logging.info(
-        f'Post {top_parent.fullname} completed by {post.author}!'
-    )
 
-    flair_post(top_parent, flair.completed)
+        flair_post(top_parent, flair.completed)
+    elif resp.status_code == 409:
+        send_reddit_reply(post, done_already_completed)
+        flair_post(top_parent, flair.completed)
+    elif resp.status_code == 412:
+        if "not yet been claimed" in resp.get('message'):
+            send_reddit_reply(post, done_still_unclaimed)
+            flair_post(top_parent, flair.unclaimed)
+        else:
+            send_reddit_reply(post, done_not_claimed_by_you)
+            flair_post(top_parent, flair.in_progress)
 
 
 def process_unclaim(post, cfg):

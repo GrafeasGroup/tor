@@ -269,6 +269,30 @@ def send_transcription_to_blossom(done_comment, transcription_comment, cfg):
     })
 
 
+def get_or_create_blossom_post_from_response(blossom_response, top_parent, cfg):
+    # We _should_ have a record of this post, but especially as we
+    # transition over to the new system it's likely that we won't.
+    # in that case, let's create it real quick so the system knows
+    # what we're talking about.
+    if not blossom_response.get('results'):
+        logging.info(f"Missing post id {top_parent.fullname}, sending to Blossom.")
+        resp = cfg.blossom.post('/submission/', data={
+            "submission_id": clean_id(top_parent.fullname),
+            "source": "transcribersofreddit",
+            "url": top_parent.url,
+            "tor_url": reddit_url.format(top_parent.permalink)
+        })
+        # Post object 12345 created!
+        post_id = int(resp['message'].strip("Post object ").strip(" created!"))
+        # now grab the post we just created
+        post = cfg.blossom.get(f"/submission/{post_id}/")
+    else:
+        # we got the information through a search call, so we need to drill
+        # down to the actual content
+        post = blossom_response['results'][0]
+    return post
+
+
 def send_reddit_reply(reddit_obj, message):
     # We've run into an issue where someone has commented and then deleted the
     # comment between when the bot pulls mail and when it processes comments.
