@@ -113,7 +113,9 @@ def process_post(new_post, cfg):
         cfg.blossom.post(
             '/submission/', data={
                 'submission_id': result.fullname,
-                'source': 'transcribersofreddit'
+                'source': 'transcribersofreddit',
+                'url': new_post['url'],
+                'tor_url': reddit_url.format(new_post['permalink'])
             }
         )
 

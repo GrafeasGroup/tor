@@ -135,7 +135,7 @@ def explode_gracefully(error):
     :param error: an exception object.
     :return: Nothing. Everything dies here.
     """
-    logging.error(error)
+    logging.critical(error)
     sys.exit(1)
 
 
@@ -231,6 +231,22 @@ def update_wiki_page(pagename, content, cfg, subreddit=None):
         )
 
 
+def send_transcription_to_blossom(done_comment, transcription_comment):
+    pass
+
+
+def send_reddit_reply(reddit_obj, message):
+    # We've run into an issue where someone has commented and then deleted the
+    # comment between when the bot pulls mail and when it processes comments.
+    # This should catch that specific issue. Log the error, but don't try again;
+    # just fall through.
+    try:
+        reddit_obj.reply(_(message))
+    except praw.exceptions.ClientException as e:
+        logging.warning(e)
+    pass
+
+
 def deactivate_heartbeat_port(port):
     """
     This isn't used as part of the normal functions; when a port is created,
@@ -267,7 +283,7 @@ def handle_rate_limit(exc):
     }
     matches = re.search(_pattern, exc.message)
     delay = matches[0] * time_map[matches[1]]
-    time.sleep(delay + 1)
+    time.sleep(int(delay) + 1)
 
 
 def signal_handler(signal, frame):

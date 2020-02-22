@@ -1,5 +1,8 @@
-import requests
+from typing import Dict
 
+import requests
+from praw.models import Comment
+from tor.core.config import Config
 
 class ConfigurationError(Exception):
     pass
@@ -29,7 +32,7 @@ class BlossomAPI(object):
         self.s = requests.Session()
         self.s.headers.update({'Authorization': f'Api-Key {api_key}'})
 
-    def _login(self):
+    def _login(self) -> requests.Response:
         resp = self.s.post(
             self.login_url, data={
                 'email': self.email, 'password': self.password
@@ -37,7 +40,16 @@ class BlossomAPI(object):
         )
         return resp
 
-    def _call(self, method: str, path: str, data=None, json=None, params=None):
+    def _call(
+            self, method: str,
+            path: str,
+            data: Dict=None,
+            json: Dict=None,
+            params: Dict=None
+    ) -> requests.Response:
+        if not path.endswith('/'):
+            raise ValueError("Path argument must end in a slash!")
+
         # https://2.python-requests.org/en/master/user/advanced/#prepared-requests
         req = requests.Request(
             method=method,
@@ -49,11 +61,15 @@ class BlossomAPI(object):
 
         for _ in range(3):
             prepped = self.s.prepare_request(req)
-            settings = self.s.merge_environment_settings(prepped.url, {}, None, None, None)
+            settings = self.s.merge_environment_settings(
+                prepped.url, {}, None, None, None
+            )
             resp = self.s.send(prepped, **settings)
 
             if resp.status_code == 403:
-                if resp.json().get('detail') == "Authentication credentials were not provided.":
+                if resp.json().get('detail') == (
+                        "Authentication credentials were not provided."
+                ):
                     self._login()
             else:
                 break
@@ -61,10 +77,10 @@ class BlossomAPI(object):
             raise Exception("Unable to authenticate! Check your email and password!")
         return resp
 
-    def get(self, path, data=None, json=None, params=None):
+    def get(self, path: str, data=None, json=None, params=None) -> requests.Response:
         return self._call('GET', path, data, json, params)
 
-    def post(self, path, data=None, json=None, params=None):
+    def post(self, path: str, data=None, json=None, params=None) -> requests.Response:
         data = data if data else {}
         # grab csrf token
         resp = self._call('GET', path, data, json, params)
@@ -72,5 +88,18 @@ class BlossomAPI(object):
             data.update({'csrfmiddlewaretoken': self.s.cookies.get('csrftoken')})
         return self._call('POST', path, data, json, params)
 
-    def patch(self, path, data=None, json=None, params=None):
+    def patch(self, path: str, data=None, json=None, params=None) -> requests.Response:
         return self._call('PATCH', path, data, json, params)
+
+    def ping(self) -> str:
+        return self._call('GET', '/ping/').json().get('ping?!')
+
+
+def get_blossom_volunteer_from_post(comment_obj: Comment, cfg: Config) -> [Dict, None]:
+    resp = cfg.blossom.get(
+        '/volunteer/', params={'username', comment_obj.author.name}
+    )
+    if resp.get('results'):
+        return resp['results'][0]
+    else:
+        return None

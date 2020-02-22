@@ -128,6 +128,7 @@ def verified_posted_transcript(post, cfg):
             _author_check(post, top_level_comment) and
             _footer_check(top_level_comment, cfg)
         ):
+            # TODO: POST TRANSCRIPTION HERE
             return True
 
     # Did their transcript get flagged by the spam filter? Check their history.
@@ -137,6 +138,7 @@ def verified_posted_transcript(post, cfg):
             cfg,
             channel='#removed_posts'
         )
+        # TODO: POST TRANSCRIPTION HERE
         return True
     else:
         return False
