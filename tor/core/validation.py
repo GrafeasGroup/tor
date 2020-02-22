@@ -1,4 +1,6 @@
-from tor.core.helpers import get_parent_post_id, send_to_modchat
+from tor.core.helpers import (
+    get_parent_post_id, send_to_modchat, send_transcription_to_blossom
+)
 from tor.strings import translation
 
 i18n = translation()
@@ -94,6 +96,7 @@ def _author_history_check(post, cfg):
             and _thread_title_check(post, history_post)
             and _thread_author_check(post, history_post, cfg)
         ):
+            send_transcription_to_blossom(post, history_post, cfg)
             return True
     return False
 
@@ -128,7 +131,7 @@ def verified_posted_transcript(post, cfg):
             _author_check(post, top_level_comment) and
             _footer_check(top_level_comment, cfg)
         ):
-            # TODO: POST TRANSCRIPTION HERE
+            send_transcription_to_blossom(post, top_level_comment, cfg)
             return True
 
     # Did their transcript get flagged by the spam filter? Check their history.
@@ -138,7 +141,6 @@ def verified_posted_transcript(post, cfg):
             cfg,
             channel='#removed_posts'
         )
-        # TODO: POST TRANSCRIPTION HERE
         return True
     else:
         return False

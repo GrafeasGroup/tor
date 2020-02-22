@@ -226,7 +226,6 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
     done_completed_transcript = i18n['responses']['done']['completed_transcript']
     done_still_unclaimed = i18n['responses']['done']['still_unclaimed']
     done_already_completed = i18n['responses']['done']['already_completed']
-    something_went_wrong = i18n['responses']['general']['oops']
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
@@ -277,6 +276,7 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
             f'post by claimant {post.author}. Hrm... '
         )
         send_reddit_reply(post, done_cannot_find_transcript)
+        return
 
     # Control flow:
     # If we have an override, we end up here to complete.
@@ -299,87 +299,8 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
     logging.info(
         f'Post {top_parent.fullname} completed by {post.author}!'
     )
-    # get that information saved for the user
-
-
-    author = User(str(post.author), cfg.redis)
-    author.list_update('posts_completed', clean_id(post.fullname))
-    author.save()
 
     flair_post(top_parent, flair.completed)
-
-
-
-    try:
-        if flair.unclaimed in top_parent.link_flair_text:
-            post.reply(_(done_still_unclaimed))
-        elif top_parent.link_flair_text == flair.in_progress:
-            if not override and not verified_posted_transcript(post, cfg):
-                # we need to double-check these things to keep people
-                # from gaming the system
-                logging.info(
-                    f'Post {top_parent.fullname} does not appear to have a '
-                    f'post by claimant {post.author}. Hrm... '
-                )
-                # noinspection PyUnresolvedReferences
-                try:
-                    post.reply(_(done_cannot_find_transcript))
-                except praw.exceptions.ClientException as e:
-                    # We've run into an issue where someone has commented and
-                    # then deleted the comment between when the bot pulls mail
-                    # and when it processes comments. This should catch that.
-                    # Possibly should look into subclassing praw.Comment.reply
-                    # to include some basic error handling of this so that
-                    # we can fix it throughout the application.
-                    logging.warning(e)
-                return
-
-            # Control flow:
-            # If we have an override, we end up here to complete.
-            # If there is no override, we go into the validation above.
-            # If the validation fails, post the apology and return.
-            # If the validation succeeds, come down here.
-
-            if override:
-                logging.info('Moderator override starting!')
-            # noinspection PyUnresolvedReferences
-            try:
-                if alt_text_trigger:
-                    post.reply(_(
-                        'I think you meant `done`, so here we go!\n\n'
-                        f'{done_completed_transcript}'
-                    ))
-                else:
-                    post.reply(_(done_completed_transcript))
-                update_user_flair(post, cfg)
-                logging.info(
-                    f'Post {top_parent.fullname} completed by {post.author}!'
-                )
-                # get that information saved for the user
-                author = User(str(post.author), cfg.redis)
-                author.list_update('posts_completed', clean_id(post.fullname))
-                author.save()
-
-            except praw.exceptions.ClientException:
-                # If the butt deleted their comment and we're already this
-                # far into validation, just mark it as done. Clearly they
-                # already passed.
-                logging.info(
-                    f'Attempted to mark post {top_parent.fullname} '
-                    f'as done... hit ClientException.'
-                )
-            flair_post(top_parent, flair.completed)
-
-            cfg.redis.incr('total_completed', amount=1)
-
-    except praw.exceptions.APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
-            logging.info(
-                f'Comment attempting to mark ID {top_parent.fullname} '
-                f'as done has been deleted'
-            )
-            return
-        raise  # Re-raise exception if not
 
 
 def process_unclaim(post, cfg):

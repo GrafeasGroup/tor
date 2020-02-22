@@ -9,7 +9,7 @@ import prawcore
 from tor.core import __version__
 from tor.core.config import config
 from tor.core.heartbeat import stop_heartbeat_server
-from tor.core.strings import bot_footer
+from tor.core.strings import bot_footer, reddit_url
 
 
 class Object(object):
@@ -231,8 +231,42 @@ def update_wiki_page(pagename, content, cfg, subreddit=None):
         )
 
 
-def send_transcription_to_blossom(done_comment, transcription_comment):
-    pass
+def get_transcription_content(transcription_comment) -> str:
+    """
+    Assumes that we start with the transcription comment found during
+    the validation step. Walk through the tree starting at that comment
+    doing a simple check for any comment that is written by the same person
+    as a direct reply -- eventually this should probably be more robust,
+    but it works for what we need at the moment.
+
+    :param transcription_comment: praw RedditComment
+    :return: str
+    """
+    transcription_comment_bodies = []
+    transcription_comment.replies.replace_more(limit=None)
+    tc = transcription_comment
+    while True:
+        transcription_comment_bodies.append(tc.body)
+        if any([i.author == tc.author for i in tc.replies]):
+            for reply in tc.replies:
+                if reply.author == tc.author:
+                    tc = reply
+        else:
+            break
+
+    return '\n\n---\n\n'.join(transcription_comment_bodies)
+
+
+def send_transcription_to_blossom(done_comment, transcription_comment, cfg):
+    transcription = get_transcription_content(transcription_comment)
+    cfg.blossom.post('/transcription/', data={
+        'submission_id': done_comment.submission.id,
+        'username': done_comment.author.name,
+        't_id': transcription_comment.id,
+        'completion_method': 'transcribersofreddit',
+        't_url': reddit_url.format(transcription_comment.permalink),
+        't_text': transcription
+    })
 
 
 def send_reddit_reply(reddit_obj, message):
@@ -242,9 +276,13 @@ def send_reddit_reply(reddit_obj, message):
     # just fall through.
     try:
         reddit_obj.reply(_(message))
-    except praw.exceptions.ClientException as e:
-        logging.warning(e)
-    pass
+    except praw.exceptions.APIException as e:
+        if e.error_type == 'DELETED_COMMENT':
+            logging.info(
+                f'Cannot reply to comment {reddit_obj.name} -- comment deleted'
+            )
+            return
+        raise  # Re-raise exception if not
 
 
 def deactivate_heartbeat_port(port):
