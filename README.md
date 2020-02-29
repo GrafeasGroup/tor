@@ -26,7 +26,7 @@ Among other things, this bot handles:
 
 ### From release
 
-Given a release in <https://github.com/GrafeasGroup/tor/releases>, download the attached `.whl` file for your platform/architecture and `pip install` it directly like so:
+Given a release in <https://github.com/GrafeasGroup/tor/releases> (perhaps the [latest](https://github.com/GrafeasGroup/tor/releases/latest)), download the attached `.whl` file for your platform/architecture and `pip install` it directly like so:
 
 ```sh
 $ pip install ./path/to/tor-3.6.1-py3-any-none.whl
@@ -34,12 +34,12 @@ $ pip install ./path/to/tor-3.6.1-py3-any-none.whl
 
 ### From source
 
-Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/) and Python 3.6.
+Make sure you have an [up-to-date copy of pip installed](https://pip.pypa.io/en/stable/installing/), the latest version of [Poetry](https://www.python-poetry.org/), and Python 3.6.
 
 ```sh
 $ git clone https://github.com/GrafeasGroup/tor.git tor
 $ cd tor/
-$ pip install .
+$ poetry install
 ```
 
 ## Big Picture
@@ -65,8 +65,7 @@ Monitoring daemon (via subreddit's /new feed):
 To build the package from source, start in the base of the repository and run:
 
 ```sh
-$ pip install wheel
-$ python setup.py bdist_wheel
+$ poetry build
 ```
 
 When building is complete, upload everything in the `dist/` directory that was just created as part of the GitHub release.
