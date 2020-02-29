@@ -93,7 +93,7 @@ def update_user_flair(post, cfg):
     """
     flair_text = '{} Γ - Beta Tester'
 
-    post_author = User(str(post.author), cfg.redis)
+    post_author = User(str(post.author), redis_conn=cfg.redis)
     current_transcription_count = post_author.get('transcriptions', 0)
 
     try:

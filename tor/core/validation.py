@@ -1,14 +1,17 @@
+from praw.models import Comment, Submission
+
+from tor.core.config import Config
 from tor.core.helpers import get_parent_post_id, send_to_modchat
 from tor.strings import translation
 
 i18n = translation()
 
 
-def _author_check(original_post, claimant_post):
+def _author_check(original_post: Comment, claimant_post: Comment) -> bool:
     return original_post.author == claimant_post.author
 
 
-def _footer_check(reply, cfg, tor_link=None, new_reddit=False):
+def _footer_check(reply: Comment, cfg: Config, tor_link=None, new_reddit=False) -> bool:
     """
     Is the footer in there?
 
@@ -20,22 +23,21 @@ def _footer_check(reply, cfg, tor_link=None, new_reddit=False):
         footer or the WYSIWYG (new reddit) malformed footer.
     :return: True / None.
     """
-    if tor_link is None:
+    if not tor_link:
         tor_link = i18n['urls']['ToR_link']
 
-    if cfg.perform_header_check:
-        if new_reddit:
-            return tor_link in reply.body and "^(I'm a" in reply.body
-
-        else:
-            return tor_link in reply.body and '&#32;' in reply.body
-    else:
-        # If we don't want the check to take place, we'll just return
-        # true to negate it.
+    if not cfg.perform_header_check:
+        # If we don't want the check to take place, we'll just
+        # return true to negate it.
         return True
 
+    if tor_link not in reply.body:
+        return False
 
-def _thread_title_check(original_post, history_item):
+    return "^(I'm a" in reply.body or '&#32;' in reply.body
+
+
+def _thread_title_check(original_post: Comment, history_item: Comment) -> bool:
     """
     Verify that the link titles match. On the original post, it will be
     removed, but we should still be able to extract the title of the
@@ -53,7 +55,7 @@ def _thread_title_check(original_post, history_item):
     )
 
 
-def _thread_author_check(original_post, history_item, cfg):
+def _thread_author_check(original_post: Comment, history_item: Comment, cfg: Config) -> bool:
     """
     This allows us to check whether the author of the thread that the
     transcription is posted in is the same as the author of the linked
@@ -66,14 +68,11 @@ def _thread_author_check(original_post, history_item, cfg):
     :return: True if the author of the original submission matches the author
         of the submission the transcription is on.
     """
-    return (
-        history_item.submission.author == cfg.r.submission(
-            url=original_post.submission.url
-        ).author
-    )
+    submission = cfg.r.submission(url=original_post.submission.url)
+    return history_item.submission.author == submission.author
 
 
-def _author_history_check(post, cfg):
+def _author_history_check(post: Comment, cfg: Config) -> bool:
     """
     Pull the ten latest comments from the user's history. Chances are that's
     enough to see if they've actually done the post or not without slowing
@@ -88,17 +87,21 @@ def _author_history_check(post, cfg):
     :return: True if the post is found in the history, False if not.
     """
     for history_post in post.author.comments.new(limit=10):
-        if (
-            history_post.is_root
-            and _footer_check(history_post, cfg)
-            and _thread_title_check(post, history_post)
-            and _thread_author_check(post, history_post, cfg)
-        ):
-            return True
+        if not history_post.is_root:
+            continue
+        if not _footer_check(history_post, cfg):
+            continue
+        if not _thread_title_check(post, history_post):
+            continue
+        if not _thread_author_check(post, history_post, cfg):
+            continue
+
+        return True
+
     return False
 
 
-def verified_posted_transcript(post, cfg):
+def verified_posted_transcript(post: Comment, cfg: Config) -> bool:
     """
     Because we're using basic gamification, we need to put in at least
     a few things to make it difficult to game the system. When a user
@@ -116,19 +119,17 @@ def verified_posted_transcript(post, cfg):
     :param cfg: the global config object.
     :return: True if a post is found, False if not.
     """
-    top_parent = get_parent_post_id(post, cfg.r)
+    top_parent: Submission = get_parent_post_id(post, cfg.r)
+    linked_resource: Submission = cfg.r.submission(top_parent.id_from_url(top_parent.url))
 
-    linked_resource = cfg.r.submission(
-        top_parent.id_from_url(top_parent.url)
-    )
     # get rid of the "See More Comments" crap
     linked_resource.comments.replace_more(limit=0)
     for top_level_comment in linked_resource.comments.list():
-        if (
-            _author_check(post, top_level_comment) and
-            _footer_check(top_level_comment, cfg)
-        ):
-            return True
+        if not _author_check(post, top_level_comment):
+            continue
+        if not _footer_check(top_level_comment, cfg):
+            continue
+        return True
 
     # Did their transcript get flagged by the spam filter? Check their history.
     if _author_history_check(post, cfg):
@@ -138,5 +139,5 @@ def verified_posted_transcript(post, cfg):
             channel='#removed_posts'
         )
         return True
-    else:
-        return False
+
+    return False

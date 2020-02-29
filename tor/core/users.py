@@ -3,23 +3,17 @@ This is a standalone addition which contains a non-thread-safe implementation
 of a dict user object that is stored in Redis. It can either take in an active
 Redis connection as an argument or create its own with some defaults.
 """
-import os
 import json
 import logging
+from typing import Any, Dict
 
-import redis
+from redis import StrictRedis
 
-
-class UserError(Exception):
-    def __init__(self, message, *args):
-        self.message = message  # bypass DeprecationWarning
-        super().__init__(message, *args)
+UserData = Dict[str, Any]
 
 
-class UserConnectionError(Exception):
-    def __init__(self, message, *args):
-        self.message = message  # bypass DeprecationWarning
-        super().__init__(message, *args)
+class UserDataNotFound(Exception):
+    pass
 
 
 class User(object):
@@ -32,50 +26,40 @@ class User(object):
     pam.update('position', 'Office Administrator')
     pam.save()
     """
-    def __init__(
-            self, username=None, redis_conn=None, create_if_not_found=True
-    ):
+
+    def __init__(self, username: str, redis_conn: StrictRedis, create_if_not_found=True):
         """
         Create our own Redis connection if one is not passed in.
         We also assume that there is already a logging object created.
 
         :param username: String; the username we're looking for. No fuzzing
             here; this must be exact.
-        :param redis: Object; a `redis` instance.
+        :param redis: Object; a `StrictRedis` instance.
         """
+        if not redis_conn:
+            raise ValueError('Missing Redis connection')
+        if not username:
+            raise ValueError('Username not supplied')
 
         super().__init__()
-        if redis_conn:
-            self.r = redis_conn
-        else:
-            try:
-                url = os.getenv(
-                    'REDIS_CONNECTION_URL', 'redis://localhost:6379/0'
-                )
-                self.r = redis.StrictRedis.from_url(url)
-                self.r.ping()
-            except redis.exceptions.ConnectionError:
-                raise UserConnectionError('Unable to reach Redis.')
-
-        if not username:
-            raise UserError('Username not supplied.')
+        self.redis = redis_conn
         self.username = username
 
         self.create_if_not_found = create_if_not_found
         self.redis_key = '::user::{}'
         self.user_data = self._load()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self.user_data)
 
-    def get(self, key, default_return=None):
+    def get(self, key: str, default_return=None) -> Any:
         return self.user_data.get(key, default_return)
 
-    def _load(self):
+    def _load(self) -> UserData:
         """
         :return: Dict or None; the loaded information from Redis.
         """
-        result = self.r.get(self.redis_key.format(self.username))
+        result = self.redis.get(self.redis_key.format(self.username))
         if not result:
             if self.create_if_not_found:
                 logging.debug(
@@ -84,33 +68,25 @@ class User(object):
                 return self._create_default_user_data()
             else:
                 logging.debug('User not found, returning None.')
-                return None
+                raise UserDataNotFound()
 
         return json.loads(result.decode())
 
-    def save(self):
-        self.r.set(
+    def save(self) -> None:
+        self.redis.set(
             self.redis_key.format(self.username),
             json.dumps(self.user_data)
         )
 
-    def update(self, key, value):
+    def update(self, key: str, value: Any) -> None:
         self.user_data[key] = value
 
-    def list_update(self, key, value):
+    def list_update(self, key: str, value: Any) -> None:
         if not self.user_data.get(key):
-            self.user_data[key] = list()
+            self.user_data[key] = []
         self.user_data[key] += [value]
 
-    def _create_default_user_data(self):
-        self.user_data = dict()
+    def _create_default_user_data(self) -> UserData:
+        self.user_data = {}
         self.user_data.update({'username': self.username})
         return self.user_data
-
-
-if __name__ == '__main__':
-    pam = User('pam')
-    print(pam)
-    pam.update('transcriptions', pam.get('transcriptions', 1) + 1)
-    print(pam.get('transcriptions'))
-    pam.save()

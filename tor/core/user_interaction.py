@@ -1,9 +1,11 @@
 import logging
 import random
 
-import praw
-from praw.models import Message as RedditMessage
+from praw.exceptions import APIException, ClientException
+from praw.models import Comment, Message
+
 from tor import __BOT_NAMES__
+from tor.core.config import Config
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
                               reports, send_to_modchat)
 from tor.core.users import User
@@ -14,9 +16,10 @@ from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
 
 i18n = translation()
+log = logging.getLogger(__name__)
 
 
-def coc_accepted(post, cfg):
+def coc_accepted(post: Comment, cfg: Config) -> bool:
     """
     Verifies that the user is in the Redis set "accepted_CoC".
 
@@ -28,7 +31,7 @@ def coc_accepted(post, cfg):
     return cfg.redis.sismember('accepted_CoC', post.author.name) == 1
 
 
-def process_coc(post, cfg):
+def process_coc(post: Comment, cfg: Config) -> None:
     """
     Adds the username of the redditor to the db as accepting the code of
     conduct.
@@ -72,7 +75,7 @@ def process_coc(post, cfg):
     process_claim(post, cfg, first_time=True)
 
 
-def process_claim(post, cfg, first_time=False):
+def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
     """
     Handles comment replies containing the word 'claim' and routes
     based on a basic decision tree.
@@ -87,14 +90,11 @@ def process_claim(post, cfg, first_time=False):
     claim_already_complete = i18n['responses']['claim']['already_complete']
     please_accept_coc = i18n['responses']['general']['coc_not_accepted']
 
-    if first_time:
-        claim_success = i18n['responses']['claim']['first_claim_success']
-    else:
-        claim_success = i18n['responses']['claim']['success']
+    claim_success = i18n['responses']['claim']['first_claim_success' if first_time else 'success']
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
-        logging.debug('Received `claim` on post we do not own. Ignoring.')
+        log.debug('Received `claim` on post we do not own. Ignoring.')
         return
 
     try:
@@ -107,7 +107,7 @@ def process_claim(post, cfg, first_time=False):
 
         # this can be either '' or None depending on how the API is feeling
         # today
-        if top_parent.link_flair_text in ['', None]:
+        if not top_parent.link_flair_text:
             # There exists the very small possibility that the post was
             # malformed and doesn't actually have flair on it. In that case,
             # let's set something so the next part doesn't crash.
@@ -118,9 +118,7 @@ def process_claim(post, cfg, first_time=False):
             post.reply(_(claim_success))
 
             flair_post(top_parent, flair.in_progress)
-            logging.info(
-                f'Claim on ID {top_parent.fullname} by {post.author} successful'
-            )
+            log.info(f'Claim on ID {top_parent.fullname} by {post.author} successful')
 
         # can't claim something that's already claimed
         elif top_parent.link_flair_text == flair.in_progress:
@@ -128,17 +126,14 @@ def process_claim(post, cfg, first_time=False):
         elif top_parent.link_flair_text == flair.completed:
             post.reply(_(claim_already_complete))
 
-    except praw.exceptions.APIException as e:
+    except APIException as e:
         if e.error_type == 'DELETED_COMMENT':
-            logging.info(
-                f'Comment attempting to claim ID {top_parent.fullname} has '
-                f'been deleted. Back up for grabs! '
-            )
+            log.info(f'Comment attempting to claim ID {top_parent.fullname} has been deleted. Back up for grabs!')
             return
         raise  # Re-raise exception if not
 
 
-def process_done(post, cfg, override=False, alt_text_trigger=False):
+def process_done(post: Comment, cfg: Config, override=False, alt_text_trigger=False) -> None:
     """
     Handles comments where the user says they've completed a post.
     Also includes a basic decision tree to enable verification of
@@ -163,7 +158,7 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
-        logging.info('Received `done` on post we do not own. Ignoring.')
+        log.info('Received `done` on post we do not own. Ignoring.')
         return
 
     try:
@@ -173,21 +168,18 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
             if not override and not verified_posted_transcript(post, cfg):
                 # we need to double-check these things to keep people
                 # from gaming the system
-                logging.info(
-                    f'Post {top_parent.fullname} does not appear to have a '
-                    f'post by claimant {post.author}. Hrm... '
-                )
+                log.info(f'Post {top_parent.fullname} does not appear to have a post by claimant {post.author}. Hrm... ')
                 # noinspection PyUnresolvedReferences
                 try:
                     post.reply(_(done_cannot_find_transcript))
-                except praw.exceptions.ClientException as e:
+                except ClientException as e:
                     # We've run into an issue where someone has commented and
                     # then deleted the comment between when the bot pulls mail
                     # and when it processes comments. This should catch that.
                     # Possibly should look into subclassing praw.Comment.reply
                     # to include some basic error handling of this so that
                     # we can fix it throughout the application.
-                    logging.warning(e)
+                    log.warning(e)
                 return
 
             # Control flow:
@@ -197,7 +189,7 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
             # If the validation succeeds, come down here.
 
             if override:
-                logging.info('Moderator override starting!')
+                log.info('Moderator override starting!')
             # noinspection PyUnresolvedReferences
             try:
                 if alt_text_trigger:
@@ -208,37 +200,29 @@ def process_done(post, cfg, override=False, alt_text_trigger=False):
                 else:
                     post.reply(_(done_completed_transcript))
                 update_user_flair(post, cfg)
-                logging.info(
-                    f'Post {top_parent.fullname} completed by {post.author}!'
-                )
+                log.info(f'Post {top_parent.fullname} completed by {post.author}!')
                 # get that information saved for the user
-                author = User(str(post.author), cfg.redis)
+                author = User(str(post.author), redis_conn=cfg.redis)
                 author.list_update('posts_completed', clean_id(post.fullname))
                 author.save()
 
-            except praw.exceptions.ClientException:
+            except ClientException:
                 # If the butt deleted their comment and we're already this
                 # far into validation, just mark it as done. Clearly they
                 # already passed.
-                logging.info(
-                    f'Attempted to mark post {top_parent.fullname} '
-                    f'as done... hit ClientException.'
-                )
+                log.info(f'Attempted to mark post {top_parent.fullname} as done... hit ClientException.')
             flair_post(top_parent, flair.completed)
 
             cfg.redis.incr('total_completed', amount=1)
 
-    except praw.exceptions.APIException as e:
+    except APIException as e:
         if e.error_type == 'DELETED_COMMENT':
-            logging.info(
-                f'Comment attempting to mark ID {top_parent.fullname} '
-                f'as done has been deleted'
-            )
+            log.info(f'Comment attempting to mark ID {top_parent.fullname} as done has been deleted')
             return
         raise  # Re-raise exception if not
 
 
-def process_unclaim(post, cfg):
+def process_unclaim(post: Comment, cfg: Config) -> None:
     # Sometimes people need to unclaim things. Usually this happens because of
     # an issue with the post itself, like it's been locked or deleted. Either
     # way, we should probably be able to handle it.
@@ -261,7 +245,7 @@ def process_unclaim(post, cfg):
 
     # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
-        logging.info('Received `unclaim` on post we do not own. Ignoring.')
+        log.info('Received `unclaim` on post we do not own. Ignoring.')
         return
 
     if flair.unclaimed in top_parent.link_flair_text:
@@ -313,32 +297,29 @@ def process_unclaim(post, cfg):
         return
 
 
-def process_thanks(post, cfg):
+def process_thanks(post: Comment, cfg: Config) -> None:
     thumbs_up_gifs = i18n['urls']['thumbs_up_gifs']
     youre_welcome = i18n['responses']['general']['youre_welcome']
     try:
         post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
-    except praw.exceptions.APIException as e:
+    except APIException as e:
         if e.error_type == 'DELETED_COMMENT':
-            logging.debug('Comment requiring thanks was deleted')
+            log.debug('Comment requiring thanks was deleted')
             return
         raise
 
 
-def process_wrong_post_location(post, cfg):
+def process_wrong_post_location(post: Comment, cfg: Config) -> None:
     transcript_on_tor_post = i18n['responses']['general']['transcript_on_tor_post']
     if _footer_check(post, cfg, new_reddit=True):
         transcript_on_tor_post += i18n['responses']['general']['new_reddit_transcript']
     try:
         post.reply(_(transcript_on_tor_post))
-    except praw.exceptions.APIException:
-        logging.debug(
-            'Something went wrong with asking about a misplaced post; '
-            'ignoring.'
-        )
+    except APIException:
+        log.debug('Something went wrong with asking about a misplaced post; ignoring.')
 
 
-def process_message(message: RedditMessage, cfg):
+def process_message(message: Message, cfg: Config) -> None:
     dm_subject = i18n['responses']['direct_message']['dm_subject']
     dm_body = i18n['responses']['direct_message']['dm_body']
 
@@ -352,16 +333,10 @@ def process_message(message: RedditMessage, cfg):
             f'DM from <{i18n["urls"]["reddit_url"].format("/u/" + username)}|u/{username}> -- '
             f'*{message.subject}*:\n{message.body}', cfg
         )
-        logging.info(
-            f'Received DM from {username}. \n Subject: '
-            f'{message.subject}\n\nBody: {message.body} '
-        )
+        log.info(f'Received DM from {username}. \n Subject: {message.subject}\n\nBody: {message.body}')
     else:
         send_to_modchat(
             f'DM with no author -- '
             f'*{message.subject}*:\n{message.body}', cfg
         )
-        logging.info(
-            f'Received DM with no author. \n Subject: '
-            f'{message.subject}\n\nBody: {message.body} '
-        )
+        log.info(f'Received DM with no author. \n Subject: {message.subject}\n\nBody: {message.body}')
