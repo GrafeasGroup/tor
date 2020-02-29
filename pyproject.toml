@@ -24,13 +24,13 @@ bugsnag = "^3.6"
 requests = "^2.22"
 slackclient = "^1"
 PyYaml = "^5.1"
-flake8 = "^3.7.9"
-mypy = "^0.761"
 
 [tool.poetry.dev-dependencies]
 better-exceptions = "^0.2.2"
 pytest = "^5.1"
 pytest-cov = "^2.7"
+flake8 = "^3.7.9"
+mypy = "^0.761"
 
 [tool.poetry.scripts]
 tor-moderator = "tor.cli.main:main"
