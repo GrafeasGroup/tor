@@ -144,10 +144,7 @@ def check_inbox(cfg: Config) -> None:
             log.info('Skipping response from our OCR bot')
 
         elif cfg.redis.sismember('blacklist', author_name):
-            log.info(
-                f'Skipping inbox item from {author_name!r} who is on the '
-                f'blacklist'
-            )
+            log.info(f'Skipping inbox item from {author_name!r} who is on the blacklist')
 
         elif isinstance(item, RedditComment) and is_our_subreddit(item.subreddit.name, cfg):
             process_reply(item, cfg)
@@ -157,7 +154,6 @@ def check_inbox(cfg: Config) -> None:
 
         elif isinstance(item, RedditMessage):
             if item.subject[0] == '!':
-                # Handle our special commands
                 process_command(item, cfg)
             else:
                 process_message(item, cfg)
