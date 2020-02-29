@@ -3,6 +3,7 @@ import re
 import signal
 import sys
 import time
+from typing import List
 
 import praw
 import prawcore
@@ -48,7 +49,7 @@ _pattern = re.compile(r'again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$',
 running = True
 
 
-def _(message):
+def _(message: str) -> str:
     """
     Message formatter. Returns the message and the disclaimer for the
     footer.
@@ -59,28 +60,17 @@ def _(message):
     return bot_footer.format(message, version=__version__)
 
 
-def log_header(message):
-    logging.info('*' * 50)
-    logging.info(message)
-    logging.info('*' * 50)
-
-
-def clean_list(items):
+def clean_list(items: List[str]) -> List[str]:
     """
     Takes a list and removes entries that are only newlines.
 
     :param items: List.
     :return: List, sans newlines
     """
-    cleaned = []
-    for item in items:
-        if item.strip() != '':
-            cleaned.append(item)
-
-    return cleaned
+    return list([item.strip() for item in items if item.strip()])
 
 
-def send_to_modchat(message, cfg, channel='general'):
+def send_to_modchat(message: str, cfg: Config, channel='general') -> None:
     """
     Sends a message to the ToR mod chat.
 
@@ -102,7 +92,7 @@ def send_to_modchat(message, cfg, channel='general'):
             logging.error(e)
 
 
-def is_our_subreddit(subreddit_name, cfg):
+def is_our_subreddit(subreddit_name: str, cfg: Config) -> bool:
     """
     Compares given subreddit to the one we're operating out of
 
@@ -117,7 +107,7 @@ def is_our_subreddit(subreddit_name, cfg):
     return str(subreddit_name).casefold() == str(cfg.tor.name).casefold()
 
 
-def explode_gracefully(error):
+def explode_gracefully(error: Exception) -> None:
     """
     A last-ditch effort to try to raise a few more flags as it goes down.
     Only call in times of dire need.
@@ -127,16 +117,6 @@ def explode_gracefully(error):
     """
     logging.error(error)
     sys.exit(1)
-
-
-def subreddit_from_url(url):
-    """
-    Returns the subreddit a post was made in, based on its reddit URL
-    """
-    m = subreddit_regex.search(url)
-    if m is not None:
-        return m.group(1)
-    return None
 
 
 def clean_id(post_id):

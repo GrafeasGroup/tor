@@ -8,7 +8,7 @@ from slackclient import SlackClient
 from tor.core import __HEARTBEAT_FILE__
 from tor.core.config import config
 from tor.core.heartbeat import configure_heartbeat
-from tor.core.helpers import clean_list, get_wiki_page, log_header
+from tor.core.helpers import clean_list, get_wiki_page
 
 # Use a logger local to this module
 log = logging.getLogger(__name__)
@@ -24,7 +24,9 @@ def configure_logging(cfg, log_name='transcribersofreddit.log'):
     else:
         log.info('Not running with Bugsnag!')
 
-    log_header('Starting!')
+    log.info('*' * 50)
+    log.info('Starting!')
+    log.info('*' * 50)
 
 
 def populate_header(cfg):
