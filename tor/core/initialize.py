@@ -70,15 +70,6 @@ def populate_domain_lists(cfg):
         log.debug(f'Domain list populated: {current_domain_list}')
 
 
-def populate_moderators(cfg):
-    # Praw doesn't cache this information, so it requests it every damn time
-    # we ask about the moderators. Let's cache this so we can drastically cut
-    # down on the number of calls for the mod list.
-
-    # this call returns a full list rather than a generator. Praw is weird.
-    cfg.tor_mods = cfg.tor.moderator()
-
-
 def populate_subreddit_lists(cfg):
     """
     Gets the list of subreddits to monitor and loads it into memory.
@@ -153,7 +144,8 @@ def initialize(cfg):
     log.debug('Formatting loaded.')
     populate_header(cfg)
     log.debug('Header loaded.')
-    populate_moderators(cfg)
+    # this call returns a full list rather than a generator. Praw is weird.
+    cfg.tor_mods = cfg.tor.moderator()
     log.debug('Mod list loaded.')
     populate_gifs(cfg)
     log.debug('Gifs loaded.')
