@@ -71,6 +71,8 @@ responses:
       This post is still unclaimed! Please claim it first or message the mods to take care of this.
     completed_transcript: |
       Awesome, thanks for your help! I'll update your flair to reflect your new count.
+
+      If you want to help keep these bots running, please check out our patreon on the sidebar
     cannot_find_transcript: |
       Sorry; I can't find your transcript post on the link. Please message the mods to have them look at this.
 
