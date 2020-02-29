@@ -125,7 +125,7 @@ def populate_subreddit_lists(cfg):
 
 
 def populate_gifs(cfg):
-    cfg.no_gifs = get_wiki_page('usefulgifs/no', cfg).split('\r\n')
+    cfg.no_gifs = get_wiki_page('usefulgifs/no', cfg).splitlines()
 
 
 def initialize(cfg):
