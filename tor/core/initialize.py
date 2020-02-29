@@ -77,10 +77,6 @@ def populate_subreddit_lists(cfg):
     :return: None.
     """
 
-    cfg.subreddits_to_check = []
-    cfg.upvote_filter_subs = {}
-    cfg.no_link_header_subs = []
-
     cfg.subreddits_to_check = get_wiki_page('subreddits',
                                             cfg).splitlines()
     cfg.subreddits_to_check = clean_list(cfg.subreddits_to_check)
@@ -122,7 +118,6 @@ def populate_subreddit_lists(cfg):
 
     lines = get_wiki_page('subreddits/archive-time', cfg).splitlines()
     cfg.archive_time_default = int(lines[0])
-    cfg.archive_time_subreddits = {}
     for line in lines[1:]:
         if ',' in line:
             sub, time = line.split(',')
@@ -130,8 +125,6 @@ def populate_subreddit_lists(cfg):
 
 
 def populate_gifs(cfg):
-    # zero it out so we can load more
-    cfg.no_gifs = []
     cfg.no_gifs = get_wiki_page('usefulgifs/no', cfg).split('\r\n')
 
 
