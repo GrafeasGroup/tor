@@ -33,14 +33,6 @@ class flair(object):
     disregard = 'Disregard'
 
 
-class css_flair(object):
-    unclaimed = 'unclaimed'
-    completed = 'transcriptioncomplete'
-    in_progress = 'inprogress'
-    meta = 'meta'
-    disregard = 'disregard'
-
-
 class reports(object):
     original_post_deleted_or_locked = 'Original post has been deleted or locked'
     post_should_be_marked_nsfw = 'Post should be marked as NSFW'
