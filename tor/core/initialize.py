@@ -1,9 +1,7 @@
 import logging
 import os
 import random
-import sys
 
-import redis
 from bugsnag.handlers import BugsnagHandler
 from praw import Reddit
 from slackclient import SlackClient
@@ -11,44 +9,6 @@ from tor.core import __HEARTBEAT_FILE__
 from tor.core.config import config
 from tor.core.heartbeat import configure_heartbeat
 from tor.core.helpers import clean_list, get_wiki_page, log_header
-
-
-def configure_tor(cfg):
-    """
-    Assembles the tor object based on whether or not we've enabled debug mode
-    and returns it. There's really no reason to put together a Subreddit
-    object dedicated to our subreddit -- it just makes some future lines
-    a little easier to type.
-
-    :param r: the active Reddit object.
-    :param cfg: the global config object.
-    :return: the Subreddit object for the chosen subreddit.
-    """
-    if cfg.debug_mode:
-        tor = cfg.r.subreddit('ModsOfToR')
-    else:
-        # normal operation, our primary subreddit
-        tor = cfg.r.subreddit('transcribersofreddit')
-
-    return tor
-
-
-def configure_redis():
-    """
-    Creates a connection to the local Redis server, then returns the active
-    connection.
-
-    :return: object: the active Redis object.
-    """
-    try:
-        url = os.getenv('REDIS_CONNECTION_URL', 'redis://localhost:6379/0')
-        redis_server = redis.StrictRedis.from_url(url)
-        redis_server.ping()
-    except redis.exceptions.ConnectionError:
-        logging.fatal("Redis server is not running! Exiting!")
-        sys.exit(1)
-
-    return redis_server
 
 
 def configure_logging(cfg, log_name='transcribersofreddit.log'):
@@ -128,9 +88,6 @@ def populate_moderators(cfg):
     # Praw doesn't cache this information, so it requests it every damn time
     # we ask about the moderators. Let's cache this so we can drastically cut
     # down on the number of calls for the mod list.
-
-    # nuke the existing list
-    cfg.tor_mods = []
 
     # this call returns a full list rather than a generator. Praw is weird.
     cfg.tor_mods = cfg.tor.moderator()
@@ -285,6 +242,7 @@ def build_bot(
     config.name = full_name if full_name else name
     config.bot_version = version
     config.heartbeat_logging = heartbeat_logging
+
     configure_logging(config, log_name=log_name)
     configure_modchat(config)
 
