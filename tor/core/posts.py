@@ -109,7 +109,7 @@ def process_post(new_post, cfg):
         add_complete_post_id(new_post['name'], cfg)
         cfg.redis.incr('total_posted', amount=1)
 
-        if cfg.OCR and content_type == 'image':
+        if content_type == 'image':
             # hook for OCR bot; in order to avoid race conditions, we add the
             # key / value pair that the bot isn't looking for before adding
             # to the set that it's monitoring.
