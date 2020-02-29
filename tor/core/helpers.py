@@ -7,7 +7,7 @@ import time
 import praw
 import prawcore
 from tor.core import __version__
-from tor.core.config import config
+from tor.core.config import config, Config
 from tor.core.heartbeat import stop_heartbeat_server
 from tor.core.strings import bot_footer
 
@@ -182,7 +182,7 @@ def get_parent_post_id(post, r):
             return r.submission(id=clean_id(post.parent_id))
 
 
-def get_wiki_page(pagename, cfg, return_on_fail=None, subreddit=None):
+def get_wiki_page(pagename: str, cfg: Config, return_on_fail=None, subreddit=None) -> str:
     """
     Return the contents of a given wiki page.
 
