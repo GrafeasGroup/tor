@@ -270,6 +270,8 @@ def process_unclaim(post, cfg):
         return
 
     for item in top_parent.user_reports:
+        if not item[0]:
+            continue
         if (
             reports.original_post_deleted_or_locked in item[0] or reports.post_violates_rules in item[0]
         ):
