@@ -5,23 +5,22 @@ import sys
 import time
 from typing import List
 
-import praw
-import prawcore
+from praw.exceptions import APIException
+from praw.models import Comment, Submission, Subreddit
+from prawcore.exceptions import RequestException, ServerError, Forbidden
+
+import tor.core
 from tor.core import __version__
 from tor.core.config import config, Config
 from tor.core.heartbeat import stop_heartbeat_server
 from tor.core.strings import bot_footer
 
 
+log = logging.getLogger(__name__)
+
 subreddit_regex = re.compile(
     r'reddit.com\/r\/([a-z0-9\-\_\+]+)',
     flags=re.IGNORECASE
-)
-
-default_exceptions = (
-    prawcore.exceptions.RequestException,
-    prawcore.exceptions.ServerError,
-    prawcore.exceptions.Forbidden
 )
 
 
@@ -44,9 +43,6 @@ class reports(object):
 # error message for an API timeout
 _pattern = re.compile(r'again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$',
                       re.IGNORECASE)
-
-# CTRL+C handler variable
-running = True
 
 
 def _(message: str) -> str:
@@ -87,9 +83,9 @@ def send_to_modchat(message: str, cfg: Config, channel='general') -> None:
                 text=message
             )
         except Exception as e:
-            logging.error(f'Failed to send message to modchat #{channel}: '
-                          f'\'{message}\'')
-            logging.error(e)
+            log.error(f'Failed to send message to modchat #{channel}: '
+                      f'\'{message}\'')
+            log.error(e)
 
 
 def is_our_subreddit(subreddit_name: str, cfg: Config) -> bool:
@@ -107,19 +103,7 @@ def is_our_subreddit(subreddit_name: str, cfg: Config) -> bool:
     return str(subreddit_name).casefold() == str(cfg.tor.name).casefold()
 
 
-def explode_gracefully(error: Exception) -> None:
-    """
-    A last-ditch effort to try to raise a few more flags as it goes down.
-    Only call in times of dire need.
-
-    :param error: an exception object.
-    :return: Nothing. Everything dies here.
-    """
-    logging.error(error)
-    sys.exit(1)
-
-
-def clean_id(post_id):
+def clean_id(post_id: str) -> str:
     """
     Fixes the Reddit ID so that it can be used to get a new object.
 
@@ -133,7 +117,7 @@ def clean_id(post_id):
     return post_id[post_id.index('_') + 1:]
 
 
-def get_parent_post_id(post, r):
+def get_parent_post_id(post: Comment, subreddit: Subreddit) -> Submission:
     """
     Takes any given comment object and returns the object of the
     original post, no matter how far up the chain it is. This is
@@ -145,14 +129,14 @@ def get_parent_post_id(post, r):
     :param r: the instantiated reddit object
     :return: submission object of the top post.
     """
-    while True:
-        if not post.is_root:
-            post = r.comment(id=clean_id(post.parent_id))
-        else:
-            return r.submission(id=clean_id(post.parent_id))
+    if not post.is_root:
+        parent = subreddit.comment(id=clean_id(post.parent_id))
+        return get_parent_post_id(parent, subreddit)
+    else:
+        return subreddit.submission(id=clean_id(post.parent_id))
 
 
-def get_wiki_page(pagename: str, cfg: Config, return_on_fail=None, subreddit=None) -> str:
+def get_wiki_page(pagename: str, cfg: Config) -> str:
     """
     Return the contents of a given wiki page.
 
@@ -166,56 +150,14 @@ def get_wiki_page(pagename: str, cfg: Config, return_on_fail=None, subreddit=Non
     :return: String or None. The content of the requested page if
         present else None.
     """
-    if not subreddit:
-        subreddit = cfg.tor
-    logging.debug(f'Retrieving wiki page {pagename}')
+    log.debug(f'Retrieving wiki page {pagename}')
     try:
-        result = subreddit.wiki[pagename].content_md
-        return result if result != '' else return_on_fail
+        return cfg.tor.wiki[pagename].content_md
     except prawcore.exceptions.NotFound:
-        return return_on_fail
+        return ''
 
 
-def update_wiki_page(pagename, content, cfg, subreddit=None):
-    """
-    Sends new content to the requested wiki page.
-
-    :param pagename: String. The name of the page to be edited.
-    :param content: String. New content for the wiki page.
-    :param cfg: Dict. Global config object.
-    :param subreddit: Object. A specific PRAW Subreddit object if we
-        want to interact with a different sub.
-    :return: None.
-    """
-
-    logging.debug(f'Updating wiki page {pagename}')
-
-    if not subreddit:
-        subreddit = cfg.tor
-
-    try:
-        return subreddit.wiki[pagename].edit(content)
-    except prawcore.exceptions.NotFound as e:
-        logging.error(
-            f'{e} - Requested wiki page {pagename} not found. Cannot update.'
-        )
-
-
-def deactivate_heartbeat_port(port):
-    """
-    This isn't used as part of the normal functions; when a port is created,
-    it gets used again and again. The point of this function is to deregister
-    the port that the status page checks, but would probably only be used by
-    the command line.
-
-    :param port: int, the port number
-    :return: None
-    """
-    config.redis.srem('active_heartbeat_ports', port)
-    logging.info('Removed port from set of heartbeats.')
-
-
-def stop_heartbeat():
+def stop_heartbeat() -> None:
     """
     Any logic that goes along with stopping the cherrypy heartbeat server goes
     here. This is called on exit of `run_until_dead()`, either through keyboard
@@ -226,10 +168,10 @@ def stop_heartbeat():
     :return: None
     """
     stop_heartbeat_server()
-    logging.info('Stopped heartbeat!')
+    log.info('Stopped heartbeat!')
 
 
-def handle_rate_limit(exc):
+def handle_rate_limit(exc: APIException):
     time_map = {
         'second': 1,
         'minute': 60,
@@ -240,32 +182,7 @@ def handle_rate_limit(exc):
     time.sleep(delay + 1)
 
 
-def signal_handler(signal, frame):
-    """
-    This is the SIGINT handler that allows us to intercept CTRL+C.
-    When this is triggered, it will wait until the primary loop ends
-    the current iteration before ending. Press CTRL+C twice to kill
-    immediately.
-
-    :param signal: Unused.
-    :param frame: Unused.
-    :return: None.
-    """
-    global running
-
-    if not running:
-        logging.critical('User pressed CTRL+C twice!!! Killing!')
-        stop_heartbeat()
-        sys.exit(1)
-
-    logging.info(
-        '\rUser triggered command line shutdown. Will terminate after current '
-        'loop.'
-    )
-    running = False
-
-
-def run_until_dead(func, exceptions=default_exceptions):
+def run_until_dead(func):
     """
     The official method that replaces all that ugly boilerplate required to
     start up a bot under the TranscribersOfReddit umbrella. This method handles
@@ -280,30 +197,42 @@ def run_until_dead(func, exceptions=default_exceptions):
         issues) but they can be overridden with a passed-in set.
     :return: None.
     """
+
+    def double_ctrl_c_handler(*args, **kwargs) -> None:
+        if not tor.core.is_running:
+            log.critical('User pressed CTRL+C twice!!! Killing!')
+            stop_heartbeat()
+            sys.exit(1)
+
+        log.info(
+            '\rUser triggered command line shutdown. Will terminate after current loop.'
+        )
+        tor.core.is_running = False
+        pass
+
     # handler for CTRL+C
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, double_ctrl_c_handler)
 
     try:
-        while running:
+        while tor.core.is_running:
             try:
                 func(config)
-            except praw.exceptions.APIException as e:
+            except APIException as e:
                 if e.error_type == 'RATELIMIT':
-                    logging.warning(
+                    log.warning(
                         'Ratelimit - artificially limited by Reddit. Sleeping'
                         ' for requested time!'
                     )
                     handle_rate_limit(e)
-            except exceptions as e:
-                logging.warning(
-                    f'{e} - Issue communicating with Reddit. Sleeping for 60s!'
-                )
+            except (RequestException, ServerError, Forbidden) as e:
+                log.warning(f'{e} - Issue communicating with Reddit. Sleeping for 60s!')
                 time.sleep(60)
 
-        logging.info('User triggered shutdown. Shutting down.')
+        log.info('User triggered shutdown. Shutting down.')
         stop_heartbeat()
         sys.exit(0)
 
     except Exception as e:
         stop_heartbeat()
-        explode_gracefully(e)
+        log.error(e)
+        sys.exit(1)
