@@ -1,5 +1,7 @@
 import logging
+from typing import Dict, Union
 
+from tor.core.config import Config
 from tor.core.helpers import _
 from tor.core.strings import reddit_url
 from tor.helpers.flair import flair, flair_post
@@ -9,9 +11,12 @@ from tor.helpers.youtube import (get_yt_transcript, get_yt_video_id,
 from tor.strings import translation
 
 i18n = translation()
+log = logging.getLogger(__name__)
+
+PostSummary = Dict[str, Union[str, int, bool, None]]
 
 
-def process_post(new_post, cfg):
+def process_post(new_post: PostSummary, cfg: Config) -> None:
     """
     After a valid post has been discovered, this handles the formatting
     and posting of those calls as workable jobs to ToR.
@@ -28,11 +33,11 @@ def process_post(new_post, cfg):
     if new_post['subreddit'] in cfg.upvote_filter_subs:
         # ignore posts if they don't meet the threshold for karma and the sub
         # is in our list of upvoted filtered ones
-        if new_post['ups'] < cfg.upvote_filter_subs[new_post['subreddit']]:
+        if int(str(new_post['ups'])) < cfg.upvote_filter_subs[str(new_post['subreddit'])]:
             return
 
-    if not is_valid(new_post['name'], cfg):
-        logging.debug(id_already_handled_in_db.format(new_post['name']))
+    if not is_valid(str(new_post['name']), cfg):
+        log.debug(id_already_handled_in_db.format(new_post['name']))
         return
 
     if new_post['archived']:
@@ -42,10 +47,7 @@ def process_post(new_post, cfg):
         # we don't want to handle deleted posts, that's just silly
         return
 
-    logging.info(
-        f'Posting call for transcription on ID {new_post["name"]} posted by '
-        f'{new_post["author"]}'
-    )
+    log.info(f'Posting call for transcription on ID {new_post["name"]} posted by {new_post["author"]}')
 
     if new_post['domain'] in cfg.image_domains:
         content_type = 'image'
@@ -56,20 +58,17 @@ def process_post(new_post, cfg):
         content_format = cfg.audio_formatting
 
     elif new_post['domain'] in cfg.video_domains:
-        if 'youtu' in new_post['domain']:
+        if 'youtu' in str(new_post['domain']):
             if not valid_youtube_video(new_post['url']):
-                add_complete_post_id(new_post['name'], cfg)
+                add_complete_post_id(str(new_post['name']), cfg)
                 return
             if get_yt_transcript(new_post['url']):
                 np = cfg.r.submission(id=new_post['name'])
                 np.reply(_(
                     yt_already_has_transcripts
                 ))
-                add_complete_post_id(new_post['name'], cfg)
-                logging.info(
-                    f'Found YouTube video, {get_yt_video_id(new_post["url"])},'
-                    f' with good transcripts.'
-                )
+                add_complete_post_id(str(new_post['name']), cfg)
+                log.info(f'Found YouTube video, {get_yt_video_id(new_post["url"])}, with good transcripts.')
                 return
         content_type = 'video'
         content_format = cfg.video_formatting
@@ -80,7 +79,7 @@ def process_post(new_post, cfg):
 
     # Truncate a post title if it exceeds 250 characters, so the added
     # formatting still fits in Reddit's 300 char limit for post titles
-    post_title = new_post['title']
+    post_title = str(new_post['title'])
     max_title_length = 250
     if len(post_title) > max_title_length:
         post_title = post_title[:max_title_length - 3] + '...'
@@ -106,7 +105,7 @@ def process_post(new_post, cfg):
         )
         flair_post(result, flair.unclaimed)
 
-        add_complete_post_id(new_post['name'], cfg)
+        add_complete_post_id(str(new_post['name']), cfg)
         cfg.redis.incr('total_posted', amount=1)
 
         if content_type == 'image':
@@ -122,7 +121,7 @@ def process_post(new_post, cfg):
     # exclusively 503s and 403s that arbitrarily resolve themselves. A missed
     # post or two is not the end of the world.
     except Exception as e:
-        logging.error(
+        log.error(
             f'{e} - unable to post content.\nID: {new_post["name"]}\n '
             f'Title: {new_post["title"]}\n Subreddit: '
             f'{new_post["subreddit"]}'

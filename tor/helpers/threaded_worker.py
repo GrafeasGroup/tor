@@ -13,10 +13,12 @@ from datetime import datetime, timedelta
 from typing import Dict, List
 
 import requests
-from tor.core.posts import process_post
+
+from tor.core.config import Config
+from tor.core.posts import process_post, PostSummary
 
 
-def check_domain_filter(item: Dict, cfg) -> bool:
+def check_domain_filter(item: Dict, cfg: Config) -> bool:
     """
     Validate that a given post is actually one that we can (or should) work on
     by checking the domain of the post against our filters.
@@ -25,16 +27,19 @@ def check_domain_filter(item: Dict, cfg) -> bool:
     :param cfg: the config object.
     :return: True if we can work on it, False otherwise.
     """
+    if item['domain'] in cfg.image_domains:
+        return True
+    if item['domain'] in cfg.audio_domains:
+        return True
+    if item['domain'] in cfg.video_domains:
+        return True
+    if item['subreddit'] in cfg.subreddits_domain_filter_bypass:
+        return True
 
-    return True if (
-        item['domain'] in cfg.image_domains or
-        item['domain'] in cfg.audio_domains or
-        item['domain'] in cfg.video_domains or
-        item['subreddit'] in cfg.subreddits_domain_filter_bypass
-    ) else False
+    return False
 
 
-def get_subreddit_posts(sub: str) -> [List, None]:
+def get_subreddit_posts(sub: str) -> List[PostSummary]:
 
     def generate_user_agent() -> str:
         """
@@ -53,12 +58,9 @@ def get_subreddit_posts(sub: str) -> [List, None]:
             )
         )
 
-    def parse_json_posts(posts: Dict) -> List:
-        trimmed_links = list()
-        number_of_posts = 10
-        posts_raw = posts['data']['children']
-        posts_raw = posts_raw[:number_of_posts]  # cut the list from 25 to 10
-        for item in posts_raw:
+    def parse_json_posts(posts: Dict) -> List[PostSummary]:
+        trimmed_links: List[PostSummary] = []
+        for item in posts['data']['children'][:10]:  # last 10 posts
             # there are only two top level keys here; kind (comment / post) and
             # data. No reason to keep the kind because we're only pulling posts.
             item = item['data']
@@ -81,7 +83,7 @@ def get_subreddit_posts(sub: str) -> [List, None]:
     headers = {
         'User-Agent': generate_user_agent()
     }
-    url = 'https://www.reddit.com/r/{}/new/.json'.format(sub)
+    url = f'https://www.reddit.com/r/{sub}/new/.json'
     result = requests.get(url, headers=headers).json()
     # we have two states here: one has the data we want and the other is an
     # error state. The error state looks like this:
@@ -93,11 +95,11 @@ def get_subreddit_posts(sub: str) -> [List, None]:
     return parse_json_posts(result)
 
 
-def is_time_to_scan(cfg) -> bool:
+def is_time_to_scan(cfg: Config) -> bool:
     return datetime.now() > cfg.last_post_scan_time + timedelta(seconds=45)
 
 
-def threaded_check_submissions(cfg):
+def threaded_check_submissions(cfg: Config) -> None:
     """
     Single threaded PRAW performance:
     finished in 56.75446701049805s
@@ -118,7 +120,7 @@ def threaded_check_submissions(cfg):
 
     subreddits = cfg.subreddits_to_check
 
-    total_posts = list()
+    total_posts: List[PostSummary] = []
     # by not specifying a maximum number of threads, ThreadPoolExecutor will
     # grab the CPU count of the current machine and multiply it by 5, allowing
     # us to keep sane limits wherever we're running.
@@ -128,7 +130,7 @@ def threaded_check_submissions(cfg):
             jobs.append(executor.submit(get_subreddit_posts, sub))
         for f in as_completed(jobs):
             try:
-                data = f.result()
+                data: List[PostSummary] = f.result()
                 total_posts += data
             except Exception as exc:
                 logging.warning('an exception was generated: {}'.format(exc))
