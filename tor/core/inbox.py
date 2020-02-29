@@ -4,8 +4,10 @@ import re
 from praw.exceptions import ClientException as RedditClientException
 from praw.models import Comment as RedditComment
 from praw.models import Message as RedditMessage
+from praw.models.reddit.mixins import InboxableMixin
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
+from tor.core.config import Config
 from tor.core.helpers import send_to_modchat, is_our_subreddit
 from tor.core.mentions import process_mention
 from tor.core.strings import reddit_url
@@ -16,14 +18,15 @@ from tor.core.user_interaction import (process_claim, process_coc,
 
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
-    # re.compile('unclaim', re.IGNORECASE),
     re.compile('undo', re.IGNORECASE),
     # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
 
+log = logging.getLogger(__name__)
 
-def forward_to_slack(item, cfg):
-    username = item.author.name
+
+def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
+    username = str(item.author.name)
 
     send_to_modchat(
         f'<{reddit_url.format(item.context)}|Unhandled message>'
@@ -31,37 +34,33 @@ def forward_to_slack(item, cfg):
         f' <{reddit_url.format("/u/" + username)}|u/{username}> -- '
         f'*{item.subject}*:\n{item.body}', cfg
     )
-    logging.info(
+    log.info(
         f'Received unhandled inbox message from {username}. \n Subject: '
         f'{item.subject}\n\nBody: {item.body} '
     )
 
 
-def process_mod_intervention(post, cfg):
+def process_mod_intervention(post: RedditComment, cfg: Config) -> None:
     """
     Triggers an alert in slack with a link to the comment if there is something
     offensive or in need of moderator intervention
     """
-    if not isinstance(post, RedditComment):
-        # Why are we here if it's not a comment?
-        return
-
     # Collect all offenses (noted by the above regular expressions) from the
     # original
-    phrases = []
+    phrase_list = []
     for regex in MOD_SUPPORT_PHRASES:
         matches = regex.search(post.body)
         if not matches:
             continue
 
-        phrases.append(matches.group())
+        phrase_list.append(matches.group())
 
-    if len(phrases) == 0:
+    if len(phrase_list) == 0:
         # Nothing offensive here, why did this function get triggered?
         return
 
     # Wrap each phrase in double-quotes (") and commas in between
-    phrases = '"' + '", "'.join(phrases) + '"'
+    phrases = '"' + '", "'.join(phrase_list) + '"'
 
     send_to_modchat(
         f':rotating_light::rotating_light: Mod Intervention Needed '
@@ -71,8 +70,7 @@ def process_mod_intervention(post, cfg):
     )
 
 
-def process_reply(reply, cfg):
-    # noinspection PyUnresolvedReferences
+def process_reply(reply: RedditComment, cfg: Config) -> None:
     try:
         r_body = reply.body.lower()  # cache that thing
 
@@ -110,8 +108,8 @@ def process_reply(reply, cfg):
             forward_to_slack(reply, cfg)
 
     except (RedditClientException, AttributeError) as e:
-        logging.warning(e)
-        logging.warning(
+        log.warning(e)
+        log.warning(
             f"Unable to process comment {reply.submission.shortlink} "
             f"by {reply.author}"
         )
@@ -120,7 +118,7 @@ def process_reply(reply, cfg):
         # uncommon, but common enough that this is necessary.
 
 
-def check_inbox(cfg):
+def check_inbox(cfg: Config) -> None:
     """
     Goes through all the unread messages in the inbox. It deliberately
     leaves mail which does not fit into either category so that it can
@@ -143,10 +141,10 @@ def check_inbox(cfg):
 
         elif author_name == 'transcribot':
             # bot responses shouldn't trigger workflows in other bots
-            logging.info('Skipping response from our OCR bot')
+            log.info('Skipping response from our OCR bot')
 
         elif cfg.redis.sismember('blacklist', author_name):
-            logging.info(
+            log.info(
                 f'Skipping inbox item from {author_name!r} who is on the '
                 f'blacklist'
             )
@@ -154,7 +152,7 @@ def check_inbox(cfg):
         elif isinstance(item, RedditComment) and is_our_subreddit(item.subreddit.name, cfg):
             process_reply(item, cfg)
         elif isinstance(item, RedditComment):
-            logging.info(f'Received username mention! ID {item}')
+            log.info(f'Received username mention! ID {item}')
             process_mention(item)
 
         elif isinstance(item, RedditMessage):
