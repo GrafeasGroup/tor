@@ -3,7 +3,6 @@ from typing import Dict, Union
 
 from tor.core.config import Config
 from tor.core.helpers import _
-from tor.core.strings import reddit_url
 from tor.helpers.flair import flair, flair_post
 from tor.helpers.reddit_ids import add_complete_post_id, is_valid
 from tor.helpers.youtube import (get_yt_transcript, get_yt_video_id,
@@ -92,7 +91,7 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
                 type=content_type.title(),
                 title=post_title
             ),
-            url=reddit_url.format(new_post['permalink'])
+            url=i18n["urls"]["reddit_url"].format(new_post['permalink'])
         )
         result.reply(
             _(

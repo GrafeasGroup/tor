@@ -6,7 +6,6 @@ from praw.models import Message as RedditMessage
 from tor import __BOT_NAMES__
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
                               reports, send_to_modchat)
-from tor.core.strings import reddit_url
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
 from tor.core.validation import _footer_check
@@ -63,9 +62,9 @@ def process_coc(post, cfg):
     # instead. If they're actually new, then send a message to slack.
     if result == 1:
         send_to_modchat(
-            f'<{reddit_url.format("/user/" + post.author.name)}|u/{post.author.name}>'
+            f'<{i18n["urls"]["reddit_url"].format("/user/" + post.author.name)}|u/{post.author.name}>'
             f' has just'
-            f' <{reddit_url.format(post.context)}|accepted the CoC!>'
+            f' <{i18n["urls"]["reddit_url"].format(post.context)}|accepted the CoC!>'
             f' {modchat_emote}',
             cfg,
             channel='new_volunteers'
@@ -350,7 +349,7 @@ def process_message(message: RedditMessage, cfg):
 
     if username:
         send_to_modchat(
-            f'DM from <{reddit_url.format("/u/" + username)}|u/{username}> -- '
+            f'DM from <{i18n["urls"]["reddit_url"].format("/u/" + username)}|u/{username}> -- '
             f'*{message.subject}*:\n{message.body}', cfg
         )
         logging.info(

@@ -8,7 +8,6 @@ from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
 from tor.core.config import Config
 from tor.core.helpers import send_to_modchat, is_our_subreddit, _
-from tor.core.strings import reddit_url
 from tor.core.user_interaction import (process_claim, process_coc,
                                        process_done, process_message,
                                        process_thanks, process_unclaim,
@@ -26,11 +25,12 @@ log = logging.getLogger(__name__)
 
 def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
     username = str(item.author.name)
+    i18n = translation()
 
     send_to_modchat(
-        f'<{reddit_url.format(item.context)}|Unhandled message>'
+        f'<{i18n["urls"]["reddit_url"].format(item.context)}|Unhandled message>'
         f' by'
-        f' <{reddit_url.format("/u/" + username)}|u/{username}> -- '
+        f' <{i18n["urls"]["reddit_url"].format("/u/" + username)}|u/{username}> -- '
         f'*{item.subject}*:\n{item.body}', cfg
     )
     log.info(

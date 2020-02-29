@@ -9,11 +9,11 @@ from praw.exceptions import APIException
 from praw.models import Comment, Submission, Subreddit
 from prawcore.exceptions import RequestException, ServerError, Forbidden
 
+from tor.strings import translation
 import tor.core
 from tor.core import __version__
 from tor.core.config import config, Config
 from tor.core.heartbeat import stop_heartbeat_server
-from tor.core.strings import bot_footer
 
 
 log = logging.getLogger(__name__)
@@ -22,6 +22,7 @@ subreddit_regex = re.compile(
     r'reddit.com\/r\/([a-z0-9\-\_\+]+)',
     flags=re.IGNORECASE
 )
+i18n = translation()
 
 
 class flair(object):
@@ -53,7 +54,7 @@ def _(message: str) -> str:
     :param message: string. The message to be displayed.
     :return: string. The original message plus the footer.
     """
-    return bot_footer.format(message, version=__version__)
+    return i18n['responses']['bot_footer'].format(message, version=__version__)
 
 
 def clean_list(items: List[str]) -> List[str]:
