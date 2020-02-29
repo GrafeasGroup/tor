@@ -1,6 +1,7 @@
 import argparse
 import os
 import time
+import logging
 
 # The `import tor` lines is necessary because `tor.__SELF_NAME__` is
 # set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1
@@ -90,6 +91,12 @@ def run(cfg):
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(levelname)s | %(funcName)s | %(message)s',
+        datefmt='%Y-%m-%dT%H:%M:%S',
+    )
+
     config.debug_mode = DEBUG_MODE
 
     if config.debug_mode:

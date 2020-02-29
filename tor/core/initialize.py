@@ -10,28 +10,24 @@ from tor.core.config import config
 from tor.core.heartbeat import configure_heartbeat
 from tor.core.helpers import clean_list, get_wiki_page, log_header
 
+# Use a logger local to this module
+log = logging.getLogger(__name__)
+
 
 def configure_logging(cfg, log_name='transcribersofreddit.log'):
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(levelname)s | %(funcName)s | %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S',
-    )
-
     # will intercept anything error level or above
     if cfg.bugsnag_api_key:
         bs_handler = BugsnagHandler()
         bs_handler.setLevel(logging.ERROR)
         logging.getLogger('').addHandler(bs_handler)
-        logging.info('Bugsnag enabled!')
+        log.info('Bugsnag enabled!')
     else:
-        logging.info('Not running with Bugsnag!')
+        log.info('Not running with Bugsnag!')
 
     log_header('Starting!')
 
 
 def populate_header(cfg):
-    cfg.header = ''
     cfg.header = get_wiki_page('format/header', cfg)
 
 
@@ -42,12 +38,6 @@ def populate_formatting(cfg):
 
     :return: None.
     """
-    # zero out everything so we can reinitialize later
-    cfg.audio_formatting = ''
-    cfg.video_formatting = ''
-    cfg.image_formatting = ''
-    cfg.other_formatting = ''
-
     cfg.audio_formatting = get_wiki_page('format/audio', cfg)
     cfg.video_formatting = get_wiki_page('format/video', cfg)
     cfg.image_formatting = get_wiki_page('format/images', cfg)
@@ -61,10 +51,6 @@ def populate_domain_lists(cfg):
 
     :return: None.
     """
-
-    cfg.video_domains = []
-    cfg.image_domains = []
-    cfg.audio_domains = []
 
     domains = get_wiki_page('domains', cfg)
     domains = ''.join(domains.splitlines()).split('---')
@@ -81,7 +67,7 @@ def populate_domain_lists(cfg):
 
         current_domain_list += domain_list
         # [current_domain_list.append(x) for x in domain_list]
-        logging.debug(f'Domain list populated: {current_domain_list}')
+        log.debug(f'Domain list populated: {current_domain_list}')
 
 
 def populate_moderators(cfg):
@@ -107,7 +93,7 @@ def populate_subreddit_lists(cfg):
     cfg.subreddits_to_check = get_wiki_page('subreddits',
                                             cfg).splitlines()
     cfg.subreddits_to_check = clean_list(cfg.subreddits_to_check)
-    logging.debug(
+    log.debug(
         f'Created list of subreddits from wiki: {cfg.subreddits_to_check}'
     )
 
@@ -118,7 +104,7 @@ def populate_subreddit_lists(cfg):
             sub, threshold = line.split(',')
             cfg.upvote_filter_subs[sub] = int(threshold)
 
-    logging.debug(
+    log.debug(
         f'Retrieved subreddits subject to the upvote filter: '
         f'{cfg.upvote_filter_subs} '
     )
@@ -129,7 +115,7 @@ def populate_subreddit_lists(cfg):
     cfg.subreddits_domain_filter_bypass = clean_list(
         cfg.subreddits_domain_filter_bypass
     )
-    logging.debug(
+    log.debug(
         f'Retrieved subreddits that bypass the domain filter: '
         f'{cfg.subreddits_domain_filter_bypass} '
     )
@@ -138,7 +124,7 @@ def populate_subreddit_lists(cfg):
         'subreddits/no-link-header', cfg
     ).split('\r\n')
     cfg.no_link_header_subs = clean_list(cfg.no_link_header_subs)
-    logging.debug(
+    log.debug(
         f'Retrieved subreddits subject to the upvote filter: '
         f'{cfg.no_link_header_subs} '
     )
@@ -160,17 +146,17 @@ def populate_gifs(cfg):
 
 def initialize(cfg):
     populate_domain_lists(cfg)
-    logging.debug('Domains loaded.')
+    log.debug('Domains loaded.')
     populate_subreddit_lists(cfg)
-    logging.debug('Subreddits loaded.')
+    log.debug('Subreddits loaded.')
     populate_formatting(cfg)
-    logging.debug('Formatting loaded.')
+    log.debug('Formatting loaded.')
     populate_header(cfg)
-    logging.debug('Header loaded.')
+    log.debug('Header loaded.')
     populate_moderators(cfg)
-    logging.debug('Mod list loaded.')
+    log.debug('Mod list loaded.')
     populate_gifs(cfg)
-    logging.debug('Gifs loaded.')
+    log.debug('Gifs loaded.')
 
 
 def get_heartbeat_port(cfg):
@@ -186,7 +172,7 @@ def get_heartbeat_port(cfg):
         # have we already reserved a port for this process?
         with open(__HEARTBEAT_FILE__, 'r') as port_file:
             port = int(port_file.readline().strip())
-        logging.debug('Found existing port saved on disk')
+        log.debug('Found existing port saved on disk')
         return port
     except OSError:
         pass
@@ -199,7 +185,7 @@ def get_heartbeat_port(cfg):
             # create that file we looked for earlier
             with open(__HEARTBEAT_FILE__, 'w') as port_file:
                 port_file.write(str(port))
-            logging.debug(f'generated port {port} and saved to disk')
+            log.debug(f'generated port {port} and saved to disk')
 
             return port
 
@@ -258,4 +244,4 @@ def build_bot(
         # and for this version, heartbeat requires db access
         configure_heartbeat(config)
 
-    logging.info('Bot built and initialized!')
+    log.info('Bot built and initialized!')
