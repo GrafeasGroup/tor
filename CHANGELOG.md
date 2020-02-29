@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [UNRELEASED]
 
 - Skip mod flags that (somehow) come back as `null`, because obviously human intervention is needed (credit @thelonelyghost)
+- Add link to tutorial for first transcriptions (credit @Pf441)
 
 ## [3.12.0] - 2019-12-12
 
