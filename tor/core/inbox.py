@@ -118,7 +118,6 @@ def process_reply(reply, cfg):
         # the only way we should hit this is if somebody comments and then
         # deletes their comment before the bot finished processing. It's
         # uncommon, but common enough that this is necessary.
-        pass
 
 
 def check_inbox(cfg):
