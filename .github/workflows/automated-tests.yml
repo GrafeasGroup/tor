@@ -1,0 +1,47 @@
+name: Automated Testing
+
+on: ['push', 'pull_request']
+
+jobs:
+  analyze:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+      - run: |
+          pip install --upgrade pip
+          pip install poetry
+          hash -r
+
+          poetry install -v --extras ci
+      - run: poetry run mypy .
+      - run: poetry run flake8 .
+  test:
+    runs-on: ubuntu-18.04
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version:
+          - '3.6'
+          - '3.7'
+          - '3.8'
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: 'x64'
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+          hash -r
+
+          poetry install -v --extras ci
+      - run: poetry run pytest --cov=tor
