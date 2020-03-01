@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [UNRELEASED]
 
 - Minor typos in bot messages
+- Removes heartbeat server
+- Adds type annotations to method signatures
+- Removes a metric crap-ton of dead code
+- Clarifies the logic of what the bot is doing and why, using more semantic names of methods
+- Tightens some overly broad interfaces (Only default value of a keyword arg is used? Buh-bye keyword arg, you're now permanently set that way!)
+- Uses flake8, mypy, and pytest as part of CI execution
+- Replaces Travis CI with GitHub Actions
 
 ## [3.12.2] - 2020-02-29
 
