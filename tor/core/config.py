@@ -3,7 +3,8 @@ import logging
 import os
 from typing import Dict, List, Union
 
-from praw.models import Subreddit, Reddit  # type: ignore
+from praw import Reddit  # type: ignore
+from praw.models import Subreddit  # type: ignore
 from praw.models.reddit.subreddit import ModeratorRelationship  # type: ignore
 from slackclient import SlackClient  # type: ignore
 
