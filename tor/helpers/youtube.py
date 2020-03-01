@@ -2,12 +2,14 @@ import logging
 from urllib.parse import parse_qs, urlparse
 
 import requests
+from requests.exceptions import HTTPError
+
 from tor.strings import translation
 
-youtube_transcription_url = translation()['urls']['yt_transcript_url']
+i18n = translation()
 
 
-def get_yt_video_id(url):
+def get_yt_video_id(url: str) -> str:
     """
     Returns Video_ID extracting from the given url of Youtube
 
@@ -31,52 +33,49 @@ def get_yt_video_id(url):
 
     query = urlparse(url)
 
-    if 'youtube' in query.hostname:
+    if 'youtube' in str(query.hostname):
         if query.path == '/watch':
             return parse_qs(query.query)['v'][0]
         elif query.path.startswith(('/embed/', '/v/')):
             return query.path.split('/')[2]
-    elif 'youtu.be' in query.hostname:
+    elif 'youtu.be' in str(query.hostname):
         return query.path[1:]
-    else:
-        raise ValueError
+
+    return ''
 
 
-def get_yt_transcript(url, yt_transcript_url=youtube_transcription_url):
-    """
-    Takes a url, formats it, and sends it off to Google to request the
-    uploader-provided transcripts. If we get them, we return them;
-    if we get nothing or an error, it returns None.
-
-    :param url: the YouTube video URL
-    :param yt_transcript_url: the unformatted url to get the transcripts
-    :return: string; the transcript if we get it, None if we don't or
-        if there's an error.
-    """
+def has_youtube_transcript(url: str) -> bool:
     try:
         video_id = get_yt_video_id(url)
-        if video_id is None:
-            # If not able to get video id, no point in continuing
-            return None
+        if not video_id:
+            return False
 
-        result = requests.get(
-            yt_transcript_url.format(video_id)
-        )
+        result = requests.get(i18n['urls']['yt_transcript_url'].format(video_id))
         result.raise_for_status()
-        if result.text.startswith(
-                '<?xml version="1.0" encoding="utf-8" ?><transcript><text'
-        ):
-            return result
-        else:
-            return None
-    except requests.exceptions.HTTPError as e:
-        logging.error(
-            f'{e} - Cannot retrieve transcript for {url}'
-        )
-        return None
+
+        if result.text.startswith('<?xml version="1.0" encoding="utf-8" ?><transcript><text'):
+            return True
+
+        return False
+    except HTTPError as e:
+        logging.error(f'{e} - Cannot retrieve transcript for {url}')
+        return False
 
 
-def valid_youtube_video(url):
+def is_youtube_url(url: str) -> bool:
+    if url.startswith(('youtu', 'www')):
+        url = 'http://' + url
+
+    query = urlparse(url)
+
+    if 'youtube' not in str(query.hostname):
+        return True
+    if 'youtu.be' not in str(query.hostname):
+        return True
+    return False
+
+
+def is_transcribable_youtube_video(url: str) -> bool:
     """
     We don't want to process channels or user accounts, so we'll filter
     those out here.
@@ -85,9 +84,7 @@ def valid_youtube_video(url):
     :return: True if it's a video; false if it's a channel,
     user, or playlist.
     """
-    banned_keywords = ['user', 'channel', 'playlist']
-    for keyword in banned_keywords:
-        if keyword in url:
-            return False
+    if not is_youtube_url(url):
+        return False
 
-    return True
+    return not any(keyword in url for keyword in ['user', 'channel', 'playlist'])

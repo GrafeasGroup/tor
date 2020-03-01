@@ -2,9 +2,7 @@ from praw.models import Submission
 from tor.core.config import Config
 
 
-def add_complete_post_id(
-    post_id: str, cfg: Config, return_result: bool = False
-) -> [None, bool]:
+def add_complete_post_id(post_id: str, cfg: Config) -> bool:
     """
     Adds the post id to the complete_post_ids set in Redis. This is used to keep
     track of which posts we've worked on and which ones we haven't.
@@ -19,8 +17,11 @@ def add_complete_post_id(
         we don't care.
     """
     result = cfg.redis.sadd("complete_post_ids", post_id)
-    if return_result:
-        return True if result == 1 else False
+    return result == 1
+
+
+def has_been_posted(post_id: str, cfg: Config) -> bool:
+    return cfg.redis.sismember('complete_post_ids', post_id) == 1
 
 
 def is_valid(post_id: str, cfg: Config) -> bool:
@@ -40,10 +41,10 @@ def is_valid(post_id: str, cfg: Config) -> bool:
     # if we get back a True, then we return True because the post was submitted
     # successfully and it's good to work on. If the insert fails, then we
     # want to return a False because we cannot work on that post again.
-    return add_complete_post_id(post_id, cfg, return_result=True)
+    return add_complete_post_id(post_id, cfg)
 
 
-def is_removed(post: Submission, full_check: bool = False) -> bool:
+def is_removed(post: Submission) -> bool:
     """
     Reddit does not allow non-mods to tell whether or not a post has been
     removed, which understandably makes it a little difficult to figure out
@@ -69,8 +70,4 @@ def is_removed(post: Submission, full_check: bool = False) -> bool:
     :param post: The post that we are attempting to investigate.
     :return: True is the post looks like it has been removed, False otherwise.
     """
-
-    if full_check:
-        return False if post.is_crosspostable and post.can_gild else True
-    else:
-        return not post.is_crosspostable
+    return not post.is_crosspostable

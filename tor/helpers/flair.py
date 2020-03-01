@@ -1,11 +1,17 @@
 import logging
+from typing import Tuple
+
+from praw.models import Comment, Submission
 
 from tor import __BOT_NAMES__
+from tor.core.config import Config
 from tor.core.helpers import clean_id, flair, send_to_modchat
 from tor.core.users import User
 
+log = logging.getLogger(__name__)
 
-def flair_post(post, text):
+
+def flair_post(post: Submission, text: str) -> None:
     """
     Sets the requested flair on a given post. Must provide a string
     which matches an already-available flair template.
@@ -30,12 +36,10 @@ def flair_post(post, text):
             return
 
     # if the flairing is successful, we won't hit this line.
-    logging.error(
-        f'Cannot find requested flair {text}. Not flairing.'
-    )
+    log.error(f'Cannot find requested flair {text}. Not flairing.')
 
 
-def _get_flair_css(transcription_count):
+def _get_flair_css(transcription_count: int) -> str:
     if transcription_count >= 2500:
         return 'grafeas-ruby'
     elif transcription_count >= 1000:
@@ -52,7 +56,7 @@ def _get_flair_css(transcription_count):
         return 'grafeas'
 
 
-def _parse_existing_flair(user_flair):
+def _parse_existing_flair(user_flair: str) -> Tuple[int, str]:
     """
     Take the flair string and identify the proper incremented score along with
     its matching CSS class.
@@ -66,20 +70,10 @@ def _parse_existing_flair(user_flair):
 
     css = _get_flair_css(new_flair_count)
 
-    # check to make sure we actually got something
-    # 3/28/2018, another unannounced API change. Empty flairs now return
-    # an empty string instead of None. Keeping None just in case, though.
-    if css in ['', None]:
-        logging.error(
-            f'Cannot find flair css for value {new_flair_count}. What happened?'
-        )
-        # set to the default with no special looks on the subreddit
-        css = 'grafeas'
-
     return new_flair_count, css
 
 
-def update_user_flair(post, cfg):
+def update_user_flair(post: Comment, cfg: Config) -> None:
     """
     On a successful transcription, this takes the user's current flair,
     increments the counter by one, and stores it back to the subreddit.
@@ -102,13 +96,11 @@ def update_user_flair(post, cfg):
         # ID of our post object and re-request it from Reddit in order to
         # get the *actual* object, even though they have the same ID. It's
         # weird.
-        user_flair = cfg.r.comment(
-            id=clean_id(post.fullname)
-        ).author_flair_text
+        user_flair = cfg.r.comment(id=clean_id(post.fullname)).author_flair_text
     except AttributeError:
-        user_flair = flair_text
+        user_flair = flair_text.format('0')
 
-    if user_flair in ['', None]:
+    if not user_flair:
         # HOLD ON. Do we have one saved? Maybe Reddit's screwing up.
         if current_transcription_count != 0:
             # we have a user object for them and shouldn't have landed here.
@@ -126,17 +118,13 @@ def update_user_flair(post, cfg):
         user_flair += additional_flair_text
 
         cfg.tor.flair.set(post.author, text=user_flair, css_class=flair_css)
-        logging.info(f'Setting flair for {post.author}')
+        log.info(f'Setting flair for {post.author}')
 
         post_author.update('transcriptions', current_transcription_count + 1)
         post_author.save()
 
-    else:
-        # they're bot or a mod and have custom flair. Leave it alone.
-        return
 
-
-def set_meta_flair_on_other_posts(cfg):
+def set_meta_flair_on_other_posts(cfg: Config) -> None:
     """
     Loops through the 10 newest posts on ToR and sets the flair to
     'Meta' for any post that is not authored by the bot or any of
@@ -146,18 +134,16 @@ def set_meta_flair_on_other_posts(cfg):
     :return: None.
     """
     for post in cfg.tor.new(limit=10):
+        if str(post.author) in __BOT_NAMES__:
+            continue
+        if str(post.author) in cfg.tor_mods:
+            continue
+        if post.link_flair_text == flair.meta:
+            continue
 
-        if (
-            post.author.name not in __BOT_NAMES__ and
-            post.author not in cfg.tor_mods and
-            post.link_flair_text != flair.meta
-        ):
-            logging.info(
-                f'Flairing post {post.fullname} by author {post.author} with '
-                f'Meta. '
-            )
-            flair_post(post, flair.meta)
-            send_to_modchat(
-                f'New meta post: <{post.shortlink}|{post.title}>',
-                cfg
-            )
+        log.info(f'Flairing post {post.fullname} by author {post.author} with Meta.')
+        flair_post(post, flair.meta)
+        send_to_modchat(
+            f'New meta post: <{post.shortlink}|{post.title}>',
+            cfg
+        )
