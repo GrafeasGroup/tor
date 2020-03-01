@@ -9,11 +9,10 @@ from praw.exceptions import APIException
 from praw.models import Comment, Submission, Subreddit
 from prawcore.exceptions import RequestException, ServerError, Forbidden
 
-from tor.strings import translation
 import tor.core
 from tor.core import __version__
 from tor.core.config import config, Config
-from tor.core.heartbeat import stop_heartbeat_server
+from tor.strings import translation
 
 
 log = logging.getLogger(__name__)
@@ -158,21 +157,7 @@ def get_wiki_page(pagename: str, cfg: Config) -> str:
         return ''
 
 
-def stop_heartbeat() -> None:
-    """
-    Any logic that goes along with stopping the cherrypy heartbeat server goes
-    here. This is called on exit of `run_until_dead()`, either through keyboard
-    or crash. The heartbeat server will terminate if the process dies anyway,
-    but this allows for a clean shutdown.
-
-    :param cfg: the global config object
-    :return: None
-    """
-    stop_heartbeat_server()
-    log.info('Stopped heartbeat!')
-
-
-def handle_rate_limit(exc: APIException):
+def handle_rate_limit(exc: APIException) -> None:
     time_map = {
         'second': 1,
         'minute': 60,
@@ -202,14 +187,12 @@ def run_until_dead(func):
     def double_ctrl_c_handler(*args, **kwargs) -> None:
         if not tor.core.is_running:
             log.critical('User pressed CTRL+C twice!!! Killing!')
-            stop_heartbeat()
             sys.exit(1)
 
         log.info(
             '\rUser triggered command line shutdown. Will terminate after current loop.'
         )
         tor.core.is_running = False
-        pass
 
     # handler for CTRL+C
     signal.signal(signal.SIGINT, double_ctrl_c_handler)
@@ -230,10 +213,8 @@ def run_until_dead(func):
                 time.sleep(60)
 
         log.info('User triggered shutdown. Shutting down.')
-        stop_heartbeat()
         sys.exit(0)
 
     except Exception as e:
-        stop_heartbeat()
         log.error(e)
         sys.exit(1)

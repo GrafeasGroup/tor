@@ -12,7 +12,7 @@ from tor import __version__
 from tor.core.config import config
 from tor.core.helpers import run_until_dead
 from tor.core.inbox import check_inbox
-from tor.core.initialize import configure_logging, configure_heartbeat, initialize
+from tor.core.initialize import configure_logging, initialize
 from tor.helpers.flair import set_meta_flair_on_other_posts
 from tor.helpers.threaded_worker import threaded_check_submissions
 
@@ -113,7 +113,6 @@ def main():
     config.bot_version = __version__
     configure_logging(config)
     initialize(config)
-    configure_heartbeat(config)
     config.perform_header_check = True
     log.info('Bot built and initialized')
 

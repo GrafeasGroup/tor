@@ -1,7 +1,6 @@
 import datetime
 import logging
 import os
-import random
 from typing import Dict, List, Union
 
 from praw.models import Subreddit, Reddit
@@ -9,7 +8,7 @@ from praw.models.reddit.subreddit import ModeratorRelationship
 from slackclient import SlackClient
 
 from tor import __root__, __version__, __SELF_NAME__
-from tor.core import __HEARTBEAT_FILE__, cached_property
+from tor.core import cached_property
 
 # Load configuration regardless of if bugsnag is setup correctly
 try:
@@ -50,7 +49,6 @@ class Config(object):
     # Name of the bot
     name = __SELF_NAME__
     bot_version = __version__
-    heartbeat_logging = False
 
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
 
@@ -78,27 +76,6 @@ class Config(object):
             return self.r.subreddit('ModsOfTor')
         else:
             return self.r.subreddit('transcribersofreddit')
-
-    @cached_property
-    def heartbeat_port(self):
-        try:
-            with open(__HEARTBEAT_FILE__, 'r') as port_file:
-                port = int(port_file.readline().strip())
-            logging.debug('Found existing port saved on disk')
-            return port
-        except OSError:
-            pass
-
-        while True:
-            port = random.randrange(40000, 40200)  # is 200 ports too much?
-            if self.redis.sismember('active_heartbeat_ports', port) == 0:
-                self.redis.sadd('active_heartbeat_ports', port)
-
-                with open(__HEARTBEAT_FILE__, 'w') as port_file:
-                    port_file.write(str(port))
-                logging.debug(f'generated port {port} and saved to disk')
-
-                return port
 
     @cached_property
     def modchat(self):

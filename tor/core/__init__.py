@@ -1,11 +1,7 @@
-import os
-
 __version__ = '0.6.0'
 
 # CTRL+C handler variable
 is_running = True
-
-__HEARTBEAT_FILE__ = os.getenv('HEARTBEAT_FILE', 'heartbeat.port')
 
 _missing = object()
 
