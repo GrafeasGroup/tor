@@ -3,6 +3,7 @@ import logging
 import os
 from typing import Dict, List, Union
 
+import bugsnag  # type: ignore
 from praw import Reddit  # type: ignore
 from praw.models import Subreddit  # type: ignore
 from praw.models.reddit.subreddit import ModeratorRelationship  # type: ignore
@@ -10,14 +11,6 @@ from slackclient import SlackClient  # type: ignore
 
 from tor import __root__, __version__, __SELF_NAME__
 from tor.core import cached_property
-
-# Load configuration regardless of if bugsnag is setup correctly
-try:
-    import bugsnag  # type: ignore
-except ImportError:
-    # If loading from setup.py or bugsnag isn't installed, we
-    # don't want to bomb out completely
-    bugsnag = None
 
 
 class Config(object):
@@ -100,13 +93,9 @@ try:
 except OSError:
     Config.bugsnag_api_key = os.getenv('BUGSNAG_API_KEY', '')
 
-if bugsnag and Config.bugsnag_api_key:
+if Config.bugsnag_api_key:
     bugsnag.configure(
         api_key=Config.bugsnag_api_key,
         app_version=__version__,
         project_root=__root__,
     )
-
-
-# ----- Compatibility -----
-config = Config()

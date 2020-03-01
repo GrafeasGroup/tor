@@ -11,7 +11,7 @@ from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFou
 
 import tor.core
 from tor.core import __version__
-from tor.core.config import config, Config
+from tor.core.config import Config
 from tor.strings import translation
 
 
@@ -171,7 +171,7 @@ def handle_rate_limit(exc: APIException) -> None:
     time.sleep(delay + 1)
 
 
-def run_until_dead(func):
+def run_until_dead(func, cfg: Config):
     """
     The official method that replaces all that ugly boilerplate required to
     start up a bot under the TranscribersOfReddit umbrella. This method handles
@@ -203,7 +203,7 @@ def run_until_dead(func):
     try:
         while tor.core.is_running:
             try:
-                func(config)
+                func(cfg)
             except APIException as e:
                 if e.error_type == 'RATELIMIT':
                     log.warning(

@@ -9,7 +9,7 @@ from praw import Reddit  # type: ignore
 # set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1
 import tor
 from tor import __version__
-from tor.core.config import config
+from tor.core.config import Config
 from tor.core.helpers import run_until_dead
 from tor.core.inbox import check_inbox
 from tor.core.initialize import configure_logging, initialize
@@ -100,6 +100,7 @@ def main():
         format='%(levelname)s | %(funcName)s | %(message)s',
         datefmt='%Y-%m-%dT%H:%M:%S',
     )
+    config = Config()
 
     config.debug_mode = DEBUG_MODE
 
@@ -121,9 +122,9 @@ def main():
         tor.__BOT_NAMES__.append(tor.__SELF_NAME__)
 
     if NOOP_MODE:
-        run_until_dead(noop)
+        run_until_dead(noop, config)
     else:
-        run_until_dead(run)
+        run_until_dead(run, config)
 
 
 if __name__ == '__main__':
