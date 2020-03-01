@@ -77,11 +77,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
             process_mod_intervention(reply, cfg)
 
-        elif (
-            'image transcription' in r_body
-            or validation._footer_check(reply, cfg)
-            or validation._footer_check(reply, cfg, new_reddit=True)
-        ):
+        elif 'image transcription' in r_body or validation._footer_check(reply, cfg):
             process_wrong_post_location(reply, cfg)
 
         elif 'i accept' in r_body:

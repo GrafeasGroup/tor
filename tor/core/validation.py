@@ -11,7 +11,7 @@ def _author_check(original_post: Comment, claimant_post: Comment) -> bool:
     return original_post.author == claimant_post.author
 
 
-def _footer_check(reply: Comment, cfg: Config, tor_link=None, new_reddit=False) -> bool:
+def _footer_check(reply: Comment, cfg: Config) -> bool:
     """
     Is the footer in there?
 
@@ -19,12 +19,9 @@ def _footer_check(reply: Comment, cfg: Config, tor_link=None, new_reddit=False) 
         it.
     :param cfg: the global config object.
     :param tor_link: String; the magical url key.
-    :param new_reddit: Bool; whether to check for the markdown (old reddit)
-        footer or the WYSIWYG (new reddit) malformed footer.
     :return: True / None.
     """
-    if not tor_link:
-        tor_link = i18n['urls']['ToR_link']
+    tor_link = i18n['urls']['ToR_link']
 
     if not cfg.perform_header_check:
         # If we don't want the check to take place, we'll just
