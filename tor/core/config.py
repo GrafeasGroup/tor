@@ -11,6 +11,7 @@ from slackclient import SlackClient  # type: ignore
 
 from tor import __root__, __version__, __SELF_NAME__
 from tor.core import cached_property
+from tor.core.blossom import BlossomAPI
 
 
 class Config(object):
@@ -63,6 +64,16 @@ class Config(object):
             logging.fatal("Redis server is not running")
             raise
         return conn
+
+    @cached_property
+    def blossom(self):
+        return BlossomAPI(
+            email=os.getenv('BLOSSOM_EMAIL'),
+            password=os.getenv('BLOSSOM_PASSWORD'),
+            api_key=os.getenv('BLOSSOM_API_KEY'),
+            api_base_url=os.getenv('BLOSSOM_API_URL'),
+            login_url=os.getenv('BLOSSOM_LOGIN_URL'),
+        )
 
     @cached_property
     def tor(self) -> Subreddit:
