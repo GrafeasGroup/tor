@@ -33,7 +33,6 @@ mypy = "^0.761"
 
 [tool.poetry.scripts]
 tor-moderator = "tor.cli.main:main"
-tor-flair-backup = "tor.cli.backup:main"
 
 [tool.poetry.extras]
 ci = ['pytest', 'pytest-cov']
