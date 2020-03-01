@@ -3,9 +3,9 @@ import logging
 import os
 from typing import Dict, List, Union
 
-from praw.models import Subreddit, Reddit
-from praw.models.reddit.subreddit import ModeratorRelationship
-from slackclient import SlackClient
+from praw.models import Subreddit, Reddit  # type: ignore
+from praw.models.reddit.subreddit import ModeratorRelationship  # type: ignore
+from slackclient import SlackClient  # type: ignore
 
 from tor import __root__, __version__, __SELF_NAME__
 from tor.core import cached_property

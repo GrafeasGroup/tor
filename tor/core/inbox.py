@@ -1,9 +1,10 @@
 import logging
 import re
 
-from praw.exceptions import ClientException
-from praw.models import Comment, Message
-from praw.models.reddit.mixins import InboxableMixin
+from praw.exceptions import ClientException  # type: ignore
+from praw.models import Comment, Message  # type: ignore
+from praw.models.reddit.mixins import InboxableMixin  # type: ignore
+
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
 from tor.core.config import Config

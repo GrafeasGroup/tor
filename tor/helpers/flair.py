@@ -1,7 +1,7 @@
 import logging
 from typing import Tuple
 
-from praw.models import Comment, Submission
+from praw.models import Comment, Submission  # type: ignore
 
 from tor import __BOT_NAMES__
 from tor.core.config import Config

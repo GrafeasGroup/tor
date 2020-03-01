@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Union
 
-from praw.models import Submission
+from praw.models import Submission  # type: ignore
 
 from tor.core.config import Config
 from tor.core.helpers import _

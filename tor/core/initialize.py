@@ -1,9 +1,8 @@
 import logging
 
-from bugsnag.handlers import BugsnagHandler
-from praw import Reddit
-from tor.core.config import config, Config
-from tor.core.heartbeat import configure_heartbeat
+from bugsnag.handlers import BugsnagHandler  # type: ignore
+
+from tor.core.config import Config
 from tor.core.helpers import clean_list, get_wiki_page
 
 # Use a logger local to this module

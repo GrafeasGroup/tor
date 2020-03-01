@@ -1,8 +1,8 @@
 import logging
 import random
 
-from praw.exceptions import APIException, ClientException
-from praw.models import Comment, Message
+from praw.exceptions import APIException, ClientException  # type: ignore
+from praw.models import Comment, Message  # type: ignore
 
 from tor import __BOT_NAMES__
 from tor.core.config import Config

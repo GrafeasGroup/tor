@@ -3,7 +3,7 @@ import os
 import time
 import logging
 
-from praw import Reddit
+from praw import Reddit  # type: ignore
 
 # The `import tor` lines is necessary because `tor.__SELF_NAME__` is
 # set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1

@@ -2,7 +2,8 @@ import json
 import logging
 import random
 
-from praw.exceptions import ClientException as RedditClientException
+from praw.exceptions import ClientException as RedditClientException  # type: ignore
+
 from tor.core.helpers import _, clean_id, send_to_modchat
 from tor.core.initialize import initialize
 from tor.core.user_interaction import process_done
@@ -58,10 +59,7 @@ def process_command(reply, cfg):
 
         # Mods are allowed to do any command, and some people are whitelisted
         # per command to be able to use them
-        if (
-            reply.author.name not in command['allowedNames'] and
-            not from_moderator(reply, cfg)
-        ):
+        if reply.author.name not in command['allowedNames'] and not from_moderator(reply, cfg):
             logging.info(
                 f"{reply.author.name} failed to run {requested_command},"
                 f"because they aren't a mod, or aren't whitelisted to use this"

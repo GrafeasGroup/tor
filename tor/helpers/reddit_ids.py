@@ -1,4 +1,5 @@
-from praw.models import Submission
+from praw.models import Submission  # type: ignore
+
 from tor.core.config import Config
 
 

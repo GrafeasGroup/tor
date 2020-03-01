@@ -5,9 +5,9 @@ import sys
 import time
 from typing import List
 
-from praw.exceptions import APIException
-from praw.models import Comment, Submission, Subreddit
-from prawcore.exceptions import RequestException, ServerError, Forbidden
+from praw.exceptions import APIException  # type: ignore
+from praw.models import Comment, Submission, Subreddit  # type: ignore
+from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFound  # type: ignore
 
 import tor.core
 from tor.core import __version__
@@ -153,7 +153,7 @@ def get_wiki_page(pagename: str, cfg: Config) -> str:
     log.debug(f'Retrieving wiki page {pagename}')
     try:
         return cfg.tor.wiki[pagename].content_md
-    except prawcore.exceptions.NotFound:
+    except NotFound:
         return ''
 
 
@@ -164,6 +164,9 @@ def handle_rate_limit(exc: APIException) -> None:
         'hour': 60 * 60,
     }
     matches = re.search(_pattern, exc.message)
+    if not matches:
+        log.error(f'Unable to parse rate limit message {exc.message!r}')
+        return
     delay = matches[0] * time_map[matches[1]]
     time.sleep(delay + 1)
 

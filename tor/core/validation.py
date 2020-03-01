@@ -1,4 +1,4 @@
-from praw.models import Comment, Submission
+from praw.models import Comment, Submission  # type: ignore
 
 from tor.core.config import Config
 from tor.core.helpers import get_parent_post_id, send_to_modchat
