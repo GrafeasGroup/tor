@@ -4,7 +4,7 @@ import random
 
 from praw.exceptions import ClientException as RedditClientException  # type: ignore
 
-from tor.core.helpers import _, clean_id, send_to_modchat
+from tor.core.helpers import _, clean_id, send_reddit_reply, send_to_modchat
 from tor.core.initialize import initialize
 from tor.core.user_interaction import process_done
 
@@ -40,7 +40,8 @@ def process_command(reply, cfg):
 
         except KeyError:
             if from_moderator(reply, cfg):
-                reply.reply(
+                send_reddit_reply(
+                    reply,
                     "That command hasn't been implemented yet ):"
                     "\n\nMessage a dev to make your dream come true."
                 )

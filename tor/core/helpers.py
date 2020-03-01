@@ -157,6 +157,20 @@ def get_wiki_page(pagename: str, cfg: Config) -> str:
         return ''
 
 
+def send_reddit_reply(repliable, message: str) -> None:
+    # We've run into an issue where someone has commented and then deleted the
+    # comment between when the bot pulls mail and when it processes comments.
+    # This should catch that specific issue. Log the error, but don't try again;
+    # just fall through.
+    try:
+        repliable.reply(_(message))
+    except APIException as e:
+        if e.error_type == 'DELETED_COMMENT':
+            log.info(f'Cannot reply to comment {repliable.name} -- comment deleted')
+            return
+        raise
+
+
 def handle_rate_limit(exc: APIException) -> None:
     time_map = {
         'second': 1,

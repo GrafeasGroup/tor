@@ -4,7 +4,7 @@ from typing import Dict, Union
 from praw.models import Submission  # type: ignore
 
 from tor.core.config import Config
-from tor.core.helpers import _
+from tor.core.helpers import _, send_reddit_reply
 from tor.helpers.flair import flair, flair_post
 from tor.helpers.reddit_ids import add_complete_post_id, has_been_posted
 from tor.helpers.youtube import (has_youtube_transcript, get_yt_video_id,
@@ -86,33 +86,6 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
     return True
 
 
-def handle_youtube(post: PostSummary, cfg: Config) -> bool:
-    """
-    Handle if there are youtube transcripts
-    """
-    yt_already_has_transcripts = i18n['posts']['yt_already_has_transcripts']
-    if not is_youtube_url(str(post['url'])):
-        return False
-
-    if not is_transcribable_youtube_video(str(post['url'])):
-        # Not something we can transcribe, so skip it... FOREVER
-        add_complete_post_id(str(post['url']), cfg)
-        return True
-
-    if has_youtube_transcript(str(post['url'])):
-        # NOTE: This has /u/transcribersofreddit post to the original
-        # subreddit where the video was posted saying it already has
-        # closed captioning
-        submission = cfg.r.submission(id=post['name'])
-        submission.reply(_(yt_already_has_transcripts))
-        add_complete_post_id(str(post['url']), cfg)
-        video_id = get_yt_video_id(str(post['url']))
-        log.info(f'Found YouTube video, {video_id}, with good transcripts.')
-        return True
-
-    return False
-
-
 def truncate_title(title: str) -> str:
     max_length = 250  # This is probably the longest we ever want it
 
@@ -146,7 +119,7 @@ def request_transcription(post: PostSummary, content_type: str, content_format: 
             # closed captioning
             video_id = get_yt_video_id(str(post['url']))
             submission = cfg.r.submission(id=post['name'])
-            submission.reply(_(i18n['posts']['yt_already_has_transcripts']))
+            send_reddit_reply(submission, i18n['posts']['yt_already_has_transcripts'])
             add_complete_post_id(str(post['name']), cfg)
             log.info(f'Found YouTube video, https://youtu.be/{video_id}, with good transcripts.')
             return
@@ -164,7 +137,7 @@ def request_transcription(post: PostSummary, content_type: str, content_format: 
 
     try:
         submission = cfg.tor.submit(title=title, url=url)
-        submission.reply(_(intro))
+        send_reddit_reply(submission, intro)
         flair_post(submission, flair.unclaimed)
         add_complete_post_id(str(post['name']), cfg)
 
