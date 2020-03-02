@@ -4,7 +4,7 @@ from typing import Dict, Union
 from praw.models import Submission  # type: ignore
 
 from tor.core.config import Config
-from tor.core.helpers import _, send_reddit_reply
+from tor.core.helpers import send_reddit_reply
 from tor.helpers.flair import flair, flair_post
 from tor.helpers.reddit_ids import add_complete_post_id, has_been_posted
 from tor.helpers.youtube import (has_youtube_transcript, get_yt_video_id,
