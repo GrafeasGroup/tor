@@ -286,7 +286,7 @@ def process_unclaim(post: Comment, cfg: Config) -> None:
         return
     elif unclaim == UnclaimResponse.ok:
         fragments = [reports.original_post_deleted_or_locked, reports.post_violates_rules]
-        if any(any(fragment in reason for fragment in fragments) for reason in top_parent.user_reports):
+        if any(any(fragment in reason for fragment in fragments) for reason in top_parent.user_reports if reason):
             # One of the report reasons on the /r/ToR post contained one of the
             # fragments listed above
             top_parent.mod.remove()
