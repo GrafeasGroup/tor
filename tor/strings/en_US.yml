@@ -92,6 +92,8 @@ responses:
       Thanks for letting me know! It looks like the content to transcribe has been removed, so I removed the post on our side. Cheers!
     post_already_completed: |
       I can't process an unclaim on a post that's already been completed!
+    post_you_didnt_claim: |
+      Sorry -- I can't process an unclaim on this post because it looks like it was claimed by someone else. If there's an issue, please contact the mods.
   general:
     oops: |
       Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!

@@ -141,6 +141,7 @@ def request_transcription(post: PostSummary, content_type: str, content_format: 
         add_complete_post_id(str(post['name']), cfg)
 
         cfg.redis.incr('total_posted', amount=1)
+        cfg.blossom.create_post(submission.fullname, str(post['url']), url)
         queue_ocr_bot(post, submission, cfg)
         cfg.redis.incr('total_new', amount=1)
     # The only errors that happen here are on Reddit's side -- pretty much

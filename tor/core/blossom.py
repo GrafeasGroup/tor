@@ -180,3 +180,20 @@ class BlossomAPI(object):
         # part should have caught all other error conditions, so
         # we must be fine
         return DoneResponse.ok
+
+    def unclaim_post(self, post_id: str, username: str) -> UnclaimResponse:
+        resp = self.post(f'/submission/{post_id}/unclaim/', data={'username': username})
+        if resp.status_code == 200:
+            return UnclaimResponse.ok
+        elif resp.status_code == 412:
+            return UnclaimResponse.not_claimed
+        elif resp.status_code == 406:
+            return UnclaimResponse.claimed_by_another
+        elif resp.status_code == 409:
+            return UnclaimResponse.already_completed
+
+        resp.raise_for_status()
+        # Not sure what happened, but the `.raise_for_status()`
+        # part should have caught all other error conditions, so
+        # we must be fine
+        return UnclaimResponse.ok
