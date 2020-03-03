@@ -1,4 +1,4 @@
-![GitHub Actions CI status](https://github.com/GrafeasGroup/tor/workflows/automated-tests/badge.svg)
+![GitHub Actions CI status](https://github.com/GrafeasGroup/tor/workflows/Automated%20Testing/badge.svg)
 
 # Transcribers of Reddit
 
