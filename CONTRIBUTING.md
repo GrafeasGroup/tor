@@ -6,6 +6,7 @@ Here is a short checklist of what we strive for in a well-formed code contributi
 - [ ] Entry into [`CHANGELOG.md`](/CHANGELOG.md) with `(credit: @username)` (see **Changelog** below)
 - [ ] Pull request is associated with at least 1 issue
 - [ ] Automated tests are passing
+- [ ] Static analysis (`mypy` and `flake8`) should succeed
 
 Do your best to check as many of these boxes as you can and everything will be fine!
 
@@ -34,6 +35,12 @@ $ poetry run pytest
 This project has automated tests. Be sure to check that tests are passing _before_ you
 begin development. Our emphasis is on stability here, so if tests aren't passing, that's
 a bug.
+
+```bash
+$ poetry run mypy .
+$ poetry run flake8 .
+$ poetry run pytest
+```
 
 If you have difficulty getting to that stable, initial state, reach out by opening an
 issue (see [Issues](#Issues) above). This is considered a failure by the maintainers if
