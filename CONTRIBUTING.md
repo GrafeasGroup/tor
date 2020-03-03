@@ -1,5 +1,3 @@
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/TranscribersOfReddit/TranscribersOfReddit.svg?columns=all)](http://waffle.io/TranscribersOfReddit/TranscribersOfReddit)
-
 # Contributing
 
 Here is a short checklist of what we strive for in a well-formed code contribution:
@@ -7,7 +5,7 @@ Here is a short checklist of what we strive for in a well-formed code contributi
 - [ ] Commit log is clean and devoid of "debugging" types of commits
 - [ ] Entry into [`CHANGELOG.md`](/CHANGELOG.md) with `(credit: @username)` (see **Changelog** below)
 - [ ] Pull request is associated with at least 1 issue
-- [ ] Virtualenv files are not included in the commit log
+- [ ] Automated tests are passing
 
 Do your best to check as many of these boxes as you can and everything will be fine!
 
@@ -27,51 +25,38 @@ Initial setup:
 $ git clone git@github.com:GrafeasGroup/tor.git tor
 $ cd ./tor
 
-# Setup sandbox
-$ virtualenv --no-site-packages --python=python3 venv
-$ source ./venv/bin/activate
-
-# Install the project in "editable" mode
-$ pip install --process-dependency-links -e .[dev]
+$ poetry install
+$ poetry run pytest
 ```
-
-In case there are any tests, they would be run by calling `python setup.py test`.
 
 ## Testing
 
-This project is expected to have automated test coverage, so be sure to check that tests
-are passing _before_ you begin development. Our emphasis is on stability here, so if tests
-aren't passing, that's a bug.
+This project has automated tests. Be sure to check that tests are passing _before_ you
+begin development. Our emphasis is on stability here, so if tests aren't passing, that's
+a bug.
 
-### Stability
-
-As noted before, make sure tests are passing before starting. If you have difficulty getting
-to that stable, initial state, reach out by opening an issue (see [Issues](#Issues) above).
-This is considered a failure by the maintainers if instructions are less than absolutely
-clear. Feedback is very helpful here!
+If you have difficulty getting to that stable, initial state, reach out by opening an
+issue (see [Issues](#Issues) above). This is considered a failure by the maintainers if
+instructions are less than absolutely clear. Feedback is very helpful here!
 
 ### Writing tests
 
 Tests are written using `pytest` for a variety of reasons. Some of which are:
 
-- easy assertions that an exception will be thrown and the message it contains
-- skipping some tests for stated reasons
-- marking some tests as expected to fail
-- colorized output compared to `unittest`
+- standard lib `unittest` tests are supported, should you choose to write those instead
+- Python keyword `assert` may be used, which pytest supplements with context supporting _why_ the assertion failed
+- test control mechanisms such as skipping with stated reason or marking tests as expected to fail
+- colorized output
+- code coverage reports (via `pytest-cov`) indicating which lines of app code were never executed in tests
 
-We should be able to invoke the full test suite by calling either `python setup.py test` or
-`pytest` from the terminal.
-
-The test suite should run quickly at the moment, but that won't always be the case. Running
-individual tests with `pytest path/to/test/file.py` is also acceptable while actively
-developing.
-
-> **NOTE:** a pull request should always have a fully passing test suite.
+The full test suite may be executed using `poetry run pytest`. Individual tests may be
+specified by method name (`poetry run pytest -k test_method_name`) or by filename
+(`poetry run pytest ./path/to/test_file.py`).
 
 ## Pull Requests
 
 If you're unfamiliar with the process, see [Github's helpful documentation](https://help.github.com/articles/about-pull-requests/)
-on creating pull requests.
+on creating pull requests (PR).
 
 We try to keep parity of at least one issue in each pull request. This is so we can discuss the
 big-picture plans in the issue, preferrably before actual development begins. This helps keep
@@ -95,6 +80,15 @@ Some description here
 I'm looking for feedback on what I've added so far.
 ```
 
+Alternatively, when creating a pull request, GitHub allows you to create it as a Draft PR. This is
+also a valid way to indicate it is a work-in-progress. The drawbacks to this approach are twofold:
+
+1. Option to create a Draft PR is only presented when opening the PR
+2. Once created as a Draft PR and submitted as ready for consideration, there is no way to go back to that Draft PR state
+
+For these reasons, both the `[WIP]` option and the Draft PR option are acceptable. The title of a
+PR may be modified at any time to revert back to it being a work-in-progress.
+
 ## Changelog
 
 We follow the practices defined on [Keep A Changelog](http://keepachangelog.com), keeping our
@@ -105,3 +99,26 @@ The gist of it is:
 - Add line items with a short summary of changes to `CHANGELOG.md` under the `UNRELEASED` section as they are created
 - Add `(credit: @your_username)` at the end of each line item added
 - (_When releasing a new version_) Replace `UNRELEASED` section title with the version number of the release, then create a new header above it named `UNRELEASED`
+
+## Releasing the Code
+
+Assuming there is a new release that needs to be published...
+
+1. Consider the changelog entries since the last release. According to [Semantic Versioning](https://www.semver.org/), what should the new version be?
+2. Change the `UNRELEASED` title to say the new version and the current ISO-8601 year, month, and date. Create a new `UNRELEASED` section with `_Nothing yet..._` under it
+3. Update the version in `pyproject.toml` and `tor/__init__.py` to be the new version
+4. Stage and commit all of the files modified above on the `master` branch
+5. Create a git tag (if releasing version 3.2.2, create tag named `v3.2.2`) based off of the commit to `master`
+6. Push the commit and the tag to GitHub (e.g., `git push origin master --tags`)
+
+From here there is automation to pick up that a new tag was pushed. That automation will package the
+python code into the appropriate formats and upload them to the associated GitHub Release page for that
+tag. If, for some reason that does not occur, it may also be done manually:
+
+1. Select the pushed tag in [the releases section](https://github.com/GrafeasGroup/tor/releases)
+2. Click to "draft new release"
+3. Attach files from `./dist/` which were created by running `poetry build` in your local repository
+4. Click to publish the release
+
+As soon as code is released, we should deploy it to the server that runs these bots. See private docs
+for handling that.
