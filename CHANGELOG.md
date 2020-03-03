@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [UNRELEASED]
 
-- Update logging to note the current transcription number and minor testing config changes
+_Nothing yet..._
 
+## [4.1.0] - 2020-03-03
+
+- Update logging to note the current transcription number and minor testing config changes
 
 ## [4.0.0] - 2020-02-29
 
