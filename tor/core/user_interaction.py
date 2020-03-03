@@ -199,7 +199,11 @@ def process_done(post: Comment, cfg: Config, override=False, alt_text_trigger=Fa
                 else:
                     post.reply(_(done_completed_transcript))
                 update_user_flair(post, cfg)
-                log.info(f'Post {top_parent.fullname} completed by {post.author}!')
+                current_post_count = int(cfg.redis.get("total_completed").decode())
+                log.info(
+                    f'Post {top_parent.fullname} completed by {post.author} -'
+                    f' post number {str(current_post_count + 1)}!'
+                )
                 # get that information saved for the user
                 author = User(str(post.author), redis_conn=cfg.redis)
                 author.list_update('posts_completed', clean_id(post.fullname))
@@ -255,7 +259,8 @@ def process_unclaim(post: Comment, cfg: Config) -> None:
         if not item[0]:
             continue
         if (
-            reports.original_post_deleted_or_locked in item[0] or reports.post_violates_rules in item[0]
+            reports.original_post_deleted_or_locked in item[0]
+                or reports.post_violates_rules in item[0]
         ):
             top_parent.mod.remove()
             send_to_modchat(
