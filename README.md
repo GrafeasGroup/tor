@@ -1,4 +1,4 @@
-[![Travis build status](https://img.shields.io/travis/GrafeasGroup/tor.svg)](https://travis-ci.org/GrafeasGroup/tor)
+![GitHub Actions CI status](https://github.com/GrafeasGroup/tor/workflows/automated-tests/badge.svg)
 
 # Transcribers of Reddit
 
