@@ -9,6 +9,7 @@ _Nothing yet..._
 
 ## [4.0.0] - 2020-02-29
 
+- Update logging to note the current transcription number and minor testing config changes
 - Minor typos in bot messages
 - Removes heartbeat server
 - Adds type annotations to method signatures
