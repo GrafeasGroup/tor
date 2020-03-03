@@ -84,4 +84,5 @@ See [`CONTRIBUTING.md`](/CONTRIBUTING.md) for more.
 ## Sponsors
 
 <a href="https://bugsnag.com"><img src="https://raw.githubusercontent.com/GrafeasGroup/tor/master/images/bugsnag_logo_navy.png" alt="Bugsnag logo" width=130></a>
-- For providing free error handling through [their open source program](https://www.bugsnag.com/open-source/)
+
+For providing free error handling through [their open source program](https://www.bugsnag.com/open-source/)
