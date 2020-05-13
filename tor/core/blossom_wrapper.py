@@ -78,6 +78,8 @@ class BlossomAPI:
         raises an exception.
         """
         # https://2.python-requests.org/en/master/user/advanced/#prepared-requests
+        data = data if data is not None else dict()
+        params = params if params is not None else dict()
         req = Request(method=method, url=self.base_url + path, data=data, params=params)
 
         for _ in range(self.num_retries):
