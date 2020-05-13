@@ -65,21 +65,25 @@ class BlossomAPI:
         """
         Create a call to the API using the requests package.
 
-        In this method, a request is retried in any of the following cases in this order
-        of precedence:
-        1. 403 and a message on authentication credentials: In this case, it seems that
-           tor is not yet logged in and hence we attempt to log in.
-        2. 403 and a request method which is not GET: We assume that we have not supplied
-           a (correct) CSRF token, hence we perform a GET request, retrieve the CSRF token
-           if provided and put this in our sent data.
+        In this method, a request is retried if a 403 and a message on authentication
+        credentials is returned. In this case, it seems that tor is not yet logged in and
+        hence we attempt to log in. In any other case, the request is returned at is
+        without retrying. If the described failure still occurs after the set number of
+        retries, this method raises an exception.
 
-        In any other case, the request is returned at is without retrying. If either of
-        the scenarios above still occur after the set number of retries, this method
-        raises an exception.
+        Note that because of Blossom's CSRF protection each non-GET request also first
+        requires a GET request to retrieve a CSRF token.
         """
         # https://2.python-requests.org/en/master/user/advanced/#prepared-requests
         data = data if data is not None else dict()
         params = params if params is not None else dict()
+
+        if method != "GET":
+            # Currently Blossom has CSRF protection enabled, hence tor should include a
+            # new CSRF token in this request, which is retrieved from the GET request.
+            self._call("GET", path, data, params)
+            if "csrftoken" in self.http.cookies:
+                data.update({"csrfmiddlewaretoken": self.http.cookies.get("csrftoken")})
         req = Request(method=method, url=self.base_url + path, data=data, params=params)
 
         for _ in range(self.num_retries):
@@ -96,14 +100,6 @@ class BlossomAPI:
                 ):
                     # It seems that the bot is not yet logged in, so perform the login.
                     self._login()
-                elif method != "GET":
-                    # This could mean that we require a CSRF token, hence get this through
-                    # first performing a GET request and setting it in our cookies.
-                    self.get(path, data, params)
-                    if "csrftoken" in self.http.cookies:
-                        data.update(
-                            {"csrfmiddlewaretoken": self.http.cookies.get("csrftoken")}
-                        )
                 else:
                     break
             else:
