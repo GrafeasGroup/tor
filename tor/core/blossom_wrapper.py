@@ -50,23 +50,17 @@ class BlossomAPI:
         self.num_retries = num_retries
 
         self.http = Session()
-        self.http.headers.update({'Authorization': f'Api-Key {api_key}'})
+        self.http.headers.update({"Authorization": f"Api-Key {api_key}"})
 
     def _login(self) -> Response:
         """Log into Blossom using the provided URL and credentials."""
         resp = self.http.post(
-            self.login_url, data={
-                'email': self.email, 'password': self.password
-            }
+            self.login_url, data={"email": self.email, "password": self.password}
         )
         return resp
 
     def _call(
-        self,
-        method: str,
-        path: str,
-        data: Dict = None,
-        params: Dict = None
+        self, method: str, path: str, data: Dict = None, params: Dict = None
     ) -> Response:
         """
         Create a call to the API using the requests package.
@@ -88,20 +82,25 @@ class BlossomAPI:
 
         for _ in range(self.num_retries):
             prepped = self.http.prepare_request(req)
-            settings = self.http.merge_environment_settings(prepped.url, {}, None, None, None)
+            settings = self.http.merge_environment_settings(
+                prepped.url, {}, None, None, None
+            )
             resp = self.http.send(prepped, **settings)
 
             if resp.status_code == 403:
-                if resp.json().get('detail') == 'Authentication credentials were not provided.':
+                if (
+                    resp.json().get("detail")
+                    == "Authentication credentials were not provided."
+                ):
                     # It seems that the bot is not yet logged in, so perform the login.
                     self._login()
                 elif method != "GET":
                     # This could mean that we require a CSRF token, hence get this through
                     # first performing a GET request and setting it in our cookies.
                     self.get(path, data, params)
-                    if 'csrftoken' in self.http.cookies:
+                    if "csrftoken" in self.http.cookies:
                         data.update(
-                            {'csrfmiddlewaretoken': self.http.cookies.get('csrftoken')}
+                            {"csrfmiddlewaretoken": self.http.cookies.get("csrftoken")}
                         )
                 else:
                     break
@@ -113,13 +112,12 @@ class BlossomAPI:
 
     def get(self, path: str, data=None, params=None) -> Response:
         """Request a GET request to the API."""
-        return self._call('GET', path, data, params)
+        return self._call("GET", path, data, params)
 
     def post(self, path: str, data=None, params=None) -> Response:
         """Request a POST request to the API."""
-        return self._call('POST', path, data, params)
+        return self._call("POST", path, data, params)
 
     def patch(self, path: str, data=None, params=None) -> Response:
         """Request a PATCH request to the API."""
-        return self._call('PATCH', path, data, params)
-
+        return self._call("PATCH", path, data, params)
