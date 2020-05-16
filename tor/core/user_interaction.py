@@ -82,12 +82,12 @@ def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
     This function sends a reply depending on the response from Blossom and
     creates an user when this is the first time a user uses the bot.
     """
-    top_parent = get_parent_post_id(post, cfg.r)
-    if top_parent.author.name not in __BOT_NAMES__:
+    submission = post.submission
+    if submission.author.name not in __BOT_NAMES__:
         log.debug("Received 'claim' on post we do not own. Ignoring.")
         return
 
-    response = cfg.blossom.get_submission(reddit_id=top_parent.fullname)
+    response = cfg.blossom.get_submission(reddit_id=submission.fullname)
     if response.status != BlossomStatus.ok:
         # If we are here, this means that the current submission is not yet in Blossom.
         # TODO: Create the Submission in Blossom and try this method again.
@@ -98,8 +98,8 @@ def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
     )
     if response.status == BlossomStatus.ok:
         message = i18n["responses"]["claim"]["first_claim_success" if first_time else "success"]
-        flair_post(top_parent, flair.in_progress)
-        log.info(f'Claim on ID {top_parent.fullname} by {post.author} successful.')
+        flair_post(submission, flair.in_progress)
+        log.info(f'Claim on Submission {submission.fullname} by {post.author} successful.')
     elif response.status == BlossomStatus.missing_prerequisite:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
     elif response.status == BlossomStatus.not_found:

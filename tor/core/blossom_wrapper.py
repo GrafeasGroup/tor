@@ -150,8 +150,7 @@ class BlossomAPI:
     def claim_submission(self, submission_id: str, username: str) -> BlossomResponse:
         """Claim the specified submission with the specified username."""
         response = self.patch(
-            f"/submission/{submission_id}/claim/",
-            data={"username": username}
+            f"/submission/{submission_id}/claim/", data={"username": username}
         )
         if response.status_code == 201:
             return BlossomResponse(data=response.json())
