@@ -66,8 +66,6 @@ responses:
       Please respond with `done` when complete so we can check this one off the list!
     already_claimed: |
       I'm sorry, but it looks like someone else has already claimed this post! You can check in with them to see if they need any help, but otherwise I suggest sticking around to see if another post pops up here in a little bit.
-    already_complete: |
-      This post has already been completed! Perhaps you can find a new one on the front page?
   done:
     still_unclaimed: |
       This post is still unclaimed! Please claim it first or message the mods to take care of this.

@@ -5,9 +5,10 @@ from praw.exceptions import APIException, ClientException  # type: ignore
 from praw.models import Comment, Message  # type: ignore
 
 from tor import __BOT_NAMES__
+from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import Config
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
-                              reports, send_to_modchat)
+                              reports, send_reddit_reply, send_to_modchat)
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair, flair_post, update_user_flair
@@ -76,60 +77,37 @@ def process_coc(post: Comment, cfg: Config) -> None:
 
 def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
     """
-    Handles comment replies containing the word 'claim' and routes
-    based on a basic decision tree.
+    Process a claim request.
 
-    :param post: The Comment object containing the claim.
-    :param cfg: the global config dict.
-    :return: None.
+    This function sends a reply depending on the response from Blossom and
+    creates an user when this is the first time a user uses the bot.
     """
     top_parent = get_parent_post_id(post, cfg.r)
-
-    already_claimed = i18n['responses']['claim']['already_claimed']
-    claim_already_complete = i18n['responses']['claim']['already_complete']
-    please_accept_coc = i18n['responses']['general']['coc_not_accepted']
-
-    claim_success = i18n['responses']['claim']['first_claim_success' if first_time else 'success']
-
-    # WAIT! Do we actually own this post?
     if top_parent.author.name not in __BOT_NAMES__:
-        log.debug('Received `claim` on post we do not own. Ignoring.')
+        log.debug("Received 'claim' on post we do not own. Ignoring.")
         return
 
-    try:
-        if not coc_accepted(post, cfg):
-            # do not cache this page. We want to get it every time.
-            post.reply(_(
-                please_accept_coc.format(get_wiki_page('codeofconduct', cfg))
-            ))
-            return
+    response = cfg.blossom.get_submission(reddit_id=top_parent.fullname)
+    if response.status != BlossomStatus.ok:
+        # If we are here, this means that the current submission is not yet in Blossom.
+        # TODO: Create the Submission in Blossom and try this method again.
+        raise Exception("The post is not present in Blossom.")
 
-        # this can be either '' or None depending on how the API is feeling
-        # today
-        if not top_parent.link_flair_text:
-            # There exists the very small possibility that the post was
-            # malformed and doesn't actually have flair on it. In that case,
-            # let's set something so the next part doesn't crash.
-            flair_post(top_parent, flair.unclaimed)
-
-        if flair.unclaimed in top_parent.link_flair_text:
-            # need to get that "Summoned - Unclaimed" in there too
-            post.reply(_(claim_success))
-
-            flair_post(top_parent, flair.in_progress)
-            log.info(f'Claim on ID {top_parent.fullname} by {post.author} successful')
-
-        # can't claim something that's already claimed
-        elif top_parent.link_flair_text == flair.in_progress:
-            post.reply(_(already_claimed))
-        elif top_parent.link_flair_text == flair.completed:
-            post.reply(_(claim_already_complete))
-
-    except APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
-            log.info(f'Comment attempting to claim ID {top_parent.fullname} has been deleted. Back up for grabs!')
-            return
-        raise  # Re-raise exception if not
+    response = cfg.blossom.claim_submission(
+        submission_id=response.data["id"], username=post.author.name
+    )
+    if response.status == BlossomStatus.ok:
+        message = i18n["responses"]["claim"]["first_claim_success" if first_time else "success"]
+        flair_post(top_parent, flair.in_progress)
+        log.info(f'Claim on ID {top_parent.fullname} by {post.author} successful.')
+    elif response.status == BlossomStatus.missing_prerequisite:
+        message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
+    elif response.status == BlossomStatus.not_found:
+        message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
+        cfg.blossom.create_user(username=post.author.name)
+    else:
+        message = i18n["responses"]["claim"]["already_claimed"]
+    send_reddit_reply(post, _(message))
 
 
 def process_done(post: Comment, cfg: Config, override=False, alt_text_trigger=False) -> None:
