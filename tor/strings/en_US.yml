@@ -2,6 +2,12 @@
 debug:
   id_already_handled_in_db: |
     We've already handled ID {}! Skipping!
+
+mod:
+  removed_deleted: |
+    Removed the following submission since it was removed from the parent subreddit: {}
+  removed_reported: |
+    Removed the following submission since it was reported: {}
 posts:
   discovered_submit_title: |
     {sub} | {type} | "{title}"
@@ -88,6 +94,8 @@ responses:
       Thanks for letting me know! It looks like the content to transcribe has been removed, so I removed the post on our side. Cheers!
     post_already_completed: |
       I can't process an unclaim on a post that's already been completed!
+    claimed_other_user: |
+      It appears that you have not claimed this post!
   general:
     oops: |
       Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!

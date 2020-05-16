@@ -127,6 +127,10 @@ class BlossomAPI:
         """Request a PATCH request to the API."""
         return self._call("PATCH", path, data, params)
 
+    def delete(self, path: str, data=None, params=None) -> Response:
+        """Request a DELETE request to the API."""
+        return self._call("DELETE", path, data, params)
+
     def create_user(self, username: str) -> BlossomResponse:
         """Create a new user with the given username."""
         response = self.get("/volunteer/", data={"username": username})
@@ -147,6 +151,15 @@ class BlossomAPI:
         else:
             return BlossomResponse(status=BlossomStatus.not_found)
 
+    def delete_submission(self, submission_id: str) -> BlossomResponse:
+        """Delete a Submission from Blossom corresponding to the provided ID."""
+        response = self.delete(f"/submission/{submission_id}")
+        if response.status_code == 204:
+            return BlossomResponse()
+
+        response.raise_for_status()
+        return BlossomResponse()
+
     def claim_submission(self, submission_id: str, username: str) -> BlossomResponse:
         """Claim the specified submission with the specified username."""
         response = self.patch(
@@ -159,5 +172,23 @@ class BlossomAPI:
         elif response.status_code == 409:
             return BlossomResponse(status=BlossomStatus.other_user)
         # TODO: Add the response for when CoC has not yet been accepted.
+        response.raise_for_status()
+        return BlossomResponse()
+
+    def unclaim(self, submission_id: str, username: str) -> BlossomResponse:
+        response = self.patch(
+            f"/submission/{submission_id}/unclaim", data={"username": username}
+        )
+        if response.status_code == 201:
+            return BlossomResponse(data=response.json())
+        elif response.status_code == 404:
+            return BlossomResponse(status=BlossomStatus.not_found)
+        elif response.status_code == 406:
+            return BlossomResponse(status=BlossomStatus.other_user)
+        elif response.status_code == 409:
+            return BlossomResponse(status=BlossomStatus.already_completed)
+        elif response.status_code == 412:
+            return BlossomResponse(status=BlossomStatus.missing_prerequisite)
+
         response.raise_for_status()
         return BlossomResponse()
