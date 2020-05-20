@@ -9,7 +9,7 @@ from tor import __BOT_NAMES__
 from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import Config
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
-                              reports, send_reddit_reply, send_to_modchat)
+                              remove_if_required, send_reddit_reply, send_to_modchat)
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair, flair_post, update_user_flair
@@ -230,17 +230,16 @@ def process_unclaim(post: Comment, cfg: Config) -> None:
     if response.status == BlossomStatus.ok:
         message = unclaim_messages["success"]
         flair_post(submission, flair.unclaimed)
-        removal, reported = _check_removal_required(submission, cfg)
-        if removal:
-            submission.mod.remove()
-            cfg.blossom.submission_delete(blossom_submission["id"])
-            mod_message = i18n["mod"][f"removed_{'reported' if reported else 'deleted'}"]
-            message = i18n["success_with_report" if reported else "success_without_report"]
-            send_to_modchat(
-                mod_message.format(submission.shortlink), cfg, channel="removed_posts"
-            )
+        removed, reported = remove_if_required(submission, blossom_submission["id"], cfg)
+        if removed:
+            # Select the message based on whether the post was reported or not.
+            message = i18n[
+                "success_with_report" if reported else "success_without_report"
+            ]
     elif response.status == BlossomStatus.not_found:
-        message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
+        message = i18n["responses"]["general"]["coc_not_accepted"].format(
+            get_wiki_page("codeofconduct", cfg)
+        )
         cfg.blossom.create_user(post.author.name)
     elif response.status == BlossomStatus.other_user:
         message = unclaim_messages["claimed_other_user"]
@@ -249,26 +248,6 @@ def process_unclaim(post: Comment, cfg: Config) -> None:
     else:
         message = unclaim_messages["still_unclaimed"]
     send_reddit_reply(post, _(message))
-
-
-def _check_removal_required(submission: Submission, cfg: Config) -> Tuple[bool, bool]:
-    """
-    Check whether the submission has to be removed and whether this is reported.
-
-    Note that this function returns a Tuple of booleans, where the first
-    is to signify whether the submission is to be removed and the latter
-    whether a relevant report was issued for this decision.
-    """
-    for item in submission.user_reports:
-        if item[0] and any(
-            reason in item[0] for reason
-            in (reports.original_post_deleted_or_locked, reports.post_violates_rules)
-        ):
-            return True, True
-    linked_submission = cfg.r.submission(submission.id_from_url(submission.url))
-    if is_removed(linked_submission):
-        return True, False
-    return False, False
 
 
 def process_thanks(post: Comment, cfg: Config) -> None:

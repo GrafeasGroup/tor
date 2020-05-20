@@ -95,7 +95,7 @@ responses:
     post_already_completed: |
       I can't process an unclaim on a post that's already been completed!
     claimed_other_user: |
-      It appears that you have not claimed this post!
+      Sorry, this post is claimed by someone else, so you cannot unclaim it!
   general:
     oops: |
       Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!
