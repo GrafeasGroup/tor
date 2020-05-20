@@ -1,15 +1,22 @@
-from enum import Enum, auto
-from typing import Dict
+from dataclasses import dataclass
+from enum import auto, Enum
+from typing import Any, Dict
 
 from requests import Request, Response, Session
 
 
-class BlossomResponse(Enum):
+class BlossomStatus(Enum):
     ok = auto()
     not_found = auto()
     missing_prerequisite = auto()
     other_user = auto()
     already_completed = auto()
+
+
+@dataclass
+class BlossomResponse:
+    data: Dict[str, Any] = None
+    status: BlossomStatus = BlossomStatus.ok
 
 
 class BlossomAPI:
@@ -119,3 +126,38 @@ class BlossomAPI:
     def patch(self, path: str, data=None, params=None) -> Response:
         """Request a PATCH request to the API."""
         return self._call("PATCH", path, data, params)
+
+    def create_user(self, username: str) -> BlossomResponse:
+        """Create a new user with the given username."""
+        response = self.get("/volunteer/", data={"username": username})
+        if response.status_code == 201:
+            return BlossomResponse(status=BlossomStatus.ok, data=response.json())
+        elif response.status_code == 422:
+            return BlossomResponse(status=BlossomStatus.already_completed)
+        response.raise_for_status()
+        return BlossomResponse()
+
+    def get_submission(self, reddit_id: str) -> BlossomResponse:
+        """Get the Blossom Submission corresponding to the provided Reddit ID."""
+        response = self.get("/submission/", params={"original_id": reddit_id})
+        response.raise_for_status()
+        results = response.json()['results']
+        if results:
+            return BlossomResponse(data=results[0])
+        else:
+            return BlossomResponse(status=BlossomStatus.not_found)
+
+    def claim_submission(self, submission_id: str, username: str) -> BlossomResponse:
+        """Claim the specified submission with the specified username."""
+        response = self.patch(
+            f"/submission/{submission_id}/claim/", data={"username": username}
+        )
+        if response.status_code == 201:
+            return BlossomResponse(data=response.json())
+        elif response.status_code == 404:
+            return BlossomResponse(status=BlossomStatus.not_found)
+        elif response.status_code == 409:
+            return BlossomResponse(status=BlossomStatus.other_user)
+        # TODO: Add the response for when CoC has not yet been accepted.
+        response.raise_for_status()
+        return BlossomResponse()
