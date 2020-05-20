@@ -3,7 +3,7 @@ import re
 import signal
 import sys
 import time
-from typing import List
+from typing import List, Tuple
 
 from praw.exceptions import APIException  # type: ignore
 from praw.models import Comment, Submission, Subreddit  # type: ignore
@@ -11,7 +11,9 @@ from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFou
 
 import tor.core
 from tor.core import __version__
+from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import config, Config
+from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
 
 
@@ -239,3 +241,47 @@ def run_until_dead(func):
     except Exception as e:
         log.error(e)
         sys.exit(1)
+
+
+def _check_removal_required(submission: Submission, cfg: Config) -> Tuple[bool, bool]:
+    """
+    Check whether the submission has to be removed and whether this is reported.
+
+    Note that this function returns a Tuple of booleans, where the first
+    is to signify whether the submission is to be removed and the latter
+    whether a relevant report was issued for this decision.
+    """
+    for item in submission.user_reports:
+        if item[0] and any(
+            reason in item[0] for reason
+            in (reports.original_post_deleted_or_locked, reports.post_violates_rules)
+        ):
+            return True, True
+    linked_submission = cfg.r.submission(submission.id_from_url(submission.url))
+    if is_removed(linked_submission):
+        return True, False
+    return False, False
+
+
+def remove_if_required(
+    submission: Submission, blossom_id: str, cfg: Config
+) -> Tuple[bool, bool]:
+    """
+    Remove the submission if this is required.
+
+    Returns a Tuple of booleans, indicating whether the submission is removed
+    and whether a relevant report was issued for this decision.
+    """
+    removal, reported = _check_removal_required(submission, cfg)
+    if removal:
+        submission.mod.remove()
+        response = cfg.blossom.submission_delete(blossom_id)
+        if response.status != BlossomStatus.ok:
+            return False, False
+
+        # Selects a message depending on whether the submission is reported or not.
+        mod_message = i18n["mod"][f"removed_{'reported' if reported else 'deleted'}"]
+        send_to_modchat(
+            mod_message.format(submission.shortlink), cfg, channel="removed_posts"
+        )
+    return removal, reported

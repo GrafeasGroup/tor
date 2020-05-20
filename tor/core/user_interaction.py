@@ -1,14 +1,15 @@
 import logging
 import random
+from typing import Tuple
 
 from praw.exceptions import APIException, ClientException  # type: ignore
-from praw.models import Comment, Message  # type: ignore
+from praw.models import Comment, Message, Submission  # type: ignore
 
 from tor import __BOT_NAMES__
 from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import Config
 from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
-                              reports, send_reddit_reply, send_to_modchat)
+                              remove_if_required, send_reddit_reply, send_to_modchat)
 from tor.core.users import User
 from tor.core.validation import verified_posted_transcript
 from tor.helpers.flair import flair, flair_post, update_user_flair
@@ -204,79 +205,49 @@ def process_done(post: Comment, cfg: Config, override=False, alt_text_trigger=Fa
 
 
 def process_unclaim(post: Comment, cfg: Config) -> None:
-    # Sometimes people need to unclaim things. Usually this happens because of
-    # an issue with the post itself, like it's been locked or deleted. Either
-    # way, we should probably be able to handle it.
+    """
+    Process an unclaim request.
 
-    # Process:
-    # If the post has been reported, then remove it. No checks, just do it.
-    # If the post has not been reported, attempt to load the linked post.
-    #   If the linked post is still up, then reset the flair on ToR's side
-    #    and reply to the user.
-    #   If the linked post has been taken down or deleted, then remove the post
-    #    on ToR's side and reply to the user.
-
-    top_parent = post.submission
-
-    unclaim_failure_post_already_completed = i18n['responses']['unclaim']['post_already_completed']
-    unclaim_still_unclaimed = i18n['responses']['unclaim']['still_unclaimed']
-    unclaim_success = i18n['responses']['unclaim']['success']
-    unclaim_success_with_report = i18n['responses']['unclaim']['success_with_report']
-    unclaim_success_without_report = i18n['responses']['unclaim']['success_without_report']
-
-    # WAIT! Do we actually own this post?
-    if top_parent.author.name not in __BOT_NAMES__:
-        log.info('Received `unclaim` on post we do not own. Ignoring.')
+    Note that this function also checks whether a post should be removed and
+    does so when required.
+    """
+    submission = post.submission
+    if submission.author.name not in __BOT_NAMES__:
+        log.debug("Received 'unclaim' on post we do not own. Ignoring.")
         return
 
-    if flair.unclaimed in top_parent.link_flair_text:
-        post.reply(_(unclaim_still_unclaimed))
-        return
+    response = cfg.blossom.get_submission(reddit_id=submission.fullname)
+    if response.status != BlossomStatus.ok:
+        # If we are here, this means that the current submission is not yet in Blossom.
+        # TODO: Create the Submission in Blossom and try this method again.
+        raise Exception(f"The Submission {submission.fullname} is not present in Blossom.")
 
-    for item in top_parent.user_reports:
-        if not item[0]:
-            continue
-        if (
-            reports.original_post_deleted_or_locked in item[0]
-                or reports.post_violates_rules in item[0]
-        ):
-            top_parent.mod.remove()
-            send_to_modchat(
-                'Removed the following reported post in response to an '
-                '`unclaim`: {}'.format(top_parent.shortlink),
-                cfg,
-                channel='removed_posts'
-            )
-            post.reply(_(unclaim_success_with_report))
-            return
-
-    # Okay, so they commented with unclaim, but they didn't report it.
-    # Time to check to see if they should have.
-    linked_resource = cfg.r.submission(
-        top_parent.id_from_url(top_parent.url)
+    blossom_submission = response.data
+    response = cfg.blossom.unclaim(
+        submission_id=blossom_submission["id"], username=post.author.name
     )
-    if is_removed(linked_resource):
-        top_parent.mod.remove()
-        send_to_modchat(
-            'Received `unclaim` on an unreported post, but it looks like it '
-            'was removed on the parent sub. I removed ours here: {}'
-            ''.format(top_parent.shortlink),
-            cfg,
-            channel='removed_posts'
+    unclaim_messages = i18n["responses"]["unclaim"]
+    if response.status == BlossomStatus.ok:
+        message = unclaim_messages["success"]
+        flair_post(submission, flair.unclaimed)
+        removed, reported = remove_if_required(submission, blossom_submission["id"], cfg)
+        if removed:
+            # Select the message based on whether the post was reported or not.
+            message = i18n[
+                "success_with_report" if reported else "success_without_report"
+            ]
+    elif response.status == BlossomStatus.not_found:
+        message = i18n["responses"]["general"]["coc_not_accepted"].format(
+            get_wiki_page("codeofconduct", cfg)
         )
-        post.reply(_(unclaim_success_without_report))
-        return
-
-    # Finally, if none of the other options apply, we'll reset the flair and
-    # continue on as normal.
-    if top_parent.link_flair_text == flair.completed:
-        post.reply(_(unclaim_failure_post_already_completed))
-        return
-
-    if top_parent.link_flair_text == flair.in_progress:
-        flair_post(top_parent, flair.unclaimed)
-        post.reply(_(unclaim_success))
-        return
+        cfg.blossom.create_user(post.author.name)
+    elif response.status == BlossomStatus.other_user:
+        message = unclaim_messages["claimed_other_user"]
+    elif response.status == BlossomStatus.already_completed:
+        message = unclaim_messages["post_already_completed"]
+    else:
+        message = unclaim_messages["still_unclaimed"]
+    send_reddit_reply(post, _(message))
 
 
 def process_thanks(post: Comment, cfg: Config) -> None:
