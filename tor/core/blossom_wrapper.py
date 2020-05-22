@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import auto, Enum
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from requests import Request, Response, Session
 
@@ -15,7 +15,7 @@ class BlossomStatus(Enum):
 
 @dataclass
 class BlossomResponse:
-    data: Dict[str, Any] = None
+    data: Union[Dict[str, Any], None] = None
     status: BlossomStatus = BlossomStatus.ok
 
 
@@ -145,7 +145,7 @@ class BlossomAPI:
         """Get the Blossom Submission corresponding to the provided Reddit ID."""
         response = self.get("/submission/", params={"original_id": reddit_id})
         response.raise_for_status()
-        results = response.json()['results']
+        results = response.json()["results"]
         if results:
             return BlossomResponse(data=results[0])
         else:
