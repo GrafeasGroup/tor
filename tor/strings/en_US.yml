@@ -73,8 +73,10 @@ responses:
     already_claimed: |
       I'm sorry, but it looks like someone else has already claimed this post! You can check in with them to see if they need any help, but otherwise I suggest sticking around to see if another post pops up here in a little bit.
   done:
-    still_unclaimed: |
-      This post is still unclaimed! Please claim it first or message the mods to take care of this.
+    not_claimed_by_user: |
+      It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else! If you are unable to resolve this situation, please message the mods.
+    already_completed: |
+      This post is already completed! Thanks for your effort!
     completed_transcript: |
       Awesome, thanks for your help! I'll update your flair to reflect your new count.
 
