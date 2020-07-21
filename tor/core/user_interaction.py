@@ -2,18 +2,16 @@ import logging
 import random
 from typing import Tuple
 
-from praw.exceptions import APIException, ClientException  # type: ignore
-from praw.models import Comment, Message, Submission  # type: ignore
+from praw.exceptions import APIException  # type: ignore
+from praw.models import Comment, Message  # type: ignore
 
 from tor import __BOT_NAMES__
 from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import Config
-from tor.core.helpers import (_, clean_id, get_parent_post_id, get_wiki_page,
+from tor.core.helpers import (_, get_wiki_page,
                               remove_if_required, send_reddit_reply, send_to_modchat)
-from tor.core.users import User
-from tor.core.validation import verified_posted_transcript
-from tor.helpers.flair import flair, flair_post, update_user_flair
-from tor.helpers.reddit_ids import is_removed
+from tor.core.validation import get_transcription
+from tor.helpers.flair import flair, flair_post, set_user_flair
 from tor.strings import translation
 
 i18n = translation()
@@ -101,7 +99,7 @@ def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
         message = i18n["responses"]["claim"]["first_claim_success" if first_time else "success"]
         flair_post(submission, flair.in_progress)
         log.info(f'Claim on Submission {submission.fullname} by {post.author} successful.')
-    elif response.status == BlossomStatus.missing_prerequisite:
+    elif response.status == BlossomStatus.coc_not_accepted:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
     elif response.status == BlossomStatus.not_found:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
@@ -111,97 +109,72 @@ def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
     send_reddit_reply(post, _(message))
 
 
-def process_done(post: Comment, cfg: Config, override=False, alt_text_trigger=False) -> None:
+def process_done(
+    post: Comment, cfg: Config, override=False, alt_text_trigger=False
+) -> None:
     """
-    Handles comments where the user says they've completed a post.
-    Also includes a basic decision tree to enable verification of
-    the posts to try and make sure they actually posted a
-    transcription.
+    Handles comments where the user claims to have completed a point.
+
+    This function sends a reply to the user depending on the responses received
+    from Blossom.
 
     :param post: the Comment object which contains the string 'done'.
     :param cfg: the global config object.
-    :param override: A parameter that can only come from process_override()
-        and skips the validation check.
-    :param alt_text_trigger: a trigger that adds an extra piece of text onto
-        the response. Just something to help ease the number of
-        false-positives.
-    :return: None.
+    :param override: whether the validation check should be skipped
+    :param alt_text_trigger: whether there is an alternative to "done" that has
+                             triggered this function.
     """
+    submission = post.submission
+    done_messages = i18n["responses"]["done"]
+    coc_not_accepted = i18n["responses"]["general"]["coc_not_accepted"].format(
+        get_wiki_page("codeofconduct", cfg)
+    )
 
-    top_parent = get_parent_post_id(post, cfg.r)
-
-    done_cannot_find_transcript = i18n['responses']['done']['cannot_find_transcript']
-    done_completed_transcript = i18n['responses']['done']['completed_transcript']
-    done_still_unclaimed = i18n['responses']['done']['still_unclaimed']
-
-    # WAIT! Do we actually own this post?
-    if top_parent.author.name not in __BOT_NAMES__:
-        log.info('Received `done` on post we do not own. Ignoring.')
+    if submission.author.name not in __BOT_NAMES__:
+        log.debug("Received 'done' on post we do not own. Ignoring.")
         return
 
-    try:
-        if flair.unclaimed in top_parent.link_flair_text:
-            post.reply(_(done_still_unclaimed))
-        elif top_parent.link_flair_text == flair.in_progress:
-            if not override and not verified_posted_transcript(post, cfg):
-                # we need to double-check these things to keep people
-                # from gaming the system
-                log.info(f'Post {top_parent.fullname} does not appear to have a post by claimant {post.author}. Hrm... ')
-                # noinspection PyUnresolvedReferences
-                try:
-                    post.reply(_(done_cannot_find_transcript))
-                except ClientException as e:
-                    # We've run into an issue where someone has commented and
-                    # then deleted the comment between when the bot pulls mail
-                    # and when it processes comments. This should catch that.
-                    # Possibly should look into subclassing praw.Comment.reply
-                    # to include some basic error handling of this so that
-                    # we can fix it throughout the application.
-                    log.warning(e)
-                return
+    response = cfg.blossom.get_submission(reddit_id=submission.fullname)
+    if response.status != BlossomStatus.ok:
+        # If we are here, this means that the current submission is not yet in Blossom.
+        # TODO: Create the Submission in Blossom and try this method again.
+        raise Exception(f"The Submission {submission.fullname} is not present in Blossom.")
+    blossom_submission = response.data
 
-            # Control flow:
-            # If we have an override, we end up here to complete.
-            # If there is no override, we go into the validation above.
-            # If the validation fails, post the apology and return.
-            # If the validation succeeds, come down here.
-
-            if override:
-                log.info('Moderator override starting!')
-            # noinspection PyUnresolvedReferences
-            try:
+    transcription, in_linked = get_transcription(submission, post.author, cfg)
+    if transcription is None:
+        message = done_messages["cannot_find_transcript"]
+    else:
+        create_response = cfg.blossom.create_transcription(
+            transcription, blossom_submission["id"], not in_linked
+        )
+        if create_response.status in [
+            BlossomStatus.not_found, BlossomStatus.coc_not_accepted
+        ]:
+            if create_response.status == BlossomStatus.not_found:
+                # Since we know the Submission exists at this point, it should mean
+                # in fact the user is not found within Blossom.
+                cfg.blossom.create_user(username=post.author.name)
+            message = coc_not_accepted
+        else:
+            done_response = cfg.blossom.done(
+                blossom_submission["id"], post.author.name, override
+            )
+            # Note that both the not_found and coc_not_accepted status are already
+            # caught in the previous lines of code, hence these are not checked again.
+            if done_response.status == BlossomStatus.ok:
+                flair_post(submission, flair.completed)
+                set_user_flair(post.author, cfg)
+                message = done_messages["completed_transcript"]
                 if alt_text_trigger:
-                    post.reply(_(
-                        'I think you meant `done`, so here we go!\n\n'
-                        f'{done_completed_transcript}'
-                    ))
-                else:
-                    post.reply(_(done_completed_transcript))
-                update_user_flair(post, cfg)
-                current_post_count = int(cfg.redis.get("total_completed").decode())
-                log.info(
-                    f'Post {top_parent.fullname} completed by {post.author} -'
-                    f' post number {str(current_post_count + 1)}!'
-                )
-                # get that information saved for the user
-                author = User(str(post.author), redis_conn=cfg.redis)
-                author.list_update('posts_completed', clean_id(post.fullname))
-                author.save()
-
-            except ClientException:
-                # If the butt deleted their comment and we're already this
-                # far into validation, just mark it as done. Clearly they
-                # already passed.
-                log.info(f'Attempted to mark post {top_parent.fullname} as done... hit ClientException.')
-            flair_post(top_parent, flair.completed)
-
-            cfg.redis.incr('total_completed', amount=1)
-
-    except APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
-            log.info(f'Comment attempting to mark ID {top_parent.fullname} as done has been deleted')
-            return
-        raise  # Re-raise exception if not
+                    message = f"I think you meant `done`, so here we go!\n\n{message}"
+            elif done_response.status == BlossomStatus.already_completed:
+                message = done_messages["already_completed"]
+            elif done_response.status == BlossomStatus.missing_prerequisite:
+                message = done_messages["not_claimed_by_user"]
+            else:
+                message = done_messages["cannot_find_transcript"]
+    send_reddit_reply(post, _(message))
 
 
 def process_unclaim(post: Comment, cfg: Config) -> None:
