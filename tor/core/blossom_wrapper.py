@@ -5,12 +5,15 @@ from typing import Any, Dict
 from requests import Request, Response, Session
 from praw.models import Comment
 
+
 class BlossomStatus(Enum):
-    ok = auto()
-    not_found = auto()
-    missing_prerequisite = auto()
-    other_user = auto()
     already_completed = auto()
+    coc_not_accepted = auto()
+    data_missing = auto()
+    missing_prerequisite = auto()
+    not_found = auto()
+    ok = auto()
+    other_user = auto()
 
 
 @dataclass
@@ -188,9 +191,10 @@ class BlossomAPI:
         )
         if response.status_code == 201:
             return BlossomResponse(data=response.json())
+        elif response.status_code == 403:
+            return BlossomResponse(status=BlossomStatus.coc_not_accepted)
         elif response.status_code == 404:
             return BlossomResponse(status=BlossomStatus.not_found)
-        # TODO: Add the response for when CoC has not yet been accepted.
         response.raise_for_status()
         return BlossomResponse()
 
@@ -201,11 +205,12 @@ class BlossomAPI:
         )
         if response.status_code == 201:
             return BlossomResponse(data=response.json())
+        elif response.status_code == 403:
+            return BlossomResponse(status=BlossomStatus.coc_not_accepted)
         elif response.status_code == 404:
             return BlossomResponse(status=BlossomStatus.not_found)
         elif response.status_code == 409:
-            return BlossomResponse(status=BlossomStatus.other_user)
-        # TODO: Add the response for when CoC has not yet been accepted.
+            return BlossomResponse(status=BlossomStatus.already_completed)
         response.raise_for_status()
         return BlossomResponse()
 
@@ -237,12 +242,15 @@ class BlossomAPI:
         )
         if response.status_code == 201:
             return BlossomResponse(data=response.json())
+        elif response.status_code == 403:
+            return BlossomResponse(status=BlossomStatus.coc_not_accepted)
         elif response.status_code == 404:
             return BlossomResponse(status=BlossomStatus.not_found)
         elif response.status_code == 409:
             return BlossomResponse(status=BlossomStatus.already_completed)
         elif response.status_code == 412:
             return BlossomResponse(status=BlossomStatus.missing_prerequisite)
-
+        elif response.status_code == 428:
+            return BlossomResponse(status=BlossomStatus.data_missing)
         response.raise_for_status()
         return BlossomResponse()

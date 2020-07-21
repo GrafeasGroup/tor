@@ -99,7 +99,7 @@ def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
         message = i18n["responses"]["claim"]["first_claim_success" if first_time else "success"]
         flair_post(submission, flair.in_progress)
         log.info(f'Claim on Submission {submission.fullname} by {post.author} successful.')
-    elif response.status == BlossomStatus.missing_prerequisite:
+    elif response.status == BlossomStatus.coc_not_accepted:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
     elif response.status == BlossomStatus.not_found:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
@@ -148,28 +148,32 @@ def process_done(
         create_response = cfg.blossom.create_transcription(
             transcription, blossom_submission["id"], not in_linked
         )
-        if create_response.status == BlossomStatus.not_found:
-            # Since we know the Submission exists at this point, it should mean
-            # in fact the user is not found within Blossom.
+        if create_response.status in [
+            BlossomStatus.not_found, BlossomStatus.coc_not_accepted
+        ]:
+            if create_response.status == BlossomStatus.not_found:
+                # Since we know the Submission exists at this point, it should mean
+                # in fact the user is not found within Blossom.
+                cfg.blossom.create_user(username=post.author.name)
             message = coc_not_accepted
-            cfg.blossom.create_user(username=post.author.name)
         else:
             done_response = cfg.blossom.done(
                 blossom_submission["id"], post.author.name, override
             )
+            # Note that both the not_found and coc_not_accepted status are already
+            # caught in the previous lines of code, hence these are not checked again.
             if done_response.status == BlossomStatus.ok:
                 flair_post(submission, flair.completed)
                 set_user_flair(post.author, cfg)
                 message = done_messages["completed_transcript"]
                 if alt_text_trigger:
                     message = f"I think you meant `done`, so here we go!\n\n{message}"
-            elif done_response.status == BlossomStatus.not_found:
-                message = coc_not_accepted
-                cfg.blossom.create_user(username=post.author.name)
             elif done_response.status == BlossomStatus.already_completed:
                 message = done_messages["already_completed"]
-            else:
+            elif done_response.status == BlossomStatus.missing_prerequisite:
                 message = done_messages["not_claimed_by_user"]
+            else:
+                message = done_messages["cannot_find_transcript"]
     send_reddit_reply(post, _(message))
 
 

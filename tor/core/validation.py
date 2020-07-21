@@ -17,7 +17,9 @@ def get_transcription(
 
     To obtain this Comment, first top level comments of the linked Submission
     are checked. If no valid transcription is found, the user's 10 most recent
-    posts are checked. If no transcription is found after this, None is returned.
+    posts are checked. This can be the case when the transcription is
+    automatically removed or hidden for another reason. If no transcription is
+    found after this, None is returned.
 
     This function also returns whether the transcription was available in the
     linked submission or not.
