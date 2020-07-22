@@ -1,6 +1,5 @@
 import logging
 import random
-from typing import Tuple
 
 from praw.exceptions import APIException  # type: ignore
 from praw.models import Comment, Message  # type: ignore
@@ -17,61 +16,54 @@ from tor.strings import translation
 i18n = translation()
 log = logging.getLogger(__name__)
 
-
-def coc_accepted(post: Comment, cfg: Config) -> bool:
-    """
-    Verifies that the user is in the Redis set "accepted_CoC".
-
-    :param post: the Comment object containing the claim.
-    :param cfg: the global config dict.
-    :return: True if the user has accepted the Code of Conduct, False if they
-        haven't.
-    """
-    return cfg.redis.sismember('accepted_CoC', post.author.name) == 1
+MODCHAT_EMOTES = [
+    ":badger:",
+    ":beers:",
+    ":catta-tappa:",
+    ":confetti_ball:",
+    ":coolio:",
+    ":derp:",
+    ":fb-like:",
+    ":fidget-spinner:",
+    ":gold:",
+    ":heartpulse:",
+    ":lenny1::lenny2:",
+    ":tada:",
+    ":partyblob:",
+    ":partylexi:",
+    ":party_parrot:",
+    ":trophy:",
+    ":upvote:",
+    ":+1:",
+]
 
 
 def process_coc(post: Comment, cfg: Config) -> None:
-    """
-    Adds the username of the redditor to the db as accepting the code of
-    conduct.
-
-    :param post: The Comment object containing the claim.
-    :param cfg: the global config dict.
-    :return: None.
-    """
-    result = cfg.redis.sadd('accepted_CoC', post.author.name)
-
-    modchat_emote = random.choice([
-        ':tada:',
-        ':confetti_ball:',
-        ':party-lexi:',
-        ':party-parrot:',
-        ':+1:',
-        ':trophy:',
-        ':heartpulse:',
-        ':beers:',
-        ':gold:',
-        ':upvote:',
-        ':coolio:',
-        ':derp:',
-        ':lenny1::lenny2:',
-        ':panic:',
-        ':fidget-spinner:',
-        ':fb-like:'
-    ])
-
-    # Have they already been added? If 0, then just act like they said `claim`
-    # instead. If they're actually new, then send a message to slack.
-    if result == 1:
+    """Process the acceptation of the CoC by the specified user."""
+    username = post.author. name
+    user_response = cfg.blossom.get_user(username=username)
+    if user_response.status == BlossomStatus.ok:
+        # The status codes are not checked because they are already caught by
+        # getting the user.
+        cfg.blossom.accept_coc(user_id=user_response.data.id)
+        emote = random.choice(MODCHAT_EMOTES)
+        user_url = i18n['urls']['reddit_url'].format(f'/u/{username}')
+        post_url = i18n['urls']['reddit_url'].format(post.context)
         send_to_modchat(
-            f'<{i18n["urls"]["reddit_url"].format("/user/" + post.author.name)}|u/{post.author.name}>'
-            f' has just'
-            f' <{i18n["urls"]["reddit_url"].format(post.context)}|accepted the CoC!>'
-            f' {modchat_emote}',
+            f'<{user_url}|u/{post.author.name}> has just'
+            f' <{post_url}|accepted the CoC!> {emote}',
             cfg,
             channel='new_volunteers'
         )
-    process_claim(post, cfg, first_time=True)
+        process_claim(post, cfg, first_time=True)
+    elif user_response.status == BlossomStatus.not_found:
+        cfg.blossom.create_user(username=post.author.name)
+        send_reddit_reply(
+            post,
+            i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
+        )
+    else:
+        process_claim(post, cfg)
 
 
 def process_claim(post: Comment, cfg: Config, first_time=False) -> None:

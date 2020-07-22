@@ -154,6 +154,17 @@ class BlossomAPI:
         else:
             return BlossomResponse(status=BlossomStatus.not_found)
 
+    def accept_coc(self, user_id: str) -> BlossomResponse:
+        """Let the user accept the Code of Conduct."""
+        response = self.get(f"/volunteer/{user_id}/accept_coc")
+        if response.status_code == 201:
+            return BlossomResponse()
+        elif response.status_code == 404:
+            return BlossomResponse(status=BlossomStatus.not_found)
+
+        response.raise_for_status()
+        return BlossomResponse()
+
     def get_submission(self, reddit_id: str) -> BlossomResponse:
         """Get the Blossom Submission corresponding to the provided Reddit ID."""
         response = self.get("/submission/", params={"original_id": reddit_id})
