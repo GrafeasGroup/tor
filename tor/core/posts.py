@@ -71,7 +71,7 @@ def has_enough_upvotes(post: PostSummary, cfg: Config) -> bool:
     upvotes = int(str(post['ups']))
 
     # If the subreddit is not in the upvote filter, this would mean no threshold.
-    return upvotes >= cfg.upvote_filter_subs.get(subreddit, 0)
+    return upvotes >= cfg.upvote_filter_subs.get(subreddit, float("-inf"))
 
 
 def should_process_post(post: PostSummary, cfg: Config) -> bool:
