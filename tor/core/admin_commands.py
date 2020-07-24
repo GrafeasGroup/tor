@@ -132,52 +132,6 @@ def process_override(reply, cfg):
         )
 
 
-def process_blacklist(reply, cfg):
-    """
-    This is used to basically "shadow-ban" people from the bot.
-    Format is:
-    Subject: !blacklist
-    body: <username1>\n<username2>...
-    :param reply: the comment reply object from the inbox
-    :param cfg: the global config object
-    :return: None
-    """
-
-    usernames = reply.body.splitlines()
-    results = ""
-    failed = []
-    successes = []
-    already_added = []
-
-    for username in usernames:
-        if username in cfg.tor_mods:
-            results += f'{username} is a mod! Don\'t blacklist mods!\n'
-            failed.append(username)
-            continue
-
-        try:
-            cfg.r.redditor(username)
-        except RedditClientException:
-            results += f'{username} isn\'t a valid user\n'
-            failed.append(username)
-            continue
-
-        if not cfg.redis.sadd('blacklist', username):
-            results += f'{username} is already blacklisted, ya fool!\n'
-            already_added.append(username)
-            continue
-
-        results += f'{username} is now blacklisted\n'
-        successes.append(username)
-
-        logging.info(
-            f'Blacklist: {repr(failed)} failed, {repr(successes)} succeeded, '
-            f'{repr(already_added)} were already blacklisted '
-        )
-
-        return results
-
-
 def reload_config(reply, cfg):
     logging.info(
         f'Reloading configs at the request of {reply.author.name}'

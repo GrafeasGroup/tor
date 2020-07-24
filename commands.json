@@ -7,11 +7,6 @@
     "I'm sure you're a lovely person and all, but no.\n\n{}"
   ],
   "commands": {
-    "blacklist": {
-      "description": "Add usernames to internal blacklist - a.k.a do not interact with this user.",
-      "allowedNames": [],
-      "pythonFunction": "process_blacklist"
-    },
     "reload": {
       "description": "Re-run the initialization for the global config object and refresh all values.",
       "allowedNames": [],

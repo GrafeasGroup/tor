@@ -7,6 +7,7 @@ from praw.models.reddit.mixins import InboxableMixin  # type: ignore
 
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
+from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import Config
 from tor.core.helpers import send_to_modchat, is_our_subreddit, _
 from tor.core.user_interaction import (process_claim, process_coc,
@@ -154,33 +155,31 @@ def check_inbox(cfg: Config) -> None:
 
         if author_name is None:
             send_to_modchat(
-                f'We received a message without an author -- '
-                f'*{item.subject}*:\n{item.body}', cfg
+                f"We received a message without an author -- "
+                f"*{item.subject}*:\n{item.body}", cfg
             )
-
-        elif author_name == 'transcribot':
+        elif author_name == "transcribot":
             # bot responses shouldn't trigger workflows in other bots
-            log.info('Skipping response from our OCR bot')
-
-        elif cfg.redis.sismember('blacklist', author_name):
-            log.info(f'Skipping inbox item from {author_name!r} who is on the blacklist')
-
-        elif isinstance(item, Comment) and is_our_subreddit(item.subreddit.name, cfg):
-            process_reply(item, cfg)
-        elif isinstance(item, Comment):
-            log.info(f'Received username mention! ID {item}')
-            process_mention(item)
-
-        elif isinstance(item, Message):
-            if item.subject[0] == '!':
-                process_command(item, cfg)
-            else:
-                process_message(item, cfg)
-
+            log.info("Skipping response from our OCR bot")
         else:
-            # We don't know what the heck this is, so just send it onto
-            # slack for manual triage.
-            forward_to_slack(item, cfg)
-
+            user_response = cfg.blossom.get_user(username=author_name)
+            if user_response.status != BlossomStatus.not_found and user_response.data["blacklisted"]:
+                log.info(f"Skipping inbox item from {author_name!r} who is on the blacklist")
+            else:
+                if isinstance(item, Comment):
+                    if is_our_subreddit(item.subreddit.name, cfg):
+                        process_reply(item, cfg)
+                    else:
+                        log.info(f"Received username mention! ID {item}")
+                        process_mention(item)
+                elif isinstance(item, Message):
+                    if item.subject[0] == "!":
+                        process_command(item, cfg)
+                    else:
+                        process_message(item, cfg)
+                else:
+                    # We don't know what the heck this is, so just send it onto
+                    # slack for manual triage.
+                    forward_to_slack(item, cfg)
         # No matter what, we want to mark this as read so we don't re-process it.
         item.mark_read()
