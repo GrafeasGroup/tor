@@ -165,6 +165,21 @@ class BlossomAPI:
         response.raise_for_status()
         return BlossomResponse()
 
+    def create_submission(
+            self, post_id: str, post_url: str, original_url: str
+    ) -> BlossomResponse:
+        """Create a Blossom Submission with the given information."""
+        params = {
+            "original_id": post_id,
+            "origin": "reddit",
+            "tor_url": post_url,
+            "url": original_url
+        }
+
+        response = self.post("/submission", params=params)
+        response.raise_for_status()
+        return BlossomResponse(data=response.json())
+
     def get_submission(self, reddit_id: str) -> BlossomResponse:
         """Get the Blossom Submission corresponding to the provided Reddit ID."""
         response = self.get("/submission/", params={"original_id": reddit_id})
