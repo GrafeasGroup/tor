@@ -99,6 +99,8 @@ responses:
     claimed_other_user: |
       Sorry, this post is claimed by someone else, so you cannot unclaim it!
   general:
+    blacklisted: |
+      It appears that you are blacklisted. Please contact the moderators of r/TranscribersOfReddit if you do not know why this is the case.
     oops: |
       Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!
     coc_not_accepted: |

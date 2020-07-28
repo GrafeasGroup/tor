@@ -162,24 +162,20 @@ def check_inbox(cfg: Config) -> None:
             # bot responses shouldn't trigger workflows in other bots
             log.info("Skipping response from our OCR bot")
         else:
-            user_response = cfg.blossom.get_user(username=author_name)
-            if user_response.status != BlossomStatus.not_found and user_response.data["blacklisted"]:
-                log.info(f"Skipping inbox item from {author_name!r} who is on the blacklist")
-            else:
-                if isinstance(item, Comment):
-                    if is_our_subreddit(item.subreddit.name, cfg):
-                        process_reply(item, cfg)
-                    else:
-                        log.info(f"Received username mention! ID {item}")
-                        process_mention(item)
-                elif isinstance(item, Message):
-                    if item.subject[0] == "!":
-                        process_command(item, cfg)
-                    else:
-                        process_message(item, cfg)
+            if isinstance(item, Comment):
+                if is_our_subreddit(item.subreddit.name, cfg):
+                    process_reply(item, cfg)
                 else:
-                    # We don't know what the heck this is, so just send it onto
-                    # slack for manual triage.
-                    forward_to_slack(item, cfg)
+                    log.info(f"Received username mention! ID {item}")
+                    process_mention(item)
+            elif isinstance(item, Message):
+                if item.subject[0] == "!":
+                    process_command(item, cfg)
+                else:
+                    process_message(item, cfg)
+            else:
+                # We don't know what the heck this is, so just send it onto
+                # slack for manual triage.
+                forward_to_slack(item, cfg)
         # No matter what, we want to mark this as read so we don't re-process it.
         item.mark_read()

@@ -8,6 +8,7 @@ from praw.models import Comment
 
 class BlossomStatus(Enum):
     already_completed = auto()
+    blacklisted = auto()
     coc_not_accepted = auto()
     data_missing = auto()
     missing_prerequisite = auto()
@@ -154,14 +155,15 @@ class BlossomAPI:
         else:
             return BlossomResponse(status=BlossomStatus.not_found)
 
-    def accept_coc(self, user_id: str) -> BlossomResponse:
+    def accept_coc(self, username: str) -> BlossomResponse:
         """Let the user accept the Code of Conduct."""
-        response = self.get(f"/volunteer/{user_id}/accept_coc")
+        response = self.get("/volunteer/accept_coc", params={"username", username})
         if response.status_code == 201:
             return BlossomResponse()
         elif response.status_code == 404:
             return BlossomResponse(status=BlossomStatus.not_found)
-
+        elif response.status_code == 409:
+            return BlossomResponse(status=BlossomStatus.already_completed)
         response.raise_for_status()
         return BlossomResponse()
 
@@ -237,6 +239,8 @@ class BlossomAPI:
             return BlossomResponse(status=BlossomStatus.not_found)
         elif response.status_code == 409:
             return BlossomResponse(status=BlossomStatus.already_completed)
+        elif response.status_code == 423:
+            return BlossomResponse(status=BlossomStatus.blacklisted)
         response.raise_for_status()
         return BlossomResponse()
 
@@ -254,7 +258,8 @@ class BlossomAPI:
             return BlossomResponse(status=BlossomStatus.already_completed)
         elif response.status_code == 412:
             return BlossomResponse(status=BlossomStatus.missing_prerequisite)
-
+        elif response.status_code == 423:
+            return BlossomResponse(status=BlossomStatus.blacklisted)
         response.raise_for_status()
         return BlossomResponse()
 
@@ -276,6 +281,8 @@ class BlossomAPI:
             return BlossomResponse(status=BlossomStatus.already_completed)
         elif response.status_code == 412:
             return BlossomResponse(status=BlossomStatus.missing_prerequisite)
+        elif response.status_code == 423:
+            return BlossomResponse(status=BlossomStatus.blacklisted)
         elif response.status_code == 428:
             return BlossomResponse(status=BlossomStatus.data_missing)
         response.raise_for_status()

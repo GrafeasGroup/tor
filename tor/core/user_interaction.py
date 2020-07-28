@@ -40,22 +40,24 @@ MODCHAT_EMOTES = [
 
 def process_coc(post: Comment, cfg: Config) -> None:
     """Process the acceptation of the CoC by the specified user."""
-    username = post.author. name
+    username = post.author.name
     user_response = cfg.blossom.get_user(username=username)
     if user_response.status == BlossomStatus.ok:
         # The status codes are not checked because they are already caught by
         # getting the user.
-        cfg.blossom.accept_coc(user_id=user_response.data.id)
-        emote = random.choice(MODCHAT_EMOTES)
-        user_url = i18n['urls']['reddit_url'].format(f'/u/{username}')
-        post_url = i18n['urls']['reddit_url'].format(post.context)
-        send_to_modchat(
-            f'<{user_url}|u/{post.author.name}> has just'
-            f' <{post_url}|accepted the CoC!> {emote}',
-            cfg,
-            channel='new_volunteers'
-        )
-        process_claim(post, cfg, first_time=True)
+        response = cfg.blossom.accept_coc(username=username)
+        new_acceptance = response.status == BlossomStatus.ok
+        if new_acceptance:
+            emote = random.choice(MODCHAT_EMOTES)
+            user_url = i18n['urls']['reddit_url'].format(f'/u/{username}')
+            post_url = i18n['urls']['reddit_url'].format(post.context)
+            send_to_modchat(
+                f'<{user_url}|u/{post.author.name}> has just'
+                f' <{post_url}|accepted the CoC!> {emote}',
+                cfg,
+                channel='new_volunteers'
+            )
+        process_claim(post, cfg, first_time=new_acceptance)
     elif user_response.status == BlossomStatus.not_found:
         cfg.blossom.create_user(username=post.author.name)
         send_reddit_reply(
@@ -96,6 +98,8 @@ def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
     elif response.status == BlossomStatus.not_found:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
         cfg.blossom.create_user(username=post.author.name)
+    elif response.status == BlossomStatus.blacklisted:
+        message = i18n["responses"]["general"]["blacklisted"]
     else:
         message = i18n["responses"]["claim"]["already_claimed"]
     send_reddit_reply(post, _(message))
@@ -164,6 +168,8 @@ def process_done(
                 message = done_messages["already_completed"]
             elif done_response.status == BlossomStatus.missing_prerequisite:
                 message = done_messages["not_claimed_by_user"]
+            elif response.status == BlossomStatus.blacklisted:
+                message = i18n["responses"]["general"]["blacklisted"]
             else:
                 message = done_messages["cannot_find_transcript"]
     send_reddit_reply(post, _(message))
@@ -210,6 +216,8 @@ def process_unclaim(post: Comment, cfg: Config) -> None:
         message = unclaim_messages["claimed_other_user"]
     elif response.status == BlossomStatus.already_completed:
         message = unclaim_messages["post_already_completed"]
+    elif response.status == BlossomStatus.blacklisted:
+        message = i18n["responses"]["general"]["blacklisted"]
     else:
         message = unclaim_messages["still_unclaimed"]
     send_reddit_reply(post, _(message))
