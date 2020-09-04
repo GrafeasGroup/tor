@@ -82,9 +82,9 @@ responses:
 
       Alternatively, did you remember to put the footer in your comment? _Make sure_ that you're copying and pasting the footer as it's shown, complete with all the special characters!
       
-      If the footer is correct, have you tried replying "Done" again after one-two minutes? Sometimes, freshly posted transcriptions are not seen by the bot, so waiting some minutes should fix the issue.
+      If the footer is correct, have you tried replying "Done" again after one-two minutes? Sometimes, freshly posted transcriptions are not seen by the bot, so trying again should fix the issue.
       
-      If it still doesn't work, it could be the sign of another bug, and a Modmail will warn the mods pretty quickly!
+      If it still doesn't work, it could be the sign of another bug; let us know by [sending a Modmail](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Issue&message=) so we can take a look!
   unclaim:
     still_unclaimed: |
       From what I can see, no one has claimed this post! Would you like to? All you have to do is reply to me with `claim`.
