@@ -113,7 +113,7 @@ def process_done(
     post: Comment, cfg: Config, override=False, alt_text_trigger=False
 ) -> None:
     """
-    Handles comments where the user claims to have completed a point.
+    Handles comments where the user claims to have completed a post.
 
     This function sends a reply to the user depending on the responses received
     from Blossom.
