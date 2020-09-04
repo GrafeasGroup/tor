@@ -139,20 +139,3 @@ def request_transcription(
     cfg.blossom.create_submission(
         submission.fullname, submission.url, permalink
     )
-    queue_ocr_bot(post, submission, cfg)
-
-
-def queue_ocr_bot(post: PostSummary, submission: Submission, cfg: Config) -> None:
-    """
-    Put the created submission in the queue for the OCR bot to transcribe.
-    """
-    # TODO: Remove this function and somehow run this through Blossom.
-    if post['domain'] not in cfg.image_domains:
-        # We only OCR images at this time
-        return
-
-    # Set the payload for the job
-    cfg.redis.set(str(post['name']), submission.fullname)
-
-    # Queue up the job reference
-    cfg.redis.rpush('ocr_ids', str(post['name']))

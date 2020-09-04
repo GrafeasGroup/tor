@@ -55,24 +55,6 @@ class Config(object):
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
 
     @cached_property
-    def redis(self):
-        """
-        Lazy-loaded redis connection
-        """
-        from redis import StrictRedis
-        import redis.exceptions
-
-        try:
-            url = os.environ.get('REDIS_CONNECTION_URL',
-                                 'redis://localhost:6379/0')
-            conn = StrictRedis.from_url(url)
-            conn.ping()
-        except redis.exceptions.ConnectionError:
-            logging.fatal("Redis server is not running")
-            raise
-        return conn
-
-    @cached_property
     def blossom(self):
         return BlossomAPI(
             email=os.getenv('BLOSSOM_EMAIL'),
@@ -88,6 +70,7 @@ class Config(object):
             return self.r.subreddit('ModsOfTor')
         else:
             return self.r.subreddit('transcribersofreddit')
+
     @cached_property
     def modchat(self):
         return SlackClient(os.getenv('SLACK_API_KEY', None))
