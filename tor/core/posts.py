@@ -137,5 +137,5 @@ def request_transcription(
     submission.reply(_(intro))
     flair_post(submission, flair.unclaimed)
     cfg.blossom.create_submission(
-        submission.fullname, submission.url, permalink
+        submission.fullname, submission.url, permalink, post['url']
     )

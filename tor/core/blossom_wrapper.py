@@ -168,14 +168,15 @@ class BlossomAPI:
         return BlossomResponse()
 
     def create_submission(
-            self, post_id: str, post_url: str, original_url: str
+            self, post_id: str, post_url: str, original_url: str, content_url: str,
     ) -> BlossomResponse:
         """Create a Blossom Submission with the given information."""
         params = {
             "original_id": post_id,
             "origin": "reddit",
             "tor_url": post_url,
-            "url": original_url
+            "url": original_url,
+            "content_url": content_url
         }
 
         response = self.post("/submission", params=params)
