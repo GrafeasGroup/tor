@@ -86,7 +86,7 @@ def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
         # TODO: Create the Submission in Blossom and try this method again.
         raise Exception("The post is not present in Blossom.")
 
-    response = cfg.blossom.claim_submission(
+    response = cfg.blossom.claim(
         submission_id=response.data["id"], username=post.author.name
     )
     if response.status == BlossomStatus.ok:
