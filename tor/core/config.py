@@ -1,8 +1,8 @@
 import datetime
-import logging
 import os
 from typing import Dict, List, Union
 
+from blossom_wrapper import BlossomAPI
 from praw import Reddit  # type: ignore
 from praw.models import Subreddit  # type: ignore
 from praw.models.reddit.subreddit import ModeratorRelationship  # type: ignore
@@ -10,7 +10,6 @@ from slackclient import SlackClient  # type: ignore
 
 from tor import __root__, __version__, __SELF_NAME__
 from tor.core import cached_property
-from tor.core.blossom_wrapper import BlossomAPI
 
 # Load configuration regardless of if bugsnag is setup correctly
 try:
@@ -55,24 +54,6 @@ class Config(object):
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
 
     @cached_property
-    def redis(self):
-        """
-        Lazy-loaded redis connection
-        """
-        from redis import StrictRedis
-        import redis.exceptions
-
-        try:
-            url = os.environ.get('REDIS_CONNECTION_URL',
-                                 'redis://localhost:6379/0')
-            conn = StrictRedis.from_url(url)
-            conn.ping()
-        except redis.exceptions.ConnectionError:
-            logging.fatal("Redis server is not running")
-            raise
-        return conn
-
-    @cached_property
     def blossom(self):
         return BlossomAPI(
             email=os.getenv('BLOSSOM_EMAIL'),
@@ -88,6 +69,7 @@ class Config(object):
             return self.r.subreddit('ModsOfTor')
         else:
             return self.r.subreddit('transcribersofreddit')
+
     @cached_property
     def modchat(self):
         return SlackClient(os.getenv('SLACK_API_KEY', None))

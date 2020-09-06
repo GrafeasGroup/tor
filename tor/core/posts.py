@@ -6,7 +6,7 @@ from praw.models import Submission  # type: ignore
 from tor.core.config import Config
 from tor.core.helpers import _
 from tor.helpers.flair import flair, flair_post
-from tor.helpers.reddit_ids import add_complete_post_id, has_been_posted
+from tor.helpers.reddit_ids import has_been_posted
 from tor.helpers.youtube import (has_youtube_transcript, get_yt_video_id,
                                  is_transcribable_youtube_video, is_youtube_url)
 from tor.strings import translation
@@ -47,13 +47,20 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
         content_type = 'Other'
         content_format = cfg.other_formatting
 
-    if is_youtube_url(str(new_post['url'])):
-        if not is_transcribable_youtube_video(str(new_post['url'])):
-            # Not transcribable, so let's add it to the completed posts and skip over it forever
-            add_complete_post_id(str(new_post['url']), cfg)
-            return
-
-    request_transcription(new_post, content_type, content_format, cfg)
+    try:
+        if not handle_youtube(new_post, cfg):
+            request_transcription(new_post, content_type, content_format, cfg)
+    # The only errors that happen here are on Reddit's side -- pretty much
+    # exclusively 503s and 403s that arbitrarily resolve themselves. A missed
+    # post or two is not the end of the world.
+    except Exception as e:
+        log.error(
+            f'{e} - unable to post content.\n'
+            f'ID: {new_post["name"]}\n'
+            f'Title: {new_post["title"]}\n'
+            f'Subreddit: {new_post["subreddit"]}'
+        )
+        return
 
 
 def has_enough_upvotes(post: PostSummary, cfg: Config) -> bool:
@@ -63,54 +70,45 @@ def has_enough_upvotes(post: PostSummary, cfg: Config) -> bool:
     subreddit = str(post['subreddit'])
     upvotes = int(str(post['ups']))
 
-    if subreddit not in cfg.upvote_filter_subs:
-        # Must not be a sub which has a minimum threshold
-        return True
-
-    if upvotes >= cfg.upvote_filter_subs[subreddit]:
-        return True
-
-    return False
+    # If the subreddit is not in the upvote filter, this would mean no threshold.
+    return upvotes >= cfg.upvote_filter_subs.get(subreddit, float("-inf"))
 
 
 def should_process_post(post: PostSummary, cfg: Config) -> bool:
-    if not has_enough_upvotes(post, cfg):
-        return False
-    if has_been_posted(str(post['name']), cfg):
-        return False
-    if post['archived']:
-        return False
-    if not post['author']:
-        return False
-
-    return True
+    """
+    Determine whether the provided post should be processed.
+    """
+    return all(
+        [
+            has_enough_upvotes(post, cfg),
+            not has_been_posted(str(post["name"]), cfg),
+            not post["archived"],
+            post["author"]
+        ]
+    )
 
 
 def handle_youtube(post: PostSummary, cfg: Config) -> bool:
     """
-    Handle if there are youtube transcripts
+    Handle the provided post, checking whether it is from YouTube in the process.
+
+    The returned boolean resembles whether the post is handled. If it is False,
+    this means that further handling is required.
+
+    A post gets handled when it is a YouTube post and it either has a
+    transcription or it is not transcribable in the first place.
     """
-    yt_already_has_transcripts = i18n['posts']['yt_already_has_transcripts']
-    if not is_youtube_url(str(post['url'])):
-        return False
-
-    if not is_transcribable_youtube_video(str(post['url'])):
-        # Not something we can transcribe, so skip it... FOREVER
-        add_complete_post_id(str(post['url']), cfg)
-        return True
-
-    if has_youtube_transcript(str(post['url'])):
-        # NOTE: This has /u/transcribersofreddit post to the original
-        # subreddit where the video was posted saying it already has
-        # closed captioning
-        submission = cfg.r.submission(id=post['name'])
-        submission.reply(_(yt_already_has_transcripts))
-        add_complete_post_id(str(post['url']), cfg)
-        video_id = get_yt_video_id(str(post['url']))
-        log.info(f'Found YouTube video, {video_id}, with good transcripts.')
-        return True
-
-    return False
+    url = str(post["url"])
+    if has_youtube_transcript(url):
+        # Since there is already a transcript, let /u/transcribersofreddit
+        # post to the original submission, stating it already has closed
+        # captioning.
+        video_id = get_yt_video_id(url)
+        submission = cfg.r.submission(id=post["name"])
+        submission.reply(_(i18n["posts"]["yt_already_has_transcripts"]))
+        # TODO: Determine whether we want automatic completions to be added to Blossom
+        log.info(f"Found YouTube video, https://youtu.be/{video_id}, with good transcripts.")
+    return is_youtube_url(url) and not is_transcribable_youtube_video(url)
 
 
 def truncate_title(title: str) -> str:
@@ -122,74 +120,22 @@ def truncate_title(title: str) -> str:
     return title[:(max_length - 3)] + '...'
 
 
-def request_transcription(post: PostSummary, content_type: str, content_format: str, cfg: Config):
-    # Truncate a post title if it exceeds 250 characters, so the added
-    # formatting still fits in Reddit's 300 char limit for post titles
+def request_transcription(
+        post: PostSummary, content_type: str, content_format: str, cfg: Config
+) -> None:
+    """Request a transcription by posting the provided post to our subreddit."""
     title = i18n['posts']['discovered_submit_title'].format(
         sub=str(post['subreddit']),
         type=content_type.title(),
         title=truncate_title(str(post['title'])),
     )
-    url = i18n['urls']['reddit_url'].format(str(post['permalink']))
+    permalink = i18n['urls']['reddit_url'].format(str(post['permalink']))
+    submission = cfg.tor.submit(title=title, url=permalink)
     intro = i18n['posts']['rules_comment'].format(
-        post_type=content_type,
-        formatting=content_format,
-        header=cfg.header,
+        post_type=content_type, formatting=content_format, header=cfg.header,
     )
-
-    submission: Submission
-
-    try:
-        if is_youtube_url(str(post['url'])) and has_youtube_transcript(str(post['url'])):
-            # NOTE: This has /u/transcribersofreddit post to the original
-            # subreddit where the video was posted saying it already has
-            # closed captioning
-            video_id = get_yt_video_id(str(post['url']))
-            submission = cfg.r.submission(id=post['name'])
-            submission.reply(_(i18n['posts']['yt_already_has_transcripts']))
-            add_complete_post_id(str(post['name']), cfg)
-            log.info(f'Found YouTube video, https://youtu.be/{video_id}, with good transcripts.')
-            return
-    # The only errors that happen here are on Reddit's side -- pretty much
-    # exclusively 503s and 403s that arbitrarily resolve themselves. A missed
-    # post or two is not the end of the world.
-    except Exception as e:
-        log.error(
-            f'{e} - unable to post content.\n'
-            f'ID: {post["name"]}\n'
-            f'Title: {post["title"]}\n'
-            f'Subreddit: {post["subreddit"]}'
-        )
-        return
-
-    try:
-        submission = cfg.tor.submit(title=title, url=url)
-        submission.reply(_(intro))
-        flair_post(submission, flair.unclaimed)
-        add_complete_post_id(str(post['name']), cfg)
-
-        cfg.redis.incr('total_posted', amount=1)
-        queue_ocr_bot(post, submission, cfg)
-        cfg.redis.incr('total_new', amount=1)
-    # The only errors that happen here are on Reddit's side -- pretty much
-    # exclusively 503s and 403s that arbitrarily resolve themselves. A missed
-    # post or two is not the end of the world.
-    except Exception as e:
-        log.error(
-            f'{e} - unable to post content.\n'
-            f'ID: {post["name"]}\n'
-            f'Title: {post["title"]}\n'
-            f'Subreddit: {post["subreddit"]}'
-        )
-
-
-def queue_ocr_bot(post: PostSummary, submission: Submission, cfg: Config) -> None:
-    if post['domain'] not in cfg.image_domains:
-        # We only OCR images at this time
-        return
-
-    # Set the payload for the job
-    cfg.redis.set(str(post['name']), submission.fullname)
-
-    # Queue up the job reference
-    cfg.redis.rpush('ocr_ids', str(post['name']))
+    submission.reply(_(intro))
+    flair_post(submission, flair.unclaimed)
+    cfg.blossom.create_submission(
+        submission.fullname, submission.url, permalink, post['url']
+    )
