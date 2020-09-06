@@ -1,9 +1,9 @@
 import logging
 
+from blossom_wrapper import BlossomStatus
 from praw.models import Redditor, Submission  # type: ignore
 
 from tor import __BOT_NAMES__
-from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import Config
 from tor.core.helpers import flair, send_to_modchat
 

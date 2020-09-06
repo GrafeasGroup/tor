@@ -7,7 +7,6 @@ from praw.models.reddit.mixins import InboxableMixin  # type: ignore
 
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
-from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import Config
 from tor.core.helpers import send_to_modchat, is_our_subreddit, _
 from tor.core.user_interaction import (process_claim, process_coc,

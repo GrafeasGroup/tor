@@ -61,6 +61,18 @@ d = ["aiohttp (>=3.3.2)", "aiohttp-cors"]
 
 [[package]]
 category = "main"
+description = "Wrapper for the Blossom API"
+name = "blossom-wrapper"
+optional = false
+python-versions = ">=3.6"
+version = "0.0.1"
+
+[package.source]
+reference = "59a6cca160ddf80d2081b08a9571d95cfa405e4b"
+type = "git"
+url = "git@github.com:GrafeasGroup/blossom-wrapper.git"
+[[package]]
+category = "main"
 description = "Automatic error monitoring for django, flask, etc."
 name = "bugsnag"
 optional = false
@@ -495,7 +507,8 @@ testing = ["jaraco.itertools", "func-timeout"]
 ci = []
 
 [metadata]
-content-hash = "876c1a4b857893e973bd2c37ccb8319cb13b61415496b7a923634cf02875ff31"
+content-hash = "39c997a81941ea2bfaded272204bca976f4fdd192b9c14a29148b4c4cbea95b5"
+lock-version = "1.0"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -519,6 +532,7 @@ black = [
     {file = "black-19.10b0-py36-none-any.whl", hash = "sha256:1b30e59be925fafc1ee4565e5e08abef6b03fe455102883820fe5ee2e4734e0b"},
     {file = "black-19.10b0.tar.gz", hash = "sha256:c2edb73a08e9e0e6f65a0e6af18b059b8b1cdd5bef997d7a0b181df93dc81539"},
 ]
+blossom-wrapper = []
 bugsnag = [
     {file = "bugsnag-3.9.0-py2.py3-none-any.whl", hash = "sha256:33cfcc6410a8c42311dd3958b5e5f5704e36617cd49bb53b59832a0cd6b90151"},
     {file = "bugsnag-3.9.0.tar.gz", hash = "sha256:2b4c2e2e0ab8b74328d187441ad02973a52a3e1d31beaffbc972788801dd8874"},

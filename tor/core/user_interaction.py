@@ -1,11 +1,11 @@
 import logging
 import random
 
+from blossom_wrapper import BlossomStatus
 from praw.exceptions import APIException  # type: ignore
 from praw.models import Comment, Message  # type: ignore
 
 from tor import __BOT_NAMES__
-from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import Config
 from tor.core.helpers import (_, get_wiki_page,
                               remove_if_required, send_reddit_reply, send_to_modchat)
@@ -142,7 +142,12 @@ def process_done(
         message = done_messages["cannot_find_transcript"]
     else:
         create_response = cfg.blossom.create_transcription(
-            transcription, blossom_submission["id"], not in_linked
+            transcription.id,
+            transcription.body,
+            transcription.permalink,
+            transcription.author.name,
+            blossom_submission["id"],
+            not in_linked
         )
         if create_response.status in [
             BlossomStatus.not_found, BlossomStatus.coc_not_accepted

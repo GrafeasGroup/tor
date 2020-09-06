@@ -5,13 +5,13 @@ import sys
 import time
 from typing import List, Tuple
 
+from blossom_wrapper import BlossomStatus
 from praw.exceptions import APIException  # type: ignore
 from praw.models import Comment, Submission, Subreddit  # type: ignore
 from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFound  # type: ignore
 
 import tor.core
 from tor.core import __version__
-from tor.core.blossom_wrapper import BlossomStatus
 from tor.core.config import config, Config
 from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation

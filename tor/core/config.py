@@ -1,8 +1,8 @@
 import datetime
-import logging
 import os
 from typing import Dict, List, Union
 
+from blossom_wrapper import BlossomAPI
 from praw import Reddit  # type: ignore
 from praw.models import Subreddit  # type: ignore
 from praw.models.reddit.subreddit import ModeratorRelationship  # type: ignore
@@ -10,7 +10,6 @@ from slackclient import SlackClient  # type: ignore
 
 from tor import __root__, __version__, __SELF_NAME__
 from tor.core import cached_property
-from tor.core.blossom_wrapper import BlossomAPI
 
 # Load configuration regardless of if bugsnag is setup correctly
 try:

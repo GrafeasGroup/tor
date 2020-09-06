@@ -22,6 +22,7 @@ bugsnag = "^3.6"
 requests = "^2.22"
 slackclient = "^1"
 PyYaml = "^5.1"
+blossom-wrapper = {git = "git@github.com:GrafeasGroup/blossom-wrapper.git", rev = "master"}
 
 [tool.poetry.dev-dependencies]
 better-exceptions = "^0.2.2"
