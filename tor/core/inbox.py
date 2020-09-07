@@ -1,20 +1,24 @@
 import logging
+import random
 import re
 
+from blossom_wrapper import BlossomStatus
 from praw.exceptions import ClientException  # type: ignore
 from praw.models import Comment, Message  # type: ignore
 from praw.models.reddit.mixins import InboxableMixin  # type: ignore
 
+from tor import __BOT_NAMES__
 from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
 from tor.core.config import Config
-from tor.core.helpers import send_to_modchat, is_our_subreddit, _
+from tor.core.helpers import _, is_our_subreddit, send_reddit_reply, send_to_modchat
+from tor.helpers.flair import flair_post
 from tor.core.user_interaction import (process_claim, process_coc,
                                        process_done, process_message,
-                                       process_thanks, process_unclaim,
-                                       process_wrong_post_location)
+                                       process_unclaim,)
 from tor.strings import translation
 
+i18n = translation()
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
     re.compile('undo', re.IGNORECASE),
@@ -26,7 +30,6 @@ log = logging.getLogger(__name__)
 
 def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
     username = str(item.author.name)
-    i18n = translation()
 
     send_to_modchat(
         f'<{i18n["urls"]["reddit_url"].format(item.context)}|Unhandled message>'
@@ -40,68 +43,59 @@ def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
     )
 
 
-def process_mod_intervention(post: Comment, cfg: Config) -> None:
-    """
-    Triggers an alert in slack with a link to the comment if there is something
-    offensive or in need of moderator intervention
-    """
-    # Collect all offenses (noted by the above regular expressions) from the
-    # original
-    phrase_list = []
-    for regex in MOD_SUPPORT_PHRASES:
-        matches = regex.search(post.body)
-        if not matches:
-            continue
-
-        phrase_list.append(matches.group())
-
-    if len(phrase_list) == 0:
-        # Nothing offensive here, why did this function get triggered?
-        return
-
-    # Wrap each phrase in double-quotes (") and commas in between
-    phrases = '"' + '", "'.join(phrase_list) + '"'
-
-    send_to_modchat(
-        f':rotating_light::rotating_light: Mod Intervention Needed '
-        f':rotating_light::rotating_light: '
-        f'\n\nDetected use of {phrases} {post.submission.shortlink}',
-        cfg
-    )
-
-
 def process_reply(reply: Comment, cfg: Config) -> None:
     try:
+        message = ""
+        flair = None
         r_body = reply.body.lower()  # cache that thing
 
-        if any([regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]):
-            process_mod_intervention(reply, cfg)
-
+        if matches := [match.group() for match in [regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES] if match]:
+            phrases = '"' + '", "'.join(matches) + '"'
+            send_to_modchat(
+                ":rotating_light::rotating_light: Mod Intervention Needed "
+                ":rotating_light::rotating_light: "
+                f'\n\nDetected use of {phrases} {reply.submission.shortlink}',
+                cfg
+            )
         elif 'image transcription' in r_body or validation.contains_footer(reply, cfg):
-            process_wrong_post_location(reply, cfg)
-
-        elif 'i accept' in r_body:
-            process_coc(reply, cfg)
-
-        elif 'unclaim' in r_body or 'cancel' in r_body:
-            process_unclaim(reply, cfg)
-
-        elif 'claim' in r_body or 'dibs' in r_body:
-            process_claim(reply, cfg)
-
-        elif 'done' in r_body or 'deno' in r_body or 'doen' in r_body:
-            alt_text = True if 'done' not in r_body else False
-            process_done(reply, cfg, alt_text_trigger=alt_text)
-
+            message = _(i18n['responses']['general']['transcript_on_tor_post'])
         elif 'thank' in r_body:  # trigger on "thanks" and "thank you"
-            process_thanks(reply, cfg)
-
-        elif '!override' in r_body:
-            process_override(reply, cfg)
-
+            thumbs_up_gifs = i18n['urls']['thumbs_up_gifs']
+            youre_welcome = i18n['responses']['general']['youre_welcome']
+            message = _(youre_welcome.format(random.choice(thumbs_up_gifs)))
         else:
-            # If we made it this far, it's something we can't process automatically
-            forward_to_slack(reply, cfg)
+            submission = reply.submission
+            username = reply.author.name
+            if submission.author.name not in __BOT_NAMES__:
+                log.debug("Received 'claim' on post we do not own. Ignoring.")
+                return
+
+            response = cfg.blossom.get_submission(reddit_id=submission.fullname)
+            if response.status != BlossomStatus.ok:
+                # If we are here, this means that the current submission is not yet in Blossom.
+                # TODO: Create the Submission in Blossom and try this method again.
+                raise Exception("The post is not present in Blossom.")
+            blossom_submission = response.data
+            if 'i accept' in r_body:
+                message, flair = process_coc(username, reply.context, reply, cfg)
+            elif 'unclaim' in r_body or 'cancel' in r_body:
+                message, flair = process_unclaim(
+                    username, blossom_submission, submission, cfg
+                )
+            elif 'claim' in r_body or 'dibs' in r_body:
+                message, flair = process_claim(username, blossom_submission, cfg)
+            elif 'done' in r_body or 'deno' in r_body or 'doen' in r_body:
+                alt_text = 'done' not in r_body
+                message, flair = process_done(reply.user, blossom_submission, cfg, alt_text_trigger=alt_text)
+            elif '!override' in r_body:
+                message, flair = process_override(reply.user, blossom_submission, reply.parent_id, cfg)
+            else:
+                # If we made it this far, it's something we can't process automatically
+                forward_to_slack(reply, cfg)
+        if message:
+            send_reddit_reply(reply, message)
+        if flair:
+            flair_post(reply.submission, flair)
 
     except (ClientException, AttributeError) as e:
         log.warning(e)
@@ -123,7 +117,6 @@ def process_mention(mention: Comment) -> None:
     :return: None.
     """
     try:
-        i18n = translation()
         pm_subject = i18n['responses']['direct_message']['subject']
         pm_body = i18n['responses']['direct_message']['body']
 

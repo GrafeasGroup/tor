@@ -3,14 +3,13 @@ from typing import Union, Tuple
 from praw.models import Comment, Redditor, Submission  # type: ignore
 
 from tor.core.config import Config
-from tor.core.helpers import get_parent_post_id, send_to_modchat
 from tor.strings import translation
 
 i18n = translation()
 
 
 def get_transcription(
-    submission: Submission, user: Redditor, cfg: Config
+    submission_url: str, user: Redditor, cfg: Config
 ) -> Tuple[Union[Comment, None], bool]:
     """
     Get the transcription Comment of the Submission by the provided user.
@@ -24,7 +23,7 @@ def get_transcription(
     This function also returns whether the transcription was available in the
     linked submission or not.
     """
-    linked_submission = cfg.r.submission(url=submission.url)
+    linked_submission = cfg.r.submission(url=submission_url)
     linked_submission.comments.replace_more(limit=0)
     for top_level_comment in linked_submission.comments.list():
         if all([

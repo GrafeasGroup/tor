@@ -1,16 +1,15 @@
 import logging
 import random
+from typing import Dict, Tuple
 
 from blossom_wrapper import BlossomStatus
-from praw.exceptions import APIException  # type: ignore
-from praw.models import Comment, Message  # type: ignore
+from praw.models import Message, Redditor, Submission  # type: ignore
 
-from tor import __BOT_NAMES__
 from tor.core.config import Config
 from tor.core.helpers import (_, get_wiki_page,
-                              remove_if_required, send_reddit_reply, send_to_modchat)
+                              remove_if_required, send_to_modchat)
 from tor.core.validation import get_transcription
-from tor.helpers.flair import flair, flair_post, set_user_flair
+from tor.helpers.flair import flair, set_user_flair
 from tor.strings import translation
 
 i18n = translation()
@@ -38,106 +37,103 @@ MODCHAT_EMOTES = [
 ]
 
 
-def process_coc(post: Comment, cfg: Config) -> None:
-    """Process the acceptation of the CoC by the specified user."""
-    username = post.author.name
+def process_coc(
+        username: str, context: str, blossom_submission: Dict, cfg: Config
+) -> Tuple:
+    """
+    Process the acceptation of the CoC by the specified user.
+
+    :param username: The name of the user accepting the CoC
+    :param context: The context of the reply, to use as a link
+    :param blossom_submission: The corresponding Submission in Blossom
+    :param cfg: Config of tor
+    """
     user_response = cfg.blossom.get_user(username=username)
     if user_response.status == BlossomStatus.ok:
-        # The status codes are not checked because they are already caught by
-        # getting the user.
+        # The status codes of accepting the CoC are not checked because they are already
+        # caught by getting the user.
         response = cfg.blossom.accept_coc(username=username)
         new_acceptance = response.status == BlossomStatus.ok
         if new_acceptance:
             emote = random.choice(MODCHAT_EMOTES)
-            user_url = i18n['urls']['reddit_url'].format(f'/u/{username}')
-            post_url = i18n['urls']['reddit_url'].format(post.context)
+            user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
+            post_url = i18n["urls"]["reddit_url"].format(context)
             send_to_modchat(
-                f'<{user_url}|u/{post.author.name}> has just'
-                f' <{post_url}|accepted the CoC!> {emote}',
+                f"<{user_url}|u/{username}> has just "
+                f"<{post_url}|accepted the CoC!> {emote}",
                 cfg,
-                channel='new_volunteers'
+                channel="new_volunteers"
             )
-        process_claim(post, cfg, first_time=new_acceptance)
+        return process_claim(username, blossom_submission, cfg, first_time=new_acceptance)
     elif user_response.status == BlossomStatus.not_found:
-        cfg.blossom.create_user(username=post.author.name)
-        send_reddit_reply(
-            post,
-            i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
-        )
+        cfg.blossom.create_user(username=username)
+        return i18n["responses"]["general"]["coc_not_accepted"].format(
+            get_wiki_page("codeofconduct", cfg)
+        ), None
     else:
-        process_claim(post, cfg)
+        return process_claim(username, blossom_submission, cfg)
 
 
-def process_claim(post: Comment, cfg: Config, first_time=False) -> None:
+def process_claim(
+        username: str, blossom_submission: Dict, cfg: Config, first_time=False
+) -> Tuple:
     """
     Process a claim request.
 
     This function sends a reply depending on the response from Blossom and
     creates an user when this is the first time a user uses the bot.
+
+    :param username: Name of the user claiming the submission
+    :param blossom_submission: The relevant submission in Blossom
+    :param cfg: Config of tor
+    :param first_time: Whether this is the first time a user claims something
     """
-    submission = post.submission
-    if submission.author.name not in __BOT_NAMES__:
-        log.debug("Received 'claim' on post we do not own. Ignoring.")
-        return
-
-    response = cfg.blossom.get_submission(reddit_id=submission.fullname)
-    if response.status != BlossomStatus.ok:
-        # If we are here, this means that the current submission is not yet in Blossom.
-        # TODO: Create the Submission in Blossom and try this method again.
-        raise Exception("The post is not present in Blossom.")
-
     response = cfg.blossom.claim(
-        submission_id=response.data["id"], username=post.author.name
+        submission_id=blossom_submission["id"], username=username
     )
+    return_flair = None
     if response.status == BlossomStatus.ok:
         message = i18n["responses"]["claim"]["first_claim_success" if first_time else "success"]
-        flair_post(submission, flair.in_progress)
-        log.info(f'Claim on Submission {submission.fullname} by {post.author} successful.')
+        return_flair = flair.in_progress
+        log.info(f'Claim on Submission {blossom_submission["tor_url"]} by {username} successful.')
     elif response.status == BlossomStatus.coc_not_accepted:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
     elif response.status == BlossomStatus.not_found:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
-        cfg.blossom.create_user(username=post.author.name)
+        cfg.blossom.create_user(username=username)
     elif response.status == BlossomStatus.blacklisted:
         message = i18n["responses"]["general"]["blacklisted"]
     else:
         message = i18n["responses"]["claim"]["already_claimed"]
-    send_reddit_reply(post, _(message))
+    return message, return_flair
 
 
 def process_done(
-    post: Comment, cfg: Config, override=False, alt_text_trigger=False
-) -> None:
+    user: Redditor,
+    blossom_submission: Dict,
+    cfg: Config,
+    override=False,
+    alt_text_trigger=False
+) -> Tuple:
     """
     Handles comments where the user claims to have completed a post.
 
     This function sends a reply to the user depending on the responses received
     from Blossom.
 
-    :param post: the Comment object which contains the string 'done'.
+    :param user: The user claiming his transcription is done
+    :param blossom_submission: The relevant submission in Blossom
     :param cfg: the global config object.
     :param override: whether the validation check should be skipped
     :param alt_text_trigger: whether there is an alternative to "done" that has
                              triggered this function.
     """
-    submission = post.submission
+    return_flair = None
     done_messages = i18n["responses"]["done"]
     coc_not_accepted = i18n["responses"]["general"]["coc_not_accepted"].format(
         get_wiki_page("codeofconduct", cfg)
     )
-
-    if submission.author.name not in __BOT_NAMES__:
-        log.debug("Received 'done' on post we do not own. Ignoring.")
-        return
-
-    response = cfg.blossom.get_submission(reddit_id=submission.fullname)
-    if response.status != BlossomStatus.ok:
-        # If we are here, this means that the current submission is not yet in Blossom.
-        # TODO: Create the Submission in Blossom and try this method again.
-        raise Exception(f"The Submission {submission.fullname} is not present in Blossom.")
-    blossom_submission = response.data
-
-    transcription, in_linked = get_transcription(submission, post.author, cfg)
+    transcription, in_linked = get_transcription(blossom_submission["url"], user, cfg)
     if transcription is None:
         message = done_messages["cannot_find_transcript"]
     else:
@@ -155,17 +151,17 @@ def process_done(
             if create_response.status == BlossomStatus.not_found:
                 # Since we know the Submission exists at this point, it should mean
                 # in fact the user is not found within Blossom.
-                cfg.blossom.create_user(username=post.author.name)
+                cfg.blossom.create_user(username=user.name)
             message = coc_not_accepted
         else:
             done_response = cfg.blossom.done(
-                blossom_submission["id"], post.author.name, override
+                blossom_submission["id"], user.name, override
             )
             # Note that both the not_found and coc_not_accepted status are already
             # caught in the previous lines of code, hence these are not checked again.
             if done_response.status == BlossomStatus.ok:
-                flair_post(submission, flair.completed)
-                set_user_flair(post.author, cfg)
+                return_flair = flair.completed
+                set_user_flair(user, cfg)
                 message = done_messages["completed_transcript"]
                 if alt_text_trigger:
                     message = f"I think you meant `done`, so here we go!\n\n{message}"
@@ -173,50 +169,46 @@ def process_done(
                 message = done_messages["already_completed"]
             elif done_response.status == BlossomStatus.missing_prerequisite:
                 message = done_messages["not_claimed_by_user"]
-            elif response.status == BlossomStatus.blacklisted:
+            elif done_response.status == BlossomStatus.blacklisted:
                 message = i18n["responses"]["general"]["blacklisted"]
             else:
                 message = done_messages["cannot_find_transcript"]
-    send_reddit_reply(post, _(message))
+    return message, return_flair
 
 
-def process_unclaim(post: Comment, cfg: Config) -> None:
+def process_unclaim(
+        username: str, blossom_submission: Dict, submission: Submission, cfg: Config
+) -> Tuple:
     """
     Process an unclaim request.
 
     Note that this function also checks whether a post should be removed and
     does so when required.
+
+    :param username: The name of the user unclaiming the submission
+    :param blossom_submission: The relevant Submission of Blossom
+    :param submission: The relevant Submission in Reddit
+    :param cfg: Config of tor
     """
-    submission = post.submission
-    if submission.author.name not in __BOT_NAMES__:
-        log.debug("Received 'unclaim' on post we do not own. Ignoring.")
-        return
-
-    response = cfg.blossom.get_submission(reddit_id=submission.fullname)
-    if response.status != BlossomStatus.ok:
-        # If we are here, this means that the current submission is not yet in Blossom.
-        # TODO: Create the Submission in Blossom and try this method again.
-        raise Exception(f"The Submission {submission.fullname} is not present in Blossom.")
-
-    blossom_submission = response.data
     response = cfg.blossom.unclaim(
-        submission_id=blossom_submission["id"], username=post.author.name
+        submission_id=blossom_submission["id"], username=username
     )
+    return_flair = None
     unclaim_messages = i18n["responses"]["unclaim"]
     if response.status == BlossomStatus.ok:
         message = unclaim_messages["success"]
-        flair_post(submission, flair.unclaimed)
+        return_flair = flair.unclaimed
         removed, reported = remove_if_required(submission, blossom_submission["id"], cfg)
         if removed:
             # Select the message based on whether the post was reported or not.
-            message = i18n[
+            message = unclaim_messages[
                 "success_with_report" if reported else "success_without_report"
             ]
     elif response.status == BlossomStatus.not_found:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(
             get_wiki_page("codeofconduct", cfg)
         )
-        cfg.blossom.create_user(post.author.name)
+        cfg.blossom.create_user(username)
     elif response.status == BlossomStatus.other_user:
         message = unclaim_messages["claimed_other_user"]
     elif response.status == BlossomStatus.already_completed:
@@ -225,27 +217,7 @@ def process_unclaim(post: Comment, cfg: Config) -> None:
         message = i18n["responses"]["general"]["blacklisted"]
     else:
         message = unclaim_messages["still_unclaimed"]
-    send_reddit_reply(post, _(message))
-
-
-def process_thanks(post: Comment, cfg: Config) -> None:
-    thumbs_up_gifs = i18n['urls']['thumbs_up_gifs']
-    youre_welcome = i18n['responses']['general']['youre_welcome']
-    try:
-        post.reply(_(youre_welcome.format(random.choice(thumbs_up_gifs))))
-    except APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
-            log.debug('Comment requiring thanks was deleted')
-            return
-        raise
-
-
-def process_wrong_post_location(post: Comment, cfg: Config) -> None:
-    transcript_on_tor_post = i18n['responses']['general']['transcript_on_tor_post']
-    try:
-        post.reply(_(transcript_on_tor_post))
-    except APIException:
-        log.debug('Something went wrong with asking about a misplaced post; ignoring.')
+    return message, return_flair
 
 
 def process_message(message: Message, cfg: Config) -> None:
