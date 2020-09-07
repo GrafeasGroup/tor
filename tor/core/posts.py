@@ -107,7 +107,6 @@ def handle_youtube(post: PostSummary, cfg: Config) -> bool:
         video_id = get_yt_video_id(url)
         submission = cfg.r.submission(id=post["name"])
         submission.reply(_(i18n["posts"]["yt_already_has_transcripts"]))
-        # TODO: Determine whether we want automatic completions to be added to Blossom
         log.info(f"Found YouTube video, https://youtu.be/{video_id}, with good transcripts.")
     return is_youtube_url(url) and not is_transcribable_youtube_video(url)
 

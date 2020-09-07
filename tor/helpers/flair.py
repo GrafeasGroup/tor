@@ -66,7 +66,7 @@ def set_user_flair(user: Redditor, cfg: Config) -> None:
     This function uses Blossom to retrieve the up to date gamma. The current
     flair postfix is left intact in the process.
     """
-    flair_postfix = " - Beta Tester"
+    flair_postfix = ""
     gamma = 0
     user_response = cfg.blossom.get_user(username=user.name)
     if user_response.status == BlossomStatus.ok:

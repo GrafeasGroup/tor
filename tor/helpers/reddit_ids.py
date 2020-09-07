@@ -1,12 +1,11 @@
+from blossom_wrapper import BlossomStatus
 from praw.models import Submission  # type: ignore
 
 from tor.core.config import Config
 
 
 def has_been_posted(post_id: str, cfg: Config) -> bool:
-    # TODO: This check requires a check of existence in Blossom based on the "url"
-    # property, which is not available as of now.
-    return False
+    return cfg.blossom.get_submission(post_id).status == BlossomStatus.ok
 
 
 def is_removed(post: Submission) -> bool:
