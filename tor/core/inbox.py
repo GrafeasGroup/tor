@@ -12,6 +12,7 @@ from tor.core import validation
 from tor.core.admin_commands import process_command, process_override
 from tor.core.config import Config
 from tor.core.helpers import _, is_our_subreddit, send_reddit_reply, send_to_modchat
+from tor.core.posts import get_blossom_submission
 from tor.helpers.flair import flair_post
 from tor.core.user_interaction import (process_claim, process_coc,
                                        process_done, process_message,
@@ -70,14 +71,11 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 log.debug("Received 'claim' on post we do not own. Ignoring.")
                 return
 
-            response = cfg.blossom.get_submission(reddit_id=submission.fullname)
-            if response.status != BlossomStatus.ok:
-                # If we are here, this means that the current submission is not yet in Blossom.
-                # TODO: Create the Submission in Blossom and try this method again.
-                raise Exception("The post is not present in Blossom.")
-            blossom_submission = response.data
+            blossom_submission = get_blossom_submission(submission, cfg)
             if 'i accept' in r_body:
-                message, flair = process_coc(username, reply.context, reply, cfg)
+                message, flair = process_coc(
+                    username, reply.context, blossom_submission, cfg
+                )
             elif 'unclaim' in r_body or 'cancel' in r_body:
                 message, flair = process_unclaim(
                     username, blossom_submission, submission, cfg

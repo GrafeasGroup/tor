@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, Union
 
+from blossom_wrapper import BlossomStatus
 from praw.models import Submission  # type: ignore
 
 from tor.core.config import Config
@@ -136,6 +137,23 @@ def request_transcription(
     )
     submission.reply(_(intro))
     flair_post(submission, flair.unclaimed)
-    cfg.blossom.create_submission(
-        submission.fullname, submission.url, permalink, post['url']
+    create_blossom_submission(submission, cfg, post["url"])
+
+
+def create_blossom_submission(
+        submission: Submission, cfg: Config, content_url: str = None
+) -> Dict:
+    own_link = i18n["urls"]["reddit_url"].format(str(submission.permalink))
+    content_url = content_url or cfg.r.submission(url=submission.url).url
+    return cfg.blossom.create_submission(
+        submission.fullname, own_link, submission.url, content_url
     )
+
+
+def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
+    response = cfg.blossom.get_submission(reddit_id=submission.fullname)
+    if response.status == BlossomStatus.ok:
+        return response.data
+    else:
+        # If we are here, this means that the current submission is not yet in Blossom.
+        return create_blossom_submission(submission, cfg)
