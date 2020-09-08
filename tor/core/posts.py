@@ -136,7 +136,7 @@ def request_transcription(
     )
     submission.reply(_(intro))
     flair_post(submission, flair.unclaimed)
-    create_blossom_submission(submission, cfg, post["url"])
+    create_blossom_submission(submission, cfg, str(post["url"]))
 
 
 def create_blossom_submission(

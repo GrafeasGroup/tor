@@ -2,7 +2,6 @@ import pytest  # type: ignore
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
-from tor.core.admin_commands import from_moderator
 from tor.core.admin_commands import process_override
 
 

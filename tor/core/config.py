@@ -77,7 +77,7 @@ class Config(object):
     audio_formatting = ''
     image_formatting = ''
     other_formatting = ''
-    upvote_filter_subs: Dict[str, int] = {}
+    upvote_filter_subs: Dict[str, float] = {}
     no_link_header_subs: List[str] = []
 
 
