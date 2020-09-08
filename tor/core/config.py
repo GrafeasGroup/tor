@@ -47,10 +47,6 @@ class Config(object):
     perform_header_check = True
     debug_mode = False
 
-    # Name of the bot
-    name = __SELF_NAME__
-    bot_version = __version__
-
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
 
     @cached_property

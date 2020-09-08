@@ -6,22 +6,29 @@ from tor.core.config import Config
 from tor.core.helpers import clean_list, get_wiki_page
 
 # Use a logger local to this module
-log = logging.getLogger(__name__)
+log = logging.getLogger()
 
 
-def configure_logging(cfg: Config, log_name='transcribersofreddit.log') -> None:
-    # will intercept anything error level or above
+def configure_logging(cfg: Config, log_name="transcribersofreddit.log") -> None:
+    # Set formatting and logging level.
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(funcName)s | %(message)s",
+        filename=log_name,
+    )
+
     if cfg.bugsnag_api_key:
+        # will intercept anything error level or above
         bs_handler = BugsnagHandler()
         bs_handler.setLevel(logging.ERROR)
-        logging.getLogger('').addHandler(bs_handler)
-        log.info('Bugsnag enabled!')
+        logging.getLogger().addHandler(bs_handler)
+        log.info('Bugsnag is successfully enabled!')
     else:
-        log.info('Not running with Bugsnag!')
+        log.info("No Bugsnag API Key found. Not running with Bugsnag!")
 
-    log.info('*' * 50)
-    log.info('Starting!')
-    log.info('*' * 50)
+    log.info("*" * 50)
+    log.info("Logging configured. Starting program!")
+    log.info("*" * 50)
 
 
 def populate_header(cfg: Config) -> None:

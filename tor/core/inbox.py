@@ -46,6 +46,7 @@ def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
 
 def process_reply(reply: Comment, cfg: Config) -> None:
     try:
+        log.debug(f"Received reply from {reply.author.name}: {reply.body}")
         message = ""
         flair = None
         r_body = reply.body.lower()  # cache that thing
@@ -68,7 +69,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
             submission = reply.submission
             username = reply.author.name
             if submission.author.name not in __BOT_NAMES__:
-                log.debug("Received 'claim' on post we do not own. Ignoring.")
+                log.debug("Received 'command' on post we do not own. Ignoring.")
                 return
 
             blossom_submission = get_blossom_submission(submission, cfg)

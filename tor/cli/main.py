@@ -61,7 +61,7 @@ DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
 # Streams:
 # https://www.youtube.com/watch?v=hX3j0sQ7ot8  # he's dead, Jim
 
-log = logging.getLogger(__name__)
+log = logging.getLogger()
 
 
 def parse_arguments():
@@ -95,26 +95,25 @@ def run(cfg):
 
 
 def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(levelname)s | %(funcName)s | %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S',
-    )
-
+    configure_logging(config)
     config.debug_mode = DEBUG_MODE
 
     if config.debug_mode:
-        bot_name = 'debug'
+        bot_name = "debug"
     else:
-        bot_name = os.environ.get('BOT_NAME', 'bot')
+        bot_name = os.environ.get("BOT_NAME", "bot")
 
-    config.r = Reddit(bot_name)
-    config.name = 'u/ToR'
-    config.bot_version = __version__
-    configure_logging(config)
+    log.info(f"Connecting to Reddit as {bot_name}.")
+    config.r = Reddit(
+        user_agent=bot_name,
+        client_id=os.environ.get("REDDIT_CLIENT_ID", ""),
+        client_secret=os.environ.get("REDDIT_SECRET", ""),
+        username=os.environ.get("REDDIT_USERNAME", ""),
+        password=os.environ.get("REDDIT_PASSWORD", "")
+    )
     initialize(config)
     config.perform_header_check = True
-    log.info('Bot built and initialized')
+    log.info("Bot built and initialized")
 
     tor.__SELF_NAME__ = config.r.user.me().name
     if tor.__SELF_NAME__ not in tor.__BOT_NAMES__:
@@ -126,5 +125,5 @@ def main():
         run_until_dead(run)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
