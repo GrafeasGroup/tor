@@ -19,7 +19,6 @@ jobs:
           python-version: '3.x'
           architecture: 'x64'
       - run: |
-          sudo apt-get install git
           pip install --upgrade pip
           pip install poetry
           hash -r
@@ -44,8 +43,6 @@ jobs:
           architecture: 'x64'
       - name: Install Poetry
         run: |
-          sudo apt-get install git
-          git clone --recurse-submodules git@github.com:GrafeasGroup/blossom-wrapper.git
           pip install --upgrade pip
           pip install poetry
           hash -r
