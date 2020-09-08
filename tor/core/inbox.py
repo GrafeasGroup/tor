@@ -84,9 +84,9 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 message, flair = process_claim(username, blossom_submission, cfg)
             elif 'done' in r_body or 'deno' in r_body or 'doen' in r_body:
                 alt_text = 'done' not in r_body
-                message, flair = process_done(reply.user, blossom_submission, cfg, alt_text_trigger=alt_text)
+                message, flair = process_done(reply.author, blossom_submission, reply, cfg, alt_text_trigger=alt_text)
             elif '!override' in r_body:
-                message, flair = process_override(reply.user, blossom_submission, reply.parent_id, cfg)
+                message, flair = process_override(reply.author, blossom_submission, reply.parent_id, cfg)
             else:
                 # If we made it this far, it's something we can't process automatically
                 forward_to_slack(reply, cfg)

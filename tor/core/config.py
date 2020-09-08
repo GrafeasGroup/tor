@@ -60,7 +60,6 @@ class Config(object):
             password=os.getenv('BLOSSOM_PASSWORD'),
             api_key=os.getenv('BLOSSOM_API_KEY'),
             api_base_url=os.getenv('BLOSSOM_API_URL'),
-            login_url=os.getenv('BLOSSOM_LOGIN_URL'),
         )
 
     @cached_property

@@ -275,7 +275,7 @@ def remove_if_required(
     removal, reported = _check_removal_required(submission, cfg)
     if removal:
         submission.mod.remove()
-        response = cfg.blossom.submission_delete(blossom_id)
+        response = cfg.blossom.delete_submission(blossom_id)
         if response.status != BlossomStatus.ok:
             return False, False
 

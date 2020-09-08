@@ -1,11 +1,11 @@
 import logging
 
 from blossom_wrapper import BlossomStatus
-from praw.models import Redditor, Submission  # type: ignore
+from praw.models import Comment, Redditor, Submission  # type: ignore
 
 from tor import __BOT_NAMES__
 from tor.core.config import Config
-from tor.core.helpers import flair, send_to_modchat
+from tor.core.helpers import clean_id, flair, send_to_modchat
 
 log = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ def _get_flair_css(transcription_count: int) -> str:
         return 'grafeas'
 
 
-def set_user_flair(user: Redditor, cfg: Config) -> None:
+def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
     """
     Set the flair from the comment's author according to their gamma and current flair
 
@@ -73,15 +73,18 @@ def set_user_flair(user: Redditor, cfg: Config) -> None:
         gamma = user_response.data["gamma"]
         try:
             # Retrieve the possible custom postfix from the user's current flair.
-            current_flair = next(cfg.tor.flair(redditor=user)).flair_text
-            flair_postfix = current_flair[current_flair.index("Γ") + 1:]
+            # Since there is no way to do this nicely, retrieve this flair from
+            # the posted comment.
+            current_flair = cfg.r.comment(id=clean_id(post.fullname)).author_flair_text
+            if current_flair:
+                flair_postfix = current_flair[current_flair.index("<CE><93>") + 1:]
         except StopIteration or AttributeError:
             # In this situation, either the user is not found or they do not have a flair.
             # This is not problematic and we will instead just use the standard flair.
             pass
     user_flair = f"{gamma} Γ{flair_postfix}"
     flair_css = _get_flair_css(gamma)
-    cfg.tor.flair.set(user.name, text=user_flair, css_classs=flair_css)
+    cfg.tor.flair.set(user.name, text=user_flair, css_class=flair_css)
 
 
 def set_meta_flair_on_other_posts(cfg: Config) -> None:

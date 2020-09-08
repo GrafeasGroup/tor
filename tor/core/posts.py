@@ -82,7 +82,7 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
     return all(
         [
             has_enough_upvotes(post, cfg),
-            not has_been_posted(str(post["name"]), cfg),
+            not has_been_posted(i18n["urls"]["reddit_url"].format(post["permalink"]), cfg),
             not post["archived"],
             post["author"]
         ]
@@ -150,7 +150,7 @@ def create_blossom_submission(
 
 
 def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
-    response = cfg.blossom.get_submission(reddit_id=submission.fullname)
+    response = cfg.blossom.get_submission(submission.url)
     if response.status == BlossomStatus.ok:
         return response.data
     else:

@@ -3,7 +3,7 @@ import random
 from typing import Dict, Tuple
 
 from blossom_wrapper import BlossomStatus
-from praw.models import Message, Redditor, Submission  # type: ignore
+from praw.models import Comment, Message, Redditor, Submission  # type: ignore
 
 from tor.core.config import Config
 from tor.core.helpers import (_, get_wiki_page,
@@ -53,7 +53,7 @@ def process_coc(
         # The status codes of accepting the CoC are not checked because they are already
         # caught by getting the user.
         response = cfg.blossom.accept_coc(username=username)
-        new_acceptance = response.status == BlossomStatus.ok
+        new_acceptance = (response.status == BlossomStatus.ok)
         if new_acceptance:
             emote = random.choice(MODCHAT_EMOTES)
             user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
@@ -111,6 +111,7 @@ def process_claim(
 def process_done(
     user: Redditor,
     blossom_submission: Dict,
+    post: Comment,
     cfg: Config,
     override=False,
     alt_text_trigger=False
@@ -123,6 +124,7 @@ def process_done(
 
     :param user: The user claiming his transcription is done
     :param blossom_submission: The relevant submission in Blossom
+    :param post: The post of the user, used to retrieve the user's flair
     :param cfg: the global config object.
     :param override: whether the validation check should be skipped
     :param alt_text_trigger: whether there is an alternative to "done" that has
@@ -161,7 +163,7 @@ def process_done(
             # caught in the previous lines of code, hence these are not checked again.
             if done_response.status == BlossomStatus.ok:
                 return_flair = flair.completed
-                set_user_flair(user, cfg)
+                set_user_flair(user, post, cfg)
                 message = done_messages["completed_transcript"]
                 if alt_text_trigger:
                     message = f"I think you meant `done`, so here we go!\n\n{message}"

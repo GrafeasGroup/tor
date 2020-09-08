@@ -128,7 +128,7 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
             f'approved by {user.name}'
         )
         return process_done(
-            user, blossom_submission, cfg, override=True
+            parents_parent.author, blossom_submission, parents_parent, cfg, override=True
         )
 
 
