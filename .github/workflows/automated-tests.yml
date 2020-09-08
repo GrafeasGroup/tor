@@ -45,6 +45,7 @@ jobs:
       - name: Install Poetry
         run: |
           sudo apt-get install git
+          git clone --recurse-submodules git@github.com:GrafeasGroup/blossom-wrapper.git
           pip install --upgrade pip
           pip install poetry
           hash -r
