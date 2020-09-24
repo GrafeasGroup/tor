@@ -4,6 +4,7 @@ import time
 import logging
 
 from praw import Reddit  # type: ignore
+from dotenv import load_dotenv
 
 # The `import tor` lines is necessary because `tor.__SELF_NAME__` is
 # set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1
@@ -41,18 +42,27 @@ DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
 # List is in alphabetical order. Anyone who contributes to this
 # codebase is invited to add their tunes!
 #
+# Alec Benjamin
 # Alison Wonderland
+# Apashe
 # Aramanthe
+# Betty Who
+# blink-182
 # Braxton Burks
 # Caravan Palace
+# Daft Punk
 # David Bowie
+# Dorothy
 # Hiromi
 # Girl Talk
+# Green Day
 # Icon for Hire
 # Inverness
+# John Williams
 # K-391
 # Lady Gaga
 # Neon Hitch
+# Rage Against the Machine
 # The Beatles
 # The Killers
 # Two Door Cinema Club
@@ -62,6 +72,7 @@ DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
 # https://www.youtube.com/watch?v=hX3j0sQ7ot8  # he's dead, Jim
 
 log = logging.getLogger()
+load_dotenv()
 
 
 def parse_arguments():
@@ -91,7 +102,7 @@ def run(cfg):
     set_meta_flair_on_other_posts(cfg)
 
     if cfg.debug_mode:
-        time.sleep(60)
+        time.sleep(15)
 
 
 def main():

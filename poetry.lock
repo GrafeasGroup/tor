@@ -72,6 +72,7 @@ version = "0.0.1"
 reference = "0177c18d81dfa0db0dd197b010808dd368ad1d21"
 type = "git"
 url = "https://github.com/GrafeasGroup/blossom-wrapper.git"
+
 [[package]]
 category = "main"
 description = "Automatic error monitoring for django, flask, etc."
@@ -253,23 +254,36 @@ category = "main"
 description = "PRAW, an acronym for `Python Reddit API Wrapper`, is a python package that allows for simple access to reddit's API."
 name = "praw"
 optional = false
-python-versions = "*"
-version = "5.0.1"
+python-versions = ">3.5.3"
+version = "7.1.0"
 
 [package.dependencies]
-prawcore = ">=0.11.0,<0.12"
-update-checker = ">=0.16"
+prawcore = ">=1.3.0,<2.0"
+update-checker = ">=0.17"
+websocket-client = ">=0.54.0"
+
+[package.extras]
+ci = ["coveralls"]
+dev = ["pre-commit", "black", "flake8", "pydocstyle", "sphinx (<3.0)", "sphinx-rtd-theme", "betamax (>=0.8,<0.9)", "betamax-matchers (>=0.3.0,<0.5)", "pytest (>=2.7.3)"]
+lint = ["black", "flake8", "pydocstyle", "sphinx (<3.0)", "sphinx-rtd-theme"]
+test = ["betamax (>=0.8,<0.9)", "betamax-matchers (>=0.3.0,<0.5)", "pytest (>=2.7.3)"]
 
 [[package]]
 category = "main"
 description = "Low-level communication layer for PRAW 4+."
 name = "prawcore"
 optional = false
-python-versions = "*"
-version = "0.11.0"
+python-versions = ">=3.5"
+version = "1.5.0"
 
 [package.dependencies]
 requests = ">=2.6.0,<3.0"
+
+[package.extras]
+ci = ["coveralls"]
+dev = ["black", "flake8", "pre-commit", "pydocstyle", "betamax (>=0.8,<0.9)", "betamax-matchers (>=0.4.0,<0.5)", "betamax-serializers (>=0.2.0,<0.3)", "mock (>=0.8)", "pytest", "testfixtures (>4.13.2,<7)"]
+lint = ["black", "flake8", "pre-commit", "pydocstyle"]
+test = ["betamax (>=0.8,<0.9)", "betamax-matchers (>=0.4.0,<0.5)", "betamax-serializers (>=0.2.0,<0.3)", "mock (>=0.8)", "pytest", "testfixtures (>4.13.2,<7)"]
 
 [[package]]
 category = "dev"
@@ -343,6 +357,17 @@ pytest = ">=4.6"
 
 [package.extras]
 testing = ["fields", "hunter", "process-tests (2.0.2)", "six", "pytest-xdist", "virtualenv"]
+
+[[package]]
+category = "main"
+description = "Add .env support to your django/flask apps in development and deployments"
+name = "python-dotenv"
+optional = false
+python-versions = "*"
+version = "0.14.0"
+
+[package.extras]
+cli = ["click (>=5.0)"]
 
 [[package]]
 category = "main"
@@ -508,8 +533,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 ci = []
 
 [metadata]
-content-hash = "670fb55ccd5e5b159618786eaeec48dbbc58fb19b05ee4ff46a521ad4e2e1c25"
-lock-version = "1.0"
+content-hash = "8e43b045260f398790de9a4a4dce235107d3a8b348e58f5d947484be5600de43"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -643,12 +667,12 @@ pluggy = [
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
 ]
 praw = [
-    {file = "praw-5.0.1-py2.py3-none-any.whl", hash = "sha256:1b8ed25291494d7958fd8db7b09630ac912344869de75e04da98fcf57ace6e1a"},
-    {file = "praw-5.0.1.tar.gz", hash = "sha256:741482ec00d28d40ce4b76f7fdbd19260f1d4aa4ea34e14940f30ce3f8c5132d"},
+    {file = "praw-7.1.0-py3-none-any.whl", hash = "sha256:6b93ad1e53385c68753203ec87f4d0053b2425b09fc8813847800a542efdfe6c"},
+    {file = "praw-7.1.0.tar.gz", hash = "sha256:fb55e46203a771342da7cbe144fbcd8c61d825719ce1025bdd72112194a0228f"},
 ]
 prawcore = [
-    {file = "prawcore-0.11.0-py2.py3-none-any.whl", hash = "sha256:f4341194358672c8751edad57787e4c416283dcdb0ca21e801760b90e3200b8b"},
-    {file = "prawcore-0.11.0.tar.gz", hash = "sha256:06758801e928ff8d6a3ca7da832b1e74f7f6b41a6b74ce36d892805b190ff712"},
+    {file = "prawcore-1.5.0-py3-none-any.whl", hash = "sha256:672d8a2faa12b44307874b2acfdd27f9cbaa5fa37bada4b34e36277224e6d8ed"},
+    {file = "prawcore-1.5.0.tar.gz", hash = "sha256:1f1eafc8a65d671f9892354f73142014fbb5d3a9ee621568c662d0a354e0578b"},
 ]
 py = [
     {file = "py-1.9.0-py2.py3-none-any.whl", hash = "sha256:366389d1db726cd2fcfc79732e75410e5fe4d31db13692115529d34069a043c2"},
@@ -673,6 +697,10 @@ pytest = [
 pytest-cov = [
     {file = "pytest-cov-2.10.1.tar.gz", hash = "sha256:47bd0ce14056fdd79f93e1713f88fad7bdcc583dcd7783da86ef2f085a0bb88e"},
     {file = "pytest_cov-2.10.1-py2.py3-none-any.whl", hash = "sha256:45ec2d5182f89a81fc3eb29e3d1ed3113b9e9a873bcddb2a71faaab066110191"},
+]
+python-dotenv = [
+    {file = "python-dotenv-0.14.0.tar.gz", hash = "sha256:8c10c99a1b25d9a68058a1ad6f90381a62ba68230ca93966882a4dbc3bc9c33d"},
+    {file = "python_dotenv-0.14.0-py2.py3-none-any.whl", hash = "sha256:c10863aee750ad720f4f43436565e4c1698798d763b63234fb5021b6c616e423"},
 ]
 pyyaml = [
     {file = "PyYAML-5.3.1-cp27-cp27m-win32.whl", hash = "sha256:74809a57b329d6cc0fdccee6318f44b9b8649961fa73144a98735b0aaf029f1f"},

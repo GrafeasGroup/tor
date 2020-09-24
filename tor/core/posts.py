@@ -150,9 +150,9 @@ def create_blossom_submission(
 
 
 def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
-    response = cfg.blossom.get_submission(submission.url)
+    response = cfg.blossom.get_submission(url=submission.url)
     if response.status == BlossomStatus.ok:
-        return response.data
+        return response.data[0]
     else:
         # If we are here, this means that the current submission is not yet in Blossom.
         return create_blossom_submission(submission, cfg)

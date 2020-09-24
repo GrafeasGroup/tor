@@ -48,6 +48,7 @@ def process_coc(
     :param blossom_submission: The corresponding Submission in Blossom
     :param cfg: Config of tor
     """
+    breakpoint()
     user_response = cfg.blossom.get_user(username=username)
     if user_response.status == BlossomStatus.ok:
         # The status codes of accepting the CoC are not checked because they are already
@@ -135,46 +136,54 @@ def process_done(
     coc_not_accepted = i18n["responses"]["general"]["coc_not_accepted"].format(
         get_wiki_page("codeofconduct", cfg)
     )
-    transcription, in_linked = get_transcription(blossom_submission["url"], user, cfg)
+
+    blossom_user = cfg.blossom.get_user(username=user.name)
+    if blossom_user.status != BlossomStatus.ok:
+        # If we don't know who the volunteer is, then we don't have a record of
+        # them and they need to go through the code of conduct process.
+        return coc_not_accepted, return_flair
+
+    if not blossom_user.data['accepted_coc']:
+        # If the volunteer in question hasn't accepted the code of conduct,
+        # eject early and return. Although the `create_transcription` endpoint
+        # returns a code of conduct check, we only hit it when we create a
+        # transcription, which requires that they wrote something. If a volunteer
+        # just writes `done` without putting a transcription down, it will hit
+        # this edge case.
+        return coc_not_accepted, return_flair
+
+    transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
     if transcription is None:
         message = done_messages["cannot_find_transcript"]
     else:
-        create_response = cfg.blossom.create_transcription(
+        cfg.blossom.create_transcription(
             transcription.id,
             transcription.body,
             transcription.permalink,
             transcription.author.name,
             blossom_submission["id"],
-            not in_linked
+            not is_visible
         )
-        if create_response.status in [
-            BlossomStatus.not_found, BlossomStatus.coc_not_accepted
-        ]:
-            if create_response.status == BlossomStatus.not_found:
-                # Since we know the Submission exists at this point, it should mean
-                # in fact the user is not found within Blossom.
-                cfg.blossom.create_user(username=user.name)
-            message = coc_not_accepted
+
+        done_response = cfg.blossom.done(
+            blossom_submission["id"], user.name, override
+        )
+        # Note that both the not_found and coc_not_accepted status are already
+        # caught in the previous lines of code, hence these are not checked again.
+        if done_response.status == BlossomStatus.ok:
+            return_flair = flair.completed
+            set_user_flair(user, post, cfg)
+            message = done_messages["completed_transcript"]
+            if alt_text_trigger:
+                message = f"I think you meant `done`, so here we go!\n\n{message}"
+        elif done_response.status == BlossomStatus.already_completed:
+            message = done_messages["already_completed"]
+        elif done_response.status == BlossomStatus.missing_prerequisite:
+            message = done_messages["not_claimed_by_user"]
+        elif done_response.status == BlossomStatus.blacklisted:
+            message = i18n["responses"]["general"]["blacklisted"]
         else:
-            done_response = cfg.blossom.done(
-                blossom_submission["id"], user.name, override
-            )
-            # Note that both the not_found and coc_not_accepted status are already
-            # caught in the previous lines of code, hence these are not checked again.
-            if done_response.status == BlossomStatus.ok:
-                return_flair = flair.completed
-                set_user_flair(user, post, cfg)
-                message = done_messages["completed_transcript"]
-                if alt_text_trigger:
-                    message = f"I think you meant `done`, so here we go!\n\n{message}"
-            elif done_response.status == BlossomStatus.already_completed:
-                message = done_messages["already_completed"]
-            elif done_response.status == BlossomStatus.missing_prerequisite:
-                message = done_messages["not_claimed_by_user"]
-            elif done_response.status == BlossomStatus.blacklisted:
-                message = i18n["responses"]["general"]["blacklisted"]
-            else:
-                message = done_messages["cannot_find_transcript"]
+            message = done_messages["cannot_find_transcript"]
     return message, return_flair
 
 

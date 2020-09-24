@@ -40,7 +40,7 @@ posts:
     ---
 
     **Please Note:** If you are trying to transcribe on Reddit mobile, you will not be able to copy/paste this footer. Please switch to your mobile browser and copy the footer to a note file on your device.
-    
+
     When you're done, please put the following footer at the **bottom** of your post:
 
     ---
@@ -78,18 +78,18 @@ responses:
     not_claimed_by_user: |
       It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else! If you are unable to resolve this situation, please message the mods.
     already_completed: |
-      This post is already completed! Thanks for your effort!
+      This post has already been marked as completed! Why not hit the queue for a new post?
     completed_transcript: |
       Awesome, thanks for your help! I'll update your flair to reflect your new count.
 
-      If you want to help keep these bots running, please consider [donating via Patreon or Stripe](https://www.reddit.com/r/transcribersofreddit/wiki/donations).
+      If you want to help keep these bots running, please consider [donating via Patreon or Stripe](https://www.reddit.com/r/transcribersofreddit/wiki/donations)!
     cannot_find_transcript: |
       Sorry; I can't find your transcript post on the link. Please message the mods to have them look at this.
 
       Alternatively, did you remember to put the footer in your comment? _Make sure_ that you're copying and pasting the footer as it's shown, complete with all the special characters!
-      
+
       If the footer is correct, have you tried replying "Done" again after one-two minutes? Sometimes, freshly posted transcriptions are not seen by the bot, so trying again should fix the issue.
-      
+
       If it still doesn't work, it could be the sign of another bug; let us know by [sending a Modmail](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Issue&message=) so we can take a look!
   unclaim:
     still_unclaimed: |
@@ -112,7 +112,7 @@ responses:
     coc_not_accepted: |
       Hi there! Please read and accept our Code of Conduct so that we can get you started with transcribing. Please read the Code of Conduct below, then respond to this comment with `I accept`.
 
-      After you respond, I'll process your claim as normal. A mod will check in and give you feedback when you’re finished!
+      After you respond, I'll process your request as normal. A mod will check in and give you feedback when you’re finished!
 
       ---
 
@@ -124,7 +124,7 @@ responses:
 
       Want a handy checklist to help keep track of everything? Check it out [HERE!](https://www.reddit.com/r/transcribersofreddit/wiki/checklist)
 
-      Don't forget to follow the formatting that I link above, and don't be shy to ask for assistance in either our [Discord](https://discord.gg/b5DqZXq) or [message the mods!](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Help&message=)
+      Don't forget to follow the formatting that I link above, and don't be shy to ask for assistance in either our [Discord](https://discord.gg/ZDDE3Pj) or [message the mods!](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Help&message=)
 
       Cheers!
     new_reddit_transcript: |

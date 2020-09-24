@@ -5,7 +5,7 @@ from tor.core.config import Config
 
 
 def has_been_posted(post_url: str, cfg: Config) -> bool:
-    return cfg.blossom.get_submission(post_url).status == BlossomStatus.ok
+    return cfg.blossom.get_submission(url=post_url).status == BlossomStatus.ok
 
 
 def is_removed(post: Submission) -> bool:

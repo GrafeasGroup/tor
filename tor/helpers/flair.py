@@ -78,7 +78,7 @@ def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
             current_flair = cfg.r.comment(id=clean_id(post.fullname)).author_flair_text
             if current_flair:
                 flair_postfix = current_flair[current_flair.index("<CE><93>") + 1:]
-        except StopIteration or AttributeError:
+        except (StopIteration, AttributeError, ValueError):
             # In this situation, either the user is not found or they do not have a flair.
             # This is not problematic and we will instead just use the standard flair.
             pass
