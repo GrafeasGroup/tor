@@ -48,7 +48,6 @@ def process_coc(
     :param blossom_submission: The corresponding Submission in Blossom
     :param cfg: Config of tor
     """
-    breakpoint()
     user_response = cfg.blossom.get_user(username=username)
     if user_response.status == BlossomStatus.ok:
         # The status codes of accepting the CoC are not checked because they are already
@@ -89,6 +88,8 @@ def process_claim(
     :param cfg: Config of tor
     :param first_time: Whether this is the first time a user claims something
     """
+    coc_not_accepted = i18n["responses"]["general"]["coc_not_accepted"]
+
     response = cfg.blossom.claim(
         submission_id=blossom_submission["id"], username=username
     )
@@ -97,25 +98,30 @@ def process_claim(
         message = i18n["responses"]["claim"]["first_claim_success" if first_time else "success"]
         return_flair = flair.in_progress
         log.info(f'Claim on Submission {blossom_submission["tor_url"]} by {username} successful.')
+
     elif response.status == BlossomStatus.coc_not_accepted:
-        message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
+        message = coc_not_accepted.format(get_wiki_page("codeofconduct", cfg))
+
     elif response.status == BlossomStatus.not_found:
-        message = i18n["responses"]["general"]["coc_not_accepted"].format(get_wiki_page("codeofconduct", cfg))
+        message = coc_not_accepted.format(get_wiki_page("codeofconduct", cfg))
         cfg.blossom.create_user(username=username)
+
     elif response.status == BlossomStatus.blacklisted:
         message = i18n["responses"]["general"]["blacklisted"]
+
     else:
         message = i18n["responses"]["claim"]["already_claimed"]
+
     return message, return_flair
 
 
 def process_done(
-    user: Redditor,
-    blossom_submission: Dict,
-    post: Comment,
-    cfg: Config,
-    override=False,
-    alt_text_trigger=False
+        user: Redditor,
+        blossom_submission: Dict,
+        post: Comment,
+        cfg: Config,
+        override=False,
+        alt_text_trigger=False
 ) -> Tuple:
     """
     Handles comments where the user claims to have completed a post.
@@ -133,15 +139,17 @@ def process_done(
     """
     return_flair = None
     done_messages = i18n["responses"]["done"]
-    coc_not_accepted = i18n["responses"]["general"]["coc_not_accepted"].format(
-        get_wiki_page("codeofconduct", cfg)
-    )
+    # This is explicitly missing the format call that adds the code of
+    # conduct text because if we populate it here, we will fetch the wiki
+    # page on _every single `done`_ and that's just silly. Only populate
+    # it if it's necessary.
+    coc_not_accepted = i18n["responses"]["general"]["coc_not_accepted"]
 
     blossom_user = cfg.blossom.get_user(username=user.name)
     if blossom_user.status != BlossomStatus.ok:
         # If we don't know who the volunteer is, then we don't have a record of
         # them and they need to go through the code of conduct process.
-        return coc_not_accepted, return_flair
+        return coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)), return_flair
 
     if not blossom_user.data['accepted_coc']:
         # If the volunteer in question hasn't accepted the code of conduct,
@@ -150,7 +158,7 @@ def process_done(
         # transcription, which requires that they wrote something. If a volunteer
         # just writes `done` without putting a transcription down, it will hit
         # this edge case.
-        return coc_not_accepted, return_flair
+        return coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)), return_flair
 
     transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
     if transcription is None:
@@ -176,14 +184,19 @@ def process_done(
             message = done_messages["completed_transcript"]
             if alt_text_trigger:
                 message = f"I think you meant `done`, so here we go!\n\n{message}"
+
         elif done_response.status == BlossomStatus.already_completed:
             message = done_messages["already_completed"]
+
         elif done_response.status == BlossomStatus.missing_prerequisite:
             message = done_messages["not_claimed_by_user"]
+
         elif done_response.status == BlossomStatus.blacklisted:
             message = i18n["responses"]["general"]["blacklisted"]
+
         else:
             message = done_messages["cannot_find_transcript"]
+
     return message, return_flair
 
 

@@ -1,14 +1,14 @@
 import datetime
 import os
-from typing import Dict, List, Union
 
 from blossom_wrapper import BlossomAPI
 from praw import Reddit  # type: ignore
 from praw.models import Subreddit  # type: ignore
 from praw.models.reddit.subreddit import ModeratorRelationship  # type: ignore
 from slackclient import SlackClient  # type: ignore
+from typing import Dict, List, Union
 
-from tor import __root__, __version__, __SELF_NAME__
+from tor import __root__, __version__
 from tor.core import cached_property
 
 # Load configuration regardless of if bugsnag is setup correctly

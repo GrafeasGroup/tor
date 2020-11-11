@@ -78,8 +78,21 @@ load_dotenv()
 def parse_arguments():
     parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('--debug', action='store_true', default=DEBUG_MODE, help='Puts bot in dev-mode using non-prod credentials')
-    parser.add_argument('--noop', action='store_true', default=NOOP_MODE, help='Just run the daemon, but take no action (helpful for testing infrastructure changes)')
+    parser.add_argument(
+        '--debug',
+        action='store_true',
+        default=DEBUG_MODE,
+        help='Puts bot in dev-mode using non-prod credentials'
+    )
+    parser.add_argument(
+        '--noop',
+        action='store_true',
+        default=NOOP_MODE,
+        help=(
+            'Just run the daemon, but take no action (helpful for testing infrastructure'
+            ' changes)'
+        )
+    )
 
     return parser.parse_args()
 

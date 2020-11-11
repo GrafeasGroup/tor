@@ -275,7 +275,10 @@ def remove_if_required(
     removal, reported = _check_removal_required(submission, cfg)
     if removal:
         submission.mod.remove()
-        response = cfg.blossom.delete_submission(blossom_id)
+        response = cfg.blossom.patch(
+            f"submission/{blossom_id}/",
+            data={"removed_from_queue": True},
+        )
         if response.status != BlossomStatus.ok:
             return False, False
 
