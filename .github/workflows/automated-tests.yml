@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
-          python-version: '3.x'
+          python-version: '3.8'
           architecture: 'x64'
       - run: |
           pip install --upgrade pip
@@ -26,6 +26,7 @@ jobs:
           poetry install -v --extras ci
       - run: poetry run mypy .
       - run: poetry run flake8 .
+
   test:
     runs-on: ubuntu-18.04
     strategy:
