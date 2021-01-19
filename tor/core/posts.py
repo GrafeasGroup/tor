@@ -137,33 +137,14 @@ def request_transcription(post: PostSummary, content_type: str, content_format: 
         header=cfg.header,
     )
 
-    submission: Submission
-
-    try:
-        if is_youtube_url(str(post['url'])) and has_youtube_transcript(str(post['url'])):
-            # NOTE: This has /u/transcribersofreddit post to the original
-            # subreddit where the video was posted saying it already has
-            # closed captioning
-            video_id = get_yt_video_id(str(post['url']))
-            submission = cfg.r.submission(id=post['name'])
-            submission.reply(_(i18n['posts']['yt_already_has_transcripts']))
-            add_complete_post_id(str(post['name']), cfg)
-            log.info(f'Found YouTube video, https://youtu.be/{video_id}, with good transcripts.')
-            return
-    # The only errors that happen here are on Reddit's side -- pretty much
-    # exclusively 503s and 403s that arbitrarily resolve themselves. A missed
-    # post or two is not the end of the world.
-    except Exception as e:
-        log.error(
-            f'{e} - unable to post content.\n'
-            f'ID: {post["name"]}\n'
-            f'Title: {post["title"]}\n'
-            f'Subreddit: {post["subreddit"]}'
-        )
+    if is_youtube_url(str(post['url'])) and has_youtube_transcript(str(post['url'])):
+        video_id = get_yt_video_id(str(post['url']))
+        add_complete_post_id(str(post['name']), cfg)
+        log.info(f'Found YouTube video, https://youtu.be/{video_id}, with good transcripts.')
         return
 
     try:
-        submission = cfg.tor.submit(title=title, url=url)
+        submission: Submission = cfg.tor.submit(title=title, url=url)
         submission.reply(_(intro))
         flair_post(submission, flair.unclaimed)
         add_complete_post_id(str(post['name']), cfg)

@@ -5,7 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [UNRELEASED]
 
-_Nothing yet..._
+## [4.2.2] - 2021-01-17
+
+- Fixes bug introduced by Reddit where bot cannot post on other subs, thus cross-posting capability was removed
+
+## [4.2.1] - 2021-01-06
+
+- Fixes args used in CLI invocation, making testing if it is installed correctly work more smoothly
+
+## [4.2.0] - 2020-12-26
+
+- Includes flair for "topaz" and "jade" levels
 
 ## [4.1.0] - 2020-03-03
 
