@@ -36,7 +36,7 @@ def populate_formatting(cfg: Config) -> None:
     :return: None.
     """
     cfg.audio_formatting = get_wiki_page('format/audio', cfg)
-    cfg.video_formatting = get_wiki_page('format/video', cfg)
+    cfg.video_formatting = get_wiki_page('formats/video', cfg)
     cfg.image_formatting = get_wiki_page('format/images', cfg)
     cfg.other_formatting = get_wiki_page('format/other', cfg)
 
