@@ -1,4 +1,5 @@
 from praw.models import Comment, Submission  # type: ignore
+from prawcore.exceptions import Forbidden
 
 from tor.core.config import Config
 from tor.core.helpers import get_parent_post_id, send_to_modchat
@@ -116,25 +117,36 @@ def verified_posted_transcript(post: Comment, cfg: Config) -> bool:
     :param cfg: the global config object.
     :return: True if a post is found, False if not.
     """
+    forbidden: bool = False
     top_parent: Submission = get_parent_post_id(post, cfg.r)
     linked_resource: Submission = cfg.r.submission(top_parent.id_from_url(top_parent.url))
 
+    try:
     # get rid of the "See More Comments" crap
-    linked_resource.comments.replace_more(limit=0)
-    for top_level_comment in linked_resource.comments.list():
-        if not _author_check(post, top_level_comment):
-            continue
-        if not _footer_check(top_level_comment, cfg):
-            continue
-        return True
+        linked_resource.comments.replace_more(limit=0)
+        for top_level_comment in linked_resource.comments.list():
+            if not _author_check(post, top_level_comment):
+                continue
+            if not _footer_check(top_level_comment, cfg):
+                continue
+            return True
+    except Forbidden:
+        # we've attempted to load a subreddit that we don't have access to. The
+        # only way this can happen (reasonably) is when the sub goes private
+        # after we've already pulled the submission from it. In this case, we
+        # will default to the author history check.
+        forbidden = True
 
     # Did their transcript get flagged by the spam filter? Check their history.
     if _author_history_check(post, cfg):
-        send_to_modchat(
-            f'Found removed post: <{post.submission.shortlink}>',
-            cfg,
-            channel='#removed_posts'
-        )
+        # We only want to complain about it being removed if it was
+        # actually removed.
+        if not forbidden:
+            send_to_modchat(
+                f'Found removed post: <{post.submission.shortlink}>',
+                cfg,
+                channel='#removed_posts'
+            )
         return True
 
     return False
