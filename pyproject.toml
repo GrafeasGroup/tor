@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tor"
-version = "4.2.2"
+version = "4.2.3"
 description = "A bot that handles moderating and scoring in /r/TranscribersOfReddit"
 authors = ["Grafeas Group <devs@grafeas.org>"]
 license = "MIT"

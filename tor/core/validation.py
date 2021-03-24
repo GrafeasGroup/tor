@@ -117,7 +117,7 @@ def verified_posted_transcript(post: Comment, cfg: Config) -> bool:
     :param cfg: the global config object.
     :return: True if a post is found, False if not.
     """
-    forbidden = False
+    forbidden: bool = False
     top_parent: Submission = get_parent_post_id(post, cfg.r)
     linked_resource: Submission = cfg.r.submission(top_parent.id_from_url(top_parent.url))
 
