@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tor"
-version = "4.2.3"
+version = "4.2.4"
 description = "A bot that handles moderating and scoring in /r/TranscribersOfReddit"
 authors = ["Grafeas Group <devs@grafeas.org>"]
 license = "MIT"
@@ -16,7 +16,7 @@ include = ["commands.json", "tor/strings/*.yml"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-praw = "=5.0.1"
+praw = "^5.0.1"
 redis = "^2"
 sh = "^1.12"
 bugsnag = "^3.6"
