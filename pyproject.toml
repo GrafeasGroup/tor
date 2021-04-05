@@ -16,7 +16,7 @@ include = ["commands.json", "tor/strings/*.yml"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-praw = "=5.0.1"
+praw = "^5.0.1"
 redis = "^2"
 sh = "^1.12"
 bugsnag = "^3.6"
