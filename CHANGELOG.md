@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [UNRELEASED]
 
+## [4.2.4] - 2021-04-05
+
+- Odd error with PRAW necessitates a core library upgrade
+
+## [4.2.3] - 2021-03-24
+
+- Hotfix for private subreddits
+
 ## [4.2.2] - 2021-01-17
 
 - Fixes bug introduced by Reddit where bot cannot post on other subs, thus cross-posting capability was removed
