@@ -122,7 +122,7 @@ def verified_posted_transcript(post: Comment, cfg: Config) -> bool:
     linked_resource: Submission = cfg.r.submission(top_parent.id_from_url(top_parent.url))
 
     try:
-    # get rid of the "See More Comments" crap
+        # get rid of the "See More Comments" crap
         linked_resource.comments.replace_more(limit=0)
         for top_level_comment in linked_resource.comments.list():
             if not _author_check(post, top_level_comment):
