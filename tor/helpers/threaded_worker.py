@@ -8,17 +8,15 @@
 import logging
 import random
 import string
-import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Dict, List
-from tor.strings import translation
 
 import requests
 
 from tor.core.config import Config
 from tor.core.posts import process_post, PostSummary
-from tor.helpers.reddit_ids import has_been_posted
+from tor.strings import translation
 
 log = logging.getLogger()
 i18n = translation()
@@ -129,7 +127,6 @@ def threaded_check_submissions(cfg: Config) -> None:
     # grab the CPU count of the current machine and multiply it by 5, allowing
     # us to keep sane limits wherever we're running.
 
-    start = time.time()
     with ThreadPoolExecutor() as executor:
         jobs = list()
         for sub in subreddits:
@@ -140,7 +137,6 @@ def threaded_check_submissions(cfg: Config) -> None:
                 total_posts += data
             except Exception as exc:
                 log.warning('an exception was generated: {}'.format(exc))
-    log.info(f"threadpool: {time.time() - start}s")
     total_posts = [post for post in total_posts if check_domain_filter(post, cfg)]
     unseen_post_urls = cfg.blossom.post(
         "/submission/bulkcheck/",
@@ -155,8 +151,5 @@ def threaded_check_submissions(cfg: Config) -> None:
         post for post in total_posts
         if i18n["urls"]["reddit_url"].format(post["permalink"]) in unseen_post_urls
     ]
-    # has_been_posted(i18n["urls"]["reddit_url"].format(post["permalink"]), cfg)
     for item in unseen_posts:
-        start = time.time()
         process_post(item, cfg)
-        log.info(f"process_post: {time.time() - start}s")

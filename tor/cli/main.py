@@ -110,17 +110,11 @@ def run(cfg):
     :param cfg: Global config dict, supplied by tor_core.
     :return: None.
     """
-    s = time.time()
     check_inbox(cfg)
-    log.info(f"check_inbox: {time.time() - s}s")
 
-    s = time.time()
     threaded_check_submissions(cfg)
-    log.info(f"threaded_check_submissions: {time.time() - s}s")
 
-    s = time.time()
     set_meta_flair_on_other_posts(cfg)
-    log.info(f"set_meta_flair_on_other_posts: {time.time() - s}s")
 
     if cfg.debug_mode:
         time.sleep(15)
