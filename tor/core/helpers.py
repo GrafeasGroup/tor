@@ -3,8 +3,9 @@ import re
 import signal
 import sys
 import time
-from typing import List
+from typing import List, Tuple
 
+from blossom_wrapper import BlossomStatus
 from praw.exceptions import APIException  # type: ignore
 from praw.models import Comment, Submission, Subreddit  # type: ignore
 from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFound  # type: ignore
@@ -12,6 +13,7 @@ from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFou
 import tor.core
 from tor.core import __version__
 from tor.core.config import config, Config
+from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
 
 
@@ -157,6 +159,24 @@ def get_wiki_page(pagename: str, cfg: Config) -> str:
         return ''
 
 
+def send_reddit_reply(repliable, message: str) -> None:
+    """
+    Wrapper function which catches Reddit's deleted comment exception.
+
+    We've run into an issue where someone has commented and then deleted the
+    comment between when the bot pulls mail and when it processes comments.
+    This should catch that specific issue. Log the error, but don't try again;
+    just fall through.
+    """
+    try:
+        repliable.reply(_(message))
+    except APIException as e:
+        if e.error_type == 'DELETED_COMMENT':
+            log.info(f'Cannot reply to comment {repliable.name} -- comment deleted')
+            return
+        raise
+
+
 def handle_rate_limit(exc: APIException) -> None:
     time_map = {
         'second': 1,
@@ -221,3 +241,50 @@ def run_until_dead(func):
     except Exception as e:
         log.error(e)
         sys.exit(1)
+
+
+def _check_removal_required(submission: Submission, cfg: Config) -> Tuple[bool, bool]:
+    """
+    Check whether the submission has to be removed and whether this is reported.
+
+    Note that this function returns a Tuple of booleans, where the first
+    is to signify whether the submission is to be removed and the latter
+    whether a relevant report was issued for this decision.
+    """
+    for item in submission.user_reports:
+        if item[0] and any(
+            reason in item[0] for reason
+            in (reports.original_post_deleted_or_locked, reports.post_violates_rules)
+        ):
+            return True, True
+    linked_submission = cfg.r.submission(submission.id_from_url(submission.url))
+    if is_removed(linked_submission):
+        return True, False
+    return False, False
+
+
+def remove_if_required(
+    submission: Submission, blossom_id: str, cfg: Config
+) -> Tuple[bool, bool]:
+    """
+    Remove the submission if this is required.
+
+    Returns a Tuple of booleans, indicating whether the submission is removed
+    and whether a relevant report was issued for this decision.
+    """
+    removal, reported = _check_removal_required(submission, cfg)
+    if removal:
+        submission.mod.remove()
+        response = cfg.blossom.patch(
+            f"submission/{blossom_id}/",
+            data={"removed_from_queue": True},
+        )
+        if response.status != BlossomStatus.ok:
+            return False, False
+
+        # Selects a message depending on whether the submission is reported or not.
+        mod_message = i18n["mod"][f"removed_{'reported' if reported else 'deleted'}"]
+        send_to_modchat(
+            mod_message.format(submission.shortlink), cfg, channel="removed_posts"
+        )
+    return removal, reported

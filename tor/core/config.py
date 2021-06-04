@@ -1,14 +1,14 @@
 import datetime
-import logging
 import os
-from typing import Dict, List, Union
 
+from blossom_wrapper import BlossomAPI
 from praw import Reddit  # type: ignore
 from praw.models import Subreddit  # type: ignore
 from praw.models.reddit.subreddit import ModeratorRelationship  # type: ignore
 from slackclient import SlackClient  # type: ignore
+from typing import Dict, List, Union
 
-from tor import __root__, __version__, __SELF_NAME__
+from tor import __root__, __version__
 from tor.core import cached_property
 
 # Load configuration regardless of if bugsnag is setup correctly
@@ -47,29 +47,16 @@ class Config(object):
     perform_header_check = True
     debug_mode = False
 
-    # Name of the bot
-    name = __SELF_NAME__
-    bot_version = __version__
-
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
 
     @cached_property
-    def redis(self):
-        """
-        Lazy-loaded redis connection
-        """
-        from redis import StrictRedis
-        import redis.exceptions
-
-        try:
-            url = os.environ.get('REDIS_CONNECTION_URL',
-                                 'redis://localhost:6379/0')
-            conn = StrictRedis.from_url(url)
-            conn.ping()
-        except redis.exceptions.ConnectionError:
-            logging.fatal("Redis server is not running")
-            raise
-        return conn
+    def blossom(self):
+        return BlossomAPI(
+            email=os.getenv('BLOSSOM_EMAIL'),
+            password=os.getenv('BLOSSOM_PASSWORD'),
+            api_key=os.getenv('BLOSSOM_API_KEY'),
+            api_base_url=os.getenv('BLOSSOM_API_URL'),
+        )
 
     @cached_property
     def tor(self) -> Subreddit:
@@ -81,7 +68,6 @@ class Config(object):
     @cached_property
     def modchat(self):
         return SlackClient(os.getenv('SLACK_API_KEY', None))
-
     # Compatibility
     core_version = __version__
     video_domains: List[str] = []
@@ -91,7 +77,7 @@ class Config(object):
     audio_formatting = ''
     image_formatting = ''
     other_formatting = ''
-    upvote_filter_subs: Dict[str, int] = {}
+    upvote_filter_subs: Dict[str, float] = {}
     no_link_header_subs: List[str] = []
 
 

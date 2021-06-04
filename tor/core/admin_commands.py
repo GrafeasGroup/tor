@@ -1,9 +1,9 @@
 import json
 import logging
 import random
+from typing import Dict
 
-from praw.exceptions import ClientException as RedditClientException  # type: ignore
-
+from praw.models import Redditor
 from tor.core.helpers import _, clean_id, send_to_modchat
 from tor.core.initialize import initialize
 from tor.core.user_interaction import process_done
@@ -27,19 +27,20 @@ def process_command(reply, cfg):
 
     # Trim off the ! from the start of the string
     requested_command = reply.subject[1:]
+    username = reply.author.name
 
     with open('commands.json', newline='') as commands_file:
         commands = json.load(commands_file)
         logging.debug(
             f'Searching for command {requested_command}, '
-            f'from {reply.author.name}.'
+            f'from {username}.'
         )
 
         try:
             command = commands['commands'][requested_command]
 
         except KeyError:
-            if from_moderator(reply, cfg):
+            if is_moderator(username, cfg):
                 reply.reply(
                     "That command hasn't been implemented yet ):"
                     "\n\nMessage a dev to make your dream come true."
@@ -47,25 +48,24 @@ def process_command(reply, cfg):
 
             logging.warning(
                 f"Error, command: {requested_command} not found!"
-                f" (from {reply.author.name})"
+                f" (from {username})"
             )
 
             return
 
         # command found
         logging.info(
-            f'{reply.author.name} is attempting to run {requested_command}'
+            f'{username} is attempting to run {requested_command}'
         )
 
         # Mods are allowed to do any command, and some people are whitelisted
         # per command to be able to use them
-        if reply.author.name not in command['allowedNames'] and not from_moderator(reply, cfg):
+        if username not in command['allowedNames'] and not is_moderator(username, cfg):
             logging.info(
-                f"{reply.author.name} failed to run {requested_command},"
+                f"{username} failed to run {requested_command},"
                 f"because they aren't a mod, or aren't whitelisted to use this"
                 f" command"
             )
-            username = reply.author.name
             send_to_modchat(
                 f":banhammer: Someone did something bad! "
                 f"<https://reddit.com/user/{username}|u/{username}> tried to "
@@ -82,7 +82,7 @@ def process_command(reply, cfg):
 
         logging.debug(
             f'Now executing command {requested_command},'
-            f' by {reply.author.name}.'
+            f' by {username}.'
         )
 
         result = globals()[command['pythonFunction']](reply, cfg)
@@ -91,91 +91,45 @@ def process_command(reply, cfg):
             reply.reply(result)
 
 
-def from_moderator(reply, cfg):
-    return reply.author in cfg.tor_mods
+def is_moderator(username, cfg):
+    return username in cfg.tor_mods
 
 
-def process_override(reply, cfg):
+def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, cfg):
     """
     This process is for moderators of ToR to force u/transcribersofreddit
     to mark a post as complete and award flair when the bot refutes a
     `done` claim. The comment containing "!override" must be in response to
     the bot's comment saying that it cannot find the transcript.
 
-    :param reply: the comment reply object from the moderator.
+    :param user: The user requesting the override
+    :param blossom_submission: The relevant Submission of Blossom
+    :param parent_id: The ID of the parent comment of the override
     :param cfg: the global config object.
-    :return: None.
     """
 
     # don't remove this check, it's not covered like other admin_commands
     # because it's used in reply to people, not as a PM
-    if not from_moderator(reply, cfg):
-        reply.reply(_(random.choice(cfg.no_gifs)))
+    if not is_moderator(user.name, cfg):
         logging.info(
-            f'{reply.author.name} just tried to override. Lolno.'
-        )
+            f'{user.name} just tried to override. Lolno.'
 
-        return
+        )
+        return _(random.choice(cfg.no_gifs)), None
 
     # okay, so the parent of the reply should be the bot's comment
     # saying it can't find it. In that case, we need the parent's
     # parent. That should be the comment with the `done` call in it.
-    reply_parent = cfg.r.comment(id=clean_id(reply.parent_id))
+    reply_parent = cfg.r.comment(id=clean_id(parent_id))
     parents_parent = cfg.r.comment(id=clean_id(reply_parent.parent_id))
     if 'done' in parents_parent.body.lower():
         logging.info(
             f'Starting validation override for post {parents_parent.fullname}, '
-            f'approved by {reply.author.name}'
+            f'approved by {user.name}'
         )
-        process_done(
-            parents_parent, cfg, override=True
+        return process_done(
+            parents_parent.author, blossom_submission, parents_parent, cfg, override=True
         )
-
-
-def process_blacklist(reply, cfg):
-    """
-    This is used to basically "shadow-ban" people from the bot.
-    Format is:
-    Subject: !blacklist
-    body: <username1>\n<username2>...
-    :param reply: the comment reply object from the inbox
-    :param cfg: the global config object
-    :return: None
-    """
-
-    usernames = reply.body.splitlines()
-    results = ""
-    failed = []
-    successes = []
-    already_added = []
-
-    for username in usernames:
-        if username in cfg.tor_mods:
-            results += f'{username} is a mod! Don\'t blacklist mods!\n'
-            failed.append(username)
-            continue
-
-        try:
-            cfg.r.redditor(username)
-        except RedditClientException:
-            results += f'{username} isn\'t a valid user\n'
-            failed.append(username)
-            continue
-
-        if not cfg.redis.sadd('blacklist', username):
-            results += f'{username} is already blacklisted, ya fool!\n'
-            already_added.append(username)
-            continue
-
-        results += f'{username} is now blacklisted\n'
-        successes.append(username)
-
-        logging.info(
-            f'Blacklist: {repr(failed)} failed, {repr(successes)} succeeded, '
-            f'{repr(already_added)} were already blacklisted '
-        )
-
-        return results
 
 
 def reload_config(reply, cfg):

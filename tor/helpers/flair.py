@@ -1,12 +1,11 @@
 import logging
-from typing import Tuple
 
-from praw.models import Comment, Submission  # type: ignore
+from blossom_wrapper import BlossomStatus
+from praw.models import Comment, Redditor, Submission  # type: ignore
 
 from tor import __BOT_NAMES__
 from tor.core.config import Config
 from tor.core.helpers import clean_id, flair, send_to_modchat
-from tor.core.users import User
 
 log = logging.getLogger(__name__)
 
@@ -60,72 +59,32 @@ def _get_flair_css(transcription_count: int) -> str:
         return 'grafeas'
 
 
-def _parse_existing_flair(user_flair: str) -> Tuple[int, str]:
+def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
     """
-    Take the flair string and identify the proper incremented score along with
-    its matching CSS class.
+    Set the flair from the comment's author according to their gamma and current flair
 
-    :param user_flair: String; the existing flair string for the user.
-    :return:
+    This function uses Blossom to retrieve the up to date gamma. The current
+    flair postfix is left intact in the process.
     """
-
-    # extract their current flair and add one to it
-    new_flair_count = int(user_flair[:user_flair.index('Γ') - 1]) + 1
-
-    css = _get_flair_css(new_flair_count)
-
-    return new_flair_count, css
-
-
-def update_user_flair(post: Comment, cfg: Config) -> None:
-    """
-    On a successful transcription, this takes the user's current flair,
-    increments the counter by one, and stores it back to the subreddit.
-
-    If the user is past 50 transcriptions, select the appropriate flair
-    class and write that back too.
-
-    :param post: The post which holds the author information.
-    :param cfg: The global config instance.
-    :return: None.
-    """
-    flair_text = '{} Γ - Beta Tester'
-
-    post_author = User(str(post.author), redis_conn=cfg.redis)
-    current_transcription_count = post_author.get('transcriptions', 0)
-
-    try:
-        # The post object is technically an inbox mention, even though it's
-        # a Comment object. In order to get the flair, we have to take the
-        # ID of our post object and re-request it from Reddit in order to
-        # get the *actual* object, even though they have the same ID. It's
-        # weird.
-        user_flair = cfg.r.comment(id=clean_id(post.fullname)).author_flair_text
-    except AttributeError:
-        user_flair = flair_text.format('0')
-
-    if not user_flair:
-        # HOLD ON. Do we have one saved? Maybe Reddit's screwing up.
-        if current_transcription_count != 0:
-            # we have a user object for them and shouldn't have landed here.
-            user_flair = flair_text.format(current_transcription_count)
-        else:
-            user_flair = flair_text.format('0')
-
-    if 'Γ' in user_flair:
-        new_count, flair_css = _parse_existing_flair(user_flair)
-
-        # if there's anything special in their flair string, let's save it
-        additional_flair_text = user_flair[user_flair.index('Γ') + 1:]
-        user_flair = f'{new_count} Γ'
-        # add in that special flair bit back in to keep their flair intact
-        user_flair += additional_flair_text
-
-        cfg.tor.flair.set(post.author, text=user_flair, css_class=flair_css)
-        log.info(f'Setting flair for {post.author}')
-
-        post_author.update('transcriptions', current_transcription_count + 1)
-        post_author.save()
+    flair_postfix = ""
+    gamma = 0
+    user_response = cfg.blossom.get_user(username=user.name)
+    if user_response.status == BlossomStatus.ok:
+        gamma = user_response.data["gamma"]
+        try:
+            # Retrieve the possible custom postfix from the user's current flair.
+            # Since there is no way to do this nicely, retrieve this flair from
+            # the posted comment.
+            current_flair = cfg.r.comment(id=clean_id(post.fullname)).author_flair_text
+            if current_flair:
+                flair_postfix = current_flair[current_flair.index("<CE><93>") + 1:]
+        except (StopIteration, AttributeError, ValueError):
+            # In this situation, either the user is not found or they do not have a flair.
+            # This is not problematic and we will instead just use the standard flair.
+            pass
+    user_flair = f"{gamma} Γ{flair_postfix}"
+    flair_css = _get_flair_css(gamma)
+    cfg.tor.flair.set(user.name, text=user_flair, css_class=flair_css)
 
 
 def set_meta_flair_on_other_posts(cfg: Config) -> None:
