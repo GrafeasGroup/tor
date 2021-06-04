@@ -112,7 +112,9 @@ responses:
     coc_not_accepted: |
       Hi there! Please read and accept our Code of Conduct so that we can get you started with transcribing. Please read the Code of Conduct below, then respond to this comment with `I accept`.
 
-      After you respond, I'll process your request as normal. A mod will check in and give you feedback when you’re finished!
+      **NOTE**: please write `I accept` as-is: variations like `I agree` or `Accept` won't work. Editing the old comment to be `I accept` won't work either.
+
+      After you respond, I'll process your claim as normal. A mod will check in and give you feedback when you’re finished!
 
       ---
 
@@ -165,4 +167,3 @@ urls:
     - 'http://www.reactiongifs.com/r/a-b-yay.gif'
     - 'https://media.tenor.com/images/7dcd26f4d9a2eaa246cd4ea9967d2336/tenor.gif'
     - 'http://media0.giphy.com/media/wTzPSxZBqSove/giphy.gif'
-...

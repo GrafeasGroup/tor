@@ -62,7 +62,9 @@ DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
 # K-391
 # Lady Gaga
 # Neon Hitch
+# Queen
 # Rage Against the Machine
+# Rita Ora
 # The Beatles
 # The Killers
 # Two Door Cinema Club
@@ -119,8 +121,14 @@ def run(cfg):
 
 
 def main():
-    configure_logging(config)
-    config.debug_mode = DEBUG_MODE
+    opt = parse_arguments()
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(levelname)s | %(funcName)s | %(message)s',
+        datefmt='%Y-%m-%dT%H:%M:%S',
+    )
+
+    config.debug_mode = opt.debug
 
     if config.debug_mode:
         bot_name = "debug"
@@ -143,7 +151,7 @@ def main():
     if tor.__SELF_NAME__ not in tor.__BOT_NAMES__:
         tor.__BOT_NAMES__.append(tor.__SELF_NAME__)
 
-    if NOOP_MODE:
+    if opt.noop:
         run_until_dead(noop)
     else:
         run_until_dead(run)

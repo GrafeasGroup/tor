@@ -51,6 +51,7 @@ def contains_footer(comment: Comment, cfg: Config) -> bool:
     If the perform_header_check option is not set in the configuration, this
     function always returns True.
     """
+
     if not cfg.perform_header_check:
         return True
     if i18n['urls']['ToR_link'] not in comment.body:
