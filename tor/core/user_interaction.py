@@ -181,6 +181,10 @@ def process_done(
         if done_response.status == BlossomStatus.ok:
             return_flair = flair.completed
             set_user_flair(user, post, cfg)
+            log.info(
+                f'Done on Submission {blossom_submission["tor_url"]} by {user.name}'
+                f' successful.'
+            )
             message = done_messages["completed_transcript"]
             if alt_text_trigger:
                 message = f"I think you meant `done`, so here we go!\n\n{message}"
