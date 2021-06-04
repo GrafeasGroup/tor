@@ -8,18 +8,20 @@
 import logging
 import random
 import string
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Dict, List
-import time
+from tor.strings import translation
 
 import requests
 
 from tor.core.config import Config
 from tor.core.posts import process_post, PostSummary
+from tor.helpers.reddit_ids import has_been_posted
 
 log = logging.getLogger()
-
+i18n = translation()
 
 def check_domain_filter(item: Dict, cfg: Config) -> bool:
     """
@@ -43,7 +45,6 @@ def check_domain_filter(item: Dict, cfg: Config) -> bool:
 
 
 def get_subreddit_posts(sub: str) -> List[PostSummary]:
-
     def generate_user_agent() -> str:
         """
         Reddit routinely blocks / throttles common user agents. The easiest way
@@ -140,8 +141,15 @@ def threaded_check_submissions(cfg: Config) -> None:
             except Exception as exc:
                 log.warning('an exception was generated: {}'.format(exc))
     log.info(f"threadpool: {time.time() - start}s")
-    for item in total_posts:
-        if check_domain_filter(item, cfg):
-            start = time.time()
-            process_post(item, cfg)
-            log.info(f"process_post: {time.time() - start}s")
+    total_posts = [post for post in total_posts if check_domain_filter(post, cfg)]
+    unseen_post_urls = cfg.blossom.post(
+        "/submission/bulkcheck/",
+        data={"urls": [post["permalink"] for post in total_posts]}
+    ).json()
+    # cfg.blossom.get_submission(url=post_url).status == BlossomStatus.ok
+    unseen_posts = [post for post in total_posts if post["permalink"] in unseen_post_urls]
+    # has_been_posted(i18n["urls"]["reddit_url"].format(post["permalink"]), cfg)
+    for item in unseen_posts:
+        start = time.time()
+        process_post(item, cfg)
+        log.info(f"process_post: {time.time() - start}s")

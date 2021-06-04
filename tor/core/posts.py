@@ -7,7 +7,6 @@ from praw.models import Submission  # type: ignore
 from tor.core.config import Config
 from tor.core.helpers import _
 from tor.helpers.flair import flair, flair_post
-from tor.helpers.reddit_ids import has_been_posted
 from tor.helpers.youtube import (has_youtube_transcript, get_yt_video_id,
                                  is_transcribable_youtube_video, is_youtube_url)
 from tor.strings import translation
@@ -82,7 +81,6 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
     return all(
         [
             has_enough_upvotes(post, cfg),
-            not has_been_posted(i18n["urls"]["reddit_url"].format(post["permalink"]), cfg),
             not post["archived"],
             post["author"]
         ]
