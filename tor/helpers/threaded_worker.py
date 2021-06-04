@@ -144,10 +144,17 @@ def threaded_check_submissions(cfg: Config) -> None:
     total_posts = [post for post in total_posts if check_domain_filter(post, cfg)]
     unseen_post_urls = cfg.blossom.post(
         "/submission/bulkcheck/",
-        data={"urls": [post["permalink"] for post in total_posts]}
+        data={
+            "urls": [
+                i18n["urls"]["reddit_url"].format(post["permalink"])
+                for post in total_posts
+            ]
+        }
     ).json()
-    # cfg.blossom.get_submission(url=post_url).status == BlossomStatus.ok
-    unseen_posts = [post for post in total_posts if post["permalink"] in unseen_post_urls]
+    unseen_posts = [
+        post for post in total_posts
+        if i18n["urls"]["reddit_url"].format(post["permalink"]) in unseen_post_urls
+    ]
     # has_been_posted(i18n["urls"]["reddit_url"].format(post["permalink"]), cfg)
     for item in unseen_posts:
         start = time.time()
