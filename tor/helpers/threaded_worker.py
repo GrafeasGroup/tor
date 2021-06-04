@@ -11,11 +11,14 @@ import string
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Dict, List
+import time
 
 import requests
 
 from tor.core.config import Config
 from tor.core.posts import process_post, PostSummary
+
+log = logging.getLogger()
 
 
 def check_domain_filter(item: Dict, cfg: Config) -> bool:
@@ -90,7 +93,7 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
     # {'message': 'Too Many Requests', 'error': 429}
 
     if result.get('error', None):
-        logging.warning('hit error state for {}'.format(sub))
+        log.warning('hit error state for {}'.format(sub))
         return []
     return parse_json_posts(result)
 
@@ -124,6 +127,8 @@ def threaded_check_submissions(cfg: Config) -> None:
     # by not specifying a maximum number of threads, ThreadPoolExecutor will
     # grab the CPU count of the current machine and multiply it by 5, allowing
     # us to keep sane limits wherever we're running.
+
+    start = time.time()
     with ThreadPoolExecutor() as executor:
         jobs = list()
         for sub in subreddits:
@@ -133,8 +138,10 @@ def threaded_check_submissions(cfg: Config) -> None:
                 data: List[PostSummary] = f.result()
                 total_posts += data
             except Exception as exc:
-                logging.warning('an exception was generated: {}'.format(exc))
-
+                log.warning('an exception was generated: {}'.format(exc))
+    log.info(f"threadpool: {time.time() - start}s")
     for item in total_posts:
         if check_domain_filter(item, cfg):
+            start = time.time()
             process_post(item, cfg)
+            log.info(f"process_post: {time.time() - start}s")
