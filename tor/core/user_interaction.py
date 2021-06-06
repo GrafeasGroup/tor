@@ -2,6 +2,7 @@ import logging
 import random
 from typing import Dict, Tuple
 
+import beeline
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission  # type: ignore
 
@@ -37,6 +38,7 @@ MODCHAT_EMOTES = [
 ]
 
 
+@beeline.traced(name='process_coc')
 def process_coc(
         username: str, context: str, blossom_submission: Dict, cfg: Config
 ) -> Tuple:
@@ -74,6 +76,7 @@ def process_coc(
         return process_claim(username, blossom_submission, cfg)
 
 
+@beeline.traced(name='process_claim')
 def process_claim(
         username: str, blossom_submission: Dict, cfg: Config, first_time=False
 ) -> Tuple:
@@ -115,6 +118,7 @@ def process_claim(
     return message, return_flair
 
 
+@beeline.traced(name='process_done')
 def process_done(
         user: Redditor,
         blossom_submission: Dict,
@@ -204,6 +208,7 @@ def process_done(
     return message, return_flair
 
 
+@beeline.traced(name='process_unclaim')
 def process_unclaim(
         username: str, blossom_submission: Dict, submission: Submission, cfg: Config
 ) -> Tuple:
@@ -248,6 +253,7 @@ def process_unclaim(
     return message, return_flair
 
 
+@beeline.traced(name='process_message')
 def process_message(message: Message, cfg: Config) -> None:
     dm_subject = i18n['responses']['direct_message']['dm_subject']
     dm_body = i18n['responses']['direct_message']['dm_body']

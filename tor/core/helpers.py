@@ -5,6 +5,7 @@ import sys
 import time
 from typing import List, Tuple
 
+import beeline
 from blossom_wrapper import BlossomStatus
 from praw.exceptions import APIException  # type: ignore
 from praw.models import Comment, Submission, Subreddit  # type: ignore
@@ -68,6 +69,7 @@ def clean_list(items: List[str]) -> List[str]:
     return list([item.strip() for item in items if item.strip()])
 
 
+@beeline.traced(name='send_to_modchat')
 def send_to_modchat(message: str, cfg: Config, channel='general') -> None:
     """
     Sends a message to the ToR mod chat.
@@ -138,6 +140,7 @@ def get_parent_post_id(post: Comment, subreddit: Subreddit) -> Submission:
         return subreddit.submission(id=clean_id(post.parent_id))
 
 
+@beeline.traced(name='get_wiki_page')
 def get_wiki_page(pagename: str, cfg: Config) -> str:
     """
     Return the contents of a given wiki page.
@@ -263,6 +266,7 @@ def _check_removal_required(submission: Submission, cfg: Config) -> Tuple[bool, 
     return False, False
 
 
+@beeline.traced(name='remove_if_required')
 def remove_if_required(
     submission: Submission, blossom_id: str, cfg: Config
 ) -> Tuple[bool, bool]:

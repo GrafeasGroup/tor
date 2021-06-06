@@ -25,6 +25,7 @@ blossom-wrapper = { git = "https://github.com/GrafeasGroup/blossom-wrapper.git",
 python-dotenv = "^0.14.0"
 praw = "^7.1.0"
 toml = "^0.10.2"
+honeycomb-beeline = "^2.17.0"
 
 [tool.poetry.dev-dependencies]
 better-exceptions = "^0.2.2"

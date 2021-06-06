@@ -1,10 +1,12 @@
 import argparse
+import atexit
 import os
 import time
 import logging
 
 from praw import Reddit  # type: ignore
 from dotenv import load_dotenv
+import beeline
 
 # The `import tor` lines is necessary because `tor.__SELF_NAME__` is
 # set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1
@@ -103,6 +105,7 @@ def noop(cfg):
     pass
 
 
+@beeline.traced(name='run')
 def run(cfg):
     """
     Primary routine.
@@ -127,6 +130,23 @@ def main():
         format='%(levelname)s | %(funcName)s | %(message)s',
         datefmt='%Y-%m-%dT%H:%M:%S',
     )
+
+    honeycomb_key = os.getenv('HONEYCOMB_KEY', '')
+    if len(honeycomb_key) == 0:
+        # debug mode: print what would be sent to honeycomb.io to stderr
+        beeline.init(
+            writekey='',
+            dataset='transcribersofreddit',
+            service_name='tor_moderator',
+            debug=True
+        )
+    else:
+        beeline.init(
+            writekey=honeycomb_key,
+            dataset='transcribersofreddit',
+            service_name='tor_moderator'
+        )
+    atexit.register(beeline.close)
 
     config.debug_mode = opt.debug
 
