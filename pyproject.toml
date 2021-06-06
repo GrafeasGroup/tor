@@ -24,6 +24,7 @@ PyYaml = "^5.1"
 blossom-wrapper = { git = "https://github.com/GrafeasGroup/blossom-wrapper.git", branch = "master" }
 python-dotenv = "^0.14.0"
 praw = "^7.1.0"
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
 better-exceptions = "^0.2.2"
