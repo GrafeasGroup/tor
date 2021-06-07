@@ -167,7 +167,7 @@ def process_done(
         cfg.blossom.create_transcription(
             transcription.id,
             transcription.body,
-            i18n["urls"]["reddit_url"].format(transcription.permalink),
+            i18n["urls"]["reddit_url"].format(str(transcription.permalink)),
             transcription.author.name,
             blossom_submission["id"],
             not is_visible
