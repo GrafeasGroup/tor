@@ -5,7 +5,7 @@ import sys
 import time
 from typing import List, Tuple
 
-from blossom_wrapper import BlossomStatus
+from requests import HTTPError
 from praw.exceptions import APIException  # type: ignore
 from praw.models import Comment, Submission, Subreddit  # type: ignore
 from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFound  # type: ignore
@@ -275,11 +275,13 @@ def remove_if_required(
     removal, reported = _check_removal_required(submission, cfg)
     if removal:
         submission.mod.remove()
-        response = cfg.blossom.patch(
-            f"submission/{blossom_id}/",
-            data={"removed_from_queue": True},
-        )
-        if response.status != BlossomStatus.ok:
+        try:
+            response = cfg.blossom.patch(
+                f"submission/{blossom_id}/",
+                data={"removed_from_queue": True},
+            )
+        except HTTPError:
+            log.error(f"Updating status of Submission {blossom_id} in Blossom failed.")
             return False, False
 
         # Selects a message depending on whether the submission is reported or not.
