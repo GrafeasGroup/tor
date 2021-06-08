@@ -26,6 +26,11 @@ def get_transcription(
     linked_submission = cfg.r.submission(url=submission_url)
     linked_submission.comments.replace_more(limit=0)
     for top_level_comment in linked_submission.comments.list():
+        try:
+            # Watch out for top level deleted comments
+            top_level_comment.author.name
+        except AttributeError:
+            continue
         if all([
             top_level_comment.author.name == user.name,
             contains_footer(top_level_comment, cfg)
