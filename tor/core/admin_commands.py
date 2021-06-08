@@ -121,15 +121,16 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
     # saying it can't find it. In that case, we need the parent's
     # parent. That should be the comment with the `done` call in it.
     reply_parent = cfg.r.comment(id=clean_id(parent_id))
-    parents_parent = cfg.r.comment(id=clean_id(reply_parent.parent_id))
-    if 'done' in parents_parent.body.lower():
+    grandparent = cfg.r.comment(id=clean_id(reply_parent.parent_id))
+    if 'done' in grandparent.body.lower() or 'claim' in grandparent.body.lower():
         logging.info(
-            f'Starting validation override for post {parents_parent.fullname}, '
+            f'Starting validation override for post {grandparent.fullname}, '
             f'approved by {user.name}'
         )
         return process_done(
-            parents_parent.author, blossom_submission, parents_parent, cfg, override=True
+            grandparent.author, blossom_submission, grandparent, cfg, override=True
         )
+    return "Cannot process - no target comment found.", None
 
 
 def reload_config(reply, cfg):

@@ -26,6 +26,10 @@ def get_transcription(
     linked_submission = cfg.r.submission(url=submission_url)
     linked_submission.comments.replace_more(limit=0)
     for top_level_comment in linked_submission.comments.list():
+        if not hasattr(top_level_comment, 'author'):
+            continue
+        if not hasattr(top_level_comment.author, 'name'):
+            continue
         if all([
             top_level_comment.author.name == user.name,
             contains_footer(top_level_comment, cfg)
