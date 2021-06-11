@@ -51,7 +51,9 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         flair = None
         r_body = reply.body.lower()  # cache that thing
 
-        if matches := [match.group() for match in [regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES] if match]:
+        if 'image transcription' in r_body or validation.contains_footer(reply, cfg):
+            message = _(i18n['responses']['general']['transcript_on_tor_post'])
+        elif matches := [match.group() for match in [regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES] if match]:
             phrases = '"' + '", "'.join(matches) + '"'
             send_to_modchat(
                 ":rotating_light::rotating_light: Mod Intervention Needed "
@@ -59,8 +61,6 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 f'\n\nDetected use of {phrases} {reply.submission.shortlink}',
                 cfg
             )
-        elif 'image transcription' in r_body or validation.contains_footer(reply, cfg):
-            message = _(i18n['responses']['general']['transcript_on_tor_post'])
         elif 'thank' in r_body:  # trigger on "thanks" and "thank you"
             thumbs_up_gifs = i18n['urls']['thumbs_up_gifs']
             youre_welcome = i18n['responses']['general']['youre_welcome']
