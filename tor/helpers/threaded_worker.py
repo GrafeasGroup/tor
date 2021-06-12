@@ -22,6 +22,7 @@ from tor.strings import translation
 log = logging.getLogger()
 i18n = translation()
 
+
 def check_domain_filter(item: Dict, cfg: Config) -> bool:
     """
     Validate that a given post is actually one that we can (or should) work on

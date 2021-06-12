@@ -64,7 +64,7 @@ def test_process_override_not_moderator(mock_clean_id, mock_process_done):
 @pytest.mark.skip(reason='Unfinished test implementation')
 @patch('tor.core.admin_commands.is_moderator', return_value=True)
 @patch('tor.core.user_interaction.process_done')
-def test_process_override_not_moderator2(mock_process_done, mock_process_done):
+def test_process_override_not_moderator2(mock_process_done):
     # for use with anything that requires a reply object
 
     config = MagicMock()

@@ -12,6 +12,7 @@ from typing import Dict, List, Union
 from tor import __root__, __version__
 from tor.core import cached_property
 
+
 class Config(object):
     """
     A singleton object for checking global configuration from
