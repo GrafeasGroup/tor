@@ -32,14 +32,31 @@ better-exceptions = "^0.2.2"
 pytest = "^5.1"
 pytest-cov = "^2.7"
 flake8 = "^3.7.9"
-mypy = "^0.761"
+mypy = ">=0.800"
 black = "^19.10b0"
+types-toml = "^0.1"
+types-PyYAML = "^0.1"
+types-requests = "^0.1"
+types-redis = "^3.5"
 
 [tool.poetry.scripts]
 tor-moderator = "tor.cli.main:main"
 
 [tool.poetry.extras]
 ci = ['pytest', 'pytest-cov']
+
+[[tool.mypy.overrides]]
+module = [
+    "praw",
+    "praw.*",
+    "prawcore",
+    "prawcore.*",
+    "blossom_wrapper",
+    "beeline",
+    "slackclient",
+    "pytest",
+]
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry>=0.12"]

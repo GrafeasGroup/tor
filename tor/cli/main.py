@@ -4,7 +4,7 @@ import os
 import time
 import logging
 
-from praw import Reddit  # type: ignore
+from praw import Reddit
 from dotenv import load_dotenv
 import beeline
 

@@ -3,9 +3,9 @@ import random
 import re
 
 import beeline
-from praw.exceptions import ClientException  # type: ignore
-from praw.models import Comment, Message  # type: ignore
-from praw.models.reddit.mixins import InboxableMixin  # type: ignore
+from praw.exceptions import ClientException
+from praw.models import Comment, Message
+from praw.models.reddit.mixins import InboxableMixin
 
 from tor import __BOT_NAMES__
 from tor.core import validation

@@ -7,9 +7,9 @@ from typing import List, Tuple
 
 import beeline
 from blossom_wrapper import BlossomStatus
-from praw.exceptions import APIException  # type: ignore
-from praw.models import Comment, Submission, Subreddit  # type: ignore
-from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFound  # type: ignore
+from praw.exceptions import APIException
+from praw.models import Comment, Submission, Subreddit
+from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFound
 
 import tor.core
 from tor.core import __version__

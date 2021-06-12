@@ -1,4 +1,4 @@
-import pytest  # type: ignore
+import pytest
 from unittest.mock import MagicMock
 from unittest.mock import patch
 

@@ -1,7 +1,7 @@
 import logging
 
 import beeline
-from bugsnag.handlers import BugsnagHandler  # type: ignore
+from bugsnag.handlers import BugsnagHandler
 
 from tor.core.config import Config
 from tor.core.helpers import clean_list, get_wiki_page

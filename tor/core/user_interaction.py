@@ -4,7 +4,7 @@ from typing import Dict, Tuple
 
 import beeline
 from blossom_wrapper import BlossomStatus
-from praw.models import Comment, Message, Redditor, Submission  # type: ignore
+from praw.models import Comment, Message, Redditor, Submission
 
 from tor.core.config import Config
 from tor.core.helpers import (_, get_wiki_page,

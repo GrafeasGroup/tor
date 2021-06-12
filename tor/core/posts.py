@@ -3,7 +3,7 @@ from typing import Dict, Union
 
 import beeline
 from blossom_wrapper import BlossomStatus
-from praw.models import Submission  # type: ignore
+from praw.models import Submission
 
 from tor.core.config import Config
 from tor.core.helpers import _
