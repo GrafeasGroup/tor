@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
-from tor.core.admin_commands import process_override
+from tor.core.admin_commands import process_override, is_moderator
 
 
 tor = MagicMock()
@@ -25,21 +25,21 @@ class reddit(MagicMock):
 
 def test_from_moderator_true():
     # enable dot notation to match what it's looking for
-    config = Object()
+    config = MagicMock()
     config.tor_mods = ['asdf', 'qwer']
-    reply = Object()
+    reply = MagicMock()
     reply.author = 'qwer'
 
-    assert from_moderator(reply, config) is True
+    assert is_moderator(reply.author, config) is True
 
 
 def test_from_moderator_false():
-    config = Object()
+    config = MagicMock()
     config.tor_mods = ['asdf', 'qwer']
-    reply = Object()
+    reply = MagicMock()
     reply.author = 'poiu'
 
-    assert from_moderator(reply, config) is False
+    assert is_moderator(reply, config) is False
 
 
 @pytest.mark.xfail(reason='Unmaintained test')
@@ -48,7 +48,7 @@ def test_from_moderator_false():
 def test_process_override_not_moderator(mock_clean_id, mock_process_done):
     # for use with anything that requires a reply object
 
-    config = Object()
+    config = MagicMock()
     config.no_gifs = ['asdf', 'qwer']
     config.tor_mods = ['asdf']
     config.r = reddit
@@ -62,12 +62,12 @@ def test_process_override_not_moderator(mock_clean_id, mock_process_done):
 
 
 @pytest.mark.skip(reason='Unfinished test implementation')
-@patch('tor.core.admin_commands.from_moderator', return_value=True)
+@patch('tor.core.admin_commands.is_moderator', return_value=True)
 @patch('tor.core.user_interaction.process_done')
-def test_process_override_not_moderator2(mock_process_done, asd):
+def test_process_override_not_moderator2(mock_process_done, mock_process_done):
     # for use with anything that requires a reply object
 
-    config = Object()
+    config = MagicMock()
     config.no_gifs = ['asdf', 'qwer']
     config.tor_mods = ['asdf']
     config.r = reddit
