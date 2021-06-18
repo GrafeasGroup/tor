@@ -1,7 +1,7 @@
 import logging
 
 from blossom_wrapper import BlossomStatus
-from praw.models import Comment, Redditor, Submission  # type: ignore
+from praw.models import Comment, Redditor, Submission
 
 from tor import __BOT_NAMES__
 from tor.core.config import Config

@@ -1,23 +1,16 @@
 import datetime
 import os
 
+import bugsnag
 from blossom_wrapper import BlossomAPI
-from praw import Reddit  # type: ignore
-from praw.models import Subreddit  # type: ignore
-from praw.models.reddit.subreddit import ModeratorRelationship  # type: ignore
-from slackclient import SlackClient  # type: ignore
+from praw import Reddit
+from praw.models import Subreddit
+from praw.models.reddit.subreddit import ModeratorRelationship
+from slackclient import SlackClient
 from typing import Dict, List, Union
 
 from tor import __root__, __version__
 from tor.core import cached_property
-
-# Load configuration regardless of if bugsnag is setup correctly
-try:
-    import bugsnag  # type: ignore
-except ImportError:
-    # If loading from setup.py or bugsnag isn't installed, we
-    # don't want to bomb out completely
-    bugsnag = None
 
 
 class Config(object):
@@ -52,10 +45,10 @@ class Config(object):
     @cached_property
     def blossom(self):
         return BlossomAPI(
-            email=os.getenv('BLOSSOM_EMAIL'),
-            password=os.getenv('BLOSSOM_PASSWORD'),
-            api_key=os.getenv('BLOSSOM_API_KEY'),
-            api_base_url=os.getenv('BLOSSOM_API_URL'),
+            email=os.environ['BLOSSOM_EMAIL'],
+            password=os.environ['BLOSSOM_PASSWORD'],
+            api_key=os.environ['BLOSSOM_API_KEY'],
+            api_base_url=os.environ['BLOSSOM_API_URL'],
         )
 
     @cached_property

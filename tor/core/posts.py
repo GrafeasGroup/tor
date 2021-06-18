@@ -1,8 +1,9 @@
 import logging
 from typing import Dict, Union
 
+import beeline
 from blossom_wrapper import BlossomStatus
-from praw.models import Submission  # type: ignore
+from praw.models import Submission
 
 from tor.core.config import Config
 from tor.core.helpers import _
@@ -17,6 +18,7 @@ log = logging.getLogger(__name__)
 PostSummary = Dict[str, Union[str, int, bool, None]]
 
 
+@beeline.traced(name='process_post')
 def process_post(new_post: PostSummary, cfg: Config) -> None:
     """
     After a valid post has been discovered, this handles the formatting
@@ -118,6 +120,7 @@ def truncate_title(title: str) -> str:
     return title[:(max_length - 3)] + '...'
 
 
+@beeline.traced(name='request_transcription')
 def request_transcription(
         post: PostSummary, content_type: str, content_format: str, cfg: Config
 ) -> None:

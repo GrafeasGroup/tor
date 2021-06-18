@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Dict, List
 
+import beeline
 import requests
 
 from tor.core.config import Config
@@ -20,6 +21,7 @@ from tor.strings import translation
 
 log = logging.getLogger()
 i18n = translation()
+
 
 def check_domain_filter(item: Dict, cfg: Config) -> bool:
     """
@@ -42,6 +44,7 @@ def check_domain_filter(item: Dict, cfg: Config) -> bool:
     return False
 
 
+@beeline.traced_thread
 def get_subreddit_posts(sub: str) -> List[PostSummary]:
     def generate_user_agent() -> str:
         """
@@ -82,25 +85,29 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
                 })
         return trimmed_links
 
-    headers = {
-        'User-Agent': generate_user_agent()
-    }
-    url = f'https://www.reddit.com/r/{sub}/new/.json'
-    result = requests.get(url, headers=headers).json()
-    # we have two states here: one has the data we want and the other is an
-    # error state. The error state looks like this:
-    # {'message': 'Too Many Requests', 'error': 429}
+    with beeline.tracer(name='get_subreddit_posts'):
+        beeline.add_context({'subreddit', sub})
 
-    if result.get('error', None):
-        log.warning('hit error state for {}'.format(sub))
-        return []
-    return parse_json_posts(result)
+        headers = {
+            'User-Agent': generate_user_agent()
+        }
+        url = f'https://www.reddit.com/r/{sub}/new/.json'
+        result = requests.get(url, headers=headers).json()
+        # we have two states here: one has the data we want and the other is an
+        # error state. The error state looks like this:
+        # {'message': 'Too Many Requests', 'error': 429}
+
+        if result.get('error', None):
+            log.warning('hit error state for {}'.format(sub))
+            return []
+        return parse_json_posts(result)
 
 
 def is_time_to_scan(cfg: Config) -> bool:
     return datetime.now() > cfg.last_post_scan_time + timedelta(seconds=45)
 
 
+@beeline.traced(name='threaded_check_submissions')
 def threaded_check_submissions(cfg: Config) -> None:
     """
     Single threaded PRAW performance:

@@ -1,6 +1,6 @@
 from typing import Union, Tuple
 
-from praw.models import Comment, Redditor, Submission  # type: ignore
+from praw.models import Comment, Redditor
 
 from tor.core.config import Config
 from tor.strings import translation

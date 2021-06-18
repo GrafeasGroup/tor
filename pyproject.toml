@@ -15,7 +15,7 @@ exclude = ['test', 'test.*', '*.test.*', '*.test']
 include = ["commands.json", "tor/strings/*.yml"]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.9"
 sh = "^1.12"
 bugsnag = "^3.6"
 requests = "^2.22"
@@ -24,20 +24,39 @@ PyYaml = "^5.1"
 blossom-wrapper = { git = "https://github.com/GrafeasGroup/blossom-wrapper.git", branch = "master" }
 python-dotenv = "^0.14.0"
 praw = "^7.1.0"
+toml = "^0.10.2"
+honeycomb-beeline = "^2.17.0"
 
 [tool.poetry.dev-dependencies]
 better-exceptions = "^0.2.2"
 pytest = "^5.1"
 pytest-cov = "^2.7"
 flake8 = "^3.7.9"
-mypy = "^0.761"
+mypy = ">=0.800"
 black = "^19.10b0"
+types-toml = "^0.1"
+types-PyYAML = "^0.1"
+types-requests = "^0.1"
+types-redis = "^3.5"
 
 [tool.poetry.scripts]
 tor-moderator = "tor.cli.main:main"
 
 [tool.poetry.extras]
 ci = ['pytest', 'pytest-cov']
+
+[[tool.mypy.overrides]]
+module = [
+    "praw",
+    "praw.*",
+    "prawcore",
+    "prawcore.*",
+    "blossom_wrapper",
+    "beeline",
+    "slackclient",
+    "pytest",
+]
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry>=0.12"]

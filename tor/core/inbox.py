@@ -2,10 +2,10 @@ import logging
 import random
 import re
 
-from blossom_wrapper import BlossomStatus
-from praw.exceptions import ClientException  # type: ignore
-from praw.models import Comment, Message  # type: ignore
-from praw.models.reddit.mixins import InboxableMixin  # type: ignore
+import beeline
+from praw.exceptions import ClientException
+from praw.models import Comment, Message
+from praw.models.reddit.mixins import InboxableMixin
 
 from tor import __BOT_NAMES__
 from tor.core import validation
@@ -29,6 +29,7 @@ MOD_SUPPORT_PHRASES = [
 log = logging.getLogger(__name__)
 
 
+@beeline.traced(name='forward_to_slack')
 def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
     username = str(item.author.name)
 
@@ -44,6 +45,7 @@ def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
     )
 
 
+@beeline.traced(name='process_reply')
 def process_reply(reply: Comment, cfg: Config) -> None:
     try:
         log.debug(f"Received reply from {reply.author.name}: {reply.body}")
@@ -107,6 +109,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         # uncommon, but common enough that this is necessary.
 
 
+@beeline.traced(name='process_mention')
 def process_mention(mention: Comment) -> None:
     """
     Handles username mentions and handles the formatting and posting of
@@ -129,6 +132,7 @@ def process_mention(mention: Comment) -> None:
         pass
 
 
+@beeline.traced(name='check_inbox')
 def check_inbox(cfg: Config) -> None:
     """
     Goes through all the unread messages in the inbox. It deliberately

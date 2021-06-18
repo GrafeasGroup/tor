@@ -3,12 +3,15 @@ import logging
 import random
 from typing import Dict
 
+import beeline
 from praw.models import Redditor
+
 from tor.core.helpers import _, clean_id, send_to_modchat
 from tor.core.initialize import initialize
 from tor.core.user_interaction import process_done
 
 
+@beeline.traced(name='process_command')
 def process_command(reply, cfg):
     """
     This function processes any commands send to the bot via PM with a subject
@@ -95,6 +98,7 @@ def is_moderator(username, cfg):
     return username in cfg.tor_mods
 
 
+@beeline.traced(name='process_override')
 def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, cfg):
     """
     This process is for moderators of ToR to force u/transcribersofreddit

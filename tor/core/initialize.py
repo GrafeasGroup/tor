@@ -1,6 +1,7 @@
 import logging
 
-from bugsnag.handlers import BugsnagHandler  # type: ignore
+import beeline
+from bugsnag.handlers import BugsnagHandler
 
 from tor.core.config import Config
 from tor.core.helpers import clean_list, get_wiki_page
@@ -9,6 +10,7 @@ from tor.core.helpers import clean_list, get_wiki_page
 log = logging.getLogger()
 
 
+@beeline.traced('configure_logging')
 def configure_logging(cfg: Config, log_name="transcribersofreddit.log") -> None:
     # Set formatting and logging level.
     logging.basicConfig(
@@ -31,10 +33,12 @@ def configure_logging(cfg: Config, log_name="transcribersofreddit.log") -> None:
     log.info("*" * 50)
 
 
+@beeline.traced('populate_header')
 def populate_header(cfg: Config) -> None:
     cfg.header = get_wiki_page('format/header', cfg)
 
 
+@beeline.traced('populate_formatting')
 def populate_formatting(cfg: Config) -> None:
     """
     Grabs the contents of the three wiki pages that contain the
@@ -48,6 +52,7 @@ def populate_formatting(cfg: Config) -> None:
     cfg.other_formatting = get_wiki_page('format/other', cfg)
 
 
+@beeline.traced('populate_domain_lists')
 def populate_domain_lists(cfg: Config) -> None:
     """
     Loads the approved content domains into the config object from the
@@ -74,6 +79,7 @@ def populate_domain_lists(cfg: Config) -> None:
         log.debug(f'Domain list populated: {current_domain_list}')
 
 
+@beeline.traced('populate_subreddit_lists')
 def populate_subreddit_lists(cfg: Config) -> None:
     """
     Gets the list of subreddits to monitor and loads it into memory.
@@ -101,10 +107,12 @@ def populate_subreddit_lists(cfg: Config) -> None:
     log.debug(f'Retrieved subreddits subject to the upvote filter: {cfg.no_link_header_subs}')
 
 
+@beeline.traced('populate_gifs')
 def populate_gifs(cfg: Config) -> None:
     cfg.no_gifs = get_wiki_page('usefulgifs/no', cfg).splitlines()
 
 
+@beeline.traced('initialize')
 def initialize(cfg: Config) -> None:
     populate_domain_lists(cfg)
     log.debug('Domains loaded.')
