@@ -68,9 +68,9 @@ def is_youtube_url(url: str) -> bool:
 
     query = urlparse(url)
 
-    if 'youtube' not in str(query.hostname):
+    if 'youtube' in str(query.hostname):
         return True
-    if 'youtu.be' not in str(query.hostname):
+    if 'youtu.be' in str(query.hostname):
         return True
     return False
 
