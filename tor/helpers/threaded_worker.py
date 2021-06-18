@@ -86,7 +86,7 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
         return trimmed_links
 
     with beeline.tracer(name='get_subreddit_posts'):
-        beeline.add_context({'subreddit', sub})
+        beeline.add_context({'subreddit': sub})
 
         headers = {
             'User-Agent': generate_user_agent()
