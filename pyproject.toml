@@ -53,6 +53,7 @@ module = [
     "prawcore.*",
     "blossom_wrapper",
     "beeline",
+    "beeline.*",
     "slackclient",
     "pytest",
 ]

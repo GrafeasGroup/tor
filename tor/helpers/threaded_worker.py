@@ -13,6 +13,8 @@ from datetime import datetime, timedelta
 from typing import Dict, List
 
 import beeline
+# patch requests lib to instrument it with Honeycomb
+from beeline.patch.requests import *  # noqa
 import requests
 
 from tor.core.config import Config
@@ -45,7 +47,10 @@ def check_domain_filter(item: Dict, cfg: Config) -> bool:
 
 
 @beeline.traced_thread
+@beeline.traced(name='get_subreddit_posts')
 def get_subreddit_posts(sub: str) -> List[PostSummary]:
+    beeline.add_context({'subreddit': sub})
+
     def generate_user_agent() -> str:
         """
         Reddit routinely blocks / throttles common user agents. The easiest way
@@ -85,22 +90,20 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
                 })
         return trimmed_links
 
-    with beeline.tracer(name='get_subreddit_posts'):
-        beeline.add_context({'subreddit': sub})
+    headers = {
+        'User-Agent': generate_user_agent()
+    }
+    url = f'https://www.reddit.com/r/{sub}/new/.json'
+    result = requests.get(url, headers=headers).json()
+    # we have two states here: one has the data we want and the other is an
+    # error state. The error state looks like this:
+    # {'message': 'Too Many Requests', 'error': 429}
 
-        headers = {
-            'User-Agent': generate_user_agent()
-        }
-        url = f'https://www.reddit.com/r/{sub}/new/.json'
-        result = requests.get(url, headers=headers).json()
-        # we have two states here: one has the data we want and the other is an
-        # error state. The error state looks like this:
-        # {'message': 'Too Many Requests', 'error': 429}
+    if result.get('error', None):
+        log.warning('hit error state for {}'.format(sub))
+        return []
 
-        if result.get('error', None):
-            log.warning('hit error state for {}'.format(sub))
-            return []
-        return parse_json_posts(result)
+    return parse_json_posts(result)
 
 
 def is_time_to_scan(cfg: Config) -> bool:
