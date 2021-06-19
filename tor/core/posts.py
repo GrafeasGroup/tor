@@ -54,8 +54,16 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
         content_format = cfg.other_formatting
 
     try:
-        if not handle_youtube(new_post, cfg):
+        if not is_youtube_url(str(new_post['url'])):
             request_transcription(new_post, content_type, content_format, cfg)
+
+        elif is_transcribable_youtube_video(str(new_post['url'])):
+            handle_youtube(new_post, cfg)
+
+        else:
+            # must be a random link that happens to be on youtube.com
+            pass
+
     # The only errors that happen here are on Reddit's side -- pretty much
     # exclusively 503s and 403s that arbitrarily resolve themselves. A missed
     # post or two is not the end of the world.
@@ -87,12 +95,9 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
     return all([has_enough_upvotes(post, cfg), not post["archived"], post["author"]])
 
 
-def handle_youtube(post: PostSummary, cfg: Config) -> bool:
+def handle_youtube(post: PostSummary, cfg: Config) -> None:
     """
-    Handle the provided post, checking whether it is from YouTube in the process.
-
-    The returned boolean resembles whether the post is handled. If it is False,
-    this means that further handling is required.
+    Handle the provided post, assuming it is a YouTube link with available transcription.
 
     A post gets handled when it is a YouTube post and it either has a
     transcription or it is not transcribable in the first place.
@@ -103,12 +108,13 @@ def handle_youtube(post: PostSummary, cfg: Config) -> bool:
         # post to the original submission, stating it already has closed
         # captioning.
         video_id = get_yt_video_id(url)
-        submission = cfg.r.submission(id=post["name"])
+        submission = cfg.r.submission(id=str(post["name"]))
         submission.reply(_(i18n["posts"]["yt_already_has_transcripts"]))
         log.info(
             f"Found YouTube video, https://youtu.be/{video_id}, with good transcripts."
         )
-    return is_youtube_url(url) and not is_transcribable_youtube_video(url)
+    else:
+        request_transcription(post, 'video', cfg.video_formatting, cfg)
 
 
 def truncate_title(title: str) -> str:
