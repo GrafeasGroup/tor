@@ -1,17 +1,18 @@
 import json
 import logging
 import random
-from typing import Dict
+from typing import Dict, Tuple
 
 import beeline
 from praw.models import Redditor
 
+from tor.core import CLAIM_PHRASES, DONE_PHRASES
 from tor.core.helpers import _, clean_id, send_to_modchat
 from tor.core.initialize import initialize
 from tor.core.user_interaction import process_done
 
 
-@beeline.traced(name='process_command')
+@beeline.traced(name="process_command")
 def process_command(reply, cfg):
     """
     This function processes any commands send to the bot via PM with a subject
@@ -32,15 +33,14 @@ def process_command(reply, cfg):
     requested_command = reply.subject[1:]
     username = reply.author.name
 
-    with open('commands.json', newline='') as commands_file:
+    with open("commands.json", newline="") as commands_file:
         commands = json.load(commands_file)
         logging.debug(
-            f'Searching for command {requested_command}, '
-            f'from {username}.'
+            f"Searching for command {requested_command}, from {username}."
         )
 
         try:
-            command = commands['commands'][requested_command]
+            command = commands["commands"][requested_command]
 
         except KeyError:
             if is_moderator(username, cfg):
@@ -50,20 +50,17 @@ def process_command(reply, cfg):
                 )
 
             logging.warning(
-                f"Error, command: {requested_command} not found!"
-                f" (from {username})"
+                f"Error, command: {requested_command} not found! (from {username})"
             )
 
             return
 
         # command found
-        logging.info(
-            f'{username} is attempting to run {requested_command}'
-        )
+        logging.info(f"{username} is attempting to run {requested_command}")
 
         # Mods are allowed to do any command, and some people are whitelisted
         # per command to be able to use them
-        if username not in command['allowedNames'] and not is_moderator(username, cfg):
+        if username not in command["allowedNames"] and not is_moderator(username, cfg):
             logging.info(
                 f"{username} failed to run {requested_command},"
                 f"because they aren't a mod, or aren't whitelisted to use this"
@@ -72,23 +69,21 @@ def process_command(reply, cfg):
             send_to_modchat(
                 f":banhammer: Someone did something bad! "
                 f"<https://reddit.com/user/{username}|u/{username}> tried to "
-                f"run {requested_command}!", cfg
+                f"run {requested_command}!",
+                cfg,
             )
 
             reply.reply(
-                random.choice(commands['notAuthorizedResponses']).format(
+                random.choice(commands["notAuthorizedResponses"]).format(
                     random.choice(cfg.no_gifs)
                 )
             )
 
             return
 
-        logging.debug(
-            f'Now executing command {requested_command},'
-            f' by {username}.'
-        )
+        logging.debug(f"Now executing command {requested_command}, by {username}.")
 
-        result = globals()[command['pythonFunction']](reply, cfg)
+        result = globals()[command["pythonFunction"]](reply, cfg)
 
         if result is not None:
             reply.reply(result)
@@ -98,7 +93,7 @@ def is_moderator(username, cfg):
     return username in cfg.tor_mods
 
 
-@beeline.traced(name='process_override')
+@beeline.traced(name="process_override")
 def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, cfg):
     """
     This process is for moderators of ToR to force u/transcribersofreddit
@@ -112,13 +107,11 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
     :param cfg: the global config object.
     """
 
+    # TODO: turn this into a decorator
     # don't remove this check, it's not covered like other admin_commands
     # because it's used in reply to people, not as a PM
     if not is_moderator(user.name, cfg):
-        logging.info(
-            f'{user.name} just tried to override. Lolno.'
-
-        )
+        logging.info(f"{user.name} just tried to override. Lolno.")
         return _(random.choice(cfg.no_gifs)), None
 
     # okay, so the parent of the reply should be the bot's comment
@@ -126,10 +119,10 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
     # parent. That should be the comment with the `done` call in it.
     reply_parent = cfg.r.comment(id=clean_id(parent_id))
     grandparent = cfg.r.comment(id=clean_id(reply_parent.parent_id))
-    if 'done' in grandparent.body.lower() or 'claim' in grandparent.body.lower():
+    if grandparent.body.lower() in (CLAIM_PHRASES + DONE_PHRASES):
         logging.info(
-            f'Starting validation override for post {grandparent.fullname}, '
-            f'approved by {user.name}'
+            f"Starting validation override for post {grandparent.fullname}, "
+            f"approved by {user.name}"
         )
         return process_done(
             grandparent.author, blossom_submission, grandparent, cfg, override=True
@@ -138,23 +131,38 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
 
 
 def reload_config(reply, cfg):
-    logging.info(
-        f'Reloading configs at the request of {reply.author.name}'
-    )
+    logging.info(f"Reloading configs at the request of {reply.author.name}")
     initialize(cfg)
-    logging.info('Reload complete.')
+    logging.info("Reload complete.")
 
-    return 'Config reloaded!'
+    return "Config reloaded!"
 
 
-def ping(reply, cfg):
+def ping(reply, cfg) -> str:
     """
     Replies to the !ping command, and is used as a keep alive check
-    :param reply: Not used, but it is here due to the way the function is called
+    :param reply: Message object
     :param cfg: See reply param
     :return: The ping string, which in turn is given to Reddit's reply.reply()
     """
-    logging.info(
-        f'Received ping from {reply.author.name}. Pong!'
-    )
+    logging.info(f"Received ping from {reply.author.name}. Pong!")
     return "Pong!"
+
+
+@beeline.traced(name="process_debug")
+def process_debug(user: Redditor, blossom_submission: Dict, cfg) -> Tuple[str, None]:
+    # TODO: turn this into a decorator
+    # don't remove this check, it's not covered like other admin_commands
+    # because it's used in reply to people, not as a PM
+    if not is_moderator(user.name, cfg):
+        logging.info(f"{user.name} just tried to override. Lolno.")
+        return _(random.choice(cfg.no_gifs)), None
+
+    # format for reddit by putting four spaces at the beginning of each line
+    message = "\n".join(
+        [
+            "    {}".format(i)
+            for i in json.dumps(blossom_submission, indent=4).split("\n")
+        ]
+    )
+    return message, None

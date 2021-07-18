@@ -164,6 +164,7 @@ def process_done(
         # this edge case.
         return coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)), return_flair
 
+    # TODO: fix override command
     transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
     if transcription is None:
         message = done_messages["cannot_find_transcript"]
@@ -261,9 +262,8 @@ def process_message(message: Message, cfg: Config) -> None:
     author = message.author
     username = author.name if author else None
 
-    author.message(dm_subject, dm_body)
-
     if username:
+        author.message(dm_subject, dm_body)
         send_to_modchat(
             f'DM from <{i18n["urls"]["reddit_url"].format("/u/" + username)}|u/{username}> -- '
             f'*{message.subject}*:\n{message.body}', cfg
