@@ -26,6 +26,10 @@ MOD_SUPPORT_PHRASES = [
     # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
 
+CLAIM_PHRASES = ["claim", "dibs"]
+DONE_PHRASES = ['done', 'deno', 'doen']
+UNCLAIM_PHRASES = ['unclaim', 'cancel']
+
 log = logging.getLogger(__name__)
 
 
@@ -79,15 +83,17 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 message, flair = process_coc(
                     username, reply.context, blossom_submission, cfg
                 )
-            elif 'unclaim' in r_body or 'cancel' in r_body:
+            elif r_body in UNCLAIM_PHRASES:
                 message, flair = process_unclaim(
                     username, blossom_submission, submission, cfg
                 )
-            elif 'claim' in r_body or 'dibs' in r_body:
+            elif r_body in CLAIM_PHRASES:
                 message, flair = process_claim(username, blossom_submission, cfg)
-            elif 'done' in r_body or 'deno' in r_body or 'doen' in r_body:
+            elif r_body in DONE_PHRASES:
                 alt_text = 'done' not in r_body
-                message, flair = process_done(reply.author, blossom_submission, reply, cfg, alt_text_trigger=alt_text)
+                message, flair = process_done(
+                    reply.author, blossom_submission, reply, cfg, alt_text_trigger=alt_text
+                )
             elif '!override' in r_body:
                 message, flair = process_override(reply.author, blossom_submission, reply.parent_id, cfg)
             else:
@@ -99,14 +105,14 @@ def process_reply(reply: Comment, cfg: Config) -> None:
             flair_post(reply.submission, flair)
 
     except (ClientException, AttributeError) as e:
+        # the only way we should hit this is if somebody comments and then
+        # deletes their comment before the bot finished processing. It's
+        # uncommon, but common enough that this is necessary.
         log.warning(e)
         log.warning(
             f"Unable to process comment {reply.submission.shortlink} "
             f"by {reply.author}"
         )
-        # the only way we should hit this is if somebody comments and then
-        # deletes their comment before the bot finished processing. It's
-        # uncommon, but common enough that this is necessary.
 
 
 @beeline.traced(name='process_mention')
