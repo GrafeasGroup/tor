@@ -266,6 +266,16 @@ def _check_removal_required(submission: Submission, cfg: Config) -> Tuple[bool, 
     return False, False
 
 
+def check_for_phrase(content: str, phraselist: List) -> bool:
+    """
+    See if a substring from the list is in the content.
+
+    This allows us to handle somewhat uncommon (but relied-upon) behavior like
+    'done -- this is an automated action'.
+    """
+    return any([option in content for option in phraselist])
+
+
 @beeline.traced(name='remove_if_required')
 def remove_if_required(
     submission: Submission, blossom_id: str, cfg: Config

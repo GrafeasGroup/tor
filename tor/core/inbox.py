@@ -16,7 +16,9 @@ from tor.core import (
 )
 from tor.core.admin_commands import process_command, process_override, process_debug
 from tor.core.config import Config
-from tor.core.helpers import _, is_our_subreddit, send_reddit_reply, send_to_modchat
+from tor.core.helpers import (
+    _, is_our_subreddit, send_reddit_reply, send_to_modchat, check_for_phrase
+)
 from tor.core.posts import get_blossom_submission
 from tor.core.user_interaction import (
     process_claim,
@@ -88,13 +90,13 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 message, flair = process_coc(
                     username, reply.context, blossom_submission, cfg
                 )
-            elif r_body in UNCLAIM_PHRASES:
+            elif check_for_phrase(r_body, UNCLAIM_PHRASES):
                 message, flair = process_unclaim(
                     username, blossom_submission, submission, cfg
                 )
-            elif r_body in CLAIM_PHRASES:
+            elif check_for_phrase(r_body, CLAIM_PHRASES):
                 message, flair = process_claim(username, blossom_submission, cfg)
-            elif r_body in DONE_PHRASES:
+            elif check_for_phrase(r_body, DONE_PHRASES):
                 alt_text = "done" not in r_body
                 message, flair = process_done(
                     reply.author,
