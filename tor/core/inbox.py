@@ -1,6 +1,5 @@
 import logging
 import random
-import re
 
 import beeline
 from praw.exceptions import ClientException
@@ -8,27 +7,20 @@ from praw.models import Comment, Message
 from praw.models.reddit.mixins import InboxableMixin
 
 from tor import __BOT_NAMES__
-from tor.core import validation
-from tor.core.admin_commands import process_command, process_override
+from tor.core import (
+    validation, CLAIM_PHRASES, DONE_PHRASES, MOD_SUPPORT_PHRASES, UNCLAIM_PHRASES
+)
+from tor.core.admin_commands import process_command, process_override, process_debug
 from tor.core.config import Config
 from tor.core.helpers import _, is_our_subreddit, send_reddit_reply, send_to_modchat
 from tor.core.posts import get_blossom_submission
+from tor.core.user_interaction import (
+    process_claim, process_coc, process_done, process_message, process_unclaim
+)
 from tor.helpers.flair import flair_post
-from tor.core.user_interaction import (process_claim, process_coc,
-                                       process_done, process_message,
-                                       process_unclaim,)
 from tor.strings import translation
 
 i18n = translation()
-MOD_SUPPORT_PHRASES = [
-    re.compile('fuck', re.IGNORECASE),
-    re.compile('undo', re.IGNORECASE),
-    # re.compile('(?:good|bad) bot', re.IGNORECASE),
-]
-
-CLAIM_PHRASES = ["claim", "dibs"]
-DONE_PHRASES = ['done', 'deno', 'doen']
-UNCLAIM_PHRASES = ['unclaim', 'cancel']
 
 log = logging.getLogger(__name__)
 
@@ -96,6 +88,8 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 )
             elif '!override' in r_body:
                 message, flair = process_override(reply.author, blossom_submission, reply.parent_id, cfg)
+            elif '!debug' in r_body:
+                message, flair = process_debug()
             else:
                 # If we made it this far, it's something we can't process automatically
                 forward_to_slack(reply, cfg)

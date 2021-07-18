@@ -1,3 +1,5 @@
+import re
+
 __version__ = '0.6.0'
 
 # CTRL+C handler variable
@@ -46,3 +48,14 @@ class cached_property(object):
             value = self.func(obj)
             obj.__dict__[self.__name__] = value
         return value
+
+
+MOD_SUPPORT_PHRASES = [
+    re.compile('fuck', re.IGNORECASE),
+    re.compile('undo', re.IGNORECASE),
+    # re.compile('(?:good|bad) bot', re.IGNORECASE),
+]
+
+CLAIM_PHRASES = ["claim", "dibs"]
+DONE_PHRASES = ['done', 'deno', 'doen']
+UNCLAIM_PHRASES = ['unclaim', 'cancel']

@@ -6,6 +6,7 @@ from typing import Dict
 import beeline
 from praw.models import Redditor
 
+from tor.core import CLAIM_PHRASES, DONE_PHRASES
 from tor.core.helpers import _, clean_id, send_to_modchat
 from tor.core.initialize import initialize
 from tor.core.user_interaction import process_done
@@ -126,7 +127,7 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
     # parent. That should be the comment with the `done` call in it.
     reply_parent = cfg.r.comment(id=clean_id(parent_id))
     grandparent = cfg.r.comment(id=clean_id(reply_parent.parent_id))
-    if 'done' in grandparent.body.lower() or 'claim' in grandparent.body.lower():
+    if grandparent.body.lower() in (CLAIM_PHRASES + DONE_PHRASES):
         logging.info(
             f'Starting validation override for post {grandparent.fullname}, '
             f'approved by {user.name}'
@@ -147,10 +148,10 @@ def reload_config(reply, cfg):
     return 'Config reloaded!'
 
 
-def ping(reply, cfg):
+def ping(reply, cfg) -> str:
     """
     Replies to the !ping command, and is used as a keep alive check
-    :param reply: Not used, but it is here due to the way the function is called
+    :param reply: Message object
     :param cfg: See reply param
     :return: The ping string, which in turn is given to Reddit's reply.reply()
     """
@@ -158,3 +159,8 @@ def ping(reply, cfg):
         f'Received ping from {reply.author.name}. Pong!'
     )
     return "Pong!"
+
+
+@beeline.traced(name='process_debug')
+def process_debug(message):
+    ...
