@@ -36,6 +36,8 @@ DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
 # Jake L (2017-11-17)
 # Michael W (2017-11-27)
 # Luke Abby (2019-07-02)
+# David G (2021-06-14)
+# Jason H (2021-07-01)
 
 # Musical Dedications:
 #
