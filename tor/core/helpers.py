@@ -17,7 +17,6 @@ from tor.core.config import config, Config
 from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
 
-
 log = logging.getLogger(__name__)
 
 subreddit_regex = re.compile(
