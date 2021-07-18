@@ -164,6 +164,7 @@ def process_done(
         # this edge case.
         return coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)), return_flair
 
+    # TODO: fix override command
     transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
     if transcription is None:
         message = done_messages["cannot_find_transcript"]
