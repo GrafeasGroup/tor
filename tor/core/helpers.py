@@ -17,7 +17,6 @@ from tor.core.config import config, Config
 from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
 
-
 log = logging.getLogger(__name__)
 
 subreddit_regex = re.compile(
@@ -283,7 +282,7 @@ def remove_if_required(
             f"submission/{blossom_id}/",
             data={"removed_from_queue": True},
         )
-        if response.status != BlossomStatus.ok:
+        if not str(response.status_code).startswith('2'):
             return False, False
 
         # Selects a message depending on whether the submission is reported or not.

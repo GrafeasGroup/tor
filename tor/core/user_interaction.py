@@ -7,8 +7,9 @@ from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission
 
 from tor.core.config import Config
-from tor.core.helpers import (get_wiki_page,
-                              remove_if_required, send_to_modchat)
+from tor.core.helpers import (
+    get_wiki_page, remove_if_required, send_to_modchat
+)
 from tor.core.validation import get_transcription
 from tor.helpers.flair import flair, set_user_flair
 from tor.strings import translation
@@ -167,11 +168,10 @@ def process_done(
         # this edge case.
         return coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)), return_flair
 
-    # TODO: fix override command
     transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
-    if transcription is None:
-        message = done_messages["cannot_find_transcript"]
-    else:
+
+    message = done_messages["cannot_find_transcript"]  # default message
+    if transcription:
         cfg.blossom.create_transcription(
             transcription.id,
             transcription.body,
@@ -181,6 +181,9 @@ def process_done(
             not is_visible
         )
 
+    if transcription or override:
+        # because we can enter this state with or without a transcription, it
+        # makes sense to have this as a separate block.
         done_response = cfg.blossom.done(
             blossom_submission["id"], user.name, override
         )
@@ -205,9 +208,6 @@ def process_done(
 
         elif done_response.status == BlossomStatus.blacklisted:
             message = i18n["responses"]["general"]["blacklisted"]
-
-        else:
-            message = done_messages["cannot_find_transcript"]
 
     return message, return_flair
 
