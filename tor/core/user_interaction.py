@@ -180,7 +180,7 @@ def process_done(
 
     if transcription or override:
         # because we can enter this state with or without a transcription, it
-        # makes sense to have this is a separate block.
+        # makes sense to have this as a separate block.
         done_response = cfg.blossom.done(
             blossom_submission["id"], user.name, override
         )
