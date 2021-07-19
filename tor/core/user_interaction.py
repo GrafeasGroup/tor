@@ -113,8 +113,11 @@ def process_claim(
     elif response.status == BlossomStatus.blacklisted:
         message = i18n["responses"]["general"]["blacklisted"]
 
-    else:
+    elif response.status == BlossomStatus.already_claimed:
         message = i18n["responses"]["claim"]["already_claimed"]
+
+    else:
+        message = i18n["responses"]["general"]["oops"]
 
     return message, return_flair
 
