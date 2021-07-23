@@ -170,4 +170,11 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         post_summary["permalink"] = linked_post.permalink
         post_summary["name"] = linked_post.permalink
 
-        return create_blossom_submission(post_summary, submission, cfg)
+        new_submission = create_blossom_submission(post_summary, submission, cfg)
+        # this submission will have the wrong post times because we didn't know about
+        # it, so let's leave a marker that we can clean up later on Blossom's side.
+        cfg.blossom.patch(
+            f"submission/{new_submission['id']}/",
+            data={"redis_id": "incomplete"},
+        )
+        return new_submission
