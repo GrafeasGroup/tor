@@ -162,4 +162,19 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         return response.data[0]
     else:
         # If we are here, this means that the current submission is not yet in Blossom.
-        return create_blossom_submission(submission, cfg)
+        # Mock up a Blossom object, since this will only be used when Blossom doesn't
+        # know about it
+        post_summary = {}
+        linked_post = cfg.r.submission(url=submission.url)
+        post_summary["url"] = linked_post.url
+        post_summary["permalink"] = linked_post.permalink
+        post_summary["name"] = linked_post.permalink
+
+        new_submission = create_blossom_submission(post_summary, submission, cfg)
+        # this submission will have the wrong post times because we didn't know about
+        # it, so let's leave a marker that we can clean up later on Blossom's side.
+        cfg.blossom.patch(
+            f"submission/{new_submission['id']}/",
+            data={"redis_id": "incomplete"},
+        )
+        return new_submission

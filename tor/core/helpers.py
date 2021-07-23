@@ -6,7 +6,6 @@ import time
 from typing import List, Tuple
 
 import beeline
-from blossom_wrapper import BlossomStatus
 from praw.exceptions import APIException
 from praw.models import Comment, Submission, Subreddit
 from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFound
