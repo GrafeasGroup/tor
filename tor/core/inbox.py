@@ -78,6 +78,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 ),
                 cfg,
             )
+            message = _(i18n["responses"]["general"]["getting_help"])
         elif "thank" in r_body:  # trigger on "thanks" and "thank you"
             thumbs_up_gifs = i18n["urls"]["thumbs_up_gifs"]
             youre_welcome = i18n["responses"]["general"]["youre_welcome"]

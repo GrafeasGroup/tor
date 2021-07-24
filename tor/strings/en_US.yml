@@ -124,6 +124,8 @@ responses:
     claimed_other_user: |
       Sorry, this post is claimed by someone else, so you cannot unclaim it!
   general:
+    getting_help: |
+      Help is on the way! I have notified the mods and someone should be here to assist you soon.
     blacklisted: |
       It appears that you are blacklisted. Please contact the moderators of r/TranscribersOfReddit if you do not know why this is the case.
     oops: |
