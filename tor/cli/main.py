@@ -133,21 +133,18 @@ def main():
         datefmt='%Y-%m-%dT%H:%M:%S',
     )
 
-    honeycomb_key = os.getenv('HONEYCOMB_KEY', '')
-    if len(honeycomb_key) == 0:
-        # debug mode: print what would be sent to honeycomb.io to stderr
-        beeline.init(
-            writekey='',
-            dataset='transcribersofreddit',
-            service_name='tor_moderator',
-            debug=True
-        )
-    else:
-        beeline.init(
-            writekey=honeycomb_key,
-            dataset='transcribersofreddit',
-            service_name='tor_moderator'
-        )
+    honeycomb_key = os.getenv("HONEYCOMB_KEY", "")
+
+    # if no api key, do not send data and instead print what would be sent to stderr
+    # if we have a key, pass data to honeycomb.io
+    args = {
+        "writekey": honeycomb_key,
+        "dataset": "transcribersofreddit",
+        "service_name": "tor_moderator",
+        "debug": True if len(honeycomb_key) == 0 else False,
+        "sample_rate": 10,
+    }
+    beeline.init(**args)
     atexit.register(beeline.close)
 
     config.debug_mode = opt.debug
