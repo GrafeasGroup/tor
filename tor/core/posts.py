@@ -9,8 +9,6 @@ from tor.core.config import Config
 from tor.core.helpers import _
 from tor.helpers.flair import flair, flair_post
 from tor.helpers.youtube import (
-    has_youtube_transcript,
-    get_yt_video_id,
     is_transcribable_youtube_video,
     is_youtube_url,
 )
@@ -56,8 +54,7 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
         content_format = cfg.other_formatting
 
     try:
-        if not handle_youtube(new_post, cfg):
-            request_transcription(new_post, content_type, content_format, cfg)
+        request_transcription(new_post, content_type, content_format, cfg)
     # The only errors that happen here are on Reddit's side -- pretty much
     # exclusively 503s and 403s that arbitrarily resolve themselves. A missed
     # post or two is not the end of the world.
@@ -86,31 +83,15 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
     """
     Determine whether the provided post should be processed.
     """
-    return all([has_enough_upvotes(post, cfg), not post["archived"], post["author"]])
-
-
-def handle_youtube(post: PostSummary, cfg: Config) -> bool:
-    """
-    Handle the provided post, checking whether it is from YouTube in the process.
-
-    The returned boolean resembles whether the post is handled. If it is False,
-    this means that further handling is required.
-
-    A post gets handled when it is a YouTube post and it either has a
-    transcription or it is not transcribable in the first place.
-    """
     url = str(post["url"])
-    if has_youtube_transcript(url):
-        # Since there is already a transcript, let /u/transcribersofreddit
-        # post to the original submission, stating it already has closed
-        # captioning.
-        video_id = get_yt_video_id(url)
-        submission = cfg.r.submission(id=post["name"])
-        submission.reply(_(i18n["posts"]["yt_already_has_transcripts"]))
-        log.info(
-            f"Found YouTube video, https://youtu.be/{video_id}, with good transcripts."
-        )
-    return is_youtube_url(url) and not is_transcribable_youtube_video(url)
+    return all(
+        [
+            has_enough_upvotes(post, cfg),
+            not post["archived"],
+            post["author"],
+            is_transcribable_youtube_video(url) if is_youtube_url(url) else True
+        ]
+    )
 
 
 def truncate_title(title: str) -> str:

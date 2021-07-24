@@ -1,10 +1,3 @@
-# After a lengthy discussion with @thelonelyghost, it became apparent that we're
-# fully expecting to completely throw away this codebase when we finish the
-# rewrite for celery. Therefore, ugly-ass hacks are allowed in the name of
-# making the current bots faster if at all possible. Is it maintainable?
-# Not really, but that's a conscious decision on our part. Feast your eyes
-# upon the ugliness... and know that we are sorry.
-
 import logging
 import random
 import string
