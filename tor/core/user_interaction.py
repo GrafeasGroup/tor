@@ -1,5 +1,6 @@
 import logging
 import random
+import time
 from typing import Dict, Tuple
 
 import beeline
@@ -171,6 +172,13 @@ def process_done(
     transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
 
     message = done_messages["cannot_find_transcript"]  # default message
+
+    if not transcription:
+        # When the user replies `done` quickly after posting the transcription,
+        # it might not be available on Reddit yet. Wait a bit and try again.
+        time.sleep(1)
+        transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
+
     if transcription:
         cfg.blossom.create_transcription(
             transcription.id,
