@@ -8,11 +8,13 @@ mod:
     Removed the following submission since it was removed from the parent subreddit: {}
   removed_reported: |
     Removed the following submission since it was reported: {}
-inbox:
-  mod_intervention_needed: |
+  intervention_needed: |
     :rotating_light::rotating_light: Mod Intervention Needed :rotating_light::rotating_light:
 
     Detected use of {phrases} {link}
+  formatting_issues: |
+    I detected formatting issues in the transcription by {author}: {issues}
+    {link}
 posts:
   discovered_submit_title: |
     {sub} | {type} | "{title}"

@@ -7,7 +7,10 @@ import beeline
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission
 
-from tor.automatic_assessment.automatic_assessment import check_transcription_for_errors, get_formatting_error_message
+from tor.automatic_assessment.automatic_assessment import (
+    check_transcription_for_errors,
+    get_formatting_error_message,
+)
 from tor.core.config import Config
 from tor.core.helpers import get_wiki_page, remove_if_required, send_to_modchat
 from tor.core.validation import get_transcription
@@ -215,6 +218,15 @@ def process_done(
         if len(formatting_errors) > 0:
             # Formatting issues found.  Reject the `done` and ask the
             # volunteer to fix them.
+            issues = ", ".join([error.value for error in formatting_errors])
+            # Also send it to the mod Slack so we can validate the issues
+            send_to_modchat(
+                i18n["mod"]["formatting_issues"].format(
+                    author=user.name, issues=issues, link=post.permalink,
+                ),
+                cfg,
+                "formatting-issues",
+            )
             message = get_formatting_error_message(formatting_errors)
             return message, return_flair
 

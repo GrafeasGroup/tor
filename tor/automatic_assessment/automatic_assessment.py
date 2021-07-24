@@ -1,5 +1,5 @@
 import re
-from typing import Optional, List, Set
+from typing import Optional, Set
 
 from tor.automatic_assessment.formatting_errors import FormattingError
 from tor.automatic_assessment.helpers import format_as_markdown_list
