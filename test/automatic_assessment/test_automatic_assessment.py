@@ -7,9 +7,29 @@ from tor.automatic_assessment.automatic_assessment import (
     check_for_missing_separators,
     check_transcription,
     check_for_separator_heading,
-    check_for_malformed_footer,
+    check_for_malformed_footer, check_for_bold_header,
 )
 from tor.automatic_assessment.formatting_errors import FormattingError
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("**Image Transcription: Tumblr**", True),
+        ("**Image Transcription:**", True),
+        ("**Image Transcription**", True),
+        ("**Video Transcription:**", True),
+        ("*Image Transcription: Tumblr*", False),
+        ("*Image Transcription:*", False),
+        ("*Image Transcription*", False),
+        ("*Image Transcription: Tumblr*\n\n---\n\n**Image Transcription: Tumblr**", False),
+    ],
+)
+def test_check_for_bold_header(test_input: str, should_match: bool) -> None:
+    """Test if bold headers are detected."""
+    actual = check_for_bold_header(test_input)
+    expected = FormattingError.BOLD_HEADER if should_match else None
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
@@ -22,7 +42,7 @@ from tor.automatic_assessment.formatting_errors import FormattingError
     ],
 )
 def test_check_for_missing_separators(test_input: str, should_match: bool) -> None:
-    """Test if fenced code blocks are detected"""
+    """Test if missing separators are detected."""
     actual = check_for_missing_separators(test_input)
     expected = FormattingError.MISSING_SEPARATORS if should_match else None
     assert actual == expected
@@ -38,7 +58,7 @@ def test_check_for_missing_separators(test_input: str, should_match: bool) -> No
     ],
 )
 def test_check_for_separator_headings(test_input: str, should_match: bool) -> None:
-    """Test if fenced code blocks are detected"""
+    """Test if separators misused as headings are detected."""
     actual = check_for_separator_heading(test_input)
     expected = FormattingError.SEPARATOR_HEADINGS if should_match else None
     assert actual == expected
@@ -64,7 +84,7 @@ def test_check_for_separator_headings(test_input: str, should_match: bool) -> No
     ],
 )
 def test_check_for_malformed_footer(test_input: str, should_match: bool) -> None:
-    """Test if malformed footers are detected correctly."""
+    """Test if malformed footers are detected."""
     actual = check_for_malformed_footer(test_input)
     expected = FormattingError.MALFORMED_FOOTER if should_match else None
     assert actual == expected
@@ -80,7 +100,7 @@ def test_check_for_malformed_footer(test_input: str, should_match: bool) -> None
     ],
 )
 def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> None:
-    """Test if fenced code blocks are detected"""
+    """Test if fenced code blocks are detected."""
     actual = check_for_fenced_code_block(test_input)
     expected = FormattingError.FENCED_CODE_BLOCK if should_match else None
     assert actual == expected
