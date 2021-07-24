@@ -17,7 +17,11 @@ from tor.core import (
 from tor.core.admin_commands import process_command, process_override, process_debug
 from tor.core.config import Config
 from tor.core.helpers import (
-    _, is_our_subreddit, send_reddit_reply, send_to_modchat, check_for_phrase
+    _,
+    is_our_subreddit,
+    send_reddit_reply,
+    send_to_modchat,
+    check_for_phrase,
 )
 from tor.core.posts import get_blossom_submission
 from tor.core.user_interaction import (
@@ -69,9 +73,9 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         ]:
             phrases = '"' + '", "'.join(matches) + '"'
             send_to_modchat(
-                ":rotating_light::rotating_light: Mod Intervention Needed "
-                ":rotating_light::rotating_light: "
-                f"\n\nDetected use of {phrases} {reply.submission.shortlink}",
+                i18n["inbox"]["mod_intervention_needed"].format(
+                    phrases=phrases, link=reply.submission.shortlink,
+                ),
                 cfg,
             )
         elif "thank" in r_body:  # trigger on "thanks" and "thank you"
