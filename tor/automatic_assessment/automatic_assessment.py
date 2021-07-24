@@ -94,7 +94,7 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingError]
     )
 
 
-def check_transcription(transcription: str) -> Set[FormattingError]:
+def check_transcription_for_errors(transcription: str) -> Set[FormattingError]:
     """Check the transcription for common formatting errors."""
     return set(
         error

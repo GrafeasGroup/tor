@@ -5,7 +5,7 @@ import pytest
 from tor.automatic_assessment.automatic_assessment import (
     check_for_fenced_code_block,
     check_for_missing_separators,
-    check_transcription,
+    check_transcription_for_errors,
     check_for_separator_heading,
     check_for_malformed_footer,
     check_for_bold_header,
@@ -182,5 +182,5 @@ function foo(x: int) {
 def test_check_transcription(test_input: str, expected: List[FormattingError]) -> None:
     """Test if formatting errors are detected correctly"""
     print(test_input)
-    actual = check_transcription(test_input)
+    actual = check_transcription_for_errors(test_input)
     assert actual == set(expected)
