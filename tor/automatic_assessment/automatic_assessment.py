@@ -99,6 +99,9 @@ def check_transcription_for_errors(transcription: str) -> Set[FormattingError]:
     return set(
         error
         for error in [
+            check_for_bold_header(transcription),
+            check_for_malformed_footer(transcription),
+            check_for_separator_heading(transcription),
             check_for_missing_separators(transcription),
             check_for_fenced_code_block(transcription),
         ]
