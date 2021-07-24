@@ -213,7 +213,7 @@ automatic_assessment:
     \    Heading
     \    ---
 
-    If you actually intended to make a heading, please use the sytax with number sign (`#`), like this:
+    If you actually intended to make a heading, please use the syntax with number signs (`#`), like this:
 
     \    ## Heading
   malformed_footer: |
