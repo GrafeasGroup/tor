@@ -7,7 +7,8 @@ from tor.automatic_assessment.automatic_assessment import (
     check_for_missing_separators,
     check_transcription,
     check_for_separator_heading,
-    check_for_malformed_footer, check_for_bold_header,
+    check_for_malformed_footer,
+    check_for_bold_header,
 )
 from tor.automatic_assessment.formatting_errors import FormattingError
 
@@ -22,7 +23,10 @@ from tor.automatic_assessment.formatting_errors import FormattingError
         ("*Image Transcription: Tumblr*", False),
         ("*Image Transcription:*", False),
         ("*Image Transcription*", False),
-        ("*Image Transcription: Tumblr*\n\n---\n\n**Image Transcription: Tumblr**", False),
+        (
+            "*Image Transcription: Tumblr*\n\n---\n\n**Image Transcription: Tumblr**",
+            False,
+        ),
     ],
 )
 def test_check_for_bold_header(test_input: str, should_match: bool) -> None:
