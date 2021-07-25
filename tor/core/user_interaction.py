@@ -13,7 +13,7 @@ from tor.validation.formatting_validation import (
 )
 from tor.core.config import Config
 from tor.core.helpers import get_wiki_page, remove_if_required, send_to_modchat
-from tor.core.validation import get_transcription
+from tor.validation.transcription_validation import get_transcription
 from tor.helpers.flair import flair, set_user_flair
 from tor.strings import translation
 

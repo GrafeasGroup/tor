@@ -8,7 +8,6 @@ from praw.models.reddit.mixins import InboxableMixin
 
 from tor import __BOT_NAMES__
 from tor.core import (
-    validation,
     CLAIM_PHRASES,
     DONE_PHRASES,
     MOD_SUPPORT_PHRASES,
@@ -33,6 +32,7 @@ from tor.core.user_interaction import (
 )
 from tor.helpers.flair import flair_post
 from tor.strings import translation
+from tor.validation.transcription_validation import is_comment_transcription
 
 i18n = translation()
 
@@ -64,7 +64,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         flair = None
         r_body = reply.body.lower()  # cache that thing
 
-        if "image transcription" in r_body or validation.is_comment_transcription(reply, cfg):
+        if "image transcription" in r_body or is_comment_transcription(reply, cfg):
             message = _(i18n["responses"]["general"]["transcript_on_tor_post"])
         elif matches := [
             match.group()
