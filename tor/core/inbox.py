@@ -64,7 +64,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         flair = None
         r_body = reply.body.lower()  # cache that thing
 
-        if "image transcription" in r_body or validation.contains_footer(reply, cfg):
+        if "image transcription" in r_body or validation.is_comment_transcription(reply, cfg):
             message = _(i18n["responses"]["general"]["transcript_on_tor_post"])
         elif matches := [
             match.group()

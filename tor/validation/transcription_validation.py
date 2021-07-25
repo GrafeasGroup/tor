@@ -32,7 +32,7 @@ def get_transcription(
             continue
         if all([
             top_level_comment.author.name == user.name,
-            contains_footer(top_level_comment, cfg)
+            is_comment_transcription(top_level_comment, cfg)
         ]):
             return top_level_comment, True
 
@@ -42,15 +42,18 @@ def get_transcription(
         if all([
             post.submission.fullname == linked_submission.fullname,
             post.is_root,
-            contains_footer(post, cfg)
+            is_comment_transcription(post, cfg)
         ]):
             return post, False
     return None, False
 
 
-def contains_footer(comment: Comment, cfg: Config) -> bool:
+def is_comment_transcription(comment: Comment, cfg: Config) -> bool:
     """
-    Check whether the footer is within the provided comment.
+    Check if the comment is meant to be a transcription.
+
+    This just performs a basic check, stricter rules are enforced when
+    checking for any formatting issues.
 
     If the perform_header_check option is not set in the configuration, this
     function always returns True.
