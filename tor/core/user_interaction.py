@@ -8,9 +8,7 @@ from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission
 
 from tor.core.config import Config
-from tor.core.helpers import (
-    get_wiki_page, remove_if_required, send_to_modchat
-)
+from tor.core.helpers import get_wiki_page, remove_if_required, send_to_modchat
 from tor.core.validation import get_transcription
 from tor.helpers.flair import flair, set_user_flair
 from tor.strings import translation
@@ -40,9 +38,9 @@ MODCHAT_EMOTES = [
 ]
 
 
-@beeline.traced(name='process_coc')
+@beeline.traced(name="process_coc")
 def process_coc(
-        username: str, context: str, blossom_submission: Dict, cfg: Config
+    username: str, context: str, blossom_submission: Dict, cfg: Config
 ) -> Tuple:
     """
     Process the acceptation of the CoC by the specified user.
@@ -57,7 +55,7 @@ def process_coc(
         # The status codes of accepting the CoC are not checked because they are already
         # caught by getting the user.
         response = cfg.blossom.accept_coc(username=username)
-        new_acceptance = (response.status == BlossomStatus.ok)
+        new_acceptance = response.status == BlossomStatus.ok
         if new_acceptance:
             emote = random.choice(MODCHAT_EMOTES)
             user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
@@ -66,21 +64,26 @@ def process_coc(
                 f"<{user_url}|u/{username}> has just "
                 f"<{post_url}|accepted the CoC!> {emote}",
                 cfg,
-                channel="new_volunteers"
+                channel="new_volunteers",
             )
-        return process_claim(username, blossom_submission, cfg, first_time=new_acceptance)
+        return process_claim(
+            username, blossom_submission, cfg, first_time=new_acceptance
+        )
     elif user_response.status == BlossomStatus.not_found:
         cfg.blossom.create_user(username=username)
-        return i18n["responses"]["general"]["coc_not_accepted"].format(
-            get_wiki_page("codeofconduct", cfg)
-        ), None
+        return (
+            i18n["responses"]["general"]["coc_not_accepted"].format(
+                get_wiki_page("codeofconduct", cfg)
+            ),
+            None,
+        )
     else:
         return process_claim(username, blossom_submission, cfg)
 
 
-@beeline.traced(name='process_claim')
+@beeline.traced(name="process_claim")
 def process_claim(
-        username: str, blossom_submission: Dict, cfg: Config, first_time=False
+    username: str, blossom_submission: Dict, cfg: Config, first_time=False
 ) -> Tuple:
     """
     Process a claim request.
@@ -100,9 +103,13 @@ def process_claim(
     )
     return_flair = None
     if response.status == BlossomStatus.ok:
-        message = i18n["responses"]["claim"]["first_claim_success" if first_time else "success"]
+        message = i18n["responses"]["claim"][
+            "first_claim_success" if first_time else "success"
+        ]
         return_flair = flair.in_progress
-        log.info(f'Claim on Submission {blossom_submission["tor_url"]} by {username} successful.')
+        log.info(
+            f'Claim on Submission {blossom_submission["tor_url"]} by {username} successful.'
+        )
 
     elif response.status == BlossomStatus.coc_not_accepted:
         message = coc_not_accepted.format(get_wiki_page("codeofconduct", cfg))
@@ -115,7 +122,15 @@ def process_claim(
         message = i18n["responses"]["general"]["blacklisted"]
 
     elif response.status == BlossomStatus.already_claimed:
-        message = i18n["responses"]["claim"]["already_claimed"]
+        claimed_by = response.data["username"]
+        if claimed_by == username:
+            # This user already got the submission
+            message = i18n["responses"]["claim"]["already_claimed_by_self"]
+        else:
+            # The submission was claimed by someone else
+            message = i18n["responses"]["claim"]["already_claimed_by_someone"].format(
+                claimed_by=claimed_by
+            )
 
     else:
         message = i18n["responses"]["general"]["oops"]
@@ -123,14 +138,14 @@ def process_claim(
     return message, return_flair
 
 
-@beeline.traced(name='process_done')
+@beeline.traced(name="process_done")
 def process_done(
-        user: Redditor,
-        blossom_submission: Dict,
-        post: Comment,
-        cfg: Config,
-        override=False,
-        alt_text_trigger=False
+    user: Redditor,
+    blossom_submission: Dict,
+    post: Comment,
+    cfg: Config,
+    override=False,
+    alt_text_trigger=False,
 ) -> Tuple:
     """
     Handles comments where the user claims to have completed a post.
@@ -158,16 +173,22 @@ def process_done(
     if blossom_user.status != BlossomStatus.ok:
         # If we don't know who the volunteer is, then we don't have a record of
         # them and they need to go through the code of conduct process.
-        return coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)), return_flair
+        return (
+            coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)),
+            return_flair,
+        )
 
-    if not blossom_user.data['accepted_coc']:
+    if not blossom_user.data["accepted_coc"]:
         # If the volunteer in question hasn't accepted the code of conduct,
         # eject early and return. Although the `create_transcription` endpoint
         # returns a code of conduct check, we only hit it when we create a
         # transcription, which requires that they wrote something. If a volunteer
         # just writes `done` without putting a transcription down, it will hit
         # this edge case.
-        return coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)), return_flair
+        return (
+            coc_not_accepted.format(get_wiki_page("codeofconduct", cfg)),
+            return_flair,
+        )
 
     transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
 
@@ -177,7 +198,9 @@ def process_done(
         # When the user replies `done` quickly after posting the transcription,
         # it might not be available on Reddit yet. Wait a bit and try again.
         time.sleep(1)
-        transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
+        transcription, is_visible = get_transcription(
+            blossom_submission["url"], user, cfg
+        )
 
     if transcription:
         cfg.blossom.create_transcription(
@@ -186,15 +209,13 @@ def process_done(
             i18n["urls"]["reddit_url"].format(str(transcription.permalink)),
             transcription.author.name,
             blossom_submission["id"],
-            not is_visible
+            not is_visible,
         )
 
     if transcription or override:
         # because we can enter this state with or without a transcription, it
         # makes sense to have this as a separate block.
-        done_response = cfg.blossom.done(
-            blossom_submission["id"], user.name, override
-        )
+        done_response = cfg.blossom.done(blossom_submission["id"], user.name, override)
         # Note that both the not_found and coc_not_accepted status are already
         # caught in the previous lines of code, hence these are not checked again.
         if done_response.status == BlossomStatus.ok:
@@ -202,7 +223,7 @@ def process_done(
             set_user_flair(user, post, cfg)
             log.info(
                 f'Done on Submission {blossom_submission["tor_url"]} by {user.name}'
-                f' successful.'
+                f" successful."
             )
             message = done_messages["completed_transcript"]
             if alt_text_trigger:
@@ -220,9 +241,9 @@ def process_done(
     return message, return_flair
 
 
-@beeline.traced(name='process_unclaim')
+@beeline.traced(name="process_unclaim")
 def process_unclaim(
-        username: str, blossom_submission: Dict, submission: Submission, cfg: Config
+    username: str, blossom_submission: Dict, submission: Submission, cfg: Config
 ) -> Tuple:
     """
     Process an unclaim request.
@@ -243,7 +264,9 @@ def process_unclaim(
     if response.status == BlossomStatus.ok:
         message = unclaim_messages["success"]
         return_flair = flair.unclaimed
-        removed, reported = remove_if_required(submission, blossom_submission["id"], cfg)
+        removed, reported = remove_if_required(
+            submission, blossom_submission["id"], cfg
+        )
         if removed:
             # Select the message based on whether the post was reported or not.
             message = unclaim_messages[
@@ -265,10 +288,10 @@ def process_unclaim(
     return message, return_flair
 
 
-@beeline.traced(name='process_message')
+@beeline.traced(name="process_message")
 def process_message(message: Message, cfg: Config) -> None:
-    dm_subject = i18n['responses']['direct_message']['dm_subject']
-    dm_body = i18n['responses']['direct_message']['dm_body']
+    dm_subject = i18n["responses"]["direct_message"]["dm_subject"]
+    dm_body = i18n["responses"]["direct_message"]["dm_body"]
 
     author = message.author
     username = author.name if author else None
@@ -277,12 +300,16 @@ def process_message(message: Message, cfg: Config) -> None:
         author.message(dm_subject, dm_body)
         send_to_modchat(
             f'DM from <{i18n["urls"]["reddit_url"].format("/u/" + username)}|u/{username}> -- '
-            f'*{message.subject}*:\n{message.body}', cfg
+            f"*{message.subject}*:\n{message.body}",
+            cfg,
         )
-        log.info(f'Received DM from {username}. \n Subject: {message.subject}\n\nBody: {message.body}')
+        log.info(
+            f"Received DM from {username}. \n Subject: {message.subject}\n\nBody: {message.body}"
+        )
     else:
         send_to_modchat(
-            f'DM with no author -- '
-            f'*{message.subject}*:\n{message.body}', cfg
+            f"DM with no author -- " f"*{message.subject}*:\n{message.body}", cfg
         )
-        log.info(f'Received DM with no author. \n Subject: {message.subject}\n\nBody: {message.body}')
+        log.info(
+            f"Received DM with no author. \n Subject: {message.subject}\n\nBody: {message.body}"
+        )
