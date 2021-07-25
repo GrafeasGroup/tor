@@ -111,6 +111,6 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
 
 def get_formatting_issue_message(errors: Set[FormattingIssue]) -> str:
     """Get a message containing instructions for each formatting issue."""
-    error_messages = [i18n["validation"][error.value] for error in errors]
+    error_messages = [i18n["formatting_issues"][error.value] for error in errors]
     error_list = format_as_markdown_list(error_messages)
-    return i18n["validation"]["message"].format(error_list=error_list)
+    return i18n["formatting_issues"]["message"].format(error_list=error_list)

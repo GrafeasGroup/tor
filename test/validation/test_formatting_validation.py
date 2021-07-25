@@ -179,8 +179,9 @@ function foo(x: int) {
         ),
     ],
 )
-def test_check_for_formatting_issues(test_input: str, expected: List[FormattingIssue]) -> None:
+def test_check_for_formatting_issues(
+    test_input: str, expected: List[FormattingIssue]
+) -> None:
     """Test if formatting issues are detected correctly"""
-    print(test_input)
     actual = check_for_formatting_issues(test_input)
     assert actual == set(expected)
