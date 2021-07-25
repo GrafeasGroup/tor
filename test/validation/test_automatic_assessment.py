@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from tor.automatic_assessment.automatic_assessment import (
+from tor.validation.automatic_assessment import (
     check_for_fenced_code_block,
     check_for_missing_separators,
     check_transcription_for_errors,
@@ -10,7 +10,7 @@ from tor.automatic_assessment.automatic_assessment import (
     check_for_malformed_footer,
     check_for_bold_header,
 )
-from tor.automatic_assessment.formatting_errors import FormattingError
+from tor.validation.formatting_errors import FormattingError
 
 
 @pytest.mark.parametrize(

@@ -7,7 +7,7 @@ import beeline
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission
 
-from tor.automatic_assessment.automatic_assessment import (
+from tor.validation.automatic_assessment import (
     check_transcription_for_errors,
     get_formatting_error_message,
 )

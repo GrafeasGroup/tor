@@ -1,8 +1,8 @@
 import re
 from typing import Optional, Set
 
-from tor.automatic_assessment.formatting_errors import FormattingError
-from tor.automatic_assessment.helpers import format_as_markdown_list
+from tor.validation.formatting_errors import FormattingError
+from tor.validation.helpers import format_as_markdown_list
 from tor.strings import translation
 
 i18n = translation()
@@ -111,6 +111,6 @@ def check_transcription_for_errors(transcription: str) -> Set[FormattingError]:
 
 def get_formatting_error_message(errors: Set[FormattingError]) -> str:
     """Get a message containing instructions for each formatting error."""
-    error_messages = [i18n["automatic_assessment"][error.value] for error in errors]
+    error_messages = [i18n["validation"][error.value] for error in errors]
     error_list = format_as_markdown_list(error_messages)
-    return i18n["automatic_assessment"]["message"].format(error_list=error_list)
+    return i18n["validation"]["message"].format(error_list=error_list)

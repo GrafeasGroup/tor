@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from tor.automatic_assessment.helpers import (
+from tor.validation.helpers import (
     format_as_markdown_list_item,
     format_as_markdown_list,
 )
