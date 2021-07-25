@@ -80,6 +80,14 @@ responses:
       I'm sorry, but it looks like u\/{claimed_by} has already claimed this post!
 
       You can check in with them to see if they need any help, but otherwise I suggest sticking around to see if another post pops up here in a little bit.
+    too_many_claims: |
+      Woah, slow down there! Please complete your other claimed posts first before starting a new one:
+
+      {links}
+
+      If you already completed them, reply `done` to me there. If you don't want them anymore, you can use `unclaim`.
+
+      If you need help, reply `help` and I will get a human to assist you!
   done:
     not_claimed_by_user: |
       It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else! If you are unable to resolve this situation, please message the mods.

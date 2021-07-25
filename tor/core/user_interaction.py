@@ -132,6 +132,12 @@ def process_claim(
                 claimed_by=claimed_by
             )
 
+    elif response.status == BlossomStatus.too_many_claims:
+        claimed_links = [submission["tor_url"] for submission in response.data]
+        message = i18n["responses"]["claim"]["too_many_claims"].format(
+            links="\n".join(f"- {link}" for link in claimed_links),
+        )
+
     else:
         message = i18n["responses"]["general"]["oops"]
 
