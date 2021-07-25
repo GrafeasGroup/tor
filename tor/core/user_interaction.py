@@ -7,9 +7,9 @@ import beeline
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission
 
-from tor.validation.automatic_assessment import (
-    check_transcription_for_errors,
-    get_formatting_error_message,
+from tor.validation.formatting_validation import (
+    check_for_formatting_issues,
+    get_formatting_issue_message,
 )
 from tor.core.config import Config
 from tor.core.helpers import get_wiki_page, remove_if_required, send_to_modchat
@@ -214,7 +214,7 @@ def process_done(
 
     if transcription:
         # Try to detect common formatting errors
-        formatting_errors = check_transcription_for_errors(transcription.body)
+        formatting_errors = check_for_formatting_issues(transcription.body)
         if len(formatting_errors) > 0:
             # Formatting issues found.  Reject the `done` and ask the
             # volunteer to fix them.
@@ -229,7 +229,7 @@ def process_done(
                 cfg,
                 "formatting-issues",
             )
-            message = get_formatting_error_message(formatting_errors)
+            message = get_formatting_issue_message(formatting_errors)
             return message, return_flair
 
         cfg.blossom.create_transcription(

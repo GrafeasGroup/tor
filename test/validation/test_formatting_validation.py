@@ -2,15 +2,15 @@ from typing import List
 
 import pytest
 
-from tor.validation.automatic_assessment import (
+from tor.validation.formatting_validation import (
     check_for_fenced_code_block,
     check_for_missing_separators,
-    check_transcription_for_errors,
+    check_for_formatting_issues,
     check_for_separator_heading,
     check_for_malformed_footer,
     check_for_bold_header,
 )
-from tor.validation.formatting_errors import FormattingError
+from tor.validation.formatting_issues import FormattingIssue
 
 
 @pytest.mark.parametrize(
@@ -32,7 +32,7 @@ from tor.validation.formatting_errors import FormattingError
 def test_check_for_bold_header(test_input: str, should_match: bool) -> None:
     """Test if bold headers are detected."""
     actual = check_for_bold_header(test_input)
-    expected = FormattingError.BOLD_HEADER if should_match else None
+    expected = FormattingIssue.BOLD_HEADER if should_match else None
     assert actual == expected
 
 
@@ -48,7 +48,7 @@ def test_check_for_bold_header(test_input: str, should_match: bool) -> None:
 def test_check_for_missing_separators(test_input: str, should_match: bool) -> None:
     """Test if missing separators are detected."""
     actual = check_for_missing_separators(test_input)
-    expected = FormattingError.MISSING_SEPARATORS if should_match else None
+    expected = FormattingIssue.MISSING_SEPARATORS if should_match else None
     assert actual == expected
 
 
@@ -64,7 +64,7 @@ def test_check_for_missing_separators(test_input: str, should_match: bool) -> No
 def test_check_for_separator_headings(test_input: str, should_match: bool) -> None:
     """Test if separators misused as headings are detected."""
     actual = check_for_separator_heading(test_input)
-    expected = FormattingError.SEPARATOR_HEADINGS if should_match else None
+    expected = FormattingIssue.SEPARATOR_HEADINGS if should_match else None
     assert actual == expected
 
 
@@ -90,7 +90,7 @@ def test_check_for_separator_headings(test_input: str, should_match: bool) -> No
 def test_check_for_malformed_footer(test_input: str, should_match: bool) -> None:
     """Test if malformed footers are detected."""
     actual = check_for_malformed_footer(test_input)
-    expected = FormattingError.MALFORMED_FOOTER if should_match else None
+    expected = FormattingIssue.MALFORMED_FOOTER if should_match else None
     assert actual == expected
 
 
@@ -106,7 +106,7 @@ def test_check_for_malformed_footer(test_input: str, should_match: bool) -> None
 def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> None:
     """Test if fenced code blocks are detected."""
     actual = check_for_fenced_code_block(test_input)
-    expected = FormattingError.FENCED_CODE_BLOCK if should_match else None
+    expected = FormattingIssue.FENCED_CODE_BLOCK if should_match else None
     assert actual == expected
 
 
@@ -123,7 +123,7 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
             "for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;"
             "like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
             "we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
-            [FormattingError.MISSING_SEPARATORS],
+            [FormattingIssue.MISSING_SEPARATORS],
         ),
         (
             """*Image Transcription:*
@@ -143,7 +143,7 @@ function foo(x: int) {
             "for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;"
             "like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
             "we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
-            [FormattingError.FENCED_CODE_BLOCK],
+            [FormattingIssue.FENCED_CODE_BLOCK],
         ),
         (
             """*Image Transcription:*
@@ -159,7 +159,7 @@ function foo(x: int) {
             "for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;"
             "like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
             "we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
-            [FormattingError.FENCED_CODE_BLOCK, FormattingError.MISSING_SEPARATORS],
+            [FormattingIssue.FENCED_CODE_BLOCK, FormattingIssue.MISSING_SEPARATORS],
         ),
         (
             """*Image Transcription:*
@@ -179,8 +179,8 @@ function foo(x: int) {
         ),
     ],
 )
-def test_check_transcription(test_input: str, expected: List[FormattingError]) -> None:
-    """Test if formatting errors are detected correctly"""
+def test_check_for_formatting_issues(test_input: str, expected: List[FormattingIssue]) -> None:
+    """Test if formatting issues are detected correctly"""
     print(test_input)
-    actual = check_transcription_for_errors(test_input)
+    actual = check_for_formatting_issues(test_input)
     assert actual == set(expected)
