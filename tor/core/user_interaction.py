@@ -219,7 +219,9 @@ def process_done(
             # Formatting issues found.  Reject the `done` and ask the
             # volunteer to fix them.
             issues = ", ".join([error.value for error in formatting_errors])
-            # Also send it to the mod Slack so we can validate the issues
+            # TODO: Re-evaluate if this is necessary
+            # This is more of a temporary thing to see how the
+            # volunteers react to the bot.
             send_to_modchat(
                 i18n["mod"]["formatting_issues"].format(
                     author=user.name, issues=issues, link=post.permalink,
