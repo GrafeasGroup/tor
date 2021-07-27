@@ -281,7 +281,7 @@ test = ["betamax (>=0.8,<0.9)", "betamax-matchers (>=0.3.0,<0.5)", "pytest (>=2.
 
 [[package]]
 name = "prawcore"
-version = "2.2.0"
+version = "2.3.0"
 description = "Low-level communication layer for PRAW 4+."
 category = "main"
 optional = false
@@ -578,7 +578,7 @@ ci = []
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "9f643030de10574e3aaccf8cfa29067896308768ef83a5388f31c8bd3c32a2bc"
+content-hash = "f13b0ff4211321e9375689b7c07be760d33c9ea4b7d43e13980e657a1c8dc2dc"
 
 [metadata.files]
 appdirs = [
@@ -746,8 +746,8 @@ praw = [
     {file = "praw-7.3.0.tar.gz", hash = "sha256:9773fb5a2f5ab910d6f8e14da84e81d8d3d868261745371341d8b2043588ba7c"},
 ]
 prawcore = [
-    {file = "prawcore-2.2.0-py3-none-any.whl", hash = "sha256:cb7a01e43202233d62c4f9c0da890f6e6a534cebc16fb6ef1e71aff7077b0f42"},
-    {file = "prawcore-2.2.0.tar.gz", hash = "sha256:bde42fad459c4dcfe0f22a18921ef4981ee7cd286ea1de3eb697ba91838c9123"},
+    {file = "prawcore-2.3.0-py3-none-any.whl", hash = "sha256:48c17db447fa06a13ca3e722201f443031437708daa736c05a1df895fbcceff5"},
+    {file = "prawcore-2.3.0.tar.gz", hash = "sha256:daf1ccd4b7a80dc4e6567d48336d782e94a9a6dad83770fc2edf76dc9a84f56d"},
 ]
 py = [
     {file = "py-1.10.0-py2.py3-none-any.whl", hash = "sha256:3b80836aa6d1feeaa108e046da6423ab8f6ceda6468545ae8d02d9d58d18818a"},

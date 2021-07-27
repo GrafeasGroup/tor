@@ -21,7 +21,7 @@ bugsnag = "^3.6"
 requests = "^2.22"
 slackclient = "^1"
 PyYaml = "^5.1"
-blossom-wrapper = { git = "https://github.com/GrafeasGroup/blossom-wrapper.git", branch = "master", rev = "e8ed76b" }
+blossom-wrapper = { git = "https://github.com/GrafeasGroup/blossom-wrapper.git", branch = "master" }
 python-dotenv = "^0.14.0"
 praw = "^7.1.0"
 toml = "^0.10.2"
