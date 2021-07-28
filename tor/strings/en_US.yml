@@ -226,8 +226,9 @@ formatting_issues:
     \ ---
 
 
-    \ Heading\n
-    \ ---
+    Heading
+
+    ---
 
 
     If you actually intended to make a heading, please use the syntax with number signs (`#`), like this:
