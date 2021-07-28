@@ -8,6 +8,13 @@ mod:
     Removed the following submission since it was removed from the parent subreddit: {}
   removed_reported: |
     Removed the following submission since it was reported: {}
+  intervention_needed: |
+    :rotating_light::rotating_light: Mod Intervention Needed :rotating_light::rotating_light:
+
+    Detected use of {phrases} {link}
+  formatting_issues: |
+    I detected formatting issues in the transcription by {author}: {issues}
+    {link}
 posts:
   discovered_submit_title: |
     {sub} | {type} | "{title}"
@@ -119,6 +126,8 @@ responses:
     claimed_other_user: |
       Sorry, this post is claimed by someone else, so you cannot unclaim it!
   general:
+    getting_help: |
+      Help is on the way! I have notified the mods and someone should be here to assist you soon.
     blacklisted: |
       It appears that you are blacklisted. Please contact the moderators of r/TranscribersOfReddit if you do not know why this is the case.
     oops: |
@@ -167,6 +176,68 @@ responses:
       Unfortunately I'm a bot and so I can't help you out myself. I've forwarded your message to the moderators so they can help you out! They should message you shortly. In the future, you can [message the mods at this link](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Help&message=) to reach them directly.
 
       Cheers!
+formatting_issues:
+  message: |
+    I have automatically detected **formatting issues** in your transcription.
+
+    Please try to fix them and simply **comment `done` again** afterwards:
+
+    {error_list}
+
+    If you are overwhelmed by the issues or require assistance, **reply with `help`** and I will get a human to help you out!
+  bold_header: |
+    **Bold header**: You seemed to have made the header bold instead of italic. Please only use one asterisk (`*`) on each side instead of two.
+    For example:
+
+    \    *Image Transcription: Tumblr*
+  missing_separators: |
+    **Missing separator**: You appear to be missing the horizontal separators (`---`) after the header and/or before the footer.
+    Please note that you might not be able to see them on mobile devices.
+    Every transcription must have the following format:
+
+    \    <header>
+    \
+    \    ---
+    \
+    \    <content>
+    \
+    \    ---
+    \
+    \    <footer>
+  separator_headings: |
+    **Separator as heading**: It seems like you meant to make a horizontal separator (`---`), but have created a heading instead.
+    The separators require an empty line before and after it, like this:
+
+    \
+    \    ---
+    \
+
+    If you put it directly after a line of text, it will display as a heading, for example:
+
+    \    Heading
+    \    ---
+
+    If you actually intended to make a heading, please use the syntax with number signs (`#`), like this:
+
+    \    ## Heading
+  malformed_footer: |
+    **Malformed footer**: The transcription footer seems to be formatted incorrectly. Please copy it exactly as seen in the templates:
+
+    \        ^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)
+
+    This makes sure that it displays correctly on all devices.
+  fenced_code_block: |
+    **Fenced code block**: It looks like you used a fenced code block, i.e. you surrounded your code by three backticks, like this:
+
+    \    ```
+    \    int x = 0;
+    \    int y = x * 100;
+    \    ````
+
+    Unfortunately, this doesn't render correctly on all devices. Instead, please prefix every line by four spaces, like this:
+
+    \        int x = 0;
+    \        int y = x * 100;
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
