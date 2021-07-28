@@ -8,6 +8,7 @@ from praw.models.reddit.mixins import InboxableMixin
 
 from tor import __BOT_NAMES__
 from tor.core import (
+    validation,
     CLAIM_PHRASES,
     DONE_PHRASES,
     MOD_SUPPORT_PHRASES,
@@ -16,11 +17,7 @@ from tor.core import (
 from tor.core.admin_commands import process_command, process_override, process_debug
 from tor.core.config import Config
 from tor.core.helpers import (
-    _,
-    is_our_subreddit,
-    send_reddit_reply,
-    send_to_modchat,
-    check_for_phrase,
+    _, is_our_subreddit, send_reddit_reply, send_to_modchat, check_for_phrase
 )
 from tor.core.posts import get_blossom_submission
 from tor.core.user_interaction import (
@@ -32,7 +29,6 @@ from tor.core.user_interaction import (
 )
 from tor.helpers.flair import flair_post
 from tor.strings import translation
-from tor.validation.transcription_validation import is_comment_transcription
 
 i18n = translation()
 
@@ -64,7 +60,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         flair = None
         r_body = reply.body.lower()  # cache that thing
 
-        if "image transcription" in r_body or is_comment_transcription(reply, cfg):
+        if "image transcription" in r_body or validation.contains_footer(reply, cfg):
             message = _(i18n["responses"]["general"]["transcript_on_tor_post"])
         elif matches := [
             match.group()
@@ -73,12 +69,11 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         ]:
             phrases = '"' + '", "'.join(matches) + '"'
             send_to_modchat(
-                i18n["mod"]["intervention_needed"].format(
-                    phrases=phrases, link=reply.submission.shortlink,
-                ),
+                ":rotating_light::rotating_light: Mod Intervention Needed "
+                ":rotating_light::rotating_light: "
+                f"\n\nDetected use of {phrases} {reply.submission.shortlink}",
                 cfg,
             )
-            message = _(i18n["responses"]["general"]["getting_help"])
         elif "thank" in r_body:  # trigger on "thanks" and "thank you"
             thumbs_up_gifs = i18n["urls"]["thumbs_up_gifs"]
             youre_welcome = i18n["responses"]["general"]["youre_welcome"]
