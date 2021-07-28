@@ -212,7 +212,7 @@ def process_done(
             blossom_submission["url"], user, cfg
         )
 
-    if transcription:
+    if transcription and not override:
         # Try to detect common formatting errors
         formatting_errors = check_for_formatting_issues(transcription.body)
         if len(formatting_errors) > 0:
@@ -232,6 +232,7 @@ def process_done(
             message = get_formatting_issue_message(formatting_errors)
             return message, return_flair
 
+    if transcription:
         cfg.blossom.create_transcription(
             transcription.id,
             transcription.body,
