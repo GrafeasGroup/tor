@@ -14,7 +14,7 @@ FOOTER = "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
 
 BOLD_HEADER_PATTERN = re.compile(r"^\s*\*\*(Image|Video|Audio) Transcription:?.*\*\*")
 MISSING_SEPARATORS_PATTERN = re.compile(r"[-]{3}")
-SEPARATOR_HEADING_PATTERN = re.compile(r"^[\W\w]+\n---")
+SEPARATOR_HEADING_PATTERN = re.compile(r"^\w+[ ]*\n---+")
 FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 
 

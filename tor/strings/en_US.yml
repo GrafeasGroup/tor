@@ -214,9 +214,9 @@ formatting_issues:
     The separators require an empty line before and after it, like this:
 
 
-    \    \n
+    \     (empty line)\n
     \    ---\n
-    \    \n
+    \    (empty line)\n
 
 
     If you put it directly after a line of text, it will display as a heading, for example:
