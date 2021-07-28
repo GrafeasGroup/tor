@@ -53,6 +53,7 @@ class cached_property(object):
 MOD_SUPPORT_PHRASES = [
     re.compile('fuck', re.IGNORECASE),
     re.compile('undo', re.IGNORECASE),
+    re.compile('help', re.IGNORECASE),
     # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
 

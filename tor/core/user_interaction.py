@@ -7,9 +7,13 @@ import beeline
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission
 
+from tor.validation.formatting_validation import (
+    check_for_formatting_issues,
+    get_formatting_issue_message,
+)
 from tor.core.config import Config
 from tor.core.helpers import get_wiki_page, remove_if_required, send_to_modchat
-from tor.core.validation import get_transcription
+from tor.validation.transcription_validation import get_transcription
 from tor.helpers.flair import flair, set_user_flair
 from tor.strings import translation
 
@@ -148,7 +152,7 @@ def process_claim(
 def process_done(
     user: Redditor,
     blossom_submission: Dict,
-    post: Comment,
+    comment: Comment,
     cfg: Config,
     override=False,
     alt_text_trigger=False,
@@ -161,7 +165,7 @@ def process_done(
 
     :param user: The user claiming his transcription is done
     :param blossom_submission: The relevant submission in Blossom
-    :param post: The post of the user, used to retrieve the user's flair
+    :param comment: The comment of the user, used to retrieve the user's flair
     :param cfg: the global config object.
     :param override: whether the validation check should be skipped
     :param alt_text_trigger: whether there is an alternative to "done" that has
@@ -208,6 +212,26 @@ def process_done(
             blossom_submission["url"], user, cfg
         )
 
+    if transcription and not override:
+        # Try to detect common formatting errors
+        formatting_errors = check_for_formatting_issues(transcription.body)
+        if len(formatting_errors) > 0:
+            # Formatting issues found.  Reject the `done` and ask the
+            # volunteer to fix them.
+            issues = ", ".join([error.value for error in formatting_errors])
+            # TODO: Re-evaluate if this is necessary
+            # This is more of a temporary thing to see how the
+            # volunteers react to the bot.
+            send_to_modchat(
+                i18n["mod"]["formatting_issues"].format(
+                    author=user.name, issues=issues, link=f"https://reddit.com{comment.context}",
+                ),
+                cfg,
+                "formatting-issues",
+            )
+            message = get_formatting_issue_message(formatting_errors)
+            return message, return_flair
+
     if transcription:
         cfg.blossom.create_transcription(
             transcription.id,
@@ -226,7 +250,7 @@ def process_done(
         # caught in the previous lines of code, hence these are not checked again.
         if done_response.status == BlossomStatus.ok:
             return_flair = flair.completed
-            set_user_flair(user, post, cfg)
+            set_user_flair(user, comment, cfg)
             log.info(
                 f'Done on Submission {blossom_submission["tor_url"]} by {user.name}'
                 f" successful."
