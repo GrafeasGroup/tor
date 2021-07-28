@@ -202,57 +202,57 @@ formatting_issues:
     Every transcription must have the following format:
 
 
-  \    <header>\n
-  \    \n
-  \    ---\n
-  \    \n
-  \    <content>\n
-  \    \n
-  \    ---\n
-  \    \n
-  \    <footer>"
+    \    <header>\n
+    \    \n
+    \    ---\n
+    \    \n
+    \    <content>\n
+    \    \n
+    \    ---\n
+    \    \n
+    \    <footer>"
   separator_headings: "**Separator as heading**: It seems like you meant to make a horizontal separator (`---`), but have created a heading instead.
 
     The separators require an empty line before and after it, like this:
 
 
-  \    \n
-  \    ---\n
-  \    \n
+    \    \n
+    \    ---\n
+    \    \n
 
 
     If you put it directly after a line of text, it will display as a heading, for example:
 
 
-  \    Heading\n
-  \    ---
+    \    Heading\n
+    \    ---
 
 
     If you actually intended to make a heading, please use the syntax with number signs (`#`), like this:
 
 
-  \    ## Heading"
+    \    ## Heading"
   malformed_footer: "**Malformed footer**: The transcription footer seems to be formatted incorrectly. Please copy it exactly as seen in the templates:
 
 
-  \        ^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)
+    \        ^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)
 
 
     This makes sure that it displays correctly on all devices."
   fenced_code_block: "**Fenced code block**: It looks like you used a fenced code block, i.e. you surrounded your code by three backticks, like this:
 
 
-  \    ```\n
-  \    int x = 0;\n
-  \    int y = x * 100;\n
-  \    ````
+    \    ```\n
+    \    int x = 0;\n
+    \    int y = x * 100;\n
+    \    ````
 
 
     Unfortunately, this doesn't render correctly on all devices. Instead, please prefix every line by four spaces, like this:
 
 
-  \        int x = 0;\n
-  \        int y = x * 100;"
+    \        int x = 0;\n
+    \        int y = x * 100;"
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
