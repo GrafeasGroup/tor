@@ -12,6 +12,10 @@ from tor.validation.formatting_validation import (
 )
 from tor.validation.formatting_issues import FormattingIssue
 
+# We need trailing whitespaces for some tests.
+# Because they are within a multiline string,
+# I couldn't disable them via a line comment.
+# flake8: noqa: W291
 
 @pytest.mark.parametrize(
     "test_input,should_match",
