@@ -197,18 +197,18 @@ formatting_issues:
 
     Please note that you might not be able to see them on mobile devices.
 
-    Every transcription must have the following format:
+    Every transcription must have the following format (note the empty lines between each section):
 
 
-    \      <header>\n
-    \     \n
-    \     ---\n
-    \     \n
-    \     <content>\n
-    \     \n
-    \     ---\n
-    \     \n
-    \     <footer>"
+    \    <header>\n
+    \   \n
+    \   ---\n
+    \   \n
+    \   <content>\n
+    \   \n
+    \   ---\n
+    \   \n
+    \   <footer>"
   separator_headings: "**Separator as heading**: It seems like you meant to make a horizontal separator (`---`), but have created a heading instead.
 
     The separators require an empty line before and after it, like this:
@@ -249,8 +249,8 @@ formatting_issues:
     Unfortunately, this doesn't render correctly on all devices. Instead, please prefix every line by four spaces, like this:
 
 
-    \      int x = 0;\n
-    \     int y = x * 100;"
+    \        int x = 0;\n
+    \       int y = x * 100;"
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
