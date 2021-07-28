@@ -26,38 +26,31 @@ def get_transcription(
     linked_submission = cfg.r.submission(url=submission_url)
     linked_submission.comments.replace_more(limit=0)
     for top_level_comment in linked_submission.comments.list():
-        if not hasattr(top_level_comment, "author"):
+        if not hasattr(top_level_comment, 'author'):
             continue
-        if not hasattr(top_level_comment.author, "name"):
+        if not hasattr(top_level_comment.author, 'name'):
             continue
-        if all(
-            [
-                top_level_comment.author.name == user.name,
-                is_comment_transcription(top_level_comment, cfg),
-            ]
-        ):
+        if all([
+            top_level_comment.author.name == user.name,
+            contains_footer(top_level_comment, cfg)
+        ]):
             return top_level_comment, True
 
     # In the case where the comment cannot be found within the top-level
     # comments, instead attempt to find it in the user's last 10 posts.
     for post in user.comments.new(limit=10):
-        if all(
-            [
-                post.submission.fullname == linked_submission.fullname,
-                post.is_root,
-                is_comment_transcription(post, cfg),
-            ]
-        ):
+        if all([
+            post.submission.fullname == linked_submission.fullname,
+            post.is_root,
+            contains_footer(post, cfg)
+        ]):
             return post, False
     return None, False
 
 
-def is_comment_transcription(comment: Comment, cfg: Config) -> bool:
+def contains_footer(comment: Comment, cfg: Config) -> bool:
     """
-    Check if the comment is meant to be a transcription.
-
-    This just performs a basic check, stricter rules are enforced when
-    checking for any formatting issues.
+    Check whether the footer is within the provided comment.
 
     If the perform_header_check option is not set in the configuration, this
     function always returns True.
@@ -65,7 +58,7 @@ def is_comment_transcription(comment: Comment, cfg: Config) -> bool:
 
     if not cfg.perform_header_check:
         return True
-    if i18n["urls"]["ToR_link"] not in comment.body:
+    if i18n['urls']['ToR_link'] not in comment.body:
         return False
 
     return "^(I'm a" in comment.body or "&#32;" in comment.body
