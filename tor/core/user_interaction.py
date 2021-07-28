@@ -152,7 +152,7 @@ def process_claim(
 def process_done(
     user: Redditor,
     blossom_submission: Dict,
-    post: Comment,
+    comment: Comment,
     cfg: Config,
     override=False,
     alt_text_trigger=False,
@@ -165,7 +165,7 @@ def process_done(
 
     :param user: The user claiming his transcription is done
     :param blossom_submission: The relevant submission in Blossom
-    :param post: The post of the user, used to retrieve the user's flair
+    :param comment: The comment of the user, used to retrieve the user's flair
     :param cfg: the global config object.
     :param override: whether the validation check should be skipped
     :param alt_text_trigger: whether there is an alternative to "done" that has
@@ -224,7 +224,7 @@ def process_done(
             # volunteers react to the bot.
             send_to_modchat(
                 i18n["mod"]["formatting_issues"].format(
-                    author=user.name, issues=issues, link=post.permalink,
+                    author=user.name, issues=issues, link=comment.context,
                 ),
                 cfg,
                 "formatting-issues",
@@ -249,7 +249,7 @@ def process_done(
         # caught in the previous lines of code, hence these are not checked again.
         if done_response.status == BlossomStatus.ok:
             return_flair = flair.completed
-            set_user_flair(user, post, cfg)
+            set_user_flair(user, comment, cfg)
             log.info(
                 f'Done on Submission {blossom_submission["tor_url"]} by {user.name}'
                 f" successful."
