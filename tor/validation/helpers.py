@@ -12,7 +12,8 @@ def format_as_markdown_list_item(item: str) -> str:
       text and stuff.
     """
     lines = item.splitlines()
-    return "\n".join([f"- {lines[0]}"] + [f"  {line}" for line in lines[1:]])
+    # includes lots of extra spaces to get Reddit to parse it correctly
+    return "\n".join([f"- {lines[0]}"] + [f"    {line}" for line in lines[1:]])
 
 
 def format_as_markdown_list(items: List[str]) -> str:
