@@ -222,8 +222,12 @@ formatting_issues:
     If you put it directly after a line of text, it will display as a heading, for example:
 
 
-    \    Heading\n
-    \    ---
+    \  Heading\n
+    \ ---
+
+
+    \ Heading\n
+    \---
 
 
     If you actually intended to make a heading, please use the syntax with number signs (`#`), like this:
