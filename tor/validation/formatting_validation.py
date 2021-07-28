@@ -13,8 +13,8 @@ FOOTER = "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
 "we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)"
 
 BOLD_HEADER_PATTERN = re.compile(r"^\s*\*\*(Image|Video) Transcription:?.*\*\*")
-MISSING_SEPARATORS_PATTERN = re.compile(r"\n\n---+\n\n")
-SEPARATOR_HEADING_PATTERN = re.compile(r"\S+\n---+")
+MISSING_SEPARATORS_PATTERN = re.compile(r"\n[ ]*\n[ ]{,3}---+[ ]*\n[ ]*\n")
+SEPARATOR_HEADING_PATTERN = re.compile(r"\w+[ ]*\n---+")
 FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 
 

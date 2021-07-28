@@ -43,6 +43,25 @@ def test_check_for_bold_header(test_input: str, should_match: bool) -> None:
         ("This is a\n\n---\n\ntext", True),
         ("This\n\n---\n\nis a\n\n---\n\ntext", False),
         ("This\n\n---\n\nis\n\n---\n\na\n\n---\n\ntext", False),
+        ("This\n  \n   ---  \n \nis\n  \n---    \n \n  a text", False),
+        (
+            """*Image Transcription: Meme*
+
+---  
+
+[*An image of Robin from "Stranger Things" wearing a Scoops Ahoy uniform. She is holding a whiteboard in front of her and looking off-camera with a condescending expression. The whiteboard reads:*]
+
+If you can force people and draft them to go to war, you can force people to get vaccines.
+
+---
+
+"""
+            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
+            "for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;"
+            "like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
+            "we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            False,
+        ),
     ],
 )
 def test_check_for_missing_separators(test_input: str, should_match: bool) -> None:
@@ -57,6 +76,7 @@ def test_check_for_missing_separators(test_input: str, should_match: bool) -> No
     [
         ("Heading\n---", True),
         ("Heading with Spaces\n---", True),
+        ("Heading    \n---", True),
         ("Not Heading\n\n---", False),
         ("Just text\nand\nstuff", False),
     ],
@@ -167,6 +187,24 @@ function foo(x: int) {
 ---
 
 [*Description of Image.*]
+
+---
+
+"""
+            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
+            "for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;"
+            "like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
+            "we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            [],
+        ),
+        (
+            """*Image Transcription: Meme*
+
+---  
+
+[*An image of Robin from "Stranger Things" wearing a Scoops Ahoy uniform. She is holding a whiteboard in front of her and looking off-camera with a condescending expression. The whiteboard reads:*]
+
+If you can force people and draft them to go to war, you can force people to get vaccines.
 
 ---
 
