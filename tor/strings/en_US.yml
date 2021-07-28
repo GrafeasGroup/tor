@@ -242,17 +242,17 @@ formatting_issues:
   fenced_code_block: "**Fenced code block**: It looks like you used a fenced code block, i.e. you surrounded your code by three backticks, like this:
 
 
-    \    ```\n
-    \    int x = 0;\n
-    \    int y = x * 100;\n
-    \    ````
+    \      ```\n
+    \     int x = 0;\n
+    \     int y = x * 100;\n
+    \     ```
 
 
     Unfortunately, this doesn't render correctly on all devices. Instead, please prefix every line by four spaces, like this:
 
 
-    \        int x = 0;\n
-    \        int y = x * 100;"
+    \      int x = 0;\n
+    \     int y = x * 100;"
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
