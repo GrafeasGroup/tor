@@ -242,10 +242,10 @@ formatting_issues:
   fenced_code_block: "**Fenced code block**: It looks like you used a fenced code block, i.e. you surrounded your code by three backticks, like this:
 
 
-    \      ```\n
-    \     int x = 0;\n
-    \     int y = x * 100;\n
-    \     ```
+    \  ```\n
+    \ int x = 0;\n
+    \ int y = x * 100;\n
+    \ ```
 
 
     Unfortunately, this doesn't render correctly on all devices. Instead, please prefix every line by four spaces, like this:
