@@ -65,7 +65,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         r_body = reply.body.lower()  # cache that thing
 
         if "image transcription" in r_body or is_comment_transcription(reply, cfg):
-            message = _(i18n["responses"]["general"]["transcript_on_tor_post"])
+            message = i18n["responses"]["general"]["transcript_on_tor_post"]
         elif matches := [
             match.group()
             for match in [regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]
@@ -78,7 +78,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 ),
                 cfg,
             )
-            message = _(i18n["responses"]["general"]["getting_help"])
+            message = i18n["responses"]["general"]["getting_help"]
         elif "thank" in r_body:  # trigger on "thanks" and "thank you"
             thumbs_up_gifs = i18n["urls"]["thumbs_up_gifs"]
             youre_welcome = i18n["responses"]["general"]["youre_welcome"]
