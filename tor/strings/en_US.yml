@@ -193,7 +193,7 @@ formatting_issues:
     For example:
 
 
-    \    *Image Transcription: Tumblr*"
+    \     *Image Transcription: Tumblr*"
   missing_separators: |-
     "**Missing separator**: You appear to be missing the horizontal separators (`---`) after the header and/or before the footer.
 
@@ -202,15 +202,15 @@ formatting_issues:
     Every transcription must have the following format:
 
 
-    \    <header>\n
-    \    \n
-    \    ---\n
-    \    \n
-    \    <content>\n
-    \    \n
-    \    ---\n
-    \    \n
-    \    <footer>"
+    \      <header>\n
+    \     \n
+    \     ---\n
+    \     \n
+    \     <content>\n
+    \     \n
+    \     ---\n
+    \     \n
+    \     <footer>"
   separator_headings: "**Separator as heading**: It seems like you meant to make a horizontal separator (`---`), but have created a heading instead.
 
     The separators require an empty line before and after it, like this:
