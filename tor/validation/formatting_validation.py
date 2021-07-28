@@ -68,7 +68,7 @@ def check_for_separator_heading(transcription: str) -> Optional[FormattingIssue]
     """
     return (
         FormattingIssue.SEPARATOR_HEADINGS
-        if SEPARATOR_HEADING_PATTERN.search(transcription) is None
+        if len(SEPARATOR_HEADING_PATTERN.findall(transcription)) < 2
         else None
     )
 
