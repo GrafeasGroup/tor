@@ -233,7 +233,7 @@ formatting_issues:
     If you actually intended to make a heading, please use the syntax with number signs (`#`), like this:
 
 
-    \    ## Heading"
+    \  ## Heading"
   malformed_footer: "**Malformed footer**: The transcription footer seems to be formatted incorrectly. Please copy it exactly as seen in the templates:
 
 
