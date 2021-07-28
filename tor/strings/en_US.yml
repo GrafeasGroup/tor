@@ -187,15 +187,13 @@ formatting_issues:
 
 
     If you are overwhelmed by the issues or require assistance, **reply with `help`** and I will get a human to help you out!"
-  bold_header: |-
-    "**Bold header**: You seemed to have made the header bold instead of italic. Please only use one asterisk (`*`) on each side instead of two.
+  bold_header: "**Bold header**: You seemed to have made the header bold instead of italic. Please only use one asterisk (`*`) on each side instead of two.
 
     For example:
 
 
     \     *Image Transcription: Tumblr*"
-  missing_separators: |-
-    "**Missing separator**: You appear to be missing the horizontal separators (`---`) after the header and/or before the footer.
+  missing_separators: "**Missing separator**: You appear to be missing the horizontal separators (`---`) after the header and/or before the footer.
 
     Please note that you might not be able to see them on mobile devices.
 
