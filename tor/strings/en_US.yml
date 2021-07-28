@@ -72,8 +72,22 @@ responses:
       Does this post break the rules? Please report it! If you don't want this post anymore (or can't complete it), respond to this comment with `unclaim`.
 
       Please respond with `done` when complete so we can check this one off the list!
-    already_claimed: |
-      I'm sorry, but it looks like someone else has already claimed this post! You can check in with them to see if they need any help, but otherwise I suggest sticking around to see if another post pops up here in a little bit.
+    already_claimed_by_self: |
+      You already claimed this post!
+
+      If you completed and posted your transcription on the partner sub, reply `done` to me so we can check this one off the list!
+    already_claimed_by_someone: |
+      I'm sorry, but it looks like u\/{claimed_by} has already claimed this post!
+
+      You can check in with them to see if they need any help, but otherwise I suggest sticking around to see if another post pops up here in a little bit.
+    too_many_claims: |
+      Woah, slow down there! Please complete your other claimed posts first before starting a new one:
+
+      {links}
+
+      If you already completed them, reply `done` to me there. If you don't want them anymore, you can use `unclaim`.
+
+      If you need help, reply `help` and I will get a human to assist you!
   done:
     not_claimed_by_user: |
       It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else! If you are unable to resolve this situation, please message the mods.
