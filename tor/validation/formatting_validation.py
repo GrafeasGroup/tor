@@ -14,7 +14,7 @@ FOOTER = "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
 
 BOLD_HEADER_PATTERN = re.compile(r"^\s*\*\*(Image|Video|Audio) Transcription:?.*\*\*")
 MISSING_SEPARATORS_PATTERN = re.compile(r"[-]{3}")
-SEPARATOR_HEADING_PATTERN = re.compile(r"^\w+[ ]*\n---+")
+SEPARATOR_HEADING_PATTERN = re.compile(r"[\n]{2}---[\n]{2}")
 FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 
 
@@ -61,11 +61,14 @@ def check_for_separator_heading(transcription: str) -> Optional[FormattingIssue]
     Heading
     ---
 
-    Will be a level 2 heading. This is almost always a mistake.
+    Will be a level 2 heading.
+
+    Because we want to see two newlines on either side of the horizontal rule,
+    this check returns an error if the target regex is _not_ in the source.
     """
     return (
         FormattingIssue.SEPARATOR_HEADINGS
-        if SEPARATOR_HEADING_PATTERN.search(transcription) is not None
+        if SEPARATOR_HEADING_PATTERN.search(transcription) is None
         else None
     )
 

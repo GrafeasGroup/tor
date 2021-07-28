@@ -177,7 +177,7 @@ responses:
 
       Cheers!
 formatting_issues:
-  message: "I have automatically detected **formatting issues** in your transcription.
+  message: "It looks like there might be some **formatting issues** in your transcription.
 
 
     Please try to fix them and simply **comment `done` again** afterwards:
