@@ -224,7 +224,7 @@ def process_done(
             # volunteers react to the bot.
             send_to_modchat(
                 i18n["mod"]["formatting_issues"].format(
-                    author=user.name, issues=issues, link=comment.context,
+                    author=user.name, issues=issues, link=f"https://reddit.com{comment.context}",
                 ),
                 cfg,
                 "formatting-issues",
