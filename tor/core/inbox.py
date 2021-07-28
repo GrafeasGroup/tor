@@ -74,7 +74,9 @@ def process_reply(reply: Comment, cfg: Config) -> None:
             phrases = '"' + '", "'.join(matches) + '"'
             send_to_modchat(
                 i18n["mod"]["intervention_needed"].format(
-                    phrases=phrases, link=reply.submission.shortlink,
+                    phrases=phrases,
+                    link=reply.submission.shortlink,
+                    author=reply.author.name,
                 ),
                 cfg,
             )
