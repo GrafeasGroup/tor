@@ -192,7 +192,7 @@ formatting_issues:
     For example:
 
 
-    \     *Image Transcription: Tumblr*"
+    \    *Image Transcription: Tumblr*"
   missing_separators: "**Missing separator**: You appear to be missing the horizontal separators (`---`) after the header and/or before the footer.
 
     Please note that you might not be able to see them on mobile devices.
