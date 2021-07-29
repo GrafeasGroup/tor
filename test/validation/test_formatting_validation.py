@@ -8,7 +8,7 @@ from tor.validation.formatting_validation import (
     check_for_formatting_issues,
     check_for_separator_heading,
     check_for_malformed_footer,
-    check_for_bold_header,
+    check_for_bold_header, PROPER_SEPARATORS_PATTERN,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -16,6 +16,25 @@ from tor.validation.formatting_issues import FormattingIssue
 # Because they are within a multiline string,
 # I couldn't disable them via a line comment.
 # flake8: noqa: W291
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("\n\n---\n\n", True),
+        ("\n  \n---\n  \n", True),
+        ("Word\n\n---\n\nWord", True),
+        ("\n\n   ---       \n\n", True),
+        ("\n\n-  -  -\n\n", True),
+        ("Word\n---\n\n", False),
+        ("\n\n--\n\n", False),
+        ("\n\n    ---\n\n", False),
+    ]
+)
+def test_proper_separator_pattern(test_input: str, should_match: bool) -> None:
+    """Test if horizontal separators are recognized correctly."""
+    actual = PROPER_SEPARATORS_PATTERN.search(test_input) is not None
+    assert actual == should_match
+
 
 @pytest.mark.parametrize(
     "test_input,should_match",

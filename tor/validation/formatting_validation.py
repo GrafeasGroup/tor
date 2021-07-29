@@ -12,9 +12,34 @@ FOOTER = "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
 "like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
 "we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)"
 
+# Regex to recognize headers that have been made bold instead of italic.
+# Example:
+#
+# **Image Transcription: Tumblr**
 BOLD_HEADER_PATTERN = re.compile(r"^\s*\*\*(Image|Video|Audio) Transcription:?.*\*\*")
-MISSING_SEPARATORS_PATTERN = re.compile(r"[-]{3}")
-SEPARATOR_HEADING_PATTERN = re.compile(r"[\n]{2}---[\n]{2}")
+
+# Regex to recognize correctly formed separators.
+# Separators are three dashes (---), potentially with spaces in-between.
+# They need to be surrounded by empty lines (which can contain spaces)
+# The separator line (---) can start with up to three spaces and end with arbitrary spaces.
+PROPER_SEPARATORS_PATTERN = re.compile(r"\n[ ]*\n[ ]{,3}([-][ ]*){3,}[ ]*\n[ ]*\n")
+
+# Regex to recognize a separator (---) being misused as heading.
+# This happens when they empty line before the separator is missing.
+# The following example will display as heading and not as separator:
+#
+# Heading
+# ---
+#
+# The separator line can start with up to three spaces and contain spaces in-between.
+SEPARATOR_HEADING_PATTERN = re.compile(r"[\w][*_ ]*\n[ ]{,3}([-][ ]*){3,}")
+
+# Regex to recognize fenced code blocks, i.e. code blocks surrounded by three backticks.
+# Example:
+#
+# ```
+# int x = 0;
+# ```
 FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 
 
@@ -47,7 +72,7 @@ def check_for_missing_separators(transcription: str) -> Optional[FormattingIssue
     """
     return (
         FormattingIssue.MISSING_SEPARATORS
-        if len(MISSING_SEPARATORS_PATTERN.findall(transcription)) < 2
+        if len(PROPER_SEPARATORS_PATTERN.findall(transcription)) < 2
         else None
     )
 
@@ -68,7 +93,7 @@ def check_for_separator_heading(transcription: str) -> Optional[FormattingIssue]
     """
     return (
         FormattingIssue.SEPARATOR_HEADINGS
-        if len(SEPARATOR_HEADING_PATTERN.findall(transcription)) < 2
+        if SEPARATOR_HEADING_PATTERN.search(transcription)
         else None
     )
 
