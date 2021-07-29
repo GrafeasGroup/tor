@@ -2,6 +2,7 @@ from typing import List
 
 import pytest
 
+from test.validation.helpers import load_all_valid_transcriptions
 from tor.validation.formatting_validation import (
     check_for_fenced_code_block,
     check_for_missing_separators,
@@ -272,3 +273,13 @@ def test_check_for_formatting_issues(
     """Test if formatting issues are detected correctly"""
     actual = check_for_formatting_issues(test_input)
     assert actual == set(expected)
+
+
+@pytest.mark.parametrize(
+    "transcription",
+    load_all_valid_transcriptions()
+)
+def test_check_for_formatting_issues_valid_transcription(transcription: str) -> None:
+    """Make sure that valid transcriptions don't generate formatting issues."""
+    actual = check_for_formatting_issues(transcription)
+    assert actual == set([])
