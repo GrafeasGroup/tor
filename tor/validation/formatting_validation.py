@@ -2,7 +2,7 @@ import re
 from typing import Optional, Set
 
 from tor.validation.formatting_issues import FormattingIssue
-from tor.validation.helpers import format_as_markdown_list
+from tor.validation.helpers import format_as_sections
 from tor.strings import translation
 
 i18n = translation()
@@ -115,5 +115,5 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
 def get_formatting_issue_message(errors: Set[FormattingIssue]) -> str:
     """Get a message containing instructions for each formatting issue."""
     error_messages = [i18n["formatting_issues"][error.value] for error in errors]
-    error_list = format_as_markdown_list(error_messages)
+    error_list = format_as_sections(error_messages)
     return i18n["formatting_issues"]["message"].format(error_list=error_list)
