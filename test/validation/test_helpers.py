@@ -2,9 +2,7 @@ from typing import List
 
 import pytest
 
-from tor.validation.helpers import (
-    format_as_sections
-)
+from tor.validation.helpers import format_as_sections
 
 
 @pytest.mark.parametrize(

@@ -8,7 +8,8 @@ from tor.validation.formatting_validation import (
     check_for_formatting_issues,
     check_for_separator_heading,
     check_for_malformed_footer,
-    check_for_bold_header, PROPER_SEPARATORS_PATTERN,
+    check_for_bold_header,
+    PROPER_SEPARATORS_PATTERN,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -17,18 +18,21 @@ from tor.validation.formatting_issues import FormattingIssue
 # I couldn't disable them via a line comment.
 # flake8: noqa: W291
 
+
 @pytest.mark.parametrize(
     "test_input,should_match",
     [
-        ("\n\n---\n\n", True),
-        ("\n  \n---\n  \n", True),
-        ("Word\n\n---\n\nWord", True),
-        ("\n\n   ---       \n\n", True),
-        ("\n\n-  -  -\n\n", True),
-        ("Word\n---\n\n", False),
-        ("\n\n--\n\n", False),
-        ("\n\n    ---\n\n", False),
-    ]
+        ("\n\n---\n\n", True),  # "Normal" separator
+        ("\n\n-------\n\n", True),  # More dashes are allowed
+        ("\n  \n---\n  \n", True),  # Spaces on the empty lines are allowed
+        ("Word\n\n---\n\nWord", True),  # Separator with surrounding text
+        ("\n\n   ---\n\n", True),  # Separator can start with up to three spaces
+        ("\n\n---      \n\n", True),  # Separator can have trailing spaces
+        ("\n\n-  -  -\n\n", True),  # Separator can have spaces in-between
+        ("Word\n---\n\n", False),  # Only one linebreak makes a heading
+        ("\n\n--\n\n", False),  # Not enough dashes
+        ("\n\n    ---\n\n", False),  # Four leading spaces makes a code block
+    ],
 )
 def test_proper_separator_pattern(test_input: str, should_match: bool) -> None:
     """Test if horizontal separators are recognized correctly."""
