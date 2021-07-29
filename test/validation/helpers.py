@@ -7,7 +7,7 @@ VALID_TRANSCRIPTION_PATH = os.path.join('test', 'validation', 'transcriptions', 
 
 def load_valid_transcription_from_file(name: str) -> str:
     """Load a transcription from the transcriptions/valid folder."""
-    file = open(os.path.join(VALID_TRANSCRIPTION_PATH, name))
+    file = open(os.path.join(VALID_TRANSCRIPTION_PATH, name), encoding="utf-8")
     return file.read()
 
 
