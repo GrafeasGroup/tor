@@ -6,10 +6,11 @@ from tor.validation.formatting_validation import (
     check_for_fenced_code_block,
     check_for_missing_separators,
     check_for_formatting_issues,
-    check_for_separator_heading,
+    check_for_heading_with_dashes,
     check_for_malformed_footer,
     check_for_bold_header,
     PROPER_SEPARATORS_PATTERN,
+    HEADING_WITH_DASHES_PATTERN,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -37,6 +38,27 @@ from tor.validation.formatting_issues import FormattingIssue
 def test_proper_separator_pattern(test_input: str, should_match: bool) -> None:
     """Test if horizontal separators are recognized correctly."""
     actual = PROPER_SEPARATORS_PATTERN.search(test_input) is not None
+    assert actual == should_match
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("Heading\n---\n", True),  # "Classical" heading with dashes
+        ("Heading\n-------\n", True),  # More dashes are allowed
+        ("Heading   \n---\n", True),  # Trailing spaces after word are allowed
+        ("*Heading*\n---\n", True),  # Formatting characters in heading are allowed
+        ("Heading\n   ---\n", True),  # Dashes can start with up to three spaces
+        ("Heading\n-  -  -\n", True),  # Dashes can have spaces in-between
+        ("Heading\n---    \n", True),  # Dashes can have trailing spaces
+        ("Heading\n---asd\n", False),  # Dashes can't have words after them
+        ("Heading\n\n---\n\n", False),  # That's a separator
+        ("   \n   \n---\n\n", False),  # That's a separator
+    ],
+)
+def test_heading_with_dashes_pattern(test_input: str, should_match: bool) -> None:
+    """Test if headings made with dashes are recognized correctly."""
+    actual = HEADING_WITH_DASHES_PATTERN.search(test_input) is not None
     assert actual == should_match
 
 
@@ -101,17 +123,17 @@ def test_check_for_missing_separators(test_input: str, should_match: bool) -> No
 @pytest.mark.parametrize(
     "test_input,should_match",
     [
-        ("Heading\n---", True),
-        ("Heading with Spaces\n---", True),
-        ("Heading    \n---", True),
-        ("Not Heading\n\n---", False),
-        ("Just text\nand\nstuff", False),
+        ("Heading\n---\n", True),
+        ("Heading with Spaces\n---\n", True),
+        ("Heading    \n---\n", True),
+        ("Not Heading\n\n---\n", False),
+        ("Just text\nand\nstuff\n", False),
     ],
 )
 def test_check_for_separator_headings(test_input: str, should_match: bool) -> None:
     """Test if separators misused as headings are detected."""
-    actual = check_for_separator_heading(test_input)
-    expected = FormattingIssue.SEPARATOR_HEADINGS if should_match else None
+    actual = check_for_heading_with_dashes(test_input)
+    expected = FormattingIssue.HEADING_WITH_DASHES if should_match else None
     assert actual == expected
 
 

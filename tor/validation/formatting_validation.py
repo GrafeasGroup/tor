@@ -32,7 +32,7 @@ PROPER_SEPARATORS_PATTERN = re.compile(r"\n[ ]*\n[ ]{,3}([-][ ]*){3,}[ ]*\n[ ]*\
 # ---
 #
 # The separator line can start with up to three spaces and contain spaces in-between.
-SEPARATOR_HEADING_PATTERN = re.compile(r"[\w][*_ ]*\n[ ]{,3}([-][ ]*){3,}")
+HEADING_WITH_DASHES_PATTERN = re.compile(r"[\w][*_ ]*\n[ ]{,3}([-][ ]*){3,}\n")
 
 # Regex to recognize fenced code blocks, i.e. code blocks surrounded by three backticks.
 # Example:
@@ -77,23 +77,20 @@ def check_for_missing_separators(transcription: str) -> Optional[FormattingIssue
     )
 
 
-def check_for_separator_heading(transcription: str) -> Optional[FormattingIssue]:
-    """Check if the transcription has headings that were meant to be separators.
+def check_for_heading_with_dashes(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription has headings created with dashes.
 
-    When the separators are missing an empty line before them, they make the
-    text a heading instead of appearing as a separator:
+    In markdown, you can make headings by putting three dashes on the next line.
+    Almost always, these dashes were intended to be separators instead.
 
     Heading
     ---
 
     Will be a level 2 heading.
-
-    Because we want to see two newlines on either side of the horizontal rule,
-    this check returns an error if the target regex is _not_ in the source.
     """
     return (
-        FormattingIssue.SEPARATOR_HEADINGS
-        if SEPARATOR_HEADING_PATTERN.search(transcription)
+        FormattingIssue.HEADING_WITH_DASHES
+        if HEADING_WITH_DASHES_PATTERN.search(transcription)
         else None
     )
 
@@ -129,7 +126,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
         for issue in [
             check_for_bold_header(transcription),
             check_for_malformed_footer(transcription),
-            check_for_separator_heading(transcription),
+            check_for_heading_with_dashes(transcription),
             check_for_missing_separators(transcription),
             check_for_fenced_code_block(transcription),
         ]
