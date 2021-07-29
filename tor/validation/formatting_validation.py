@@ -32,7 +32,7 @@ PROPER_SEPARATORS_PATTERN = re.compile(r"\n[ ]*\n[ ]{,3}([-][ ]*){3,}[ ]*\n[ ]*\
 # ---
 #
 # The separator line can start with up to three spaces and contain spaces in-between.
-HEADING_WITH_DASHES_PATTERN = re.compile(r"[\w][*_ ]*\n[ ]{,3}([-][ ]*){3,}\n")
+HEADING_WITH_DASHES_PATTERN = re.compile(r"[\w][:*_ ]*\n[ ]{,3}([-][ ]*){3,}\n")
 
 # Regex to recognize fenced code blocks, i.e. code blocks surrounded by three backticks.
 # Example:
