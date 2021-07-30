@@ -201,29 +201,29 @@ formatting_issues:
 
 
     \    <header>\n
-    \    \n
-    \    ---\n
-    \    \n
-    \    <content>\n
-    \    \n
-    \    ---\n
-    \    \n
-    \    <footer>"
+    \   \n
+    \   ---\n
+    \   \n
+    \   <content>\n
+    \   \n
+    \   ---\n
+    \   \n
+    \   <footer>"
   separator_headings: "**Separator as heading**: It seems like you meant to make a horizontal separator (`---`), but have created a heading instead.
 
     The separators require an empty line before and after it, like this:
 
 
     \    (empty line)\n
-    \    ---\n
-    \    (empty line)\n
+    \   ---\n
+    \   (empty line)\n
 
 
     If you put it directly after a line of text, it will display as a heading, for example:
 
 
     \    Heading\n
-    \    ---
+    \   ---
 
 
     Heading
@@ -246,16 +246,16 @@ formatting_issues:
 
 
     \    ```\n
-    \    int x = 0;\n
-    \    int y = x * 100;\n
-    \    ```
+    \   int x = 0;\n
+    \   int y = x * 100;\n
+    \   ```
 
 
     Unfortunately, this doesn't render correctly on all devices. Instead, please prefix every line by four spaces, like this:
 
 
     \    int x = 0;\n
-    \    int y = x * 100;"
+    \   int y = x * 100;"
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
