@@ -17,7 +17,7 @@ from tor.validation.formatting_validation import (
     PROPER_SEPARATORS_PATTERN,
     HEADING_WITH_DASHES_PATTERN,
     UNESCAPED_USERNAME_PATTERN,
-    check_for_unescaped_username,
+    check_for_unescaped_username, check_for_unescaped_subreddit, UNESCAPED_SUBREDDIT_PATTERN,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -73,6 +73,8 @@ def test_heading_with_dashes_pattern(test_input: str, should_match: bool) -> Non
     "test_input,should_match",
     [
         ("u/username", True),  # Username with one slash
+        ("Text u/username Text", True),  # Username in text
+        ("**u/username**", True),  # Username bolded
         ("/u/username", True),  # Username with two slashes
         ("u/123456", True),  # Username with numbers
         ("u/_username_", True),  # Username with underscores
@@ -81,6 +83,7 @@ def test_heading_with_dashes_pattern(test_input: str, should_match: bool) -> Non
         (r"\/u/username", False),  # Escaped username with first slash escaped
         (r"/u\/username", False),  # Escaped username with second slash escaped
         (r"\/u\/username", False),  # Escaped username with both slashes escaped
+        (r"https://www.reddit.com/u/username", False),  # Link to user
         (r"r/subreddit", False),  # Subreddit name with one slash
         (r"/r/subreddit", False),  # Subreddit name with two slashes
     ],
@@ -88,6 +91,31 @@ def test_heading_with_dashes_pattern(test_input: str, should_match: bool) -> Non
 def test_unescaped_username_pattern(test_input: str, should_match: bool) -> None:
     """Test if headings made with dashes are recognized correctly."""
     actual = UNESCAPED_USERNAME_PATTERN.search(test_input) is not None
+    assert actual == should_match
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("r/subreddit", True),  # Subreddit with one slash
+        ("Text r/subreddit Text", True),  # Subreddit in text
+        ("**r/subreddit**", True),  # Subreddit bolded
+        ("/r/subreddit", True),  # Subreddit with two slashes
+        ("r/123456", True),  # Subreddit with numbers
+        ("r/subreddit", True),  # Subreddit with underscores
+        ("r/-subreddit-", True),  # Subreddit with dashes
+        (r"r\/subreddit", False),  # Escaped subreddit with one slash
+        (r"\/r/subreddit", False),  # Escaped subreddit with first slash escaped
+        (r"/r\/subreddit", False),  # Escaped subreddit with second slash escaped
+        (r"\/r\/subreddit", False),  # Escaped subreddit with both slashes escaped
+        (r"https://www.reddit.com/r/subreddit", False),  # Link to subreddit
+        (r"u/username", False),  # Username with one slash
+        (r"/u/username", False),  # Username with two slashes
+    ],
+)
+def test_unescaped_subreddit_pattern(test_input: str, should_match: bool) -> None:
+    """Test if headings made with dashes are recognized correctly."""
+    actual = UNESCAPED_SUBREDDIT_PATTERN.search(test_input) is not None
     assert actual == should_match
 
 
@@ -222,6 +250,27 @@ def test_check_for_unescaped_username(test_input: str, should_match: bool) -> No
 
 
 @pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("r/subreddit", True),
+        ("/r/subreddit", True),
+        (r"r\/subreddit", False),
+        (r"\/r/subreddit", False),
+        (r"\/r\/subreddit", False),
+        (
+            load_invalid_transcription_from_file("unescaped_username_subreddit.txt"),
+            True,
+        ),
+    ],
+)
+def test_check_for_unescaped_subreddit(test_input: str, should_match: bool) -> None:
+    """Test if unescaped subreddit names are detected."""
+    actual = check_for_unescaped_subreddit(test_input)
+    expected = FormattingIssue.UNESCAPED_SUBREDDIT if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
     "test_input,expected",
     [
         (
@@ -240,7 +289,7 @@ def test_check_for_unescaped_username(test_input: str, should_match: bool) -> No
         ),
         (
             load_invalid_transcription_from_file("unescaped_username_subreddit.txt"),
-            [FormattingIssue.UNESCAPED_USERNAME],
+            [FormattingIssue.UNESCAPED_USERNAME, FormattingIssue.UNESCAPED_SUBREDDIT],
         ),
         (
             load_invalid_transcription_from_file("bold-header_heading-with-dashes.txt"),
