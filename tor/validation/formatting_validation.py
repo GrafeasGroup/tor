@@ -125,6 +125,21 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
     )
 
 
+def check_for_unescaped_username(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription contains an unescaped username.
+
+    Examples: u/username and /u/username are not allowed.
+    Instead, u\\/username, \\/u/username or \\/u\\/username need to be used.
+
+    Otherwise the user will get pinged.
+    """
+    return (
+        FormattingIssue.UNESCAPED_USERNAME
+        if UNESCAPED_USERNAME_PATTERN.search(transcription) is not None
+        else None
+    )
+
+
 def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
     """Check the transcription for common formatting issues."""
     return set(
@@ -135,6 +150,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_heading_with_dashes(transcription),
             check_for_missing_separators(transcription),
             check_for_fenced_code_block(transcription),
+            check_for_unescaped_username(transcription),
         ]
         if issue is not None
     )

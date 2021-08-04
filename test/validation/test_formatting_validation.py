@@ -15,7 +15,9 @@ from tor.validation.formatting_validation import (
     check_for_malformed_footer,
     check_for_bold_header,
     PROPER_SEPARATORS_PATTERN,
-    HEADING_WITH_DASHES_PATTERN, UNESCAPED_USERNAME_PATTERN,
+    HEADING_WITH_DASHES_PATTERN,
+    UNESCAPED_USERNAME_PATTERN,
+    check_for_unescaped_username,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -199,6 +201,27 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
 
 
 @pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("u/username", True),
+        ("/u/username", True),
+        (r"u\/username", False),
+        (r"\/u/username", False),
+        (r"\/u\/username", False),
+        (
+            load_invalid_transcription_from_file("unescaped_username_subreddit.txt"),
+            True,
+        ),
+    ],
+)
+def test_check_for_unescaped_username(test_input: str, should_match: bool) -> None:
+    """Test if unescaped usernames are detected."""
+    actual = check_for_unescaped_username(test_input)
+    expected = FormattingIssue.UNESCAPED_USERNAME if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
     "test_input,expected",
     [
         (
@@ -214,6 +237,10 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
                 "fenced-code-block_missing-separators.txt"
             ),
             [FormattingIssue.FENCED_CODE_BLOCK, FormattingIssue.MISSING_SEPARATORS],
+        ),
+        (
+            load_invalid_transcription_from_file("unescaped_username_subreddit.txt"),
+            [FormattingIssue.UNESCAPED_USERNAME],
         ),
         (
             load_invalid_transcription_from_file("bold-header_heading-with-dashes.txt"),
