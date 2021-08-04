@@ -15,7 +15,7 @@ from tor.validation.formatting_validation import (
     check_for_malformed_footer,
     check_for_bold_header,
     PROPER_SEPARATORS_PATTERN,
-    HEADING_WITH_DASHES_PATTERN,
+    HEADING_WITH_DASHES_PATTERN, UNESCAPED_USERNAME_PATTERN,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -64,6 +64,28 @@ def test_proper_separator_pattern(test_input: str, should_match: bool) -> None:
 def test_heading_with_dashes_pattern(test_input: str, should_match: bool) -> None:
     """Test if headings made with dashes are recognized correctly."""
     actual = HEADING_WITH_DASHES_PATTERN.search(test_input) is not None
+    assert actual == should_match
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("u/username", True),  # Username with one slash
+        ("/u/username", True),  # Username with two slashes
+        ("u/123456", True),  # Username with numbers
+        ("u/_username_", True),  # Username with underscores
+        ("u/-username-", True),  # Username with dashes
+        (r"u\/username", False),  # Escaped username with one slash
+        (r"\/u/username", False),  # Escaped username with first slash escaped
+        (r"/u\/username", False),  # Escaped username with second slash escaped
+        (r"\/u\/username", False),  # Escaped username with both slashes escaped
+        (r"r/subreddit", False),  # Subreddit name with one slash
+        (r"/r/subreddit", False),  # Subreddit name with two slashes
+    ],
+)
+def test_unescaped_username_pattern(test_input: str, should_match: bool) -> None:
+    """Test if headings made with dashes are recognized correctly."""
+    actual = UNESCAPED_USERNAME_PATTERN.search(test_input) is not None
     assert actual == should_match
 
 

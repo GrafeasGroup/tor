@@ -40,7 +40,13 @@ HEADING_WITH_DASHES_PATTERN = re.compile(r"[\w][:*_ ]*\n[ ]{,3}([-][ ]*){3,}\n")
 # ```
 # int x = 0;
 # ```
-FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
+FENCED_CODE_BLOCK_PATTERN = re.compile(r"```.*```", re.DOTALL)
+
+# Regex to recognized unescaped usernames.
+# They need to be escaped with a backslash, otherwise the user will be pinged
+# For example, u/username and /u/username are not allowed.
+# Instead, u\/username, \/u/username or \/u\/username should be used.
+UNESCAPED_USERNAME_PATTERN = re.compile(r"(?:(?<!\\)/u|(?<!/)u)(?<!\\)/\S+")
 
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
