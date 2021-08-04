@@ -17,7 +17,9 @@ from tor.validation.formatting_validation import (
     PROPER_SEPARATORS_PATTERN,
     HEADING_WITH_DASHES_PATTERN,
     UNESCAPED_USERNAME_PATTERN,
-    check_for_unescaped_username, check_for_unescaped_subreddit, UNESCAPED_SUBREDDIT_PATTERN,
+    check_for_unescaped_username,
+    check_for_unescaped_subreddit,
+    UNESCAPED_SUBREDDIT_PATTERN,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
