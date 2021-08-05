@@ -157,8 +157,7 @@ def process_done(
     override=False,
     alt_text_trigger=False,
 ) -> Tuple:
-    """
-    Handles comments where the user claims to have completed a post.
+    """Handle comments where the user claims to have completed a post.
 
     This function sends a reply to the user depending on the responses received
     from Blossom.
@@ -336,12 +335,14 @@ def process_message(message: Message, cfg: Config) -> None:
             cfg,
         )
         log.info(
-            f"Received DM from {username}. \n Subject: {message.subject}\n\nBody: {message.body}"
+            f"Received DM from {username}.\n"
+            f"Subject: {message.subject}\n\nBody: {message.body}"
         )
     else:
         send_to_modchat(
             f"DM with no author -- " f"*{message.subject}*:\n{message.body}", cfg
         )
         log.info(
-            f"Received DM with no author. \n Subject: {message.subject}\n\nBody: {message.body}"
+            "Received DM with no author.\n"
+            f"Subject: {message.subject}\n\nBody: {message.body}"
         )

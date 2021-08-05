@@ -11,9 +11,9 @@ log = logging.getLogger(__name__)
 
 
 def flair_post(post: Submission, text: str) -> None:
-    """
-    Sets the requested flair on a given post. Must provide a string
-    which matches an already-available flair template.
+    """Set the requested flair on a given post.
+
+    Must provide a string which matches an already-available flair template.
 
     :param post: A Submission object on ToR.
     :param text: String. The name of the flair template to apply.
@@ -58,8 +58,7 @@ def _get_flair_css(transcription_count: int) -> str:
 
 
 def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
-    """
-    Set the flair from the comment's author according to their gamma and current flair
+    """Set the flair from the comment's author according to their gamma and current flair.
 
     This function uses Blossom to retrieve the up to date gamma. The current
     flair postfix is left intact in the process.
@@ -75,7 +74,7 @@ def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
             # the posted comment.
             current_flair = cfg.r.comment(id=clean_id(post.fullname)).author_flair_text
             if current_flair:
-                flair_postfix = current_flair[current_flair.index("Γ") + 1:]
+                flair_postfix = current_flair[current_flair.index("Γ") + 1 :]
         except (StopIteration, AttributeError, ValueError):
             # In this situation, either the user is not found or they do not have a flair.
             # This is not problematic and we will instead just use the standard flair.
@@ -86,7 +85,8 @@ def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
 
 
 def set_meta_flair_on_other_posts(cfg: Config) -> None:
-    """
+    """Set meta flair on meta posts.
+
     Loops through the 10 newest posts on ToR and sets the flair to
     'Meta' for any post that is not authored by the bot or any of
     the moderators.

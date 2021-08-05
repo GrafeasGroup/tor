@@ -10,8 +10,9 @@ _missing = object()
 
 # @see https://stackoverflow.com/a/17487613/1236035
 class cached_property(object):
-    """A decorator that converts a function into a lazy property.  The
-    function wrapped is called the first time to retrieve the result
+    """A decorator that converts a function into a lazy property.
+
+    The function wrapped is called the first time to retrieve the result
     and then that calculated result is used the next time you access
     the value::
 

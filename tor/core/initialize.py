@@ -65,7 +65,7 @@ def populate_domain_lists(cfg: Config) -> None:
     domains = "".join(domain_string.splitlines()).split("---")
 
     for domainset in domains:
-        domain_list = domainset[domainset.index("["):].strip("[]").split(", ")
+        domain_list = domainset[domainset.index("[") :].strip("[]").split(", ")
         current_domain_list = []
         if domainset.startswith("video"):
             current_domain_list = cfg.video_domains

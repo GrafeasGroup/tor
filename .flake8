@@ -1,6 +1,6 @@
 [flake8]
 application-import-names = tor,core,validation
-ignore = ANN101, D100, D101, D105, D106, W503,
+ignore = ANN101, D100, D101, D105, D106, W503, E203
 import-order-style = pycharm
 max-complexity = 10
 max-line-length = 90

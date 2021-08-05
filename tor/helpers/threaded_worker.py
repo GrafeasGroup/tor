@@ -41,6 +41,7 @@ def check_domain_filter(item: Dict, cfg: Config) -> bool:
 @beeline.traced_thread
 def get_subreddit_posts(sub: str) -> List[PostSummary]:
     """Get the posts of the given subreddit."""
+
     def generate_user_agent() -> str:
         """Generate a unique user agent.
 
