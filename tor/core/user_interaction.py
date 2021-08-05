@@ -261,7 +261,7 @@ def process_done(
             transcription_count = blossom_user["gamma"]
             is_promoted = check_promotion(transcription_count)
 
-            if is_promoted != None:
+            if is_promoted == None:
                 alt_promotion_txt = ''
             else:
                 alt_promotion_txt = done_messages["promotion_text"][str(is_promoted)]
