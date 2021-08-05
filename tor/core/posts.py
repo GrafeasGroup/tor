@@ -89,7 +89,7 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
             has_enough_upvotes(post, cfg),
             not post["archived"],
             post["author"],
-            is_transcribable_youtube_video(url) if is_youtube_url(url) else True
+            is_transcribable_youtube_video(url) if is_youtube_url(url) else True,
         ]
     )
 
@@ -131,7 +131,7 @@ def create_blossom_submission(
     if (content_url := str(original_post["url"])) is None:
         content_url = cfg.r.submission(url=tor_post.url).url
     tor_url = i18n["urls"]["reddit_url"].format(str(tor_post.permalink))
-    original_url = i18n["urls"]["reddit_url"].format(str(original_post['permalink']))
+    original_url = i18n["urls"]["reddit_url"].format(str(original_post["permalink"]))
     return cfg.blossom.create_submission(
         original_post["name"], tor_url, original_url, content_url
     )
@@ -155,7 +155,6 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         # this submission will have the wrong post times because we didn't know about
         # it, so let's leave a marker that we can clean up later on Blossom's side.
         cfg.blossom.patch(
-            f"submission/{new_submission['id']}/",
-            data={"redis_id": "incomplete"},
+            f"submission/{new_submission['id']}/", data={"redis_id": "incomplete"},
         )
         return new_submission
