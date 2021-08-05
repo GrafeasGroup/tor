@@ -1,4 +1,4 @@
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 from praw.models import Comment, Redditor
 
@@ -53,8 +53,7 @@ def get_transcription(
 
 
 def is_comment_transcription(comment: Comment, cfg: Config) -> bool:
-    """
-    Check if the comment is meant to be a transcription.
+    """Check if the comment is meant to be a transcription.
 
     This just performs a basic check, stricter rules are enforced when
     checking for any formatting issues.
@@ -62,7 +61,6 @@ def is_comment_transcription(comment: Comment, cfg: Config) -> bool:
     If the perform_header_check option is not set in the configuration, this
     function always returns True.
     """
-
     if not cfg.perform_header_check:
         return True
     if i18n["urls"]["ToR_link"] not in comment.body:

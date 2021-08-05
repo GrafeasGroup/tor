@@ -1,16 +1,17 @@
 import re
 from typing import Optional, Set
 
+from tor.strings import translation
 from tor.validation.formatting_issues import FormattingIssue
 from tor.validation.helpers import format_as_sections
-from tor.strings import translation
 
 i18n = translation()
 
 FOOTER = "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
 "for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;"
 "like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
-"we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)"
+"we&#32;do&#32;it,&#32;click&#32;here!]"
+"(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)"
 
 # Regex to recognize headers that have been made bold instead of italic.
 # Example:
@@ -21,7 +22,7 @@ BOLD_HEADER_PATTERN = re.compile(r"^\s*\*\*(Image|Video|Audio) Transcription:?.*
 # Regex to recognize correctly formed separators.
 # Separators are three dashes (---), potentially with spaces in-between.
 # They need to be surrounded by empty lines (which can contain spaces)
-# The separator line (---) can start with up to three spaces and end with arbitrary spaces.
+# The separator line (---) can start with up to three spaces and end with any spaces.
 PROPER_SEPARATORS_PATTERN = re.compile(r"\n[ ]*\n[ ]{,3}([-][ ]*){3,}[ ]*\n[ ]*\n")
 
 # Regex to recognize a separator (---) being misused as heading.

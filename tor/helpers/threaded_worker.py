@@ -9,7 +9,7 @@ import beeline
 import requests
 
 from tor.core.config import Config
-from tor.core.posts import process_post, PostSummary
+from tor.core.posts import PostSummary, process_post
 from tor.strings import translation
 
 log = logging.getLogger()
@@ -17,7 +17,8 @@ i18n = translation()
 
 
 def check_domain_filter(item: Dict, cfg: Config) -> bool:
-    """
+    """Run the domain filter on the post.
+
     Validate that a given post is actually one that we can (or should) work on
     by checking the domain of the post against our filters.
 
@@ -39,8 +40,10 @@ def check_domain_filter(item: Dict, cfg: Config) -> bool:
 
 @beeline.traced_thread
 def get_subreddit_posts(sub: str) -> List[PostSummary]:
+    """Get the posts of the given subreddit."""
     def generate_user_agent() -> str:
-        """
+        """Generate a unique user agent.
+
         Reddit routinely blocks / throttles common user agents. The easiest way
         to deal with that is to (nicely) generate a partially unique user-agent
         in an easy-to-follow pattern in case they decide that they do want to
@@ -93,12 +96,14 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
 
 
 def is_time_to_scan(cfg: Config) -> bool:
+    """Determine if it is time to scan the posts."""
     return datetime.now() > cfg.last_post_scan_time + timedelta(seconds=45)
 
 
 @beeline.traced(name="threaded_check_submissions")
 def threaded_check_submissions(cfg: Config) -> None:
-    """
+    """Check the submissions in multiple threads.
+
     Single threaded PRAW performance:
     finished in 56.75446701049805s
 
@@ -108,7 +113,6 @@ def threaded_check_submissions(cfg: Config) -> None:
     multi-threaded json performance:
     finished in 1.3632569313049316s
     """
-
     if not is_time_to_scan(cfg):
         # we're still within the defined time window from the last time we
         # looked for new posts. We'll try again later.
@@ -127,9 +131,9 @@ def threaded_check_submissions(cfg: Config) -> None:
         jobs = list()
         for sub in subreddits:
             jobs.append(executor.submit(get_subreddit_posts, sub))
-        for f in as_completed(jobs):
+        for ft in as_completed(jobs):
             try:
-                data: List[PostSummary] = f.result()
+                data: List[PostSummary] = ft.result()
                 total_posts += data
             except Exception as exc:
                 log.warning("an exception was generated: {}".format(exc))

@@ -19,7 +19,8 @@ def is_youtube_url(url: str) -> bool:
 
 
 def is_transcribable_youtube_video(url: str) -> bool:
-    """
+    """Determine if the given YouTube video is transcribable.
+
     We don't want to process channels or user accounts, so we'll filter
     those out here.
 

@@ -5,11 +5,13 @@ from tor.core.config import Config
 
 
 def has_been_posted(post_url: str, cfg: Config) -> bool:
+    """Determine if the given post has been registered already."""
     return cfg.blossom.get_submission(url=post_url).status == BlossomStatus.ok
 
 
 def is_removed(post: Submission) -> bool:
-    """
+    """Determine if the post has been removed.
+
     Reddit does not allow non-mods to tell whether or not a post has been
     removed, which understandably makes it a little difficult to figure out
     whether or not we should remove a post automatically. HOWEVER, as with
