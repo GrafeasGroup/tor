@@ -59,6 +59,30 @@ def _get_flair_css(transcription_count: int) -> str:
         return 'grafeas'
 
 
+def check_promotion(transcription_count):
+
+    if transcription_count == 10000:
+        return 'grafeas-jade'
+    elif transcription_count == 5000:
+        return 'grafeas-topaz'
+    elif transcription_count == 2500:
+        return 'grafeas-ruby'
+    elif transcription_count == 1000:
+        return 'grafeas-diamond'
+    elif transcription_count == 500:
+        return 'grafeas-golden'
+    elif transcription_count == 250:
+        return 'grafeas-purple'
+    elif transcription_count == 100:
+        return 'grafeas-teal'
+    elif transcription_count == 50:
+        return 'grafeas-green'
+    else:
+        return None
+
+
+
+
 def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
     """
     Set the flair from the comment's author according to their gamma and current flair

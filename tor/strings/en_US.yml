@@ -96,6 +96,7 @@ responses:
 
       If you need help, reply `help` and I will get a human to assist you!
   done:
+
     not_claimed_by_user: |
       It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else! If you are unable to resolve this situation, please message the mods.
     already_completed: |
@@ -112,6 +113,29 @@ responses:
       If the footer is correct, have you tried replying "Done" again after one-two minutes? Sometimes, freshly posted transcriptions are not seen by the bot, so trying again should fix the issue.
 
       If it still doesn't work, it could be the sign of another bug; let us know by [sending a Modmail](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Issue&message=) so we can take a look!
+    
+    promotion_text:
+      grafeas-jade: |
+        Superb performance! You just transcribed more than 10000 posts.
+      grafeas-topaz: |
+        Outstanding! You are just halfway from hitting jade. Keep up the good work.
+      grafeas-ruby: |
+        Excellent! You have just hit the 4 digit number 1000. Lets Go!!!
+      grafeas-diamond: |
+        You are as tough as a diamond. What more to say about your good work.
+      grafeas-golden: |
+        Yipee!! Your work is so golden.
+      grafeas-purple: |
+        Congratulations!! You have hit the 250 mark. Keep going!
+      grafeas-teal: |
+        Century!! You have just hit the magic number 100.
+      grafeas-green: |
+        Congratulations!! You have achieved your first rank.
+
+
+
+
+ 
   unclaim:
     still_unclaimed: |
       From what I can see, no one has claimed this post! Would you like to? All you have to do is reply to me with `claim`.

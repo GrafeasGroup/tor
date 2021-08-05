@@ -2,6 +2,7 @@ import logging
 import random
 import time
 from typing import Dict, Tuple
+from tor.helpers.flair import check_promotion
 
 import beeline
 from blossom_wrapper import BlossomStatus
@@ -256,6 +257,16 @@ def process_done(
                 f" successful."
             )
             message = done_messages["completed_transcript"]
+            
+            transcription_count = blossom_user["gamma"]
+            is_promoted = check_promotion(transcription_count)
+
+            if is_promoted != None:
+                alt_promotion_txt = ''
+            else:
+                alt_promotion_txt = done_messages["promotion_text"][str(is_promoted)]
+
+
             if alt_text_trigger:
                 message = f"I think you meant `done`, so here we go!\n\n{message}"
 
@@ -268,7 +279,7 @@ def process_done(
         elif done_response.status == BlossomStatus.blacklisted:
             message = i18n["responses"]["general"]["blacklisted"]
 
-    return message, return_flair
+    return message, return_flair, alt_promotion_txt
 
 
 @beeline.traced(name="process_unclaim")
