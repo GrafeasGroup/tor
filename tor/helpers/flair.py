@@ -77,6 +77,8 @@ def check_promotion(transcription_count):
         return 'grafeas-teal'
     elif transcription_count == 50:
         return 'grafeas-green'
+    elif:
+        return 'grafeas-initiate'
     else:
         return None
 

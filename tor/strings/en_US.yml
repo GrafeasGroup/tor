@@ -131,7 +131,8 @@ responses:
         Century!! You have just hit the magic number 100.
       grafeas-green: |
         Congratulations!! You have achieved your first rank.
-
+      grafeas-initiate: |
+        Hooray!! You just made your first transcription.
 
 
 
