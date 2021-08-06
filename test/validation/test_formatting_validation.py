@@ -188,7 +188,7 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
         ("\n\n*#hashtag1 #hashtag2*", False),
     ]
 )
-def test_check_for_unescaped_hashtag(test_input: str, should_match: bool) -> None:
+def test_check_for_unescaped_heading(test_input: str, should_match: bool) -> None:
     """Test if unescaped hashtags are detected."""
     actual = check_for_unescaped_heading(test_input)
     expected = FormattingIssue.UNESCAPED_HEADING if should_match else None
