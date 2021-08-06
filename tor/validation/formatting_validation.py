@@ -46,7 +46,7 @@ FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 # Example:
 #
 # #Hashtag
-UNESCAPED_HEADER_PATTERN = re.compile(r"([^\\]|^)#[^ ].*")
+UNESCAPED_HEADING_PATTERN = re.compile(r"([^\\]|^)#[^ ].*")
 
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
@@ -125,7 +125,7 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
     )
 
 
-def check_for_unescaped_hashtag(transcription: str) -> Optional[FormattingIssue]:
+def check_for_unescaped_heading(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription contains an unescaped hashtag. Actual backslash in example swapped for (backslash) to
     avoid invalid escape sequence warning
 
@@ -134,8 +134,8 @@ def check_for_unescaped_hashtag(transcription: str) -> Optional[FormattingIssue]
     Invalid: #Test
     """
     return (
-        FormattingIssue.UNESCAPED_HEADER
-        if UNESCAPED_HEADER_PATTERN.search(transcription) is not None
+        FormattingIssue.UNESCAPED_HEADING
+        if UNESCAPED_HEADING_PATTERN.search(transcription) is not None
         else None
     )
 
