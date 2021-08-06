@@ -180,9 +180,9 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
 @pytest.mark.parametrize(
     "test_input,should_match",
     [
-        ("#This is an unescaped header", True),
+        ("#This is an unescaped heading", True),
         ("\#This is properly escaped", False),
-        ("# This is meant to render as a header", False),
+        ("# This is meant to render as a heading", False),
         ("\n     \n   #heading", True),
         ("\n\n\#hashtag1 #hashtag2", False),
         ("\n\n*#hashtag1 #hashtag2*", False),
