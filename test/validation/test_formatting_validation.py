@@ -182,7 +182,10 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
     [
         ("#This is an unescaped header", True),
         ("\#This is properly escaped", False),
-        ("# This is meant to render as a header", False)
+        ("# This is meant to render as a header", False),
+        ("\n     \n   #heading", True),
+        ("\n\n\#hashtag1 #hashtag2", False),
+        ("\n\n*#hashtag1 #hashtag2*", False),
     ]
 )
 def test_check_for_unescaped_hashtag(test_input: str, should_match: bool) -> None:
