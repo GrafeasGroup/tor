@@ -259,6 +259,15 @@ formatting_issues:
 
     \    int x = 0;\n
     \   int y = x * 100;"
+  unescaped_header: "**Unescaped header syntax**: It looks like you have an escaped hashtag in your transcription, this may cause it to render as a header instead of a raw hashtag. For example:
+
+    \    #Text
+
+    would render as:
+
+    #Text
+
+    To fix this, add a backslash in front of the \\# like so: `\\#Text`. If you meant for it to render as a header, please add a space after the \\# to avoid this warning. i.e. `# Text`."
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'

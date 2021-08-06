@@ -14,6 +14,7 @@ from tor.validation.formatting_validation import (
     check_for_heading_with_dashes,
     check_for_malformed_footer,
     check_for_bold_header,
+    check_for_unescaped_hashtag,
     PROPER_SEPARATORS_PATTERN,
     HEADING_WITH_DASHES_PATTERN,
 )
@@ -173,6 +174,21 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
     """Test if fenced code blocks are detected."""
     actual = check_for_fenced_code_block(test_input)
     expected = FormattingIssue.FENCED_CODE_BLOCK if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("#This is an unescaped header", True),
+        ("\#This is properly escaped", False),
+        ("# This is meant to render as a header", False)
+    ]
+)
+def test_check_for_unescaped_hashtag(test_input: str, should_match: bool) -> None:
+    """Test if unescaped hashtags are detected."""
+    actual = check_for_unescaped_hashtag(test_input)
+    expected = FormattingIssue.UNESCAPED_HEADER if should_match else None
     assert actual == expected
 
 

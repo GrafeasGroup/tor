@@ -42,6 +42,12 @@ HEADING_WITH_DASHES_PATTERN = re.compile(r"[\w][:*_ ]*\n[ ]{,3}([-][ ]*){3,}\n")
 # ```
 FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 
+# Regex to recognize unescaped hashtags which may render as headers.
+# Example:
+#
+# #Hashtag
+UNESCAPED_HEADER_PATTERN = re.compile(r"([^\\]|^)#[^ ].*")
+
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription has a bold instead of italic header."""
@@ -115,6 +121,21 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
     return (
         FormattingIssue.FENCED_CODE_BLOCK
         if FENCED_CODE_BLOCK_PATTERN.search(transcription) is not None
+        else None
+    )
+
+
+def check_for_unescaped_hashtag(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription contains an unescaped hashtag. Actual backslash in example swapped for (backslash) to
+    avoid invalid escape sequence warning
+
+    Valid: (backslash)#Text
+    Valid: # Test
+    Invalid: #Test
+    """
+    return (
+        FormattingIssue.UNESCAPED_HEADER
+        if UNESCAPED_HEADER_PATTERN.search(transcription) is not None
         else None
     )
 
