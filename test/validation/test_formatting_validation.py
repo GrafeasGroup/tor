@@ -14,7 +14,7 @@ from tor.validation.formatting_validation import (
     check_for_heading_with_dashes,
     check_for_malformed_footer,
     check_for_bold_header,
-    check_for_unescaped_hashtag,
+    check_for_unescaped_heading,
     PROPER_SEPARATORS_PATTERN,
     HEADING_WITH_DASHES_PATTERN,
 )
@@ -190,8 +190,8 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
 )
 def test_check_for_unescaped_hashtag(test_input: str, should_match: bool) -> None:
     """Test if unescaped hashtags are detected."""
-    actual = check_for_unescaped_hashtag(test_input)
-    expected = FormattingIssue.UNESCAPED_HEADER if should_match else None
+    actual = check_for_unescaped_heading(test_input)
+    expected = FormattingIssue.UNESCAPED_HEADING if should_match else None
     assert actual == expected
 
 
