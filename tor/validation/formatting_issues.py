@@ -7,3 +7,4 @@ class FormattingIssue(Enum):
     HEADING_WITH_DASHES = "heading_with_dashes"
     MALFORMED_FOOTER = "malformed_footer"
     FENCED_CODE_BLOCK = "fenced_code_block"
+    INCORRECT_LINE_BREAK = "incorrect_line_break"

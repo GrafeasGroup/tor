@@ -42,6 +42,21 @@ HEADING_WITH_DASHES_PATTERN = re.compile(r"[\w][:*_ ]*\n[ ]{,3}([-][ ]*){3,}\n")
 # ```
 FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 
+# Regex to recognize double-spaced and escaped line breaks instead of paragraph breaks
+# DO:
+# Paragraph line break:
+# This is a line
+#
+# This is another line
+# DON'T:
+# Double-spaced line break (note the two spaces at the end of the first line):
+# This is a line
+# This is another line
+# Escaped line break:
+# This is a line\
+# This is another line
+INCORRECT_LINE_BREAK_PATTERN = re.compile(r"  \n|\\\n")
+
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription has a bold instead of italic header."""
@@ -119,6 +134,15 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
     )
 
 
+def check_for_incorrect_line_break(transcription: str) -> Set[FormattingIssue]:
+    """Check if the transcription contains double-spaced or escaped line breaks"""
+    return (
+        FormattingIssue.INCORRECT_LINE_BREAK
+        if INCORRECT_LINE_BREAK_PATTERN.search(transcription) is not None
+        else None
+    )
+
+
 def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
     """Check the transcription for common formatting issues."""
     return set(
@@ -129,6 +153,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_heading_with_dashes(transcription),
             check_for_missing_separators(transcription),
             check_for_fenced_code_block(transcription),
+            check_for_incorrect_line_break(transcription),
         ]
         if issue is not None
     )

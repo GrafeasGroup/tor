@@ -9,6 +9,7 @@ from test.validation.helpers import (
 )
 from tor.validation.formatting_validation import (
     check_for_fenced_code_block,
+    check_for_incorrect_line_break,
     check_for_missing_separators,
     check_for_formatting_issues,
     check_for_heading_with_dashes,
@@ -173,6 +174,21 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
     """Test if fenced code blocks are detected."""
     actual = check_for_fenced_code_block(test_input)
     expected = FormattingIssue.FENCED_CODE_BLOCK if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("This is a line  \nThis is another line", True),
+        ("This is a line\\\nThis is another line", True),
+        ("This is a line\n\nThis is another line", False),
+    ],
+)
+def test_check_for_incorrect_line_break(test_input: str, should_match: bool) -> None:
+    """Test if incorrect line breaks are detected."""
+    actual = check_for_incorrect_line_break(test_input)
+    expected = FormattingIssue.INCORRECT_LINE_BREAK if should_match else None
     assert actual == expected
 
 
