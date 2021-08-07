@@ -259,7 +259,7 @@ formatting_issues:
 
     \    int x = 0;\n
     \   int y = x * 100;"
-  unescaped_heading: "**Unescaped heading syntax**: It looks like you have an unescaped hashtag in your transcription, this may cause it to render as a heading instead of a raw hashtag. For example:
+  unescaped_heading: "**Unescaped heading syntax**: It looks like you have an unescaped heading in your transcription, this may cause it to render as a heading instead of a raw hashtag. For example:
 
 
     \    #Text
