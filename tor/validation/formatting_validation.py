@@ -134,7 +134,7 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
     )
 
 
-def check_for_incorrect_line_break(transcription: str) -> Set[FormattingIssue]:
+def check_for_incorrect_line_break(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription contains double-spaced or escaped line breaks"""
     return (
         FormattingIssue.INCORRECT_LINE_BREAK
