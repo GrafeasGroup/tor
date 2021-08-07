@@ -212,7 +212,7 @@ formatting_issues:
     \   ---\n
     \   \n
     \   <footer>"
-  separator_headings: "**Separator as heading**: It seems like you meant to make a horizontal separator (`---`), but have created a heading instead.
+  heading_with_dashes: "**Heading with dashes**: It seems like you meant to make a horizontal separator (`---`), but have created a heading (i.e. 'big text') instead.
 
     The separators require an empty line before and after it, like this:
 
