@@ -69,6 +69,7 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
                     'title': item['title'],
                     'permalink': item['permalink'],
                     'is_nsfw': item['over_18'],
+                    'is_gallery': hasattr(item, 'is_gallery'),
                     'domain': item['domain'],
                     'ups': item['ups'],
                     'locked': item['locked'],

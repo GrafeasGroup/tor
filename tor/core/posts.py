@@ -37,7 +37,11 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
         f'Posting call for transcription on ID {new_post["name"]} posted by {new_post["author"]}'
     )
 
-    if new_post["domain"] in cfg.image_domains:
+    if new_post["is_gallery"]:
+        content_type = "gallery"
+        content_format = cfg.image_formatting
+
+    elif new_post["domain"] in cfg.image_domains:
         content_type = "image"
         content_format = cfg.image_formatting
 
@@ -48,6 +52,7 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
     elif new_post["domain"] in cfg.video_domains:
         content_type = "video"
         content_format = cfg.video_formatting
+
     else:
         # This means we pulled from a subreddit bypassing the filters.
         content_type = "Other"
