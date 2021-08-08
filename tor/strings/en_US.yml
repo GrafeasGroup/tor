@@ -259,7 +259,7 @@ formatting_issues:
 
     \    int x = 0;\n
     \   int y = x * 100;"
-  unescaped_heading: "**Unescaped heading syntax**: It looks like you have an unescaped heading in your transcription, this may cause it to render as a heading instead of a raw hashtag. For example:
+  unescaped_heading: "**Unescaped heading syntax**: It looks like you intended to transcribe a hashtag, but made it a heading (big text) instead. This is caused by not escaping the number sign (`#`) in front of the hashtag. For example:
 
 
     \    #Text
@@ -271,7 +271,7 @@ formatting_issues:
     #Text
 
 
-    To fix this, add a backslash in front of the \\# like so: `\\#Text`. If you meant for it to render as a heading, please add a space after the \\# to avoid this warning. i.e. `# Text`."
+    To fix this, add a backslash in front of the `#` like so: `#Text`. If you meant for it to render as a heading, please add a space after the `#` to avoid this warning. i.e. `# Text`."
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
