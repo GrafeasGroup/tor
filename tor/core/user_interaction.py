@@ -257,17 +257,13 @@ def process_done(
                 f" successful."
             )
             message = done_messages["completed_transcript"]
-            
             transcription_count = blossom_user["gamma"] + 1
             is_promoted = check_promotion(transcription_count)
 
-            if is_promoted != None:
-
+            if is_promoted is not  None:
                 alt_promotion_txt = done_messages["promotion_text"][str(is_promoted)]
                 message = f"{message}\n\n{alt_promotion_txt}"
                 
-
-
             if alt_text_trigger:
                 message = f"I think you meant `done`, so here we go!\n\n{message}"
 

@@ -60,7 +60,6 @@ def _get_flair_css(transcription_count: int) -> str:
 
 
 def check_promotion(transcription_count):
-
     if transcription_count == 10000:
         return 'grafeas-jade'
     elif transcription_count == 5000:
@@ -81,9 +80,6 @@ def check_promotion(transcription_count):
         return 'grafeas-initiate'
     else:
         return None
-
-
-
 
 def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
     """
