@@ -184,8 +184,8 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
         (r"\#This is properly escaped", False),
         ("# This is meant to render as a heading", False),
         ("\n     \n   #heading", True),
-        (r"\n\n\#hashtag1 #hashtag2", False),
-        (r"\n\n*#hashtag1 #hashtag2*", False),
+        ("\n\n\\#hashtag1 #hashtag2", False),
+        ("\n\n*#hashtag1 #hashtag2*", False),
     ]
 )
 def test_check_for_unescaped_heading(test_input: str, should_match: bool) -> None:
