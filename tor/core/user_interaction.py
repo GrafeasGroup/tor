@@ -258,13 +258,14 @@ def process_done(
             )
             message = done_messages["completed_transcript"]
             
-            transcription_count = blossom_user["gamma"]
+            transcription_count = blossom_user["gamma"] + 1
             is_promoted = check_promotion(transcription_count)
 
-            if is_promoted == None:
-                alt_promotion_txt = ''
-            else:
+            if is_promoted != None:
+
                 alt_promotion_txt = done_messages["promotion_text"][str(is_promoted)]
+                message = f"{message}\n\n{alt_promotion_txt}"
+                
 
 
             if alt_text_trigger:
@@ -279,7 +280,7 @@ def process_done(
         elif done_response.status == BlossomStatus.blacklisted:
             message = i18n["responses"]["general"]["blacklisted"]
 
-    return message, return_flair, alt_promotion_txt
+    return message, return_flair
 
 
 @beeline.traced(name="process_unclaim")

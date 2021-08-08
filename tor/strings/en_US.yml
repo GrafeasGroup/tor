@@ -116,23 +116,23 @@ responses:
     
     promotion_text:
       grafeas-jade: |
-        Superb performance! You just transcribed more than 10000 posts.
+        Superb performance! You just achieved Jade rank. You just transcribed 10000 posts. You have achieved the highest rank.
       grafeas-topaz: |
-        Outstanding! You are just halfway from hitting jade. Keep up the good work.
+        Outstanding! You just achieved Topaz rank. You have completed 5000 transcriptions. Next Rank : Jade at 10000 transcriptions.
       grafeas-ruby: |
-        Excellent! You have just hit the 4 digit number 1000. Lets Go!!!
+        Outstanding! You just achieved Ruby rank. You have completed 2500 transcriptions. Next Rank : Topaz at 5000 transcriptions.
       grafeas-diamond: |
-        You are as tough as a diamond. What more to say about your good work.
+        Outstanding! You just achieved Diamond rank. You have completed 1000 transcriptions. Next Rank : Ruby at 2500 transcriptions.
       grafeas-golden: |
-        Yipee!! Your work is so golden.
+        Outstanding! You just achieved Golden rank. You have completed 500 transcriptions. Next Rank : Diamond at 1000 transcriptions.
       grafeas-purple: |
-        Congratulations!! You have hit the 250 mark. Keep going!
+        Outstanding! You just achieved Purple rank. You have completed 250 transcriptions. Next Rank : Golden at 500 transcriptions.
       grafeas-teal: |
-        Century!! You have just hit the magic number 100.
+        Outstanding! You just achieved Teal rank. You have completed 100 transcriptions. Next Rank : Purple at 250 transcriptions.
       grafeas-green: |
-        Congratulations!! You have achieved your first rank.
+        Outstanding! You just achieved Green rank. You have completed 50 transcriptions. Next Rank : Teal at 100 transcriptions.
       grafeas-initiate: |
-        Hooray!! You just made your first transcription.
+        Hooray!! You just made your first transcription. Next Rank : Green at 50 transcriptions.
 
 
 
