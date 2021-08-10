@@ -220,6 +220,12 @@ def test_check_for_unescaped_heading(test_input: str, should_match: bool) -> Non
                 FormattingIssue.MISSING_SEPARATORS,
             ],
         ),
+        (
+            load_invalid_transcription_from_file("unescaped-heading.txt"),
+            [
+                FormattingIssue.UNESCAPED_HEADING
+            ]
+        )
     ],
 )
 def test_check_for_formatting_issues_invalid_transcriptions(
