@@ -150,6 +150,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_heading_with_dashes(transcription),
             check_for_missing_separators(transcription),
             check_for_fenced_code_block(transcription),
+            check_for_unescaped_heading(transcription),
         ]
         if issue is not None
     )
