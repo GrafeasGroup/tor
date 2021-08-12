@@ -46,7 +46,7 @@ FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 # Example:
 #
 # #Hashtag
-UNESCAPED_HEADING_PATTERN = re.compile(r"(\n[ ]*\n[ ]{,3}|^)#[^ #]")
+UNESCAPED_HEADING_PATTERN = re.compile(r"(\n[ ]*\n[ ]{,3}|^)#{1,6}[^ #]")
 
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
