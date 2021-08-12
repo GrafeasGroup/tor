@@ -186,6 +186,9 @@ formatting_issues:
     {error_list}
 
 
+    ---
+
+
     If you are overwhelmed by the issues or require assistance, **reply with `help`** and I will get a human to help you out!"
   bold_header: "**Bold header**: You seemed to have made the header bold instead of italic. Please only use one asterisk (`*`) on each side instead of two.
 
@@ -209,21 +212,21 @@ formatting_issues:
     \   ---\n
     \   \n
     \   <footer>"
-  separator_headings: "**Separator as heading**: It seems like you meant to make a horizontal separator (`---`), but have created a heading instead.
+  heading_with_dashes: "**Heading with dashes**: It seems like you meant to make a horizontal separator (`---`), but have created a heading (i.e. 'big text') instead.
 
     The separators require an empty line before and after it, like this:
 
 
-    \     (empty line)\n
-    \    ---\n
     \    (empty line)\n
+    \   ---\n
+    \   (empty line)\n
 
 
     If you put it directly after a line of text, it will display as a heading, for example:
 
 
-    \  Heading\n
-    \ ---
+    \    Heading\n
+    \   ---
 
 
     Heading
@@ -234,7 +237,7 @@ formatting_issues:
     If you actually intended to make a heading, please use the syntax with number signs (`#`), like this:
 
 
-    \  ## Heading"
+    \    ## Heading"
   malformed_footer: "**Malformed footer**: The transcription footer seems to be formatted incorrectly. Please copy it exactly as seen in the templates:
 
 
@@ -245,17 +248,30 @@ formatting_issues:
   fenced_code_block: "**Fenced code block**: It looks like you used a fenced code block, i.e. you surrounded your code by three backticks, like this:
 
 
-    \  ```\n
-    \ int x = 0;\n
-    \ int y = x * 100;\n
-    \ ```
+    \    ```\n
+    \   int x = 0;\n
+    \   int y = x * 100;\n
+    \   ```
 
 
     Unfortunately, this doesn't render correctly on all devices. Instead, please prefix every line by four spaces, like this:
 
 
-    \        int x = 0;\n
-    \       int y = x * 100;"
+    \    int x = 0;\n
+    \   int y = x * 100;"
+  unescaped_heading: "**Unescaped heading syntax**: It looks like you intended to transcribe a hashtag, but made it a heading (big text) instead. This is caused by not escaping the number sign (`#`) in front of the hashtag. For example:
+
+
+    \    #Text
+
+
+    would render as:
+
+
+    #Text
+
+
+    To fix this, add a backslash in front of the `#` like so: `#Text`. If you meant for it to render as a heading, please add a space after the `#` to avoid this warning. i.e. `# Text`."
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
