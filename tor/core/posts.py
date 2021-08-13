@@ -154,7 +154,7 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         linked_post = cfg.r.submission(url=submission.url)
         post_summary["url"] = linked_post.url
         post_summary["permalink"] = linked_post.permalink
-        post_summary["name"] = linked_post.permalink
+        post_summary["name"] = linked_post.fullname
 
         new_submission = create_blossom_submission(post_summary, submission, cfg)
         # this submission will have the wrong post times because we didn't know about
