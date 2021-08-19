@@ -14,6 +14,7 @@ from tor.validation.formatting_validation import (
     check_for_heading_with_dashes,
     check_for_malformed_footer,
     check_for_bold_header,
+    check_for_unescaped_heading,
     PROPER_SEPARATORS_PATTERN,
     HEADING_WITH_DASHES_PATTERN,
     UNESCAPED_USERNAME_PATTERN,
@@ -273,6 +274,25 @@ def test_check_for_unescaped_subreddit(test_input: str, should_match: bool) -> N
 
 
 @pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("#This is an unescaped heading", True),
+        (r"\#This is properly escaped", False),
+        ("# This is meant to render as a heading", False),
+        ("\n     \n   #heading", True),
+        ("\n\n\\#hashtag1 #hashtag2", False),
+        ("\n\n*#hashtag1 #hashtag2*", False),
+        ("## test", False)
+    ]
+)
+def test_check_for_unescaped_heading(test_input: str, should_match: bool) -> None:
+    """Test if unescaped hashtags are detected."""
+    actual = check_for_unescaped_heading(test_input)
+    expected = FormattingIssue.UNESCAPED_HEADING if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
     "test_input,expected",
     [
         (
@@ -301,6 +321,12 @@ def test_check_for_unescaped_subreddit(test_input: str, should_match: bool) -> N
                 FormattingIssue.MISSING_SEPARATORS,
             ],
         ),
+        (
+            load_invalid_transcription_from_file("unescaped-heading.txt"),
+            [
+                FormattingIssue.UNESCAPED_HEADING
+            ]
+        )
     ],
 )
 def test_check_for_formatting_issues_invalid_transcriptions(

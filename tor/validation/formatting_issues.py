@@ -9,3 +9,4 @@ class FormattingIssue(Enum):
     FENCED_CODE_BLOCK = "fenced_code_block"
     UNESCAPED_USERNAME = "unescaped_username"
     UNESCAPED_SUBREDDIT = "unescaped_subreddit"
+    UNESCAPED_HEADING = "unescaped_heading"

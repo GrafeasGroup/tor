@@ -54,6 +54,12 @@ UNESCAPED_USERNAME_PATTERN = re.compile(r"(?<!\w)(?:(?<!\\)/u|(?<!/)u)(?<!\\)/\S
 # Instead, r\/subreddit, \/r/subreddit or \/r\/subreddit should be used.
 UNESCAPED_SUBREDDIT_PATTERN = re.compile(r"(?<!\w)(?:(?<!\\)/r|(?<!/)r)(?<!\\)/\S+")
 
+# Regex to recognize unescaped hashtags which may render as headers.
+# Example:
+#
+# #Hashtag
+UNESCAPED_HEADING_PATTERN = re.compile(r"(\n[ ]*\n[ ]{,3}|^)#{1,6}[^ #]")
+
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription has a bold instead of italic header."""
@@ -146,6 +152,7 @@ def check_for_unescaped_username(transcription: str) -> Optional[FormattingIssue
     )
 
 
+
 def check_for_unescaped_subreddit(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription contains an unescaped subreddit name.
 
@@ -157,6 +164,21 @@ def check_for_unescaped_subreddit(transcription: str) -> Optional[FormattingIssu
     return (
         FormattingIssue.UNESCAPED_SUBREDDIT
         if UNESCAPED_SUBREDDIT_PATTERN.search(transcription) is not None
+        else None
+    )
+
+
+def check_for_unescaped_heading(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription contains an unescaped hashtag. Actual backslash in example swapped for (backslash) to
+    avoid invalid escape sequence warning
+
+    Valid: (backslash)#Text
+    Valid: # Test
+    Invalid: #Test
+    """
+    return (
+        FormattingIssue.UNESCAPED_HEADING
+        if UNESCAPED_HEADING_PATTERN.search(transcription) is not None
         else None
     )
 
@@ -173,6 +195,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_fenced_code_block(transcription),
             check_for_unescaped_username(transcription),
             check_for_unescaped_subreddit(transcription),
+            check_for_unescaped_heading(transcription),
         ]
         if issue is not None
     )
