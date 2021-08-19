@@ -152,7 +152,6 @@ def check_for_unescaped_username(transcription: str) -> Optional[FormattingIssue
     )
 
 
-
 def check_for_unescaped_subreddit(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription contains an unescaped subreddit name.
 
