@@ -156,7 +156,7 @@ def check_for_invalid_header(transcription: str) -> Optional[FormattingIssue]:
     header = transcription.split("---")[0]
     return (
         FormattingIssue.INVALID_HEADER
-        if not any([True for i in VALID_HEADERS if re.search(r"\*{}.*\*".format(i), header) is not None])
+        if not any([re.search(r"\*{}.*\*".format(i), header) is not None for i in VALID_HEADERS])
         else None
     )
 
