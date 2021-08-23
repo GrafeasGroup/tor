@@ -8,3 +8,4 @@ class FormattingIssue(Enum):
     MALFORMED_FOOTER = "malformed_footer"
     FENCED_CODE_BLOCK = "fenced_code_block"
     UNESCAPED_HEADING = "unescaped_heading"
+    INVALID_HEADER = "invalid_header"
