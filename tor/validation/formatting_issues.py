@@ -10,3 +10,4 @@ class FormattingIssue(Enum):
     UNESCAPED_USERNAME = "unescaped_username"
     UNESCAPED_SUBREDDIT = "unescaped_subreddit"
     UNESCAPED_HEADING = "unescaped_heading"
+    INVALID_HEADER = "invalid_header"

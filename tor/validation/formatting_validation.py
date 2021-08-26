@@ -60,6 +60,12 @@ UNESCAPED_SUBREDDIT_PATTERN = re.compile(r"(?<!\w)(?:(?<!\\)/r|(?<!/)r)(?<!\\)/\
 # #Hashtag
 UNESCAPED_HEADING_PATTERN = re.compile(r"(\n[ ]*\n[ ]{,3}|^)#{1,6}[^ #]")
 
+# List of valid headers for the start of the transcription
+# Example
+#
+# Image Transcription
+VALID_HEADERS = ["Audio Transcription", "Image Transcription", "Video Transcription"]
+
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription has a bold instead of italic header."""
@@ -182,6 +188,21 @@ def check_for_unescaped_heading(transcription: str) -> Optional[FormattingIssue]
     )
 
 
+def check_for_invalid_header(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription contains a valid header option (Image, Video, or Audio).
+
+    Valid: *Video Transcription: Test*
+    Valid: *Image Transcription*
+    Invalid: *Random Transcription*
+    """
+    header = transcription.split("---")[0]
+    return (
+        FormattingIssue.INVALID_HEADER
+        if not any([re.search(r"\*{}.*\*".format(i), header) is not None for i in VALID_HEADERS])
+        else None
+    )
+
+
 def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
     """Check the transcription for common formatting issues."""
     return set(
@@ -195,6 +216,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_unescaped_username(transcription),
             check_for_unescaped_subreddit(transcription),
             check_for_unescaped_heading(transcription),
+            check_for_invalid_header(transcription),
         ]
         if issue is not None
     )

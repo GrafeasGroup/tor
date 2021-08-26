@@ -280,6 +280,13 @@ formatting_issues:
 
 
     To fix this, add a backslash in front of the `#` like so: `#Text`. If you meant for it to render as a heading, please add a space after the `#` to avoid this warning. i.e. `# Text`."
+  invalid_header: "**Invalid header**: It looks like your header doesn't contain a proper type (Image, Video, or Audio) or is missing italics. Please make sure your post contains a proper header. For example if it's an Image Transcription, it should be the following at the top of your transcription:
+
+
+    \   *Image Transcription: Example*
+
+
+    same goes for Video or Audio (but with the word `Image` replaced)."
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
