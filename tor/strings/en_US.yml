@@ -293,3 +293,19 @@ urls:
     - 'http://www.reactiongifs.com/r/a-b-yay.gif'
     - 'https://media.tenor.com/images/7dcd26f4d9a2eaa246cd4ea9967d2336/tenor.gif'
     - 'http://media0.giphy.com/media/wTzPSxZBqSove/giphy.gif'
+tips:
+  message: |
+    **Tip**: {tip_message}
+  collection:
+    - Do you feel overwhelmed with a transcription or need to ask a question? Respond with `help` and I will summon a moderator to assist you!
+    - You can join r/ToR_Meta or our [Discord server](https://discord.gg/ZDDE3Pj) for announcements, meta discussions and memes!
+    - r/TranscribersOfReddit is part of the nonprofit organization [GrafeasGroup](https://grafeas.org/). If you want to support our cause, you can [make a donation here](https://grafeas.org/posts/giving-to-grafeas/). The money is used to pay for our bots and servers.
+    - Quality over quantity! Remember that one high quality transcription has a lot more value than ten rushed ones!
+    - Visually impaired people can use screen readers to access the internet. These are programs which read the text on the screen out loud. They can't read any images or videos, but our transcriptions make them accessible!
+    - We use Reddit-flavored Markdown to format our transcriptions. You can view the full documentation about the format on [this wiki page](https://www.reddit.com/wiki/markdown).
+    - If the post you claimed breaks any rules or you don't want to transcribe it after all, simply reply `unclaim` to me and you can move on to the next one!
+    - As you transcribe more and more, you unlock new ranks that change your flair color. You can see a full list of the ranks and the gamma needed to unlock them in the sidebar.
+    - Do you want transcriptions on a particular subreddit or are you a moderator of a sub that wants to partner with us? [Write us a modmail](https://www.reddit.com/message/compose?to=/r/TranscribersOfReddit)!
+    - If you are an experienced transcriber and over 18 years old, you can [apply to be a moderator](https://docs.google.com/forms/d/e/1FAIpQLSdLwks_eyb9rF52iN4Yek6tfXaDkVawkTN54TqpMYj72hzkQA/viewform). Whenever we need more mods, we look through all the applications to find the best fit for our team.
+    - Remember that we are visitors on our partnered subreddits! Please remember to follow the sub's rules and be polite to the other Redditors.
+    - Did the OP of the post already provide a transcription of the image? Reply `unclaim` to me and report the post on our end as "Original Post already has a transcription" so that we can save work on this one!
