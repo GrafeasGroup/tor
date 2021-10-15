@@ -35,9 +35,7 @@ def process_command(reply, cfg):
 
     with open("commands.json", newline="") as commands_file:
         commands = json.load(commands_file)
-        logging.debug(
-            f"Searching for command {requested_command}, from {username}."
-        )
+        logging.debug(f"Searching for command {requested_command}, from {username}.")
 
         try:
             command = commands["commands"][requested_command]
