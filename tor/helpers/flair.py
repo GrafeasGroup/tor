@@ -39,6 +39,8 @@ def flair_post(post: Submission, text: str) -> None:
 
 
 def _get_flair_css(transcription_count: int) -> str:
+    if transcription_count >= 20000:
+        return 'grafeas-sapphire'
     if transcription_count >= 10000:
         return 'grafeas-jade'
     elif transcription_count >= 5000:
@@ -55,6 +57,8 @@ def _get_flair_css(transcription_count: int) -> str:
         return 'grafeas-teal'
     elif transcription_count >= 50:
         return 'grafeas-green'
+    elif transcription_count >= 25:
+        return 'grafeas-pink'
     else:
         return 'grafeas'
 
