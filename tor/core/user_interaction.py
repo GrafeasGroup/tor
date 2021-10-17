@@ -108,11 +108,17 @@ def process_claim(
     return_flair = None
     if response.status == BlossomStatus.ok:
         # A random tip to append to the response
-        random_tip = i18n["tips"]["message"].format(tip_message=random.choice(i18n["tips"]["collection"]))
+        random_tip = i18n["tips"]["message"].format(
+            tip_message=random.choice(i18n["tips"]["collection"])
+        )
 
-        message = i18n["responses"]["claim"][
-            "first_claim_success" if first_time else "success"
-        ] + "\n\n" + random_tip
+        message = (
+            i18n["responses"]["claim"][
+                "first_claim_success" if first_time else "success"
+            ]
+            + "\n\n"
+            + random_tip
+        )
 
         return_flair = flair.in_progress
         log.info(
@@ -228,7 +234,9 @@ def process_done(
             # volunteers react to the bot.
             send_to_modchat(
                 i18n["mod"]["formatting_issues"].format(
-                    author=user.name, issues=issues, link=f"https://reddit.com{comment.context}",
+                    author=user.name,
+                    issues=issues,
+                    link=f"https://reddit.com{comment.context}",
                 ),
                 cfg,
                 "formatting-issues",

@@ -28,39 +28,37 @@ def flair_post(post: Submission, text: str) -> None:
     #   'flair_text': 'Unclaimed'
     # }
     for choice in post.flair.choices():
-        if choice['flair_text'] == text:
-            post.flair.select(
-                flair_template_id=choice['flair_template_id']
-            )
+        if choice["flair_text"] == text:
+            post.flair.select(flair_template_id=choice["flair_template_id"])
             return
 
     # if the flairing is successful, we won't hit this line.
-    log.error(f'Cannot find requested flair {text}. Not flairing.')
+    log.error(f"Cannot find requested flair {text}. Not flairing.")
 
 
 def _get_flair_css(transcription_count: int) -> str:
     if transcription_count >= 20000:
         return 'grafeas-sapphire'
     if transcription_count >= 10000:
-        return 'grafeas-jade'
+        return "grafeas-jade"
     elif transcription_count >= 5000:
-        return 'grafeas-topaz'
+        return "grafeas-topaz"
     elif transcription_count >= 2500:
-        return 'grafeas-ruby'
+        return "grafeas-ruby"
     elif transcription_count >= 1000:
-        return 'grafeas-diamond'
+        return "grafeas-diamond"
     elif transcription_count >= 500:
-        return 'grafeas-golden'
+        return "grafeas-golden"
     elif transcription_count >= 250:
-        return 'grafeas-purple'
+        return "grafeas-purple"
     elif transcription_count >= 100:
-        return 'grafeas-teal'
+        return "grafeas-teal"
     elif transcription_count >= 50:
-        return 'grafeas-green'
+        return "grafeas-green"
     elif transcription_count >= 25:
-        return 'grafeas-pink'
+        return "grafeas-pink"
     else:
-        return 'grafeas'
+        return "grafeas"
 
 
 def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
@@ -81,7 +79,7 @@ def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
             # the posted comment.
             current_flair = cfg.r.comment(id=clean_id(post.fullname)).author_flair_text
             if current_flair:
-                flair_postfix = current_flair[current_flair.index("Γ") + 1:]
+                flair_postfix = current_flair[current_flair.index("Γ") + 1 :]
         except (StopIteration, AttributeError, ValueError):
             # In this situation, either the user is not found or they do not have a flair.
             # This is not problematic and we will instead just use the standard flair.
@@ -108,9 +106,6 @@ def set_meta_flair_on_other_posts(cfg: Config) -> None:
         if post.link_flair_text == flair.meta:
             continue
 
-        log.info(f'Flairing post {post.fullname} by author {post.author} with Meta.')
+        log.info(f"Flairing post {post.fullname} by author {post.author} with Meta.")
         flair_post(post, flair.meta)
-        send_to_modchat(
-            f'New meta post: <{post.shortlink}|{post.title}>',
-            cfg
-        )
+        send_to_modchat(f"New meta post: <{post.shortlink}|{post.title}>", cfg)
