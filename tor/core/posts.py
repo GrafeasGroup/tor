@@ -37,7 +37,11 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
         f'Posting call for transcription on ID {new_post["name"]} posted by {new_post["author"]}'
     )
 
-    if new_post["domain"] in cfg.image_domains:
+    if new_post["is_gallery"]:
+        content_type = "gallery"
+        content_format = cfg.image_formatting
+
+    elif new_post["domain"] in cfg.image_domains:
         content_type = "image"
         content_format = cfg.image_formatting
 
@@ -48,6 +52,7 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
     elif new_post["domain"] in cfg.video_domains:
         content_type = "video"
         content_format = cfg.video_formatting
+
     else:
         # This means we pulled from a subreddit bypassing the filters.
         content_type = "Other"
@@ -89,7 +94,7 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
             has_enough_upvotes(post, cfg),
             not post["archived"],
             post["author"],
-            is_transcribable_youtube_video(url) if is_youtube_url(url) else True
+            is_transcribable_youtube_video(url) if is_youtube_url(url) else True,
         ]
     )
 
@@ -131,7 +136,7 @@ def create_blossom_submission(
     if (content_url := str(original_post["url"])) is None:
         content_url = cfg.r.submission(url=tor_post.url).url
     tor_url = i18n["urls"]["reddit_url"].format(str(tor_post.permalink))
-    original_url = i18n["urls"]["reddit_url"].format(str(original_post['permalink']))
+    original_url = i18n["urls"]["reddit_url"].format(str(original_post["permalink"]))
     return cfg.blossom.create_submission(
         original_post["name"], tor_url, original_url, content_url
     )
@@ -149,13 +154,12 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         linked_post = cfg.r.submission(url=submission.url)
         post_summary["url"] = linked_post.url
         post_summary["permalink"] = linked_post.permalink
-        post_summary["name"] = linked_post.permalink
+        post_summary["name"] = linked_post.fullname
 
         new_submission = create_blossom_submission(post_summary, submission, cfg)
         # this submission will have the wrong post times because we didn't know about
         # it, so let's leave a marker that we can clean up later on Blossom's side.
         cfg.blossom.patch(
-            f"submission/{new_submission['id']}/",
-            data={"redis_id": "incomplete"},
+            f"submission/{new_submission['id']}/", data={"redis_id": "incomplete"},
         )
         return new_submission

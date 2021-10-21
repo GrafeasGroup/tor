@@ -18,32 +18,28 @@ from tor.strings import translation
 
 log = logging.getLogger(__name__)
 
-subreddit_regex = re.compile(
-    r'reddit.com\/r\/([a-z0-9\-\_\+]+)',
-    flags=re.IGNORECASE
-)
+subreddit_regex = re.compile(r"reddit.com\/r\/([a-z0-9\-\_\+]+)", flags=re.IGNORECASE)
 i18n = translation()
 
 
 class flair(object):
-    unclaimed = 'Unclaimed'
-    summoned_unclaimed = 'Summoned - Unclaimed'
-    completed = 'Completed!'
-    in_progress = 'In Progress'
-    meta = 'Meta'
-    disregard = 'Disregard'
+    unclaimed = "Unclaimed"
+    summoned_unclaimed = "Summoned - Unclaimed"
+    completed = "Completed!"
+    in_progress = "In Progress"
+    meta = "Meta"
+    disregard = "Disregard"
 
 
 class reports(object):
-    original_post_deleted_or_locked = 'Original post has been deleted or locked'
-    post_should_be_marked_nsfw = 'Post should be marked as NSFW'
-    no_bot_accounts = 'No bot accounts but our own'
-    post_violates_rules = 'Post Violates Rules on Partner Subreddit'
+    original_post_deleted_or_locked = "Original post has been deleted or locked"
+    post_should_be_marked_nsfw = "Post should be marked as NSFW"
+    no_bot_accounts = "No bot accounts but our own"
+    post_violates_rules = "Post Violates Rules on Partner Subreddit"
 
 
 # error message for an API timeout
-_pattern = re.compile(r'again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$',
-                      re.IGNORECASE)
+_pattern = re.compile(r"again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$", re.IGNORECASE)
 
 
 def _(message: str) -> str:
@@ -54,7 +50,7 @@ def _(message: str) -> str:
     :param message: string. The message to be displayed.
     :return: string. The original message plus the footer.
     """
-    return i18n['responses']['bot_footer'].format(message, version=__version__)
+    return i18n["responses"]["bot_footer"].format(message, version=__version__)
 
 
 def clean_list(items: List[str]) -> List[str]:
@@ -67,8 +63,8 @@ def clean_list(items: List[str]) -> List[str]:
     return list([item.strip() for item in items if item.strip()])
 
 
-@beeline.traced(name='send_to_modchat')
-def send_to_modchat(message: str, cfg: Config, channel='general') -> None:
+@beeline.traced(name="send_to_modchat")
+def send_to_modchat(message: str, cfg: Config, channel="general") -> None:
     """
     Sends a message to the ToR mod chat.
 
@@ -79,14 +75,9 @@ def send_to_modchat(message: str, cfg: Config, channel='general') -> None:
     """
     if cfg.modchat:
         try:
-            cfg.modchat.api_call(
-                'chat.postMessage',
-                channel=channel,
-                text=message
-            )
+            cfg.modchat.api_call("chat.postMessage", channel=channel, text=message)
         except Exception as e:
-            log.error(f'Failed to send message to modchat #{channel}: '
-                      f'\'{message}\'')
+            log.error(f"Failed to send message to modchat #{channel}: " f"'{message}'")
             log.error(e)
 
 
@@ -116,7 +107,7 @@ def clean_id(post_id: str) -> str:
     :param post_id: String. Post fullname (ID)
     :return: String. Post fullname minus the first three characters.
     """
-    return post_id[post_id.index('_') + 1:]
+    return post_id[post_id.index("_") + 1 :]
 
 
 def get_parent_post_id(post: Comment, subreddit: Subreddit) -> Submission:
@@ -138,7 +129,7 @@ def get_parent_post_id(post: Comment, subreddit: Subreddit) -> Submission:
         return subreddit.submission(id=clean_id(post.parent_id))
 
 
-@beeline.traced(name='get_wiki_page')
+@beeline.traced(name="get_wiki_page")
 def get_wiki_page(pagename: str, cfg: Config) -> str:
     """
     Return the contents of a given wiki page.
@@ -153,11 +144,11 @@ def get_wiki_page(pagename: str, cfg: Config) -> str:
     :return: String or None. The content of the requested page if
         present else None.
     """
-    log.debug(f'Retrieving wiki page {pagename}')
+    log.debug(f"Retrieving wiki page {pagename}")
     try:
         return cfg.tor.wiki[pagename].content_md
     except NotFound:
-        return ''
+        return ""
 
 
 def send_reddit_reply(repliable, message: str) -> None:
@@ -172,21 +163,21 @@ def send_reddit_reply(repliable, message: str) -> None:
     try:
         repliable.reply(_(message))
     except APIException as e:
-        if e.error_type == 'DELETED_COMMENT':
-            log.info(f'Cannot reply to comment {repliable.name} -- comment deleted')
+        if e.error_type == "DELETED_COMMENT":
+            log.info(f"Cannot reply to comment {repliable.name} -- comment deleted")
             return
         raise
 
 
 def handle_rate_limit(exc: APIException) -> None:
     time_map = {
-        'second': 1,
-        'minute': 60,
-        'hour': 60 * 60,
+        "second": 1,
+        "minute": 60,
+        "hour": 60 * 60,
     }
     matches = re.search(_pattern, exc.message)
     if not matches:
-        log.error(f'Unable to parse rate limit message {exc.message!r}')
+        log.error(f"Unable to parse rate limit message {exc.message!r}")
         return
     delay = matches[0] * time_map[matches[1]]
     time.sleep(delay + 1)
@@ -210,11 +201,11 @@ def run_until_dead(func):
 
     def double_ctrl_c_handler(*args, **kwargs) -> None:
         if not tor.core.is_running:
-            log.critical('User pressed CTRL+C twice!!! Killing!')
+            log.critical("User pressed CTRL+C twice!!! Killing!")
             sys.exit(1)
 
         log.info(
-            '\rUser triggered command line shutdown. Will terminate after current loop.'
+            "\rUser triggered command line shutdown. Will terminate after current loop."
         )
         tor.core.is_running = False
 
@@ -226,17 +217,17 @@ def run_until_dead(func):
             try:
                 func(config)
             except APIException as e:
-                if e.error_type == 'RATELIMIT':
+                if e.error_type == "RATELIMIT":
                     log.warning(
-                        'Ratelimit - artificially limited by Reddit. Sleeping'
-                        ' for requested time!'
+                        "Ratelimit - artificially limited by Reddit. Sleeping"
+                        " for requested time!"
                     )
                     handle_rate_limit(e)
             except (RequestException, ServerError, Forbidden) as e:
-                log.warning(f'{e} - Issue communicating with Reddit. Sleeping for 60s!')
+                log.warning(f"{e} - Issue communicating with Reddit. Sleeping for 60s!")
                 time.sleep(60)
 
-        log.info('User triggered shutdown. Shutting down.')
+        log.info("User triggered shutdown. Shutting down.")
         sys.exit(0)
 
     except Exception as e:
@@ -254,8 +245,11 @@ def _check_removal_required(submission: Submission, cfg: Config) -> Tuple[bool, 
     """
     for item in submission.user_reports:
         if item[0] and any(
-            reason in item[0] for reason
-            in (reports.original_post_deleted_or_locked, reports.post_violates_rules)
+            reason in item[0]
+            for reason in (
+                reports.original_post_deleted_or_locked,
+                reports.post_violates_rules,
+            )
         ):
             return True, True
     linked_submission = cfg.r.submission(submission.id_from_url(submission.url))
@@ -274,7 +268,7 @@ def check_for_phrase(content: str, phraselist: List) -> bool:
     return any([option in content for option in phraselist])
 
 
-@beeline.traced(name='remove_if_required')
+@beeline.traced(name="remove_if_required")
 def remove_if_required(
     submission: Submission, blossom_id: str, cfg: Config
 ) -> Tuple[bool, bool]:
@@ -288,10 +282,9 @@ def remove_if_required(
     if removal:
         submission.mod.remove()
         response = cfg.blossom.patch(
-            f"submission/{blossom_id}/",
-            data={"removed_from_queue": True},
+            f"submission/{blossom_id}/", data={"removed_from_queue": True},
         )
-        if not str(response.status_code).startswith('2'):
+        if not str(response.status_code).startswith("2"):
             return False, False
 
         # Selects a message depending on whether the submission is reported or not.

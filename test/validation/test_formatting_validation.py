@@ -15,6 +15,7 @@ from tor.validation.formatting_validation import (
     check_for_malformed_footer,
     check_for_bold_header,
     check_for_unescaped_heading,
+    check_for_invalid_header,
     PROPER_SEPARATORS_PATTERN,
     HEADING_WITH_DASHES_PATTERN,
 )
@@ -186,12 +187,32 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
         ("\n     \n   #heading", True),
         ("\n\n\\#hashtag1 #hashtag2", False),
         ("\n\n*#hashtag1 #hashtag2*", False),
+        ("## test", False)
     ]
 )
 def test_check_for_unescaped_heading(test_input: str, should_match: bool) -> None:
     """Test if unescaped hashtags are detected."""
     actual = check_for_unescaped_heading(test_input)
     expected = FormattingIssue.UNESCAPED_HEADING if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("*Image Transcription: Test*", False),
+        ("*Image Transcription*", False),
+        ("*Audio Transcription*", False),
+        ("*Video Transcription*", False),
+        ("*Invalid Header*", True),
+        ("*Invalid Header*\n\n---\n\nBlah", True),
+        ("*Image Transcription: Test*\n\n---\n\nBlah", False)
+    ]
+)
+def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
+    """Test if invalid headers are detected."""
+    actual = check_for_invalid_header(test_input)
+    expected = FormattingIssue.INVALID_HEADER if should_match else None
     assert actual == expected
 
 
