@@ -113,30 +113,35 @@ responses:
       If the footer is correct, have you tried replying "Done" again after one-two minutes? Sometimes, freshly posted transcriptions are not seen by the bot, so trying again should fix the issue.
 
       If it still doesn't work, it could be the sign of another bug; let us know by [sending a Modmail](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Issue&message=) so we can take a look!
-    
+
     promotion_text:
-      grafeas-jade: |
-        Superb performance! You just achieved Jade rank. You just transcribed 10000 posts. You have achieved the highest rank.
-      grafeas-topaz: |
-        Outstanding! You just achieved Topaz rank. You have completed 5000 transcriptions. Next Rank : Jade at 10000 transcriptions.
-      grafeas-ruby: |
-        Outstanding! You just achieved Ruby rank. You have completed 2500 transcriptions. Next Rank : Topaz at 5000 transcriptions.
-      grafeas-diamond: |
-        Outstanding! You just achieved Diamond rank. You have completed 1000 transcriptions. Next Rank : Ruby at 2500 transcriptions.
-      grafeas-golden: |
-        Outstanding! You just achieved Golden rank. You have completed 500 transcriptions. Next Rank : Diamond at 1000 transcriptions.
-      grafeas-purple: |
-        Outstanding! You just achieved Purple rank. You have completed 250 transcriptions. Next Rank : Golden at 500 transcriptions.
-      grafeas-teal: |
-        Outstanding! You just achieved Teal rank. You have completed 100 transcriptions. Next Rank : Purple at 250 transcriptions.
-      grafeas-green: |
-        Outstanding! You just achieved Green rank. You have completed 50 transcriptions. Next Rank : Teal at 100 transcriptions.
-      grafeas-initiate: |
-        Hooray!! You just made your first transcription. Next Rank : Green at 50 transcriptions.
-
-
-
- 
+      exclamations:
+        - Whoa!
+        - Wow!
+        - Amazing!
+        - Congratulations!
+        - Congrats!
+        - Fantastic!
+        - Fantabulous!
+        - Way to go!
+        - Outstanding!
+        - Stupendous!
+      new_rank: |-
+        You've ranked up to {rank}!
+      next_rank_intros:
+        - The next rank is
+        - "Next up:"
+        - What's coming next is
+        - Next up for you is
+        - Keep going! The next is
+        - Set your sights next on
+        - Look to the future; your next challenge is
+      first_rank: |-
+        Nice work on your first transcription!
+      next_rank: |-
+        {intro} {rank} at {count} transcriptions.
+      highest_rank: |-
+        And wow! You made it. This is the top. You've earned the highest rank we offer right now!
   unclaim:
     still_unclaimed: |
       From what I can see, no one has claimed this post! Would you like to? All you have to do is reply to me with `claim`.

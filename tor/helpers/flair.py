@@ -1,4 +1,5 @@
 import logging
+import random
 
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Redditor, Submission
@@ -6,8 +7,26 @@ from praw.models import Comment, Redditor, Submission
 from tor import __BOT_NAMES__
 from tor.core.config import Config
 from tor.core.helpers import clean_id, flair, send_to_modchat
+from tor.strings import translation
 
 log = logging.getLogger(__name__)
+i18n = translation()
+
+# Make sure that the values match the technical name of the rank; the second half
+# of the value is used to drive the rank up messages. E.g.: "grafeas-ruby" -> "Ruby"
+FLAIR_DATA = {
+    20000: "grafeas-sapphire",
+    10000: "grafeas-jade",
+    5000: "grafeas-topaz",
+    2500: "grafeas-ruby",
+    1000: "grafeas-diamond",
+    500: "grafeas-golden",
+    250: "grafeas-purple",
+    100: "grafeas-teal",
+    50: "grafeas-green",
+    25: "grafeas-pink",
+    1: "grafeas",
+}
 
 
 def flair_post(post: Submission, text: str) -> None:
@@ -37,51 +56,47 @@ def flair_post(post: Submission, text: str) -> None:
 
 
 def _get_flair_css(transcription_count: int) -> str:
-    if transcription_count >= 20000:
-        return 'grafeas-sapphire'
-    if transcription_count >= 10000:
-        return "grafeas-jade"
-    elif transcription_count >= 5000:
-        return "grafeas-topaz"
-    elif transcription_count >= 2500:
-        return "grafeas-ruby"
-    elif transcription_count >= 1000:
-        return "grafeas-diamond"
-    elif transcription_count >= 500:
-        return "grafeas-golden"
-    elif transcription_count >= 250:
-        return "grafeas-purple"
-    elif transcription_count >= 100:
-        return "grafeas-teal"
-    elif transcription_count >= 50:
-        return "grafeas-green"
-    elif transcription_count >= 25:
-        return "grafeas-pink"
-    else:
-        return "grafeas"
+    keys = list(FLAIR_DATA.keys())
+    keys.sort()  # arrange from smallest to largest
+    keys.reverse()  # rearrange from largest to smallest
+    # The only time we interact with this function should be with a positive
+    # value for the count, but a little extra validation never hurt.
+    if transcription_count < 1:
+        transcription_count = 1
+    return [FLAIR_DATA[i] for i in keys if i <= transcription_count][0]
 
 
-def check_promotion(transcription_count):
-    if transcription_count == 10000:
-        return 'grafeas-jade'
-    elif transcription_count == 5000:
-        return 'grafeas-topaz'
-    elif transcription_count == 2500:
-        return 'grafeas-ruby'
-    elif transcription_count == 1000:
-        return 'grafeas-diamond'
-    elif transcription_count == 500:
-        return 'grafeas-golden'
-    elif transcription_count == 250:
-        return 'grafeas-purple'
-    elif transcription_count == 100:
-        return 'grafeas-teal'
-    elif transcription_count == 50:
-        return 'grafeas-green'
-    elif transcription_count == 1:
-        return 'grafeas-initiate'
+def check_promotion(count):
+    return FLAIR_DATA[count] if count in FLAIR_DATA.keys() else None
+
+
+def generate_promotion_message(count: int) -> str:
+    def clean_name(name: str) -> str:
+        return name.split("-")[1].title()
+
+    keys = list(FLAIR_DATA.keys())
+    keys.sort()
+    text = i18n["responses"]["done"]["promotion_text"]
+    rank = [FLAIR_DATA[r] for r in keys if r == count][0]
+    exclamation = random.choice(text["exclamations"])
+
+    if "-" in rank:
+        new_rank = text["new_rank"].format(rank=clean_name(rank))
     else:
-        return None
+        new_rank = text["first_rank"]
+
+    try:
+        next_rank_class = [FLAIR_DATA[r] for r in keys if r > count][0]
+        next_rank = text["next_rank"].format(
+            intro=random.choice(text["next_rank_intros"]),
+            rank=clean_name(next_rank_class),
+            count=[k for k, v in FLAIR_DATA.items() if v == next_rank_class][0],
+        )
+    except IndexError:
+        next_rank = text["highest_rank"]
+
+    return f"{exclamation} {new_rank} {next_rank}"
+
 
 def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
     """
