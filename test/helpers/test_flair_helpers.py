@@ -38,12 +38,12 @@ def test_get_flair_css_invalid_options(transcription_count: int, name: str) -> N
 @pytest.mark.parametrize(
     "value,expected_return",
     [
-        (0, None),
-        (25, FLAIR_DATA[25]),
-        (100, FLAIR_DATA[100]),
-        (11, None),
-        (999, None),
-        (1000, FLAIR_DATA[1000]),
+        (0, False),
+        (25, True),
+        (100, True),
+        (11, False),
+        (999, False),
+        (1000, True),
     ],
 )
 def test_check_promotion(value: int, expected_return: bool) -> None:
