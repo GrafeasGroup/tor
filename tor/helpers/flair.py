@@ -23,7 +23,7 @@ FLAIR_DATA = {
     100: {"class": "grafeas-teal", "name": "Teal"},
     50: {"class": "grafeas-green", "name": "Green"},
     25: {"class": "grafeas-pink", "name": "Pink",},
-    1: {"class": "grafeas",},
+    1: {"class": "grafeas", "name": "Initiate"},
 }
 
 
@@ -75,13 +75,17 @@ def generate_promotion_message(count: int) -> str:
     rank = [FLAIR_DATA[r].get("name") for r in keys if r == count][0]
     exclamation = random.choice(text["exclamations"])
 
-    new_rank = text["new_rank"].format(rank=rank) if rank else text["first_rank"]
+    new_rank = (
+        text["new_rank"].format(rank=rank)
+        if rank and count != 1  # if the user is a newbie, show different message
+        else text["first_rank"]
+    )
 
     try:
         next_rank_obj = [FLAIR_DATA[r] for r in keys if r > count][0]
         next_rank = text["next_rank"].format(
             intro=random.choice(text["next_rank_intros"]),
-            rank=next_rank_obj['name'],
+            rank=next_rank_obj["name"],
             count=[k for k, v in FLAIR_DATA.items() if v == next_rank_obj][0],
         )
     except IndexError:
