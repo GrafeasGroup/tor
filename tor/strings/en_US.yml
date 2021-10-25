@@ -96,6 +96,7 @@ responses:
 
       If you need help, reply `help` and I will get a human to assist you!
   done:
+
     not_claimed_by_user: |
       It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else! If you are unable to resolve this situation, please message the mods.
     already_completed: |
@@ -112,6 +113,35 @@ responses:
       If the footer is correct, have you tried replying "Done" again after one-two minutes? Sometimes, freshly posted transcriptions are not seen by the bot, so trying again should fix the issue.
 
       If it still doesn't work, it could be the sign of another bug; let us know by [sending a Modmail](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Issue&message=) so we can take a look!
+
+    promotion_text:
+      exclamations:
+        - Whoa!
+        - Wow!
+        - Amazing!
+        - Congratulations!
+        - Congrats!
+        - Fantastic!
+        - Fantabulous!
+        - Way to go!
+        - Outstanding!
+        - Stupendous!
+      new_rank: |-
+        You've ranked up to {rank}!
+      next_rank_intros:
+        - The next rank is
+        - "Next up:"
+        - What's coming next is
+        - Next up for you is
+        - Keep going! The next is
+        - Set your sights next on
+        - Look to the future; your next challenge is
+      first_rank: |-
+        Nice work on your first transcription!
+      next_rank: |-
+        {intro} {rank} at {count} transcriptions.
+      highest_rank: |-
+        And wow! You made it. This is the top. You've earned the highest rank we offer right now!
   unclaim:
     still_unclaimed: |
       From what I can see, no one has claimed this post! Would you like to? All you have to do is reply to me with `claim`.
