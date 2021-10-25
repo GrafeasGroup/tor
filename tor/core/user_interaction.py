@@ -2,6 +2,7 @@ import logging
 import random
 import time
 from typing import Dict, Tuple
+from tor.helpers.flair import check_promotion, generate_promotion_message
 
 import beeline
 from blossom_wrapper import BlossomStatus
@@ -268,6 +269,12 @@ def process_done(
                 f" successful."
             )
             message = done_messages["completed_transcript"]
+            transcription_count = blossom_user.data["gamma"] + 1
+
+            if check_promotion(transcription_count):
+                additional_message = generate_promotion_message(transcription_count)
+                message = f"{message}\n\n{additional_message}"
+
             if alt_text_trigger:
                 message = f"I think you meant `done`, so here we go!\n\n{message}"
 
