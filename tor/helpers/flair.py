@@ -1,4 +1,5 @@
 import logging
+import random
 
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Redditor, Submission
@@ -6,8 +7,24 @@ from praw.models import Comment, Redditor, Submission
 from tor import __BOT_NAMES__
 from tor.core.config import Config
 from tor.core.helpers import clean_id, flair, send_to_modchat
+from tor.strings import translation
 
 log = logging.getLogger(__name__)
+i18n = translation()
+
+FLAIR_DATA = {
+    20000: {"class": "grafeas-sapphire", "name": "Sapphire"},
+    10000: {"class": "grafeas-jade", "name": "Jade"},
+    5000: {"class": "grafeas-topaz", "name": "Topaz"},
+    2500: {"class": "grafeas-ruby", "name": "Ruby"},
+    1000: {"class": "grafeas-diamond", "name": "Diamond"},
+    500: {"class": "grafeas-golden", "name": "Golden"},
+    250: {"class": "grafeas-purple", "name": "Purple"},
+    100: {"class": "grafeas-teal", "name": "Teal"},
+    50: {"class": "grafeas-green", "name": "Green"},
+    25: {"class": "grafeas-pink", "name": "Pink",},
+    1: {"class": "grafeas", "name": "Initiate"},
+}
 
 
 def flair_post(post: Submission, text: str) -> None:
@@ -28,35 +45,53 @@ def flair_post(post: Submission, text: str) -> None:
     #   'flair_text': 'Unclaimed'
     # }
     for choice in post.flair.choices():
-        if choice['flair_text'] == text:
-            post.flair.select(
-                flair_template_id=choice['flair_template_id']
-            )
+        if choice["flair_text"] == text:
+            post.flair.select(flair_template_id=choice["flair_template_id"])
             return
 
     # if the flairing is successful, we won't hit this line.
-    log.error(f'Cannot find requested flair {text}. Not flairing.')
+    log.error(f"Cannot find requested flair {text}. Not flairing.")
 
 
 def _get_flair_css(transcription_count: int) -> str:
-    if transcription_count >= 10000:
-        return 'grafeas-jade'
-    elif transcription_count >= 5000:
-        return 'grafeas-topaz'
-    elif transcription_count >= 2500:
-        return 'grafeas-ruby'
-    elif transcription_count >= 1000:
-        return 'grafeas-diamond'
-    elif transcription_count >= 500:
-        return 'grafeas-golden'
-    elif transcription_count >= 250:
-        return 'grafeas-purple'
-    elif transcription_count >= 100:
-        return 'grafeas-teal'
-    elif transcription_count >= 50:
-        return 'grafeas-green'
-    else:
-        return 'grafeas'
+    keys = list(FLAIR_DATA.keys())
+    keys.sort()  # arrange from smallest to largest
+    keys.reverse()  # rearrange from largest to smallest
+    # The only time we interact with this function should be with a positive
+    # value for the count, but a little extra validation never hurt.
+    if transcription_count < 1:
+        transcription_count = 1
+    return [FLAIR_DATA[i]["class"] for i in keys if i <= transcription_count][0]
+
+
+def check_promotion(count):
+    return True if count in FLAIR_DATA.keys() else False
+
+
+def generate_promotion_message(count: int) -> str:
+    keys = list(FLAIR_DATA.keys())
+    keys.sort()
+    text = i18n["responses"]["done"]["promotion_text"]
+    rank = [FLAIR_DATA[r].get("name") for r in keys if r == count][0]
+    exclamation = random.choice(text["exclamations"])
+
+    new_rank = (
+        text["new_rank"].format(rank=rank)
+        if rank and count != 1  # if the user is a newbie, show different message
+        else text["first_rank"]
+    )
+
+    try:
+        next_rank_obj = [FLAIR_DATA[r] for r in keys if r > count][0]
+        next_rank = text["next_rank"].format(
+            intro=random.choice(text["next_rank_intros"]),
+            rank=next_rank_obj["name"],
+            count=[k for k, v in FLAIR_DATA.items() if v == next_rank_obj][0],
+        )
+    except IndexError:
+        next_rank = text["highest_rank"]
+
+    return f"{exclamation} {new_rank} {next_rank}"
 
 
 def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
@@ -77,7 +112,7 @@ def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
             # the posted comment.
             current_flair = cfg.r.comment(id=clean_id(post.fullname)).author_flair_text
             if current_flair:
-                flair_postfix = current_flair[current_flair.index("Γ") + 1:]
+                flair_postfix = current_flair[current_flair.index("Γ") + 1 :]
         except (StopIteration, AttributeError, ValueError):
             # In this situation, either the user is not found or they do not have a flair.
             # This is not problematic and we will instead just use the standard flair.
@@ -104,9 +139,6 @@ def set_meta_flair_on_other_posts(cfg: Config) -> None:
         if post.link_flair_text == flair.meta:
             continue
 
-        log.info(f'Flairing post {post.fullname} by author {post.author} with Meta.')
+        log.info(f"Flairing post {post.fullname} by author {post.author} with Meta.")
         flair_post(post, flair.meta)
-        send_to_modchat(
-            f'New meta post: <{post.shortlink}|{post.title}>',
-            cfg
-        )
+        send_to_modchat(f"New meta post: <{post.shortlink}|{post.title}>", cfg)

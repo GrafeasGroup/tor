@@ -84,7 +84,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         elif "thank" in r_body:  # trigger on "thanks" and "thank you"
             thumbs_up_gifs = i18n["urls"]["thumbs_up_gifs"]
             youre_welcome = i18n["responses"]["general"]["youre_welcome"]
-            message = _(youre_welcome.format(random.choice(thumbs_up_gifs)))
+            message = youre_welcome.format(random.choice(thumbs_up_gifs))
         else:
             submission = reply.submission
             username = reply.author.name

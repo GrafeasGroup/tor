@@ -25,13 +25,13 @@ def check_domain_filter(item: Dict, cfg: Config) -> bool:
     :param cfg: the config object.
     :return: True if we can work on it, False otherwise.
     """
-    if item['domain'] in cfg.image_domains:
+    if item["domain"] in cfg.image_domains:
         return True
-    if item['domain'] in cfg.audio_domains:
+    if item["domain"] in cfg.audio_domains:
         return True
-    if item['domain'] in cfg.video_domains:
+    if item["domain"] in cfg.video_domains:
         return True
-    if item['subreddit'] in cfg.subreddits_domain_filter_bypass:
+    if item["subreddit"] in cfg.subreddits_domain_filter_bypass:
         return True
 
     return False
@@ -47,52 +47,48 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
         block us for this.
         :return: A complete user agent string.
         """
-        return (
-            '0.1.0.ToR.Client.Thread.{}.ID.{} (contact u/itsthejoker)'.format(
-                random.randrange(0, 30),
-                ''.join(
-                    [random.choice(string.ascii_lowercase) for _ in range(6)]
-                ),
-            )
+        return "0.1.0.ToR.Client.Thread.{}.ID.{} (contact u/itsthejoker)".format(
+            random.randrange(0, 30),
+            "".join([random.choice(string.ascii_lowercase) for _ in range(6)]),
         )
 
     def parse_json_posts(posts: Dict) -> List[PostSummary]:
         trimmed_links: List[PostSummary] = []
-        for item in posts['data']['children'][:10]:  # last 10 posts
+        for item in posts["data"]["children"][:10]:  # last 10 posts
             # there are only two top level keys here; kind (comment / post) and
             # data. No reason to keep the kind because we're only pulling posts.
-            item = item['data']
-            if not item['is_self']:
-                trimmed_links.append({
-                    'subreddit': item['subreddit'],
-                    'name': item['name'],  # remember, this is the ID: t3_8swl2n
-                    'title': item['title'],
-                    'permalink': item['permalink'],
-                    'is_nsfw': item['over_18'],
-                    'is_gallery': "is_gallery" in item,
-                    'domain': item['domain'],
-                    'ups': item['ups'],
-                    'locked': item['locked'],
-                    'archived': item['archived'],
-                    'author': item.get('author', None),
-                    'url': item['url']
-                })
+            item = item["data"]
+            if not item["is_self"]:
+                trimmed_links.append(
+                    {
+                        "subreddit": item["subreddit"],
+                        "name": item["name"],  # remember, this is the ID: t3_8swl2n
+                        "title": item["title"],
+                        "permalink": item["permalink"],
+                        "is_nsfw": item["over_18"],
+                        "is_gallery": "is_gallery" in item,
+                        "domain": item["domain"],
+                        "ups": item["ups"],
+                        "locked": item["locked"],
+                        "archived": item["archived"],
+                        "author": item.get("author", None),
+                        "url": item["url"],
+                    }
+                )
         return trimmed_links
 
-    with beeline.tracer(name='get_subreddit_posts'):
-        beeline.add_context({'subreddit': sub})
+    with beeline.tracer(name="get_subreddit_posts"):
+        beeline.add_context({"subreddit": sub})
 
-        headers = {
-            'User-Agent': generate_user_agent()
-        }
-        url = f'https://www.reddit.com/r/{sub}/new/.json'
+        headers = {"User-Agent": generate_user_agent()}
+        url = f"https://www.reddit.com/r/{sub}/new/.json"
         result = requests.get(url, headers=headers).json()
         # we have two states here: one has the data we want and the other is an
         # error state. The error state looks like this:
         # {'message': 'Too Many Requests', 'error': 429}
 
-        if result.get('error', None):
-            log.warning('hit error state for {}'.format(sub))
+        if result.get("error", None):
+            log.warning("hit error state for {}".format(sub))
             return []
         return parse_json_posts(result)
 
@@ -101,7 +97,7 @@ def is_time_to_scan(cfg: Config) -> bool:
     return datetime.now() > cfg.last_post_scan_time + timedelta(seconds=45)
 
 
-@beeline.traced(name='threaded_check_submissions')
+@beeline.traced(name="threaded_check_submissions")
 def threaded_check_submissions(cfg: Config) -> None:
     """
     Single threaded PRAW performance:
@@ -137,7 +133,7 @@ def threaded_check_submissions(cfg: Config) -> None:
                 data: List[PostSummary] = f.result()
                 total_posts += data
             except Exception as exc:
-                log.warning('an exception was generated: {}'.format(exc))
+                log.warning("an exception was generated: {}".format(exc))
     total_posts = [post for post in total_posts if check_domain_filter(post, cfg)]
     unseen_post_urls = cfg.blossom.post(
         "/submission/bulkcheck/",
@@ -146,10 +142,11 @@ def threaded_check_submissions(cfg: Config) -> None:
                 i18n["urls"]["reddit_url"].format(post["permalink"])
                 for post in total_posts
             ]
-        }
+        },
     ).json()
     unseen_posts = [
-        post for post in total_posts
+        post
+        for post in total_posts
         if i18n["urls"]["reddit_url"].format(post["permalink"]) in unseen_post_urls
     ]
     for item in unseen_posts:

@@ -2,6 +2,7 @@ import logging
 import random
 import time
 from typing import Dict, Tuple
+from tor.helpers.flair import check_promotion, generate_promotion_message
 
 import beeline
 from blossom_wrapper import BlossomStatus
@@ -107,9 +108,19 @@ def process_claim(
     )
     return_flair = None
     if response.status == BlossomStatus.ok:
-        message = i18n["responses"]["claim"][
-            "first_claim_success" if first_time else "success"
-        ]
+        # A random tip to append to the response
+        random_tip = i18n["tips"]["message"].format(
+            tip_message=random.choice(i18n["tips"]["collection"])
+        )
+
+        message = (
+            i18n["responses"]["claim"][
+                "first_claim_success" if first_time else "success"
+            ]
+            + "\n\n"
+            + random_tip
+        )
+
         return_flair = flair.in_progress
         log.info(
             f'Claim on Submission {blossom_submission["tor_url"]} by {username} successful.'
@@ -224,7 +235,9 @@ def process_done(
             # volunteers react to the bot.
             send_to_modchat(
                 i18n["mod"]["formatting_issues"].format(
-                    author=user.name, issues=issues, link=f"https://reddit.com{comment.context}",
+                    author=user.name,
+                    issues=issues,
+                    link=f"https://reddit.com{comment.context}",
                 ),
                 cfg,
                 "formatting-issues",
@@ -256,6 +269,12 @@ def process_done(
                 f" successful."
             )
             message = done_messages["completed_transcript"]
+            transcription_count = blossom_user.data["gamma"] + 1
+
+            if check_promotion(transcription_count):
+                additional_message = generate_promotion_message(transcription_count)
+                message = f"{message}\n\n{additional_message}"
+
             if alt_text_trigger:
                 message = f"I think you meant `done`, so here we go!\n\n{message}"
 
