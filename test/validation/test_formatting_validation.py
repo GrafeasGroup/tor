@@ -183,6 +183,7 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
         ("—-", True),
         ("-—", True),
         ("---------", False),
+        ("---"), False),
         ("Word\n    int x = 1\nWord", False),
     ],
 )
