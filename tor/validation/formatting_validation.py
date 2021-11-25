@@ -40,7 +40,19 @@ HEADING_WITH_DASHES_PATTERN = re.compile(r"[\w][:*_ ]*\n[ ]{,3}([-][ ]*){3,}\n")
 # ```
 # int x = 0;
 # ```
-FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
+FENCED_CODE_BLOCK_PATTERN = re.compile(r"```.*```", re.DOTALL)
+
+# Regex to recognized unescaped usernames.
+# They need to be escaped with a backslash, otherwise the user will be pinged.
+# For example, u/username and /u/username are not allowed.
+# Instead, u\/username, \/u/username or \/u\/username should be used.
+UNESCAPED_USERNAME_PATTERN = re.compile(r"(?<!\w)(?:(?<!\\)/u|(?<!/)u)(?<!\\)/\S+")
+
+# Regex to recognized unescaped subreddit names.
+# They need to be escaped with a backslash, otherwise the sub might get pinged.
+# For example, r/subreddit and /u/subreddit are not allowed.
+# Instead, r\/subreddit, \/r/subreddit or \/r\/subreddit should be used.
+UNESCAPED_SUBREDDIT_PATTERN = re.compile(r"(?<!\w)(?:(?<!\\)/r|(?<!/)r)(?<!\\)/\S+")
 
 # Regex to recognize unescaped hashtags which may render as headers.
 # Example:
@@ -131,6 +143,36 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
     )
 
 
+def check_for_unescaped_username(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription contains an unescaped username.
+
+    Examples: u/username and /u/username are not allowed.
+    Instead, u\\/username, \\/u/username or \\/u\\/username need to be used.
+
+    Otherwise the user will get pinged.
+    """
+    return (
+        FormattingIssue.UNESCAPED_USERNAME
+        if UNESCAPED_USERNAME_PATTERN.search(transcription) is not None
+        else None
+    )
+
+
+def check_for_unescaped_subreddit(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription contains an unescaped subreddit name.
+
+    Examples: r/subreddit and /r/subreddit are not allowed.
+    Instead, r\\/subreddit, \\/r/subreddit or \\/r\\/subreddit need to be used.
+
+    Otherwise the subreddit might get pinged.
+    """
+    return (
+        FormattingIssue.UNESCAPED_SUBREDDIT
+        if UNESCAPED_SUBREDDIT_PATTERN.search(transcription) is not None
+        else None
+    )
+
+
 def check_for_unescaped_heading(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription contains an unescaped hashtag. Actual backslash in example swapped for (backslash) to
     avoid invalid escape sequence warning
@@ -176,6 +218,8 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_heading_with_dashes(transcription),
             check_for_missing_separators(transcription),
             check_for_fenced_code_block(transcription),
+            check_for_unescaped_username(transcription),
+            check_for_unescaped_subreddit(transcription),
             check_for_unescaped_heading(transcription),
             check_for_invalid_header(transcription),
         ]

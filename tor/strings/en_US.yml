@@ -289,6 +289,14 @@ formatting_issues:
 
     \    int x = 0;\n
     \   int y = x * 100;"
+  unescaped_username: "**Unescaped username**: You seem to have forgotten to escape a username, i.e. you used `u/username` or `/u/username`.
+    Unfortunately, this gives the user a notification and might annoy them.
+
+    Therefore, please escape the username with a backslash (`\\`), for example `u\\/username` or `\\/u/username`."
+  unescaped_subreddit: "**Unescaped subreddit name**: You seem to have forgotten to escape a subreddit name, i.e. you used `r/subreddit` or `/r/subreddit`.
+    Unfortunately, this might give the sub's mod a notification and could annoy them.
+
+    Therefore, please escape the subreddit name with a backslash (`\\`), for example `r\\/subreddit` or `\\/r/subreddit`."
   unescaped_heading: "**Unescaped heading syntax**: It looks like you intended to transcribe a hashtag, but made it a heading (big text) instead. This is caused by not escaping the number sign (`#`) in front of the hashtag. For example:
 
 
