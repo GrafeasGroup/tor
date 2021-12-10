@@ -7,10 +7,12 @@ from tor.strings import translation
 
 i18n = translation()
 
-FOOTER = "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
-"for&#32;Reddit&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;"
-"like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
-"we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)"
+FOOTER_PATTERN = re.compile(
+    r"\^\^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
+    r"(?:for&#32;Reddit&#32;)?and&#32;you&#32;could&#32;be&#32;too!&#32;\[If&#32;you'd&#32;"
+    r"like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
+    r"we&#32;do&#32;it,&#32;click&#32;here!\]\(https://www\.reddit\.com/r/TranscribersOfReddit/wiki/index\)\s*$"
+)
 
 # Regex to recognize headers that have been made bold instead of italic.
 # Example:
@@ -121,7 +123,11 @@ def check_for_heading_with_dashes(transcription: str) -> Optional[FormattingIssu
 
 def check_for_malformed_footer(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription doesn't contain the correct footer."""
-    return FormattingIssue.MALFORMED_FOOTER if FOOTER not in transcription else None
+    return (
+        None
+        if FOOTER_PATTERN.search(transcription)
+        else FormattingIssue.MALFORMED_FOOTER
+    )
 
 
 def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]:
