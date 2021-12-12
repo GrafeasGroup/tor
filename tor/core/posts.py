@@ -56,7 +56,7 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
     else:
         # This means we pulled from a subreddit bypassing the filters.
         content_type = "Other"
-        content_format = cfg.other_formatting
+        content_format = cfg.image_formatting
 
     try:
         request_transcription(new_post, content_type, content_format, cfg)
