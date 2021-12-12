@@ -24,7 +24,7 @@ BOLD_HEADER_PATTERN = re.compile(r"^\s*\*\*(Image|Video|Audio) Transcription:?.*
 # Separators are three dashes (---), potentially with spaces in-between.
 # They need to be surrounded by empty lines (which can contain spaces)
 # The separator line (---) can start with up to three spaces and end with arbitrary spaces.
-PROPER_SEPARATORS_PATTERN = re.compile(r"\n[ ]*\n[ ]{,3}([-][ ]*){3,}[ ]*\n[ ]*\n")
+PROPER_SEPARATORS_PATTERN = re.compile(r"\n[ ]*\n[ ]{,3}([-][ ]*){3,}\n")
 
 # Regex to recognize a separator (---) being misused as heading.
 # This happens when they empty line before the separator is missing.
