@@ -185,6 +185,8 @@ def check_inbox(cfg: Config) -> None:
         elif author_name == "transcribot":
             # bot responses shouldn't trigger workflows in other bots
             log.info("Skipping response from our OCR bot")
+        elif author_name == "blossom-app":
+            log.info("Skipping response from Blossom")
         else:
             if isinstance(item, Comment):
                 if is_our_subreddit(item.subreddit.name, cfg):
