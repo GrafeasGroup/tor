@@ -61,7 +61,7 @@ d = ["aiohttp (>=3.3.2)", "aiohttp-cors"]
 
 [[package]]
 name = "blossom-wrapper"
-version = "0.4.0"
+version = "0.5.0"
 description = ""
 category = "main"
 optional = false
@@ -76,7 +76,7 @@ urllib3 = "^1.26"
 type = "git"
 url = "https://github.com/GrafeasGroup/blossom-wrapper.git"
 reference = "master"
-resolved_reference = "8900b2784cbb82864be3d5a85389ea356f5d22dd"
+resolved_reference = "ef95ecbcaa607afabc226214495c0e242f12e80a"
 
 [[package]]
 name = "bugsnag"
