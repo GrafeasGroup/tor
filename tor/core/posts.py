@@ -160,6 +160,8 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         post_summary["url"] = linked_post.url
         post_summary["permalink"] = linked_post.permalink
         post_summary["name"] = linked_post.fullname
+        post_summary["title"] = linked_post.title
+        post_summary["is_nsfw"] = linked_post.over_18
 
         new_submission = create_blossom_submission(post_summary, submission, cfg)
         # this submission will have the wrong post times because we didn't know about
