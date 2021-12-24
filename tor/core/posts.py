@@ -138,7 +138,12 @@ def create_blossom_submission(
     tor_url = i18n["urls"]["reddit_url"].format(str(tor_post.permalink))
     original_url = i18n["urls"]["reddit_url"].format(str(original_post["permalink"]))
     return cfg.blossom.create_submission(
-        original_post["name"], tor_url, original_url, content_url
+        original_post["name"],
+        tor_url,
+        original_url,
+        content_url,
+        title=original_post["title"],
+        nsfw=original_post["is_nsfw"],
     )
 
 
