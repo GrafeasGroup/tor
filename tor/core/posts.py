@@ -142,7 +142,7 @@ def create_blossom_submission(
         tor_url,
         original_url,
         content_url,
-        title=original_post["title"],
+        post_title=original_post["title"],
         nsfw=original_post["is_nsfw"],
     )
 
