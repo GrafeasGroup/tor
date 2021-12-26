@@ -6,7 +6,7 @@ from blossom_wrapper import BlossomStatus
 from praw.models import Submission
 
 from tor.core.config import Config
-from tor.core.helpers import _
+from tor.core.helpers import _, cleanup_post_title
 from tor.helpers.flair import flair, flair_post
 from tor.helpers.youtube import (
     is_transcribable_youtube_video,
@@ -116,7 +116,7 @@ def request_transcription(
     title = i18n["posts"]["discovered_submit_title"].format(
         sub=str(post["subreddit"]),
         type=content_type.title(),
-        title=truncate_title(str(post["title"])),
+        title=truncate_title(cleanup_post_title(str(post["title"]))),
     )
     permalink = i18n["urls"]["reddit_url"].format(str(post["permalink"]))
     submission = cfg.tor.submit(title=title, url=permalink)
@@ -142,7 +142,7 @@ def create_blossom_submission(
         tor_url,
         original_url,
         content_url,
-        post_title=original_post["title"],
+        post_title=cleanup_post_title(str(original_post["title"])),
         nsfw=original_post["is_nsfw"],
     )
 
