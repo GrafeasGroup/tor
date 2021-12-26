@@ -295,3 +295,18 @@ def remove_if_required(
             mod_message.format(submission.shortlink), cfg, channel="removed_posts"
         )
     return removal, reported
+
+
+def cleanup_post_title(title: str) -> str:
+    """Clean up the given post title.
+
+    The Reddit API converts the following characters in responses:
+    - & becomes &amp;
+    - < becomes &lt;
+    - > becomes &gt;
+
+    See https://www.reddit.com/dev/api
+
+    This function reverts this conversion, to display the characters correctly again.
+    """
+    return title.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
