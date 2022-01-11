@@ -55,7 +55,7 @@ FENCED_CODE_BLOCK_PATTERN = re.compile("```.*```", re.DOTALL)
 # Escaped line break:
 # This is a line\
 # This is another line
-INCORRECT_LINE_BREAK_PATTERN = re.compile(r"  \n|\\\n")
+INCORRECT_LINE_BREAK_PATTERN = re.compile(r"[\w*_:]([ ]{2,}|\\)\n[\w*_:]")
 
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
