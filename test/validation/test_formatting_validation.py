@@ -183,6 +183,10 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
         ("This is a line  \nThis is another line", True),
         ("This is a line\\\nThis is another line", True),
         ("This is a line\n\nThis is another line", False),
+        ("*Word*  \n_Word_", True),  # Line break after formatting characters
+        ("Word    \nWord", True),  # Line break with more than two spaces
+        ("Word\n  \n---  \n\nWord", False),  # Spaces within paragraph line breaks (often happens when transcribing)
+        ("Word \nWord", False),  # Only one space at the end
     ],
 )
 def test_check_for_incorrect_line_break(test_input: str, should_match: bool) -> None:
