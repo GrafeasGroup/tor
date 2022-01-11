@@ -1,6 +1,6 @@
 import re
 
-__version__ = '0.6.0'
+__version__ = "0.6.0"
 
 # CTRL+C handler variable
 is_running = True
@@ -51,12 +51,12 @@ class cached_property(object):
 
 
 MOD_SUPPORT_PHRASES = [
-    re.compile('fuck', re.IGNORECASE),
-    re.compile('undo', re.IGNORECASE),
-    re.compile('help', re.IGNORECASE),
+    re.compile("fuck", re.IGNORECASE),
+    re.compile("undo", re.IGNORECASE),
+    re.compile("help", re.IGNORECASE),
     # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
 
 CLAIM_PHRASES = ["claim", "dibs", "clai", "caim", "clam"]
-DONE_PHRASES = ['done', 'deno', 'doen', 'dome', 'doone']
-UNCLAIM_PHRASES = ['unclaim', 'cancel', 'unclai']
+DONE_PHRASES = ["done", "deno", "doen", "dome", "doone"]
+UNCLAIM_PHRASES = ["unclaim", "cancel", "unclai"]

@@ -84,7 +84,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         elif "thank" in r_body:  # trigger on "thanks" and "thank you"
             thumbs_up_gifs = i18n["urls"]["thumbs_up_gifs"]
             youre_welcome = i18n["responses"]["general"]["youre_welcome"]
-            message = _(youre_welcome.format(random.choice(thumbs_up_gifs)))
+            message = youre_welcome.format(random.choice(thumbs_up_gifs))
         else:
             submission = reply.submission
             username = reply.author.name
@@ -185,6 +185,8 @@ def check_inbox(cfg: Config) -> None:
         elif author_name == "transcribot":
             # bot responses shouldn't trigger workflows in other bots
             log.info("Skipping response from our OCR bot")
+        elif author_name == "blossom-app":
+            log.info("Skipping response from Blossom")
         else:
             if isinstance(item, Comment):
                 if is_our_subreddit(item.subreddit.name, cfg):
