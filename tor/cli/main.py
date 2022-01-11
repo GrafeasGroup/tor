@@ -20,8 +20,8 @@ from tor.helpers.flair import set_meta_flair_on_other_posts
 from tor.helpers.threaded_worker import threaded_check_submissions
 
 ##############################
-NOOP_MODE = bool(os.getenv('NOOP_MODE', ''))
-DEBUG_MODE = bool(os.getenv('DEBUG_MODE', ''))
+NOOP_MODE = bool(os.getenv("NOOP_MODE", ""))
+DEBUG_MODE = bool(os.getenv("DEBUG_MODE", ""))
 ##############################
 
 # Patreon Dedications:
@@ -83,21 +83,21 @@ load_dotenv()
 
 def parse_arguments():
     parser = argparse.ArgumentParser(allow_abbrev=False)
-    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument(
-        '--debug',
-        action='store_true',
+        "--debug",
+        action="store_true",
         default=DEBUG_MODE,
-        help='Puts bot in dev-mode using non-prod credentials'
+        help="Puts bot in dev-mode using non-prod credentials",
     )
     parser.add_argument(
-        '--noop',
-        action='store_true',
+        "--noop",
+        action="store_true",
         default=NOOP_MODE,
         help=(
-            'Just run the daemon, but take no action (helpful for testing infrastructure'
-            ' changes)'
-        )
+            "Just run the daemon, but take no action (helpful for testing infrastructure"
+            " changes)"
+        ),
     )
 
     return parser.parse_args()
@@ -107,7 +107,7 @@ def noop(cfg):
     pass
 
 
-@beeline.traced(name='run')
+@beeline.traced(name="run")
 def run(cfg):
     """
     Primary routine.
@@ -129,8 +129,8 @@ def main():
     opt = parse_arguments()
     logging.basicConfig(
         level=logging.INFO,
-        format='%(levelname)s | %(funcName)s | %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S',
+        format="%(levelname)s | %(funcName)s | %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S",
     )
 
     honeycomb_key = os.getenv("HONEYCOMB_KEY", "")
@@ -160,7 +160,7 @@ def main():
         client_id=os.environ.get("REDDIT_CLIENT_ID", ""),
         client_secret=os.environ.get("REDDIT_SECRET", ""),
         username=os.environ.get("REDDIT_USERNAME", ""),
-        password=os.environ.get("REDDIT_PASSWORD", "")
+        password=os.environ.get("REDDIT_PASSWORD", ""),
     )
     initialize(config)
     config.perform_header_check = True
