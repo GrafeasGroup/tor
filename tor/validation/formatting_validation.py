@@ -169,7 +169,7 @@ def check_for_incorrect_line_break(transcription: str) -> Optional[FormattingIss
     return (
         FormattingIssue.INCORRECT_LINE_BREAK
         if INCORRECT_LINE_BREAK_PATTERN.search(transcription) is not None
-      else None
+        else None
     )
 
 
