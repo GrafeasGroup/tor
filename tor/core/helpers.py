@@ -292,7 +292,7 @@ def remove_if_required(
         # Selects a message depending on whether the submission is reported or not.
         mod_message = i18n["mod"][f"removed_{'reported' if reported else 'deleted'}"]
         send_to_modchat(
-            mod_message.format(submission.shortlink), cfg, channel="removed_posts"
+            mod_message.format(submission.shortlink), cfg, channel="qa_removed_posts"
         )
     return removal, reported
 
