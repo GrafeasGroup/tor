@@ -69,7 +69,7 @@ def process_coc(
                 f"<{user_url}|u/{username}> has just "
                 f"<{post_url}|accepted the CoC!> {emote}",
                 cfg,
-                channel="new_volunteers",
+                channel="CAZN8J078",
             )
         return process_claim(
             username, blossom_submission, cfg, first_time=new_acceptance
