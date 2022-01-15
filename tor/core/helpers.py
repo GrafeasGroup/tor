@@ -64,9 +64,9 @@ def clean_list(items: List[str]) -> List[str]:
 
 
 @beeline.traced(name="send_to_modchat")
-def send_to_modchat(message: str, cfg: Config, channel="general") -> None:
+def send_to_modchat(message: str, cfg: Config, channel="C4R36V9V1") -> None:
     """
-    Sends a message to the ToR mod chat.
+    Sends a message to #general on ToR mod chat.
 
     :param message: String; the message that is to be encoded
     :param cfg: the global config dict.
@@ -292,7 +292,7 @@ def remove_if_required(
         # Selects a message depending on whether the submission is reported or not.
         mod_message = i18n["mod"][f"removed_{'reported' if reported else 'deleted'}"]
         send_to_modchat(
-            mod_message.format(submission.shortlink), cfg, channel="qa_removed_posts"
+            mod_message.format(submission.shortlink), cfg, channel="C4R56LY3U"
         )
     return removal, reported
 
