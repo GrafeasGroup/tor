@@ -27,30 +27,16 @@ FLAIR_DATA = {
 }
 
 
-def flair_post(post: Submission, text: str) -> None:
+def flair_post(post: Submission, flair_id: str) -> None:
     """
-    Sets the requested flair on a given post. Must provide a string
-    which matches an already-available flair template.
+    Sets the requested flair on a given post.
 
     :param post: A Submission object on ToR.
-    :param text: String. The name of the flair template to apply.
+    :param flair_id: String. The ID of the flair template to apply.
+    You can use the flair class to select the flair ID.
     :return: None.
     """
-    # Flair looks like this:
-    # {
-    #   'flair_css_class': 'unclaimed-flair',
-    #   'flair_template_id': 'fe9d6950-142a-11e7-901e-0ecc947f9ff4',
-    #   'flair_text_editable': False,
-    #   'flair_position': 'left',
-    #   'flair_text': 'Unclaimed'
-    # }
-    for choice in post.flair.choices():
-        if choice["flair_text"] == text:
-            post.flair.select(flair_template_id=choice["flair_template_id"])
-            return
-
-    # if the flairing is successful, we won't hit this line.
-    log.error(f"Cannot find requested flair {text}. Not flairing.")
+    post.flair.select(flair_template_id=flair_id)
 
 
 def _get_flair_css(transcription_count: int) -> str:

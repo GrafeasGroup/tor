@@ -15,6 +15,9 @@ from tor.core import __version__
 from tor.core.config import config, Config
 from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
+from dotenv import load_dotenv
+
+load_dotenv()
 
 log = logging.getLogger(__name__)
 
@@ -23,12 +26,20 @@ i18n = translation()
 
 
 class flair(object):
-    unclaimed = "Unclaimed"
-    summoned_unclaimed = "Summoned - Unclaimed"
-    completed = "Completed!"
-    in_progress = "In Progress"
-    meta = "Meta"
-    disregard = "Disregard"
+    """The IDs of the post flairs.
+
+    You can define these in your .env file.
+
+    How to obtain the IDs?
+    Go to https://new.reddit.com/r/TranscribersOfReddit/about/postflair
+    and click "COPY ID" for the given flairs.
+    """
+
+    unclaimed = os.getenv("UNCLAIMED_FLAIR_ID")
+    in_progress = os.getenv("IN_PROGRESS_FLAIR_ID")
+    completed = os.getenv("COMPLETED_FLAIR_ID")
+    meta = os.getenv("META_FLAIR_ID")
+    disregard = os.getenv("DISREGARD_FLAIR_ID")
 
 
 class reports(object):
