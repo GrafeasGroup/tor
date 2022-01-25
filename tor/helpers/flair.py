@@ -122,7 +122,7 @@ def set_meta_flair_on_other_posts(cfg: Config) -> None:
             continue
         if str(post.author) in cfg.tor_mods:
             continue
-        if post.link_flair_text == flair.meta:
+        if post.link_flair_template_id == flair.meta:
             continue
 
         log.info(f"Flairing post {post.fullname} by author {post.author} with Meta.")
