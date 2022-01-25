@@ -7,7 +7,7 @@ from praw.models import Submission
 
 from tor.core.config import Config
 from tor.core.helpers import _, cleanup_post_title
-from tor.helpers.flair import flair, flair_post
+from tor.helpers.flair import flair
 from tor.helpers.youtube import (
     is_transcribable_youtube_video,
     is_youtube_url,

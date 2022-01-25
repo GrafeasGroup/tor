@@ -1,5 +1,6 @@
 import logging
 import random
+from typing import Optional
 
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Redditor, Submission
@@ -27,7 +28,7 @@ FLAIR_DATA = {
 }
 
 
-def flair_post(post: Submission, flair_id: str) -> None:
+def flair_post(post: Submission, flair_id: Optional[str]) -> None:
     """
     Sets the requested flair on a given post.
 
@@ -36,6 +37,13 @@ def flair_post(post: Submission, flair_id: str) -> None:
     You can use the flair class to select the flair ID.
     :return: None.
     """
+    if not flair_id:
+        log.error(
+            "Trying to flair post without providing a flair ID. "
+            "Did you set the .env variables?"
+        )
+        return
+
     post.flair.select(flair_template_id=flair_id)
 
 

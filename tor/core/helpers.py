@@ -4,6 +4,7 @@ import signal
 import sys
 import time
 from typing import List, Tuple
+import os
 
 import beeline
 from praw.exceptions import APIException
