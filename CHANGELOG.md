@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [UNRELEASED]
 
+- Track timestamp of last reddit post processed before sending to mod chat (credit: @crhopkins)
+
 ## [4.2.4] - 2021-04-05
 
 - Odd error with PRAW necessitates a core library upgrade
