@@ -41,6 +41,7 @@ class Config(object):
     debug_mode = False
 
     last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
+    last_set_meta_flair_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
 
     @cached_property
     def blossom(self):
