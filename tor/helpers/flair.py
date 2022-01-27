@@ -1,6 +1,5 @@
 import logging
 import random
-from datetime import datetime
 
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Redditor, Submission
@@ -150,5 +149,5 @@ def set_meta_flair_on_other_posts(cfg: Config) -> None:
         log.info(f"Flairing post {post.fullname} by author {post.author} with Meta.")
         flair_post(post, flair.meta)
         send_to_modchat(f"New meta post: <{post.shortlink}|{post.title}>", cfg)
-        
+
     cfg.last_set_meta_flair_time = new_last_time
