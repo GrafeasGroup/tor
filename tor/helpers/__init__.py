@@ -1,0 +1,11 @@
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Pull the IDs of the Slack channels
+SLACK_DEFAULT_CHANNEL_ID = os.getenv("SLACK_DEFAULT_CHANNEL_ID")
+SLACK_COC_ACCEPTED_CHANNEL_ID = os.getenv("SLACK_COC_ACCEPTED_CHANNEL_ID")
+SLACK_REMOVED_POST_CHANNEL_ID = os.getenv("SLACK_REMOVED_POST_CHANNEL_ID")
+SLACK_FORMATTING_ISSUE_CHANNEL_ID = os.getenv("SLACK_FORMATTING_ISSUE_CHANNEL_ID")
