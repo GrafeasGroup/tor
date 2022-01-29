@@ -125,6 +125,8 @@ def set_meta_flair_on_other_posts(cfg: Config) -> None:
     :param cfg: the active config object.
     :return: None.
     """
+
+    new_last_time = cfg.last_set_meta_flair_time
     for post in cfg.tor.new(limit=10):
         if str(post.author) in __BOT_NAMES__:
             continue
@@ -133,6 +135,13 @@ def set_meta_flair_on_other_posts(cfg: Config) -> None:
         if post.link_flair_template_id == flair.meta:
             continue
 
+        # Skip this post if it older than the last post we processed
+        if post.created_utc < cfg.last_set_meta_flair_time:
+            continue
+
+        new_last_time = max(new_last_time, post.created_utc)
         log.info(f"Flairing post {post.fullname} by author {post.author} with Meta.")
         flair_post(post, flair.meta)
         send_to_modchat(f"New meta post: <{post.shortlink}|{post.title}>", cfg)
+
+    cfg.last_set_meta_flair_time = new_last_time
