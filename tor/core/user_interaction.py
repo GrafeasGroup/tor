@@ -3,7 +3,10 @@ import random
 import time
 from typing import Dict, Tuple
 
-from tor.helpers import SLACK_COC_ACCEPTED_CHANNEL_ID, SLACK_FORMATTING_ISSUE_CHANNEL_ID
+from tor.core.config import (
+    SLACK_COC_ACCEPTED_CHANNEL_ID,
+    SLACK_FORMATTING_ISSUE_CHANNEL_ID,
+)
 from tor.helpers.flair import check_promotion, generate_promotion_message
 
 import beeline
