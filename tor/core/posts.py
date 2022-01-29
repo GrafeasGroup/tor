@@ -7,7 +7,7 @@ from praw.models import Submission
 
 from tor.core.config import Config
 from tor.core.helpers import _, cleanup_post_title
-from tor.helpers.flair import flair, flair_post
+from tor.helpers.flair import flair
 from tor.helpers.youtube import (
     is_transcribable_youtube_video,
     is_youtube_url,
@@ -119,12 +119,11 @@ def request_transcription(
         title=truncate_title(cleanup_post_title(str(post["title"]))),
     )
     permalink = i18n["urls"]["reddit_url"].format(str(post["permalink"]))
-    submission = cfg.tor.submit(title=title, url=permalink)
+    submission = cfg.tor.submit(title=title, url=permalink, flair_id=flair.unclaimed)
     intro = i18n["posts"]["rules_comment"].format(
         post_type=content_type, formatting=content_format, header=cfg.header,
     )
     submission.reply(_(intro))
-    flair_post(submission, flair.unclaimed)
     create_blossom_submission(post, submission, cfg)
 
 

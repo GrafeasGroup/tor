@@ -1,5 +1,6 @@
 import logging
 import random
+from typing import Optional
 
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Redditor, Submission
@@ -27,30 +28,23 @@ FLAIR_DATA = {
 }
 
 
-def flair_post(post: Submission, text: str) -> None:
+def flair_post(post: Submission, flair_id: Optional[str]) -> None:
     """
-    Sets the requested flair on a given post. Must provide a string
-    which matches an already-available flair template.
+    Sets the requested flair on a given post.
 
     :param post: A Submission object on ToR.
-    :param text: String. The name of the flair template to apply.
+    :param flair_id: String. The ID of the flair template to apply.
+    You can use the flair class to select the flair ID.
     :return: None.
     """
-    # Flair looks like this:
-    # {
-    #   'flair_css_class': 'unclaimed-flair',
-    #   'flair_template_id': 'fe9d6950-142a-11e7-901e-0ecc947f9ff4',
-    #   'flair_text_editable': False,
-    #   'flair_position': 'left',
-    #   'flair_text': 'Unclaimed'
-    # }
-    for choice in post.flair.choices():
-        if choice["flair_text"] == text:
-            post.flair.select(flair_template_id=choice["flair_template_id"])
-            return
+    if not flair_id:
+        log.error(
+            "Trying to flair post without providing a flair ID. "
+            "Did you set the .env variables?"
+        )
+        return
 
-    # if the flairing is successful, we won't hit this line.
-    log.error(f"Cannot find requested flair {text}. Not flairing.")
+    post.flair.select(flair_template_id=flair_id)
 
 
 def _get_flair_css(transcription_count: int) -> str:
@@ -138,7 +132,7 @@ def set_meta_flair_on_other_posts(cfg: Config) -> None:
             continue
         if str(post.author) in cfg.tor_mods:
             continue
-        if post.link_flair_text == flair.meta:
+        if post.link_flair_template_id == flair.meta:
             continue
 
         # Skip this post if it older than the last post we processed
