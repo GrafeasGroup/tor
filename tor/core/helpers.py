@@ -12,7 +12,12 @@ from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFou
 
 import tor.core
 from tor.core import __version__
-from tor.core.config import config, Config
+from tor.core.config import (
+    config,
+    Config,
+    SLACK_REMOVED_POST_CHANNEL_ID,
+    SLACK_DEFAULT_CHANNEL_ID,
+)
 from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
 
@@ -64,7 +69,9 @@ def clean_list(items: List[str]) -> List[str]:
 
 
 @beeline.traced(name="send_to_modchat")
-def send_to_modchat(message: str, cfg: Config, channel="C4R36V9V1") -> None:
+def send_to_modchat(
+    message: str, cfg: Config, channel: str = SLACK_DEFAULT_CHANNEL_ID
+) -> None:
     """
     Sends a message to #general on ToR mod chat.
 
@@ -292,7 +299,9 @@ def remove_if_required(
         # Selects a message depending on whether the submission is reported or not.
         mod_message = i18n["mod"][f"removed_{'reported' if reported else 'deleted'}"]
         send_to_modchat(
-            mod_message.format(submission.shortlink), cfg, channel="C4R56LY3U"
+            mod_message.format(submission.shortlink),
+            cfg,
+            channel=SLACK_REMOVED_POST_CHANNEL_ID,
         )
     return removal, reported
 
