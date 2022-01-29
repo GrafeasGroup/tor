@@ -12,8 +12,12 @@ from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFou
 
 import tor.core
 from tor.core import __version__
-from tor.core.config import config, Config
-from tor.core.config import SLACK_REMOVED_POST_CHANNEL_ID, SLACK_DEFAULT_CHANNEL_ID
+from tor.core.config import (
+    config,
+    Config,
+    SLACK_REMOVED_POST_CHANNEL_ID,
+    SLACK_DEFAULT_CHANNEL_ID,
+)
 from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
 
