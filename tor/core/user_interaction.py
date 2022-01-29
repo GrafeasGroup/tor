@@ -240,7 +240,7 @@ def process_done(
                     link=f"https://reddit.com{comment.context}",
                 ),
                 cfg,
-                "formatting-issues",
+                "qa_formatting_issues",
             )
             message = get_formatting_issue_message(formatting_errors)
             return message, return_flair
