@@ -1,24 +1,24 @@
 ---
 debug:
-  id_already_handled_in_db: |-
+  id_already_handled_in_db: |
     We've already handled ID {}! Skipping!
 
 mod:
-  removed_deleted: |-
+  removed_deleted: |
     Removed the following submission since it was removed from the parent subreddit: {}
-  removed_reported: |-
+  removed_reported: |
     Removed the following submission since it was reported: {}
-  intervention_needed: |-
+  intervention_needed: |
     :rotating_light::rotating_light: Mod Intervention Needed :rotating_light::rotating_light:
 
     Detected use of {phrases} {link}
-  formatting_issues: |-
+  formatting_issues: |
     I detected formatting issues in the transcription by {author}: {issues}
     {link}
 posts:
-  discovered_submit_title: |-
+  discovered_submit_title: |
     {sub} | {type} | "{title}"
-  rules_comment: |-
+  rules_comment: |
     If you would like to transcribe this post, please respond to this comment with `claiming` or `claim`. I will automatically mark this post as in progress so that only one person is working on a post at any given time. **Please check that the post does not break the parent sub’s rules before claiming.**
 
 
@@ -55,17 +55,17 @@ posts:
     {header}
 
     ---
-  yt_already_has_transcripts: |-
+  yt_already_has_transcripts: |
     Hi! For those who need it, it appears that this video already has transcripts provided by the uploader. If this is untrue, please use the "Message the mods" link below to let us know.
 responses:
-  bot_footer: |-
+  bot_footer: |
     {}
 
     ---
 
     v{version} | This message was posted by a bot. | [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) | [Source](https://github.com/GrafeasGroup/tor) | Questions? [Message the mods!](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Bot%20Question&message=)
   claim:
-    first_claim_success: |-
+    first_claim_success: |
       The post is yours! Best of luck and thanks for helping!
 
       Since this is your first one, please make sure to message the mods if you have any questions about the process (and / or join our [Discord](https://discord.gg/ZDDE3Pj) to talk to other volunteers). We're here to help!
@@ -73,21 +73,21 @@ responses:
       Please respond with `done` when complete so we can check this one off the list!
 
       We have a complete tutorial that shows how to transcribe step-by-step and how to fix the most common issues. We suggest you to look at it [here](https://www.reddit.com/r/TranscribersOfReddit/wiki/tutorial)!
-    success: |-
+    success: |
       The post is yours! Best of luck and thanks for helping!
 
       Does this post break the rules? Please report it! If you don't want this post anymore (or can't complete it), respond to this comment with `unclaim`.
 
       Please respond with `done` when complete so we can check this one off the list!
-    already_claimed_by_self: |-
+    already_claimed_by_self: |
       You already claimed this post!
 
       If you completed and posted your transcription on the partner sub, reply `done` to me so we can check this one off the list!
-    already_claimed_by_someone: |-
+    already_claimed_by_someone: |
       I'm sorry, but it looks like u\/{claimed_by} has already claimed this post!
 
       You can check in with them to see if they need any help, but otherwise I suggest sticking around to see if another post pops up here in a little bit.
-    too_many_claims: |-
+    too_many_claims: |
       Woah, slow down there! Please complete your other claimed posts first before starting a new one:
 
       {links}
@@ -97,15 +97,15 @@ responses:
       If you need help, reply `help` and I will get a human to assist you!
   done:
 
-    not_claimed_by_user: |-
+    not_claimed_by_user: |
       It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else! If you are unable to resolve this situation, please message the mods.
-    already_completed: |-
+    already_completed: |
       This post has already been marked as completed! Why not hit the queue for a new post?
-    completed_transcript: |-
+    completed_transcript: |
       Awesome, thanks for your help! I'll update your flair to reflect your new count.
 
       If you want to help keep these bots running, please consider [donating via Patreon or Stripe](https://www.reddit.com/r/transcribersofreddit/wiki/donations)!
-    cannot_find_transcript: |-
+    cannot_find_transcript: |
       Sorry; I can't find your transcript post on the link. Please message the mods to have them look at this.
 
       Alternatively, did you remember to put the footer in your comment? _Make sure_ that you're copying and pasting the footer as it's shown, complete with all the special characters!
@@ -143,26 +143,26 @@ responses:
       highest_rank: |-
         And wow! You made it. This is the top. You've earned the highest rank we offer right now!
   unclaim:
-    still_unclaimed: |-
+    still_unclaimed: |
       From what I can see, no one has claimed this post! Would you like to? All you have to do is reply to me with `claim`.
-    success: |-
+    success: |
       Roger that, unclaim processed!
-    success_with_report: |-
+    success_with_report: |
       Thanks for reporting! This submission has been removed.
-    success_without_report: |-
+    success_without_report: |
       Thanks for letting me know! It looks like the content to transcribe has been removed, so I removed the post on our side. Cheers!
-    post_already_completed: |-
+    post_already_completed: |
       I can't process an unclaim on a post that's already been completed!
-    claimed_other_user: |-
+    claimed_other_user: |
       Sorry, this post is claimed by someone else, so you cannot unclaim it!
   general:
-    getting_help: |-
+    getting_help: |
       Help is on the way! I have notified the mods and someone should be here to assist you soon.
-    blacklisted: |-
+    blacklisted: |
       It appears that you are blacklisted. Please contact the moderators of r/TranscribersOfReddit if you do not know why this is the case.
-    oops: |-
+    oops: |
       Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!
-    coc_not_accepted: |-
+    coc_not_accepted: |
       Hi there! Please read and accept our Code of Conduct so that we can get you started with transcribing. Please read the Code of Conduct below, then respond to this comment with `I accept`.
 
       **NOTE**: please write `I accept` as-is: variations like `I agree` or `Accept` won't work. Editing the old comment to be `I accept` won't work either.
@@ -172,9 +172,9 @@ responses:
       ---
 
       {}
-    youre_welcome: |-
+    youre_welcome: |
       [Hey, you're welcome!]({})
-    transcript_on_tor_post: |-
+    transcript_on_tor_post: |
       Hi there! I might be wrong, but I think you just posted a transcription in reply to me. The transcription should be made as a top-level comment on the material that you're working on transcribing; for example, if the content is on r/nicegirls, then the transcription should be commented as a reply to that submission on r/nicegirls. After you've commented there, come back to me and reply with `done` and I can process it!
 
       Want a handy checklist to help keep track of everything? Check it out [HERE!](https://www.reddit.com/r/transcribersofreddit/wiki/checklist)
@@ -182,13 +182,13 @@ responses:
       Don't forget to follow the formatting that I link above, and don't be shy to ask for assistance in either our [Discord](https://discord.gg/ZDDE3Pj) or [message the mods!](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Help&message=)
 
       Cheers!
-    new_reddit_transcript: |-
+    new_reddit_transcript: |
 
       P.S. It looks like you're using the Fancy Pants Editor on New Reddit -- this will cause many of our templates to not work correctly. See [here](https://reddit.com/r/transcribersofreddit/wiki/new_reddit) for more details.
   direct_message:
-    subject: |-
+    subject: |
       Username Call
-    body: |-
+    body: |
       Hi there! Thanks for pinging me!
 
       Due to some changes with how Reddit and individual subreddits handle bots, I can't be summoned directly to your comment anymore. If there's something that you would like assistance with, please post a link to that content on /r/DescriptionPlease, and one of our lovely volunteers will be along shortly.
@@ -198,17 +198,16 @@ responses:
       Cheers,
 
       The Mods of /r/TranscribersOfReddit
-    dm_subject: |-
+    dm_subject: |
       Direct Message
-    dm_body: |-
+    dm_body: |
       Hi there! Thanks for messaging me!
 
       Unfortunately I'm a bot and so I can't help you out myself. I've forwarded your message to the moderators so they can help you out! They should message you shortly. In the future, you can [message the mods at this link](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Help&message=) to reach them directly.
 
       Cheers!
 formatting_issues:
-  message: |-
-    It looks like there might be some **formatting issues** in your transcription.
+  message: "It looks like there might be some **formatting issues** in your transcription.
 
 
     Please try to fix them and simply **comment `done` again** afterwards:
@@ -220,16 +219,14 @@ formatting_issues:
     ---
 
 
-    If you are overwhelmed by the issues or require assistance, **reply with `help`** and I will get a human to help you out!
-  bold_header: |-
-    **Bold header**: You seemed to have made the header bold instead of italic. Please only use one asterisk (`*`) on each side instead of two.
+    If you are overwhelmed by the issues or require assistance, **reply with `help`** and I will get a human to help you out!"
+  bold_header: "**Bold header**: You seemed to have made the header bold instead of italic. Please only use one asterisk (`*`) on each side instead of two.
 
     For example:
 
 
-    \    *Image Transcription: Tumblr*
-  missing_separators: |-
-    **Missing separator**: You appear to be missing the horizontal separators (`---`) after the header and/or before the footer.
+    \    *Image Transcription: Tumblr*"
+  missing_separators: "**Missing separator**: You appear to be missing the horizontal separators (`---`) after the header and/or before the footer.
 
     Please note that you might not be able to see them on mobile devices.
 
@@ -244,9 +241,8 @@ formatting_issues:
     \    \n
     \    ---\n
     \    \n
-    \    <footer>
-  heading_with_dashes: |-
-    **Heading with dashes**: It seems like you meant to make a horizontal separator (`---`), but have created a heading (i.e. 'big text') instead.
+    \    <footer>"
+  heading_with_dashes: "**Heading with dashes**: It seems like you meant to make a horizontal separator (`---`), but have created a heading (i.e. 'big text') instead.
 
     The separators require an empty line before and after it, like this:
 
@@ -271,17 +267,15 @@ formatting_issues:
     If you actually intended to make a heading, please use the syntax with number signs (`#`), like this:
 
 
-    \    ## Heading
-  malformed_footer: |-
-    **Malformed footer**: The transcription footer seems to be formatted incorrectly. Please copy it exactly as seen in the templates:
+    \    ## Heading"
+  malformed_footer: "**Malformed footer**: The transcription footer seems to be formatted incorrectly. Please copy it exactly as seen in the templates:
 
 
     \    ^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;and&#32;you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!](https://www.reddit.com/r/TranscribersOfReddit/wiki/index)
 
 
-    This makes sure that it displays correctly on all devices.
-  fenced_code_block: |-
-    **Fenced code block**: It looks like you used a fenced code block, i.e. you surrounded your code by three backticks, like this:
+    This makes sure that it displays correctly on all devices."
+  fenced_code_block: "**Fenced code block**: It looks like you used a fenced code block, i.e. you surrounded your code by three backticks, like this:
 
 
     \    ```\n
@@ -294,9 +288,8 @@ formatting_issues:
 
 
     \    int x = 0;\n
-    \   int y = x * 100;
-  incorrect_line_break: |-
-    **Incorrect line break**: You seem to be using double-spaced or escaped line breaks, please use paragraph breaks instead like this:
+    \   int y = x * 100;"
+  incorrect_line_break: "**Incorrect line break**: You seem to be using double-spaced or escaped line breaks, please use paragraph breaks instead like this:
   
     \    Paragraph line break:\n
     \    This is a line\n
@@ -309,19 +302,16 @@ formatting_issues:
     \    \n
     \    Escaped line break:\n
     \    This is a line\\\n
-    \    This is another line\n
-  unescaped_username: |-
-   **Unescaped username**: You seem to have forgotten to escape a username, i.e. you used `u/username` or `/u/username`.
+    \    This is another line"
+  unescaped_username: "**Unescaped username**: You seem to have forgotten to escape a username, i.e. you used `u/username` or `/u/username`.
     Unfortunately, this gives the user a notification and might annoy them.
 
-    Therefore, please escape the username with a backslash (`\\`), for example `u\\/username` or `\\/u/username`.
-  unescaped_subreddit: |-
-    **Unescaped subreddit name**: You seem to have forgotten to escape a subreddit name, i.e. you used `r/subreddit` or `/r/subreddit`.
+    Therefore, please escape the username with a backslash (`\\`), for example `u\\/username` or `\\/u/username`."
+  unescaped_subreddit: "**Unescaped subreddit name**: You seem to have forgotten to escape a subreddit name, i.e. you used `r/subreddit` or `/r/subreddit`.
     Unfortunately, this might give the sub's mod a notification and could annoy them.
 
-    Therefore, please escape the subreddit name with a backslash (`\\`), for example `r\\/subreddit` or `\\/r/subreddit`.
-  unescaped_heading: |-
-    **Unescaped heading syntax**: It looks like you intended to transcribe a hashtag, but made it a heading (big text) instead. This is caused by not escaping the number sign (`#`) in front of the hashtag. For example:
+    Therefore, please escape the subreddit name with a backslash (`\\`), for example `r\\/subreddit` or `\\/r/subreddit`."
+  unescaped_heading: "**Unescaped heading syntax**: It looks like you intended to transcribe a hashtag, but made it a heading (big text) instead. This is caused by not escaping the number sign (`#`) in front of the hashtag. For example:
 
 
     \    #Text
@@ -333,31 +323,30 @@ formatting_issues:
     #Text
 
 
-    To fix this, add a backslash in front of the `#` like so: `#Text`. If you meant for it to render as a heading, please add a space after the `#` to avoid this warning. i.e. `# Text`.
-  invalid_header: |-
-    **Invalid header**: It looks like your header doesn't contain a proper type (Image, Video, or Audio) or is missing italics. Please make sure your post contains a proper header. For example if it's an Image Transcription, it should be the following at the top of your transcription:
+    To fix this, add a backslash in front of the `#` like so: `#Text`. If you meant for it to render as a heading, please add a space after the `#` to avoid this warning. i.e. `# Text`."
+  invalid_header: "**Invalid header**: It looks like your header doesn't contain a proper type (Image, Video, or Audio) or is missing italics. Please make sure your post contains a proper header. For example if it's an Image Transcription, it should be the following at the top of your transcription:
 
 
     \   *Image Transcription: Example*
 
 
-    same goes for Video or Audio (but with the word `Image` replaced).
+    same goes for Video or Audio (but with the word `Image` replaced)."
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
-  ToR_link: www.reddit.com/r/TranscribersOfReddit
+  ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
   reddit_url: 'https://reddit.com{}'
   thumbs_up_gifs:
-    - https://media.giphy.com/media/oBPOP48aQpIxq/giphy.gif
-    - https://media.giphy.com/media/vMnuZGHJfFSTe/giphy.gif
-    - https://media.giphy.com/media/XreQmk7ETCak0/giphy.gif
-    - https://media.giphy.com/media/ClcWrARkrq1GM/giphy.gif
-    - http://i.imgur.com/QMPRHW9.gif
-    - https://media.giphy.com/media/j5QcmXoFWl4Q0/giphy.gif
-    - http://www.reactiongifs.com/r/a-b-yay.gif
-    - https://media.tenor.com/images/7dcd26f4d9a2eaa246cd4ea9967d2336/tenor.gif
-    - http://media0.giphy.com/media/wTzPSxZBqSove/giphy.gif
+    - 'https://media.giphy.com/media/oBPOP48aQpIxq/giphy.gif'
+    - 'https://media.giphy.com/media/vMnuZGHJfFSTe/giphy.gif'
+    - 'https://media.giphy.com/media/XreQmk7ETCak0/giphy.gif'
+    - 'https://media.giphy.com/media/ClcWrARkrq1GM/giphy.gif'
+    - 'http://i.imgur.com/QMPRHW9.gif'
+    - 'https://media.giphy.com/media/j5QcmXoFWl4Q0/giphy.gif'
+    - 'http://www.reactiongifs.com/r/a-b-yay.gif'
+    - 'https://media.tenor.com/images/7dcd26f4d9a2eaa246cd4ea9967d2336/tenor.gif'
+    - 'http://media0.giphy.com/media/wTzPSxZBqSove/giphy.gif'
 tips:
-  message: |-
+  message: |
     **Tip**: {tip_message}
   collection:
     - Do you feel overwhelmed with a transcription or need to ask a question? Respond with `help` and I will summon a moderator to assist you!
