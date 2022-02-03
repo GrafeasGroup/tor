@@ -68,6 +68,21 @@ UNESCAPED_HEADING_PATTERN = re.compile(r"(\n[ ]*\n[ ]{,3}|^)#{1,6}[^ #]")
 # Image Transcription
 VALID_HEADERS = ["Audio Transcription", "Image Transcription", "Video Transcription"]
 
+# Regex to recognize double-spaced and escaped line breaks instead of paragraph breaks
+# DO:
+# Paragraph line break:
+# This is a line
+#
+# This is another line
+# DON'T:
+# Double-spaced line break (note the two spaces at the end of the first line):
+# This is a line
+# This is another line
+# Escaped line break:
+# This is a line\
+# This is another line
+INCORRECT_LINE_BREAK_PATTERN = re.compile(r"[\w*_:]([ ]{2,}|\\)\n[\w*_:]")
+
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription has a bold instead of italic header."""
@@ -149,6 +164,15 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
     )
 
 
+def check_for_incorrect_line_break(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription contains double-spaced or escaped line breaks"""
+    return (
+        FormattingIssue.INCORRECT_LINE_BREAK
+        if INCORRECT_LINE_BREAK_PATTERN.search(transcription) is not None
+        else None
+    )
+
+
 def check_for_unescaped_username(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription contains an unescaped username.
 
@@ -224,6 +248,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_heading_with_dashes(transcription),
             check_for_missing_separators(transcription),
             check_for_fenced_code_block(transcription),
+            check_for_incorrect_line_break(transcription),
             check_for_unescaped_username(transcription),
             check_for_unescaped_subreddit(transcription),
             check_for_unescaped_heading(transcription),
