@@ -302,7 +302,7 @@ formatting_issues:
     \   \n
     \   Escaped line break:
     \   This is a line\\
-    \   This is another line
+    \   This is another line"
   unescaped_username: "**Unescaped username**: You seem to have forgotten to escape a username, i.e. you used `u/username` or `/u/username`.
     Unfortunately, this gives the user a notification and might annoy them.
 
