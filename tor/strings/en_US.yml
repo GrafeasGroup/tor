@@ -289,9 +289,10 @@ formatting_issues:
 
     \    int x = 0;\n
     \   int y = x * 100;"
-  incorrect_line_break: "**Incorrect line break**: You seem to be using double-spaced or escaped line breaks, please use paragraph breaks instead like this:
+  incorrect_line_break: "**Incorrect line break**: You seem to be using double-spaced or escaped line breaks, please use paragraph breaks instead like this:\n
   
     \    Paragraph line break:\n
+    \    \n
     \    This is a line\n
     \    \n
     \    This is another line\n
