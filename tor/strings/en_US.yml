@@ -234,14 +234,14 @@ formatting_issues:
 
 
     \    <header>\n
-    \    \n
-    \    ---\n
-    \    \n
-    \    <content>\n
-    \    \n
-    \    ---\n
-    \    \n
-    \    <footer>"
+    \   \n
+    \   ---\n
+    \   \n
+    \   <content>\n
+    \   \n
+    \   ---\n
+    \   \n
+    \   <footer>"
   heading_with_dashes: "**Heading with dashes**: It seems like you meant to make a horizontal separator (`---`), but have created a heading (i.e. 'big text') instead.
 
     The separators require an empty line before and after it, like this:
@@ -292,18 +292,18 @@ formatting_issues:
   incorrect_line_break: "**Incorrect line break**: You seem to be using double-spaced or escaped line breaks, please use paragraph breaks instead like this:\n
   
     \    Paragraph line break:\n
-    \    \n
-    \    This is a line\n
-    \    \n
-    \    This is another line\n
-    \    \n
-    \    Double-spaced line break (note the two spaces at the end of the first line):\n
-    \    This is a line  \n
-    \    This is another line\n
-    \    \n
-    \    Escaped line break:\n
-    \    This is a line\\\n
-    \    This is another line"
+    \   \n
+    \   This is a line\n
+    \   \n
+    \   This is another line\n
+    \   \n
+    \   Double-spaced line break (note the two spaces at the end of the first line):\n
+    \   This is a line  \n
+    \   This is another line\n
+    \   \n
+    \   Escaped line break:\n
+    \   This is a line\\\n
+    \   This is another line"
   unescaped_username: "**Unescaped username**: You seem to have forgotten to escape a username, i.e. you used `u/username` or `/u/username`.
     Unfortunately, this gives the user a notification and might annoy them.
 
