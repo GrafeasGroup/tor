@@ -91,6 +91,17 @@ VALID_HEADERS = ["Audio Transcription", "Image Transcription", "Video Transcript
 INCORRECT_LINE_BREAK_PATTERN = re.compile(r"[\w*_:]([ ]{2,}|\\)\n[\w*_:]")
 
 
+def is_april_fools(now: datetime.datetime) -> bool:
+    now = datetime.datetime.now()
+    april_fools = datetime.datetime(now.year, 4, 1)
+
+    # April 1st, +/- 1 day
+    april_fools_range = list([april_fools + datetime.timedelta(days=x) for x in range(0, 2)])
+    april_fools_range.append(april_fools - datetime.timedelta(days=1))
+
+    return now in april_fools_range
+
+
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription has a bold instead of italic header."""
     return (
@@ -145,9 +156,8 @@ def check_for_heading_with_dashes(transcription: str) -> Optional[FormattingIssu
 
 def check_for_malformed_footer(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription doesn't contain the correct footer."""
-    now = datetime.datetime.now()
     pattern = FOOTER_PATTERN
-    if now.month == 4 and now.day in range(1, 5):  # some leeway from April 1st
+    if is_april_fools(datetime.datetime.now()):
         pattern = FOOTER_PATTERN_APRIL_FOOLS
 
     return (
