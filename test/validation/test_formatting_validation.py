@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 import pytest
@@ -23,6 +24,7 @@ from tor.validation.formatting_validation import (
     check_for_unescaped_username,
     check_for_unescaped_subreddit,
     UNESCAPED_SUBREDDIT_PATTERN,
+    is_april_fools,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -392,3 +394,8 @@ def test_check_for_formatting_issues_valid_transcription(transcription: str) -> 
     """Make sure that valid transcriptions don't generate formatting issues."""
     actual = check_for_formatting_issues(transcription)
     assert actual == set([])
+
+
+def test_april_fools():
+    target = datetime.datetime(2020, 4, 1, 12, 36) # midday on April 1
+    assert is_april_fools(target)

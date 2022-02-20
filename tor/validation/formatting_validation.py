@@ -92,14 +92,14 @@ INCORRECT_LINE_BREAK_PATTERN = re.compile(r"[\w*_:]([ ]{2,}|\\)\n[\w*_:]")
 
 
 def is_april_fools(now: datetime.datetime) -> bool:
-    now = datetime.datetime.now()
     april_fools = datetime.datetime(now.year, 4, 1)
+    margin_of_error = datetime.timedelta(days=1)
 
-    # April 1st, +/- 1 day
-    april_fools_range = list([april_fools + datetime.timedelta(days=x) for x in range(0, 2)])
-    april_fools_range.append(april_fools - datetime.timedelta(days=1))
+    # March 31st, April 1st, or April 2nd
+    begin = april_fools - margin_of_error
+    end = april_fools + margin_of_error + datetime.timedelta(days=1)
 
-    return now in april_fools_range
+    return now >= begin and now <= end
 
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
