@@ -6,8 +6,6 @@ debug:
 mod:
   removed_deleted: |
     Removed the following submission since it was removed from the parent subreddit: {}
-  removed_reported: |
-    Removed the following submission since it was reported: {}
   intervention_needed: |
     :rotating_light::rotating_light: Mod Intervention Needed :rotating_light::rotating_light:
 
@@ -147,9 +145,7 @@ responses:
       From what I can see, no one has claimed this post! Would you like to? All you have to do is reply to me with `claim`.
     success: |
       Roger that, unclaim processed!
-    success_with_report: |
-      Thanks for reporting! This submission has been removed.
-    success_without_report: |
+    success_removed: |
       Thanks for letting me know! It looks like the content to transcribe has been removed, so I removed the post on our side. Cheers!
     post_already_completed: |
       I can't process an unclaim on a post that's already been completed!
