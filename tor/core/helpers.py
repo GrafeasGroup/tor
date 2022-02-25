@@ -3,7 +3,7 @@ import re
 import signal
 import sys
 import time
-from typing import List, Tuple
+from typing import List, Dict
 import os
 
 import beeline
@@ -19,7 +19,6 @@ from tor.core.config import (
     SLACK_REMOVED_POST_CHANNEL_ID,
     SLACK_DEFAULT_CHANNEL_ID,
 )
-from tor.helpers.reddit_ids import is_removed
 from tor.strings import translation
 from dotenv import load_dotenv
 
@@ -256,29 +255,6 @@ def run_until_dead(func):
         sys.exit(1)
 
 
-def _check_removal_required(submission: Submission, cfg: Config) -> Tuple[bool, bool]:
-    """
-    Check whether the submission has to be removed and whether this is reported.
-
-    Note that this function returns a Tuple of booleans, where the first
-    is to signify whether the submission is to be removed and the latter
-    whether a relevant report was issued for this decision.
-    """
-    for item in submission.user_reports:
-        if item[0] and any(
-            reason in item[0]
-            for reason in (
-                reports.original_post_deleted_or_locked,
-                reports.post_violates_rules,
-            )
-        ):
-            return True, True
-    linked_submission = cfg.r.submission(submission.id_from_url(submission.url))
-    if is_removed(linked_submission):
-        return True, False
-    return False, False
-
-
 def check_for_phrase(content: str, phraselist: List) -> bool:
     """
     See if a substring from the list is in the content.
@@ -289,33 +265,84 @@ def check_for_phrase(content: str, phraselist: List) -> bool:
     return any([option in content for option in phraselist])
 
 
+def _remove_on_reddit(r_submission: Submission) -> None:
+    """Remove the given submission from Reddit."""
+    r_submission.mod.remove()
+
+
+def _remove_on_blossom(cfg: Config, b_submission: Dict) -> None:
+    """Remove the given submission from Blossom."""
+    b_id = b_submission["id"]
+    tor_url = b_submission["tor_url"]
+
+    removal_response = cfg.blossom.patch(f"submission/{b_id}/remove")
+    if removal_response.ok:
+        logging.info(f"Removed submission {b_id} ({tor_url}) from Blossom.")
+    else:
+        logging.warning(
+            f"Failed to remove submission {b_id} ({tor_url}) from Blossom! "
+            f"({removal_response.status_code})"
+        )
+
+
+def _nsfw_on_reddit(r_submission: Submission) -> None:
+    """Mark the submission as NSFW on Reddit."""
+    r_submission.mod.nsfw()
+
+
+def _nsfw_on_blossom(cfg: Config, b_submission: Dict) -> None:
+    """Mark the submission as NSFW on Blossom."""
+    b_id = b_submission["id"]
+    tor_url = b_submission["tor_url"]
+
+    nsfw_response = cfg.blossom.patch(f"submission/{b_id}/nsfw")
+    if nsfw_response.ok:
+        logging.info(f"Submission {b_id} ({tor_url}) marked as NSFW on Blossom.")
+    else:
+        logging.warning(
+            f"Failed to mark submission {b_id} ({tor_url}) as NSFW on Blossom! "
+            f"({nsfw_response.status_code})"
+        )
+
+
 @beeline.traced(name="remove_if_required")
 def remove_if_required(
-    submission: Submission, blossom_id: str, cfg: Config
-) -> Tuple[bool, bool]:
-    """
-    Remove the submission if this is required.
+    cfg: Config, r_submission: Submission, b_submission: Dict
+) -> bool:
+    """Automatically handle the post if it has been unclaimed.
 
-    Returns a Tuple of booleans, indicating whether the submission is removed
-    and whether a relevant report was issued for this decision.
-    """
-    removal, reported = _check_removal_required(submission, cfg)
-    if removal:
-        submission.mod.remove()
-        response = cfg.blossom.patch(
-            f"submission/{blossom_id}/", data={"removed_from_queue": True},
-        )
-        if not str(response.status_code).startswith("2"):
-            return False, False
+    We can handle the following scenarios automatically:
+    - The post has been removed on the partner sub. We can just delete remove
+      it from the queue too.
+    - The post has been reported as NSFW. We can check if the post has
+      been marked as NSFW on the partner sub. If yes, we mark it as
+      NSFW on both Reddit and Blossom.
 
-        # Selects a message depending on whether the submission is reported or not.
-        mod_message = i18n["mod"][f"removed_{'reported' if reported else 'deleted'}"]
+    :returns: True, if the post has been removed, else False.
+    """
+    partner_submission = cfg.r.submission(url=r_submission.url)
+
+    # Check if the post is marked as NSFW on the partner sub, but not on ToR
+    if not r_submission.over_18 and partner_submission.over_18:
+        # Mark NSFW on ToR and Blossom too
+        _nsfw_on_reddit(r_submission)
+        _nsfw_on_blossom(cfg, b_submission)
+
+    # Check if the post has been removed on the partner sub, but not on ToR
+    if not r_submission.removed_by_category and partner_submission.removed_by_category:
+        # Remove on ToR and Blossom too
+        _remove_on_reddit(r_submission)
+        _remove_on_blossom(cfg, b_submission)
+
+        # Notify the mods on Slack
         send_to_modchat(
-            mod_message.format(submission.shortlink),
+            i18n["mod"]["removed_deleted"].format(r_submission.shortlink),
             cfg,
             channel=SLACK_REMOVED_POST_CHANNEL_ID,
         )
-    return removal, reported
+        return True
+
+    return False
 
 
 def cleanup_post_title(title: str) -> str:

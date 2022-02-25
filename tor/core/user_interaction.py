@@ -318,14 +318,10 @@ def process_unclaim(
     if response.status == BlossomStatus.ok:
         message = unclaim_messages["success"]
         return_flair = flair.unclaimed
-        removed, reported = remove_if_required(
-            submission, blossom_submission["id"], cfg
-        )
+        removed = remove_if_required(cfg, submission, blossom_submission)
         if removed:
-            # Select the message based on whether the post was reported or not.
-            message = unclaim_messages[
-                "success_with_report" if reported else "success_without_report"
-            ]
+            # Let the user know that we removed the post
+            message = unclaim_messages["success_removed"]
     elif response.status == BlossomStatus.not_found:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(
             get_wiki_page("codeofconduct", cfg)
