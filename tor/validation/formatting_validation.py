@@ -1,3 +1,4 @@
+import datetime
 import re
 from typing import Optional, Set
 
@@ -9,6 +10,12 @@ i18n = translation()
 
 FOOTER_PATTERN = re.compile(
     r"\^\^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;"
+    r"(?:for&#32;Reddit&#32;)?and&#32;you&#32;could&#32;be&#32;too!&#32;\[If&#32;you'd&#32;"
+    r"like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
+    r"we&#32;do&#32;it,&#32;click&#32;here!\]\(https://www\.reddit\.com/r/TranscribersOfReddit/wiki/index\)\s*$"
+)
+FOOTER_PATTERN_APRIL_FOOLS = re.compile(
+    r"\^\^I'm&#32;a&#32;(?:\w|&#32;)+&#32;"  # Allow replacing "human volunteer content transcriber" with whatever
     r"(?:for&#32;Reddit&#32;)?and&#32;you&#32;could&#32;be&#32;too!&#32;\[If&#32;you'd&#32;"
     r"like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
     r"we&#32;do&#32;it,&#32;click&#32;here!\]\(https://www\.reddit\.com/r/TranscribersOfReddit/wiki/index\)\s*$"
@@ -84,6 +91,17 @@ VALID_HEADERS = ["Audio Transcription", "Image Transcription", "Video Transcript
 INCORRECT_LINE_BREAK_PATTERN = re.compile(r"[\w*_:]([ ]{2,}|\\)\n[\w*_:]")
 
 
+def is_april_fools(now: datetime.datetime) -> bool:
+    april_fools = datetime.datetime(now.year, 4, 1)
+    margin_of_error = datetime.timedelta(days=1)
+
+    # March 31st, April 1st, or April 2nd
+    begin = april_fools - margin_of_error
+    end = april_fools + margin_of_error + datetime.timedelta(days=1)
+
+    return now >= begin and now <= end
+
+
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription has a bold instead of italic header."""
     return (
@@ -138,9 +156,13 @@ def check_for_heading_with_dashes(transcription: str) -> Optional[FormattingIssu
 
 def check_for_malformed_footer(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription doesn't contain the correct footer."""
+    pattern = FOOTER_PATTERN
+    if is_april_fools(datetime.datetime.now()):
+        pattern = FOOTER_PATTERN_APRIL_FOOLS
+
     return (
         None
-        if FOOTER_PATTERN.search(transcription)
+        if pattern.search(transcription)
         else FormattingIssue.MALFORMED_FOOTER
     )
 

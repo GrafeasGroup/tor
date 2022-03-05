@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 import pytest
@@ -23,6 +24,8 @@ from tor.validation.formatting_validation import (
     check_for_unescaped_username,
     check_for_unescaped_subreddit,
     UNESCAPED_SUBREDDIT_PATTERN,
+    is_april_fools,
+    FOOTER_PATTERN_APRIL_FOOLS,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -392,3 +395,52 @@ def test_check_for_formatting_issues_valid_transcription(transcription: str) -> 
     """Make sure that valid transcriptions don't generate formatting issues."""
     actual = check_for_formatting_issues(transcription)
     assert actual == set([])
+
+
+def test_april_fools():
+    target = datetime.datetime(2020, 4, 1, 12, 36) # midday on April 1
+    assert is_april_fools(target)
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("Text without footer", True),
+        (
+            "^(I'm a human volunteer content transcriber for Reddit and you could be too!) "
+            "[^(If you'd like more information on what we do and why we do it, click here!)]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            True,
+        ),
+        # Old footer (with "for Reddit")
+        # TODO: We probably want to disallow this one at some point
+        (
+            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;for&#32;Reddit&#32;and&#32;"
+            "you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;"
+            "on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            False,
+        ),
+        # New footer (without "for Reddit")
+        (
+            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;and&#32;"
+            "you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;"
+            "on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            False,
+        ),
+        # April fool's footer (without "for Reddit")
+        (
+            "^^I'm&#32;a&#32;pterodactly&#32;and&#32;"
+            "you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;"
+            "on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            False,
+        ),
+        (load_invalid_transcription_from_file("malformed-footer.txt"), True),
+        (load_valid_transcription_from_file("190177.txt"), False),
+    ],
+)
+def test_april_fools_footer(test_input, should_match):
+    has_errors = not FOOTER_PATTERN_APRIL_FOOLS.search(test_input)
+    assert has_errors == should_match
