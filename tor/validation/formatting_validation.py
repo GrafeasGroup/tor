@@ -270,9 +270,10 @@ def check_for_reference_links(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription accidentally contains reference links.
 
     Valid: (backslash here)[**Unknown User**]: Oh man i think i just ran out of pain
-    Valid: [**Unknown User**]:Oh man i think i just ran out of pain (no space)
+    Invalid: [**Unknown User**]:Oh man i think i just ran out of pain (no space)
     Invalid: [**Unknown User**]: Oh man i think i just ran out of pain
     Invalid: [lance]: https://en.wikipedia.org/wiki/Holy_Lance "Holy Lance - Wikipedia"
+    Invalid: Test test [Hello]: Hi
     """
     return (
         FormattingIssue.REFERENCE_LINK
