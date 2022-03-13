@@ -3,6 +3,12 @@ import random
 import time
 from typing import Dict, Tuple
 
+from tor.core.config import (
+    SLACK_COC_ACCEPTED_CHANNEL_ID,
+    SLACK_FORMATTING_ISSUE_CHANNEL_ID,
+)
+from tor.helpers.flair import check_promotion, generate_promotion_message
+
 import beeline
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission
@@ -68,7 +74,7 @@ def process_coc(
                 f"<{user_url}|u/{username}> has just "
                 f"<{post_url}|accepted the CoC!> {emote}",
                 cfg,
-                channel="new_volunteers",
+                channel=SLACK_COC_ACCEPTED_CHANNEL_ID,
             )
         return process_claim(
             username, blossom_submission, cfg, first_time=new_acceptance
@@ -107,9 +113,19 @@ def process_claim(
     )
     return_flair = None
     if response.status == BlossomStatus.ok:
-        message = i18n["responses"]["claim"][
-            "first_claim_success" if first_time else "success"
-        ]
+        # A random tip to append to the response
+        random_tip = i18n["tips"]["message"].format(
+            tip_message=random.choice(i18n["tips"]["collection"])
+        )
+
+        message = (
+            i18n["responses"]["claim"][
+                "first_claim_success" if first_time else "success"
+            ]
+            + "\n\n"
+            + random_tip
+        )
+
         return_flair = flair.in_progress
         log.info(
             f'Claim on Submission {blossom_submission["tor_url"]} by {username} successful.'
@@ -224,10 +240,12 @@ def process_done(
             # volunteers react to the bot.
             send_to_modchat(
                 i18n["mod"]["formatting_issues"].format(
-                    author=user.name, issues=issues, link=f"https://reddit.com{comment.context}",
+                    author=user.name,
+                    issues=issues,
+                    link=f"https://reddit.com{comment.context}",
                 ),
                 cfg,
-                "formatting-issues",
+                SLACK_FORMATTING_ISSUE_CHANNEL_ID,
             )
             message = get_formatting_issue_message(formatting_errors)
             return message, return_flair
@@ -256,6 +274,12 @@ def process_done(
                 f" successful."
             )
             message = done_messages["completed_transcript"]
+            transcription_count = blossom_user.data["gamma"] + 1
+
+            if check_promotion(transcription_count):
+                additional_message = generate_promotion_message(transcription_count)
+                message = f"{message}\n\n{additional_message}"
+
             if alt_text_trigger:
                 message = f"I think you meant `done`, so here we go!\n\n{message}"
 
@@ -294,14 +318,10 @@ def process_unclaim(
     if response.status == BlossomStatus.ok:
         message = unclaim_messages["success"]
         return_flair = flair.unclaimed
-        removed, reported = remove_if_required(
-            submission, blossom_submission["id"], cfg
-        )
+        removed = remove_if_required(cfg, submission, blossom_submission)
         if removed:
-            # Select the message based on whether the post was reported or not.
-            message = unclaim_messages[
-                "success_with_report" if reported else "success_without_report"
-            ]
+            # Let the user know that we removed the post
+            message = unclaim_messages["success_removed"]
     elif response.status == BlossomStatus.not_found:
         message = i18n["responses"]["general"]["coc_not_accepted"].format(
             get_wiki_page("codeofconduct", cfg)

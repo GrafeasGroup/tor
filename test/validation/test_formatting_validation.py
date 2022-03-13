@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 import pytest
@@ -9,6 +10,7 @@ from test.validation.helpers import (
 )
 from tor.validation.formatting_validation import (
     check_for_fenced_code_block,
+    check_for_incorrect_line_break,
     check_for_missing_separators,
     check_for_formatting_issues,
     check_for_heading_with_dashes,
@@ -18,6 +20,12 @@ from tor.validation.formatting_validation import (
     check_for_invalid_header,
     PROPER_SEPARATORS_PATTERN,
     HEADING_WITH_DASHES_PATTERN,
+    UNESCAPED_USERNAME_PATTERN,
+    check_for_unescaped_username,
+    check_for_unescaped_subreddit,
+    UNESCAPED_SUBREDDIT_PATTERN,
+    is_april_fools,
+    FOOTER_PATTERN_APRIL_FOOLS,
 )
 from tor.validation.formatting_issues import FormattingIssue
 
@@ -66,6 +74,56 @@ def test_proper_separator_pattern(test_input: str, should_match: bool) -> None:
 def test_heading_with_dashes_pattern(test_input: str, should_match: bool) -> None:
     """Test if headings made with dashes are recognized correctly."""
     actual = HEADING_WITH_DASHES_PATTERN.search(test_input) is not None
+    assert actual == should_match
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("u/username", True),  # Username with one slash
+        ("Text u/username Text", True),  # Username in text
+        ("**u/username**", True),  # Username bolded
+        ("/u/username", True),  # Username with two slashes
+        ("u/123456", True),  # Username with numbers
+        ("u/_username_", True),  # Username with underscores
+        ("u/-username-", True),  # Username with dashes
+        (r"u\/username", False),  # Escaped username with one slash
+        (r"\/u/username", False),  # Escaped username with first slash escaped
+        (r"/u\/username", False),  # Escaped username with second slash escaped
+        (r"\/u\/username", False),  # Escaped username with both slashes escaped
+        (r"https://www.reddit.com/u/username", False),  # Link to user
+        (r"r/subreddit", False),  # Subreddit name with one slash
+        (r"/r/subreddit", False),  # Subreddit name with two slashes
+    ],
+)
+def test_unescaped_username_pattern(test_input: str, should_match: bool) -> None:
+    """Test if headings made with dashes are recognized correctly."""
+    actual = UNESCAPED_USERNAME_PATTERN.search(test_input) is not None
+    assert actual == should_match
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("r/subreddit", True),  # Subreddit with one slash
+        ("Text r/subreddit Text", True),  # Subreddit in text
+        ("**r/subreddit**", True),  # Subreddit bolded
+        ("/r/subreddit", True),  # Subreddit with two slashes
+        ("r/123456", True),  # Subreddit with numbers
+        ("r/subreddit", True),  # Subreddit with underscores
+        ("r/-subreddit-", True),  # Subreddit with dashes
+        (r"r\/subreddit", False),  # Escaped subreddit with one slash
+        (r"\/r/subreddit", False),  # Escaped subreddit with first slash escaped
+        (r"/r\/subreddit", False),  # Escaped subreddit with second slash escaped
+        (r"\/r\/subreddit", False),  # Escaped subreddit with both slashes escaped
+        (r"https://www.reddit.com/r/subreddit", False),  # Link to subreddit
+        (r"u/username", False),  # Username with one slash
+        (r"/u/username", False),  # Username with two slashes
+    ],
+)
+def test_unescaped_subreddit_pattern(test_input: str, should_match: bool) -> None:
+    """Test if headings made with dashes are recognized correctly."""
+    actual = UNESCAPED_SUBREDDIT_PATTERN.search(test_input) is not None
     assert actual == should_match
 
 
@@ -144,8 +202,18 @@ def test_check_for_heading_with_dashes(test_input: str, should_match: bool) -> N
             "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
             True,
         ),
+        # Old footer (with "for Reddit")
+        # TODO: We probably want to disallow this one at some point
         (
-            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;for&#32;and&#32;"
+            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;for&#32;Reddit&#32;and&#32;"
+            "you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;"
+            "on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            False,
+        ),
+        # New footer (without "for Reddit")
+        (
+            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;and&#32;"
             "you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;"
             "on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!]"
             "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
@@ -175,6 +243,67 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
     """Test if fenced code blocks are detected."""
     actual = check_for_fenced_code_block(test_input)
     expected = FormattingIssue.FENCED_CODE_BLOCK if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("This is a line  \nThis is another line", True),
+        ("This is a line\\\nThis is another line", True),
+        ("This is a line\n\nThis is another line", False),
+        ("*Word*  \n_Word_", True),  # Line break after formatting characters
+        ("Word    \nWord", True),  # Line break with more than two spaces
+        ("Word\n  \n---  \n\nWord", False),  # Spaces within paragraph line breaks (often happens when transcribing)
+        ("Word \nWord", False),  # Only one space at the end
+    ],
+)
+def test_check_for_incorrect_line_break(test_input: str, should_match: bool) -> None:
+    """Test if incorrect line breaks are detected."""
+    actual = check_for_incorrect_line_break(test_input)
+    expected = FormattingIssue.INCORRECT_LINE_BREAK if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("u/username", True),
+        ("/u/username", True),
+        (r"u\/username", False),
+        (r"\/u/username", False),
+        (r"\/u\/username", False),
+        (
+            load_invalid_transcription_from_file("unescaped_username_subreddit.txt"),
+            True,
+        ),
+    ],
+)
+def test_check_for_unescaped_username(test_input: str, should_match: bool) -> None:
+    """Test if unescaped usernames are detected."""
+    actual = check_for_unescaped_username(test_input)
+    expected = FormattingIssue.UNESCAPED_USERNAME if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("r/subreddit", True),
+        ("/r/subreddit", True),
+        (r"r\/subreddit", False),
+        (r"\/r/subreddit", False),
+        (r"\/r\/subreddit", False),
+        (
+            load_invalid_transcription_from_file("unescaped_username_subreddit.txt"),
+            True,
+        ),
+    ],
+)
+def test_check_for_unescaped_subreddit(test_input: str, should_match: bool) -> None:
+    """Test if unescaped subreddit names are detected."""
+    actual = check_for_unescaped_subreddit(test_input)
+    expected = FormattingIssue.UNESCAPED_SUBREDDIT if should_match else None
     assert actual == expected
 
 
@@ -236,6 +365,10 @@ def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
             [FormattingIssue.FENCED_CODE_BLOCK, FormattingIssue.MISSING_SEPARATORS],
         ),
         (
+            load_invalid_transcription_from_file("unescaped_username_subreddit.txt"),
+            [FormattingIssue.UNESCAPED_USERNAME, FormattingIssue.UNESCAPED_SUBREDDIT],
+        ),
+        (
             load_invalid_transcription_from_file("bold-header_heading-with-dashes.txt"),
             [
                 FormattingIssue.BOLD_HEADER,
@@ -264,3 +397,52 @@ def test_check_for_formatting_issues_valid_transcription(transcription: str) -> 
     """Make sure that valid transcriptions don't generate formatting issues."""
     actual = check_for_formatting_issues(transcription)
     assert actual == set([])
+
+
+def test_april_fools():
+    target = datetime.datetime(2020, 4, 1, 12, 36) # midday on April 1
+    assert is_april_fools(target)
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("Text without footer", True),
+        (
+            "^(I'm a human volunteer content transcriber for Reddit and you could be too!) "
+            "[^(If you'd like more information on what we do and why we do it, click here!)]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            True,
+        ),
+        # Old footer (with "for Reddit")
+        # TODO: We probably want to disallow this one at some point
+        (
+            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;for&#32;Reddit&#32;and&#32;"
+            "you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;"
+            "on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            False,
+        ),
+        # New footer (without "for Reddit")
+        (
+            "^^I'm&#32;a&#32;human&#32;volunteer&#32;content&#32;transcriber&#32;and&#32;"
+            "you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;"
+            "on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            False,
+        ),
+        # April fool's footer (without "for Reddit")
+        (
+            "^^I'm&#32;a&#32;pterodactly&#32;and&#32;"
+            "you&#32;could&#32;be&#32;too!&#32;[If&#32;you'd&#32;like&#32;more&#32;information&#32;"
+            "on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;we&#32;do&#32;it,&#32;click&#32;here!]"
+            "(https://www.reddit.com/r/TranscribersOfReddit/wiki/index)",
+            False,
+        ),
+        (load_invalid_transcription_from_file("malformed-footer.txt"), True),
+        (load_valid_transcription_from_file("190177.txt"), False),
+    ],
+)
+def test_april_fools_footer(test_input, should_match):
+    has_errors = not FOOTER_PATTERN_APRIL_FOOLS.search(test_input)
+    assert has_errors == should_match
