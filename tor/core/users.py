@@ -27,7 +27,9 @@ class User(object):
     pam.save()
     """
 
-    def __init__(self, username: str, redis_conn: StrictRedis, create_if_not_found=True):
+    def __init__(
+        self, username: str, redis_conn: StrictRedis, create_if_not_found=True
+    ):
         """
         Create our own Redis connection if one is not passed in.
         We also assume that there is already a logging object created.
@@ -37,16 +39,16 @@ class User(object):
         :param redis: Object; a `StrictRedis` instance.
         """
         if not redis_conn:
-            raise ValueError('Missing Redis connection')
+            raise ValueError("Missing Redis connection")
         if not username:
-            raise ValueError('Username not supplied')
+            raise ValueError("Username not supplied")
 
         super().__init__()
         self.redis = redis_conn
         self.username = username
 
         self.create_if_not_found = create_if_not_found
-        self.redis_key = '::user::{}'
+        self.redis_key = "::user::{}"
         self.user_data = self._load()
 
     def __repr__(self) -> str:
@@ -62,21 +64,16 @@ class User(object):
         result = self.redis.get(self.redis_key.format(self.username))
         if not result:
             if self.create_if_not_found:
-                logging.debug(
-                    'Did not find existing user, loaded blank slate.'
-                )
+                logging.debug("Did not find existing user, loaded blank slate.")
                 return self._create_default_user_data()
             else:
-                logging.debug('User not found, returning None.')
+                logging.debug("User not found, returning None.")
                 raise UserDataNotFound()
 
         return json.loads(result.decode())
 
     def save(self) -> None:
-        self.redis.set(
-            self.redis_key.format(self.username),
-            json.dumps(self.user_data)
-        )
+        self.redis.set(self.redis_key.format(self.username), json.dumps(self.user_data))
 
     def update(self, key: str, value: Any) -> None:
         self.user_data[key] = value
@@ -88,5 +85,5 @@ class User(object):
 
     def _create_default_user_data(self) -> UserData:
         self.user_data = {}
-        self.user_data.update({'username': self.username})
+        self.user_data.update({"username": self.username})
         return self.user_data

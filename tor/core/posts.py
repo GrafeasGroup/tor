@@ -6,8 +6,8 @@ from blossom_wrapper import BlossomStatus
 from praw.models import Submission
 
 from tor.core.config import Config
-from tor.core.helpers import _
-from tor.helpers.flair import flair, flair_post
+from tor.core.helpers import _, cleanup_post_title
+from tor.helpers.flair import flair
 from tor.helpers.youtube import (
     is_transcribable_youtube_video,
     is_youtube_url,
@@ -56,7 +56,7 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
     else:
         # This means we pulled from a subreddit bypassing the filters.
         content_type = "Other"
-        content_format = cfg.other_formatting
+        content_format = cfg.image_formatting
 
     try:
         request_transcription(new_post, content_type, content_format, cfg)
@@ -94,7 +94,7 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
             has_enough_upvotes(post, cfg),
             not post["archived"],
             post["author"],
-            is_transcribable_youtube_video(url) if is_youtube_url(url) else True
+            is_transcribable_youtube_video(url) if is_youtube_url(url) else True,
         ]
     )
 
@@ -116,15 +116,14 @@ def request_transcription(
     title = i18n["posts"]["discovered_submit_title"].format(
         sub=str(post["subreddit"]),
         type=content_type.title(),
-        title=truncate_title(str(post["title"])),
+        title=truncate_title(cleanup_post_title(str(post["title"]))),
     )
     permalink = i18n["urls"]["reddit_url"].format(str(post["permalink"]))
-    submission = cfg.tor.submit(title=title, url=permalink)
+    submission = cfg.tor.submit(title=title, url=permalink, flair_id=flair.unclaimed)
     intro = i18n["posts"]["rules_comment"].format(
         post_type=content_type, formatting=content_format, header=cfg.header,
     )
     submission.reply(_(intro))
-    flair_post(submission, flair.unclaimed)
     create_blossom_submission(post, submission, cfg)
 
 
@@ -136,9 +135,14 @@ def create_blossom_submission(
     if (content_url := str(original_post["url"])) is None:
         content_url = cfg.r.submission(url=tor_post.url).url
     tor_url = i18n["urls"]["reddit_url"].format(str(tor_post.permalink))
-    original_url = i18n["urls"]["reddit_url"].format(str(original_post['permalink']))
+    original_url = i18n["urls"]["reddit_url"].format(str(original_post["permalink"]))
     return cfg.blossom.create_submission(
-        original_post["name"], tor_url, original_url, content_url
+        original_post["name"],
+        tor_url,
+        original_url,
+        content_url,
+        post_title=cleanup_post_title(str(original_post["title"])),
+        nsfw=original_post["is_nsfw"],
     )
 
 
@@ -155,12 +159,13 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         post_summary["url"] = linked_post.url
         post_summary["permalink"] = linked_post.permalink
         post_summary["name"] = linked_post.fullname
+        post_summary["title"] = linked_post.title
+        post_summary["is_nsfw"] = linked_post.over_18
 
         new_submission = create_blossom_submission(post_summary, submission, cfg)
         # this submission will have the wrong post times because we didn't know about
         # it, so let's leave a marker that we can clean up later on Blossom's side.
         cfg.blossom.patch(
-            f"submission/{new_submission['id']}/",
-            data={"redis_id": "incomplete"},
+            f"submission/{new_submission['id']}/", data={"redis_id": "incomplete"},
         )
         return new_submission
