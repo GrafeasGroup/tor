@@ -12,3 +12,4 @@ class FormattingIssue(Enum):
     UNESCAPED_SUBREDDIT = "unescaped_subreddit"
     UNESCAPED_HEADING = "unescaped_heading"
     INVALID_HEADER = "invalid_header"
+    REFERENCE_LINK = "reference_link"
