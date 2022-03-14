@@ -336,7 +336,11 @@ def test_check_for_unescaped_heading(test_input: str, should_match: bool) -> Non
         ("*Video Transcription*", False),
         ("*Invalid Header*", True),
         ("*Invalid Header*\n\n---\n\nBlah", True),
-        ("*Image Transcription: Test*\n\n---\n\nBlah", False)
+        ("*Image Transcription: Test*\n\n---\n\nBlah", False),
+        ("Blah *Image Transcription: Test*", True),
+        ("**Image Transcription: Test**", False),  # There is a separate check for this, so it shouldn't be checked here
+        ("Image Transcription: Test*", True),
+        ("    *Image Transcription: Test*", False)
     ]
 )
 def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
