@@ -18,6 +18,7 @@ from tor.validation.formatting_validation import (
     check_for_bold_header,
     check_for_unescaped_heading,
     check_for_invalid_header,
+    check_for_reference_links,
     PROPER_SEPARATORS_PATTERN,
     HEADING_WITH_DASHES_PATTERN,
     UNESCAPED_USERNAME_PATTERN,
@@ -342,6 +343,24 @@ def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
     """Test if invalid headers are detected."""
     actual = check_for_invalid_header(test_input)
     expected = FormattingIssue.INVALID_HEADER if should_match else None
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "test_input,should_match",
+    [
+        ("[lance]: https://en.wikipedia.org/wiki/Holy_Lance \"Holy Lance - Wikipedia\"", True),
+        ("[**Unknown User**]: Oh man i think i just ran out of pain", True),
+        ("something something something [**Unknown User**]: Oh man i think i just ran out of pain", True),
+        ("[**Unknown User**]:Oh man i think i just ran out of pain", True),
+        (r"\[**Unknown User**]: Oh man i think i just ran out of pain", False),
+        ("[*The tor bot happily smiles as the entire queue is cleared in CTQ*]", False)
+    ]
+)
+def test_check_for_reference_links(test_input: str, should_match: str) -> None:
+    """Test if reference links are detected"""
+    actual = check_for_reference_links(test_input)
+    expected = FormattingIssue.REFERENCE_LINK if should_match else None
     assert actual == expected
 
 

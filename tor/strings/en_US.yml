@@ -324,10 +324,26 @@ formatting_issues:
   invalid_header: "**Invalid header**: It looks like your header doesn't contain a proper type (Image, Video, or Audio) or is missing italics. Please make sure your post contains a proper header. For example if it's an Image Transcription, it should be the following at the top of your transcription:
 
 
-    \   *Image Transcription: Example*
+    \    *Image Transcription: Example*
 
 
     same goes for Video or Audio (but with the word `Image` replaced)."
+  reference_link: "**Reference link**: It looks like you may have inadvertently used a reference link in your transcription. Reference links usually don't display properly so it's important to escape the corresponding formatting. Here is an example of a reference link format (the end can be text too, and it'll still trigger):
+  
+  
+    \    [test]: https://en.wikipedia.org/wiki/Test
+    
+    
+    Here's what accidentally using this formatting may look like in a transcription:
+    
+    
+    \    [**Unknown User**]: Hello there!
+    
+    
+    To fix this, you simply need to escape the formatting (adding a `\\` in front), here's the above example fixed:
+    
+    
+    \    \\[**Unknown User**]: Hello there!"
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
