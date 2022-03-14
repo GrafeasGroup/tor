@@ -253,7 +253,7 @@ def check_for_invalid_header(transcription: str) -> Optional[FormattingIssue]:
         FormattingIssue.INVALID_HEADER
         if not any(
             [
-                re.search(r"^\**{}.*\*".format(i), header) is not None
+                re.search(r"^\s*\*+{}.*\*".format(i), header) is not None
                 for i in VALID_HEADERS
             ]
         )
