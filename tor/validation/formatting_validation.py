@@ -75,6 +75,12 @@ UNESCAPED_HEADING_PATTERN = re.compile(r"(\n[ ]*\n[ ]{,3}|^)#{1,6}[^ #]")
 # Image Transcription
 VALID_HEADERS = ["Audio Transcription", "Image Transcription", "Video Transcription"]
 
+# Regex to recognize unescaped reference links.
+# Example:
+#
+# [Test]: Something here
+REFERENCE_LINK_PATTERN = re.compile(r"(?:[^\\]|^)\[.*\]:.*")
+
 # Regex to recognize double-spaced and escaped line breaks instead of paragraph breaks
 # DO:
 # Paragraph line break:
@@ -261,6 +267,22 @@ def check_for_invalid_header(transcription: str) -> Optional[FormattingIssue]:
     )
 
 
+def check_for_reference_links(transcription: str) -> Optional[FormattingIssue]:
+    """Check if the transcription accidentally contains reference links.
+
+    Valid: (backslash here)[**Unknown User**]: Oh man i think i just ran out of pain
+    Invalid: [**Unknown User**]:Oh man i think i just ran out of pain (no space)
+    Invalid: [**Unknown User**]: Oh man i think i just ran out of pain
+    Invalid: [lance]: https://en.wikipedia.org/wiki/Holy_Lance "Holy Lance - Wikipedia"
+    Invalid: Test test [Hello]: Hi
+    """
+    return (
+        FormattingIssue.REFERENCE_LINK
+        if REFERENCE_LINK_PATTERN.search(transcription) is not None
+        else None
+    )
+
+
 def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
     """Check the transcription for common formatting issues."""
     return set(
@@ -276,6 +298,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_unescaped_subreddit(transcription),
             check_for_unescaped_heading(transcription),
             check_for_invalid_header(transcription),
+            check_for_reference_links(transcription)
         ]
         if issue is not None
     )
