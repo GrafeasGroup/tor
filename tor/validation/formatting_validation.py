@@ -79,7 +79,7 @@ VALID_HEADERS = ["Audio Transcription", "Image Transcription", "Video Transcript
 # Example:
 #
 # [Test]: Something here
-REFERENCE_LINK_PATTERN = re.compile(r"(?:[^\\]|^)\[.*]:.*")
+REFERENCE_LINK_PATTERN = re.compile(r"(?:[^\\]|^)\[.*\]:.*")
 
 # Regex to recognize double-spaced and escaped line breaks instead of paragraph breaks
 # DO:
