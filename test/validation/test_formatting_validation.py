@@ -353,7 +353,8 @@ def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
         ("[**Unknown User**]: Oh man i think i just ran out of pain", True),
         ("something something something [**Unknown User**]: Oh man i think i just ran out of pain", True),
         ("[**Unknown User**]:Oh man i think i just ran out of pain", True),
-        (r"\[**Unknown User**]: Oh man i think i just ran out of pain", False)
+        (r"\[**Unknown User**]: Oh man i think i just ran out of pain", False),
+        ("[*The tor bot happily smiles as the entire queue is cleared in CTQ*]", False)
     ]
 )
 def test_check_for_reference_links(test_input: str, should_match: str) -> None:
