@@ -324,7 +324,7 @@ formatting_issues:
   invalid_header: "**Invalid header**: It looks like your header doesn't contain a proper type (Image, Video, or Audio), is missing italics, and/or is not at the start of your transcription. Please make sure your post contains a proper header at the start of your transcription. For example if it's an Image Transcription, it should be the following at the start of your transcription:
 
 
-    \   *Image Transcription: Example*
+    \    *Image Transcription: Example*
 
 
     same goes for Video or Audio (but with the word `Image` replaced)."
