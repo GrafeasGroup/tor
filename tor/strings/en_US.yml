@@ -64,7 +64,7 @@ responses:
     v{version} | This message was posted by a bot. | [FAQ](https://www.reddit.com/r/TranscribersOfReddit/wiki/index) | [Source](https://github.com/GrafeasGroup/tor) | Questions? [Message the mods!](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Bot%20Question&message=)
   claim:
     first_claim_success: |
-      The post is yours! Best of luck and thanks for helping!
+      ✅ The post is yours! Best of luck and thanks for helping!
 
       Since this is your first one, please make sure to message the mods if you have any questions about the process (and / or join our [Discord](https://discord.gg/ZDDE3Pj) to talk to other volunteers). We're here to help!
 
@@ -72,21 +72,21 @@ responses:
 
       We have a complete tutorial that shows how to transcribe step-by-step and how to fix the most common issues. We suggest you to look at it [here](https://www.reddit.com/r/TranscribersOfReddit/wiki/tutorial)!
     success: |
-      The post is yours! Best of luck and thanks for helping!
+      ✅ The post is yours! Best of luck and thanks for helping!
 
       Does this post break the rules? Please report it! If you don't want this post anymore (or can't complete it), respond to this comment with `unclaim`.
 
       Please respond with `done` when complete so we can check this one off the list!
     already_claimed_by_self: |
-      You already claimed this post!
+      ⚠️ You already claimed this post!
 
       If you completed and posted your transcription on the partner sub, reply `done` to me so we can check this one off the list!
     already_claimed_by_someone: |
-      I'm sorry, but it looks like u\/{claimed_by} has already claimed this post!
+      ⛔ I'm sorry, but it looks like u\/{claimed_by} has already claimed this post!
 
-      You can check in with them to see if they need any help, but otherwise I suggest sticking around to see if another post pops up here in a little bit.
+      Please select another post in the queue.
     too_many_claims: |
-      Woah, slow down there! Please complete your other claimed posts first before starting a new one:
+      ⛔ Woah, slow down there! Please complete your other claimed posts first before starting a new one:
 
       {links}
 
@@ -94,23 +94,29 @@ responses:
 
       If you need help, reply `help` and I will get a human to assist you!
   done:
-
     not_claimed_by_user: |
-      It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else! If you are unable to resolve this situation, please message the mods.
+      ⛔ It does not appear that you have claimed this post! This can be either because this post is not claimed at all or by someone else!
+
+      If you are unable to resolve this situation, reply to me with `help` to summon a moderator.
     already_completed: |
-      This post has already been marked as completed! Why not hit the queue for a new post?
+      ⛔ This post has **already been marked as completed**!
+
+      Please double check that this post was assigned to you.
+      If yes, you can move on to the next post.
+      If no, please reply with `help` to summon a moderator to resolve the situation.
     completed_transcript: |
-      Awesome, thanks for your help! I'll update your flair to reflect your new count.
+      ✅ Awesome, thanks for your help! I'll update your flair to reflect your new count.
 
       If you want to help keep these bots running, please consider [donating via Patreon or Stripe](https://www.reddit.com/r/transcribersofreddit/wiki/donations)!
     cannot_find_transcript: |
-      Sorry; I can't find your transcript post on the link. Please message the mods to have them look at this.
+      ⛔ Sorry, I **can't find** your transcription on on the post. Please take the following actions:
 
-      Alternatively, did you remember to put the footer in your comment? _Make sure_ that you're copying and pasting the footer as it's shown, complete with all the special characters!
+      - Make sure that you posted the transcription on the partner subreddit, not on r\/TranscribersOfReddit.
+      - Make sure you have switched the comment editor from the default "Fancy Pants" to "Markdown Mode". If there's a "Markdown Mode" button in your comment box, click that.
+      - Make sure you are using our [formatting guidelines](https://www.reddit.com/r/TranscribersOfReddit/wiki/guidelines) for your transcription. If you do not include the footer in your transcription, the bot won't find it!
+      - Try replying `done` to me again in a minute or two. In some cases Reddit is updating slowly and it takes some time until I can see your comment.
 
-      If the footer is correct, have you tried replying "Done" again after one-two minutes? Sometimes, freshly posted transcriptions are not seen by the bot, so trying again should fix the issue.
-
-      If it still doesn't work, it could be the sign of another bug; let us know by [sending a Modmail](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Issue&message=) so we can take a look!
+      Does it still not work? Reply `help` to me to summon a moderator!
 
     promotion_text:
       exclamations:
@@ -125,7 +131,7 @@ responses:
         - Outstanding!
         - Stupendous!
       new_rank: |-
-        You've ranked up to {rank}!
+        🎉 You've ranked up to {rank}!
       next_rank_intros:
         - The next rank is
         - "Next up:"
@@ -142,22 +148,24 @@ responses:
         And wow! You made it. This is the top. You've earned the highest rank we offer right now!
   unclaim:
     still_unclaimed: |
-      From what I can see, no one has claimed this post! Would you like to? All you have to do is reply to me with `claim`.
+      ⛔ From what I can see, no one has claimed this post! Would you like to? All you have to do is reply to me with `claim`.
     success: |
-      Roger that, unclaim processed!
+      ✅ Roger that, unclaim processed!
     success_removed: |
-      Thanks for letting me know! It looks like the content to transcribe has been removed, so I removed the post on our side. Cheers!
+      ✅ Thanks for letting me know! It looks like the content to transcribe has been removed, so I removed the post on our side. Cheers!
     post_already_completed: |
-      I can't process an unclaim on a post that's already been completed!
+      ⛔ I can't process an unclaim on a post that's already been completed!
+
+      Did something go wrong? Reply `help` to me to summon a moderator!
     claimed_other_user: |
-      Sorry, this post is claimed by someone else, so you cannot unclaim it!
+      ⛔ Sorry, this post is claimed by someone else, so you cannot unclaim it!
   general:
     getting_help: |
-      Help is on the way! I have notified the mods and someone should be here to assist you soon.
+      ✅ Help is on the way! I have notified the mods and someone should be here to assist you soon.
     blacklisted: |
-      It appears that you are blacklisted. Please contact the moderators of r/TranscribersOfReddit if you do not know why this is the case.
+      ⛔ It appears that you are blacklisted. Please contact the moderators of r/TranscribersOfReddit if you do not know why this is the case.
     oops: |
-      Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!
+      ⛔ Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!
     coc_not_accepted: |
       Hi there! Please read and accept our Code of Conduct so that we can get you started with transcribing. Please read the Code of Conduct below, then respond to this comment with `I accept`.
 
@@ -171,13 +179,12 @@ responses:
     youre_welcome: |
       [Hey, you're welcome!]({})
     transcript_on_tor_post: |
-      Hi there! I might be wrong, but I think you just posted a transcription in reply to me. The transcription should be made as a top-level comment on the material that you're working on transcribing; for example, if the content is on r/nicegirls, then the transcription should be commented as a reply to that submission on r/nicegirls. After you've commented there, come back to me and reply with `done` and I can process it!
+      ⚠️ Hi there! I might be wrong, but I think you just posted a transcription in reply to me.
+      The transcription should be made as a **top-level comment** on the post that you're working on transcribing.
+      For example, if the content is on r\/nicegirls, then the transcription should be commented as a reply to that submission on r\/nicegirls.
+      After you've commented there, come back to me and reply with `done` and I can process it!
 
-      Want a handy checklist to help keep track of everything? Check it out [HERE!](https://www.reddit.com/r/transcribersofreddit/wiki/checklist)
-
-      Don't forget to follow the formatting that I link above, and don't be shy to ask for assistance in either our [Discord](https://discord.gg/ZDDE3Pj) or [message the mods!](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Transcription%20Help&message=)
-
-      Cheers!
+      Do you need assistance? Reply to me with `help` to summon a moderator!
     new_reddit_transcript: |
 
       P.S. It looks like you're using the Fancy Pants Editor on New Reddit -- this will cause many of our templates to not work correctly. See [here](https://reddit.com/r/transcribersofreddit/wiki/new_reddit) for more details.
@@ -203,7 +210,7 @@ responses:
 
       Cheers!
 formatting_issues:
-  message: "It looks like there might be some **formatting issues** in your transcription.
+  message: "⛔ It looks like there might be some **formatting issues** in your transcription.
 
 
     Please try to fix them and simply **comment `done` again** afterwards:
@@ -360,7 +367,7 @@ urls:
     - 'http://media0.giphy.com/media/wTzPSxZBqSove/giphy.gif'
 tips:
   message: |
-    **Tip**: {tip_message}
+    ℹ️ **Tip**: {tip_message}
   collection:
     - Do you feel overwhelmed with a transcription or need to ask a question? Respond with `help` and I will summon a moderator to assist you!
     - You can join r/ToR_Meta or our [Discord server](https://discord.gg/ZDDE3Pj) for announcements, meta discussions and memes!
