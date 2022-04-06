@@ -210,6 +210,85 @@ responses:
 
       Cheers!
 formatting_issues:
+  editor:
+    message: |
+      ⛔ It looks like you have used the **wrong comment editor** to write your transcription.
+
+      Please try to fix this issue and simply **comment `done` again** afterwards:
+
+      You seem to be using the default Fancy Pants comment editor, but you need to use **Markdown Mode** for our templates to work correctly.
+
+      - Go to your transcription comment and click on the **Three Dots** and then on **Edit**.
+      - In the bottom bar of the comment editor, click on the **Markdown Mode** button. This will change your editor to Markdown Mode.
+      - Your transcription probably looks messed up now. You will see a lot of backslash (`\`) characters in front of asterisks (`*`) and other formatting characters. This escapes the formatting, e.g. of making a text italic or bold, the actual asterisks will show up. You will need to **remove the backslashes** and make the text look similar to the templates again.
+      - Click on **Save Edits** after you have restored the formatting of the transcription.
+      - If you want to avoid these problems in the future, you can **change your default editor** to Markdown Mode. Click on your avatar in the top right and on **User Settings**. Select **Feed Settings** in the top bar and then toggle on **Default to markdown** at the bottom.
+
+      ---
+
+      These issue can be annoying to fix, **reply with `help`** if you need assistance and I'll get a human to help you out!
+  structure:
+    message: |
+      ⛔ It looks like your transcription is **not structured correctly**.
+
+      Please try to fix these issues and simply **comment `done` again** afterwards:
+
+      {error_list}
+
+      ---
+
+      If you are overwhelmed by the issues or require assistance, **reply with `help`** and I will get a human to help you out!
+    header:
+      missing: |
+        You seem to be **missing the header** of the transcription. It should be placed at the top of the transcription and looks like this:
+
+        {header_code}
+
+        Make sure to adapt it to your current post type.
+      not_at_start: |
+        The header doesn't seem to be at the **start of the transcription**. It must be placed at the very top, before any other content, like this:
+
+        {header_code}
+      invalid_format: |
+        You have specified an **invalid transcription format** (`{invalid_format}`) in the header.
+        It needs to be one of "Image", "Video" or "Audio", according to the post type.
+        Try doing it like this:
+
+        {header_code}
+      format_capitalization: |
+        It looks like you haven't **capitalized the transcription format** in the header according to our guidelines.
+        Please change `{invalid_format}` to `{valid_format}`, like this:
+
+        {header_code}
+      transcription_capitalization: |
+        It looks like you haven't **capitalized the transcription text** in the header according to our guidelines.
+        Please change `{invalid_text}` to `{valid_text}`, like this:
+
+        {header_code}
+      missing_separator: |
+        You are **missing the separator** (`---`) after the transcription header. It should be placed right after it, surrounded by empty lines, like this:
+
+        {header_code}
+    footer:
+      missing: |
+        You seem to be **missing the footer** of the transcription. It should be placed at the bottom of the transcription and looks like this:
+
+        {footer_code}
+      missing_separator: |
+        You are **missing the separator** (`---`) before the transcription footer. It should be placed before after it, surrounded by empty lines, like this:
+
+        {footer_code}
+  formatting:
+    message: |
+      ⛔ It looks like there might be some **formatting issues** in your transcription.
+
+      Please try to fix them and simply **comment `done` again** afterwards:
+
+      {error_list}
+
+      ---
+
+      If you are overwhelmed by the issues or require assistance, **reply with `help`** and I will get a human to help you out!
   message: "⛔ It looks like there might be some **formatting issues** in your transcription.
 
 
