@@ -344,13 +344,13 @@ formatting_issues:
     Here's what accidentally using this formatting may look like in a transcription:
     
     
-    \    [**Unknown User**]: Hello there!
+    \    [*Redacted*]: Hello there!
     
     
     To fix this, you simply need to escape the formatting (adding a `\\` in front), here's the above example fixed:
     
     
-    \    \\[**Unknown User**]: Hello there!"
+    \    \\[*Redacted*]: Hello there!"
 urls:
   yt_transcript_url: 'http://video.google.com/timedtext?lang=en&v={}'
   ToR_link: 'www.reddit.com/r/TranscribersOfReddit'
