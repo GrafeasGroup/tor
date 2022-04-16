@@ -109,7 +109,7 @@ responses:
 
       If you want to help keep these bots running, please consider [donating via Patreon or Stripe](https://www.reddit.com/r/transcribersofreddit/wiki/donations)!
     cannot_find_transcript: |
-      ⛔ Sorry, I **can't find** your transcription on on the post. Please take the following actions:
+      ⛔ Sorry, I **can't find** your transcription on the post. Please take the following actions:
 
       - Make sure that you posted the transcription on the partner subreddit, not on r\/TranscribersOfReddit.
       - Make sure you have switched the comment editor from the default "Fancy Pants" to "Markdown Mode". If there's a "Markdown Mode" button in your comment box, click that.
