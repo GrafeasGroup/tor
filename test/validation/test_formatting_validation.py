@@ -354,10 +354,10 @@ def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
     "test_input,should_match",
     [
         ("[lance]: https://en.wikipedia.org/wiki/Holy_Lance \"Holy Lance - Wikipedia\"", True),
-        ("[**Unknown User**]: Oh man i think i just ran out of pain", True),
-        ("something something something [**Unknown User**]: Oh man i think i just ran out of pain", True),
-        ("[**Unknown User**]:Oh man i think i just ran out of pain", True),
-        (r"\[**Unknown User**]: Oh man i think i just ran out of pain", False),
+        ("[*Redacted*]: Oh man i think i just ran out of pain", True),
+        ("something something something [*Redacted*]: Oh man i think i just ran out of pain", True),
+        ("[*Redacted*]:Oh man i think i just ran out of pain", True),
+        (r"\[*Redacted*]: Oh man i think i just ran out of pain", False),
         ("[*The tor bot happily smiles as the entire queue is cleared in CTQ*]", False)
     ]
 )
