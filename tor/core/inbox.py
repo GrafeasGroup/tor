@@ -78,6 +78,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                     phrases=phrases,
                     link=reply.submission.shortlink,
                     author=reply.author.name,
+                    text=reply.body,
                 ),
                 cfg,
             )
