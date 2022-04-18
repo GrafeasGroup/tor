@@ -1,5 +1,6 @@
 import logging
 import random
+from typing import Optional
 
 import beeline
 from praw.exceptions import ClientException
@@ -60,8 +61,8 @@ def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
 def process_reply(reply: Comment, cfg: Config) -> None:
     try:
         log.debug(f"Received reply from {reply.author.name}: {reply.body}")
-        message = ""
-        flair = None
+        message: Optional[str] = ""
+        flair: Optional[str] = None
         r_body = reply.body.lower()  # cache that thing
 
         if "image transcription" in r_body or is_comment_transcription(reply, cfg):
@@ -118,6 +119,8 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 )
             elif "!debug" in r_body:
                 message, flair = process_debug(reply.author, blossom_submission, cfg)
+            elif "!comment" in r_body:
+                message, flair = None, None
             else:
                 # If we made it this far, it's something we can't process automatically
                 forward_to_slack(reply, cfg)
