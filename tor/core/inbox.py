@@ -118,6 +118,8 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 )
             elif "!debug" in r_body:
                 message, flair = process_debug(reply.author, blossom_submission, cfg)
+            elif "!comment" in r_body:
+                message, flair = None, None
             else:
                 # If we made it this far, it's something we can't process automatically
                 forward_to_slack(reply, cfg)
