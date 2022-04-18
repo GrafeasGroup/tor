@@ -9,7 +9,11 @@ mod:
   intervention_needed: |
     :rotating_light::rotating_light: Mod Intervention Needed :rotating_light::rotating_light:
 
-    Detected use of {phrases} {link}
+    Detected use of {phrases} by u/{author}: {link}
+
+    ```
+    {text}
+    ```
   formatting_issues: |
     I detected formatting issues in the transcription by {author}: {issues}
     {link}
