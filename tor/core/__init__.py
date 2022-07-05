@@ -57,6 +57,6 @@ MOD_SUPPORT_PHRASES = [
     # re.compile('(?:good|bad) bot', re.IGNORECASE),
 ]
 
-CLAIM_PHRASES = ["claim", "dibs", "clai", "caim", "clam"]
+CLAIM_PHRASES = ["claim", "dibs", "clai", "caim", "clam", "calim", "dib"]
 DONE_PHRASES = ["done", "deno", "doen", "dome", "doone"]
 UNCLAIM_PHRASES = ["unclaim", "cancel", "unclai"]
