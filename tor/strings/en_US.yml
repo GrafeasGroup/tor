@@ -80,6 +80,13 @@ responses:
 
       Does this post break the rules? Please report it! If you don't want this post anymore (or can't complete it), respond to this comment with `unclaim`.
 
+      ---
+
+      |📢We're clearing the queue on Saturday, July 23rd at 12:00UTC. Come join us! [Details here](https://www.reddit.com/r/ToR_Meta/comments/vrgp0n/clear_the_queue_is_back_join_us_saturday_july/).|
+      :--|
+
+      ---
+
       Please respond with `done` when complete so we can check this one off the list!
     already_claimed_by_self: |
       ⚠️ You already claimed this post!
@@ -110,6 +117,13 @@ responses:
       If no, please reply with `help` to summon a moderator to resolve the situation.
     completed_transcript: |
       ✅ Awesome, thanks for your help! I'll update your flair to reflect your new count.
+
+      ---
+
+      |📢We're clearing the queue on Saturday, July 23rd at 12:00UTC. Come join us! [Details here](https://www.reddit.com/r/ToR_Meta/comments/vrgp0n/clear_the_queue_is_back_join_us_saturday_july/).|
+      :--|
+
+      ---
 
       If you want to help keep these bots running, please consider [donating via Patreon or Stripe](https://www.reddit.com/r/transcribersofreddit/wiki/donations)!
     cannot_find_transcript: |
