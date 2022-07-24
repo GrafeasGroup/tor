@@ -79,6 +79,7 @@ responses:
       ✅ The post is yours! Best of luck and thanks for helping!
 
       Does this post break the rules? Please report it! If you don't want this post anymore (or can't complete it), respond to this comment with `unclaim`.
+
       Please respond with `done` when complete so we can check this one off the list!
     already_claimed_by_self: |
       ⚠️ You already claimed this post!
@@ -109,6 +110,7 @@ responses:
       If no, please reply with `help` to summon a moderator to resolve the situation.
     completed_transcript: |
       ✅ Awesome, thanks for your help! I'll update your flair to reflect your new count.
+      
       If you want to help keep these bots running, please consider [donating via Patreon or Stripe](https://www.reddit.com/r/transcribersofreddit/wiki/donations)!
     cannot_find_transcript: |
       ⛔ Sorry, I **can't find** your transcription on the post. Please take the following actions:
