@@ -3,7 +3,7 @@ from typing import List
 
 import pytest
 
-from test.validation.helpers import (
+from tor.test.validation.helpers import (
     load_all_valid_transcriptions,
     load_invalid_transcription_from_file,
     load_valid_transcription_from_file,
