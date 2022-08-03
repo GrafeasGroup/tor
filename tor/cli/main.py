@@ -115,8 +115,22 @@ def run(cfg):
     invoke_without_command=True,
 )
 @click.pass_context
-@click.option("-d", "--debug", "debug", is_flag=True, default=DEBUG_MODE, help="Puts bot in dev-mode using non-prod credentials")
-@click.option("-n", "--noop", "noop", is_flag=True, default=NOOP_MODE, help="Just run the daemon, but take no action (helpful for testing infrastructure changes)")
+@click.option(
+    "-d",
+    "--debug",
+    "debug",
+    is_flag=True,
+    default=DEBUG_MODE,
+    help="Puts bot in dev-mode using non-prod credentials",
+)
+@click.option(
+    "-n",
+    "--noop",
+    "noop",
+    is_flag=True,
+    default=NOOP_MODE,
+    help="Just run the daemon, but take no action (helpful for testing infrastructure changes)",
+)
 @click.version_option(version=__version__, prog_name=tor.__SELF_NAME__)
 def main(ctx: Context, debug: bool, noop: bool):
     """Run ToR."""

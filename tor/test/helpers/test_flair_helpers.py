@@ -28,7 +28,11 @@ def test_get_flair_css(transcription_count: int, name: str) -> None:
 
 @pytest.mark.parametrize(
     "transcription_count,name",
-    [(0, "grafeas"), (-1, "grafeas"), (-0.3, "grafeas"),],  # noqa:E231
+    [
+        (0, "grafeas"),
+        (-1, "grafeas"),
+        (-0.3, "grafeas"),
+    ],  # noqa:E231
 )
 def test_get_flair_css_invalid_options(transcription_count: int, name: str) -> None:
     assert _get_flair_css(0) == "grafeas"

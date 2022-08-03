@@ -121,7 +121,9 @@ def request_transcription(
     permalink = i18n["urls"]["reddit_url"].format(str(post["permalink"]))
     submission = cfg.tor.submit(title=title, url=permalink, flair_id=flair.unclaimed)
     intro = i18n["posts"]["rules_comment"].format(
-        post_type=content_type, formatting=content_format, header=cfg.header,
+        post_type=content_type,
+        formatting=content_format,
+        header=cfg.header,
     )
     submission.reply(_(intro))
     create_blossom_submission(post, submission, cfg)
@@ -166,6 +168,7 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         # this submission will have the wrong post times because we didn't know about
         # it, so let's leave a marker that we can clean up later on Blossom's side.
         cfg.blossom.patch(
-            f"submission/{new_submission['id']}/", data={"redis_id": "incomplete"},
+            f"submission/{new_submission['id']}/",
+            data={"redis_id": "incomplete"},
         )
         return new_submission

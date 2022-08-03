@@ -7,6 +7,7 @@ current_dir = Path(__file__).parent
 VALID_TRANSCRIPTION_PATH = current_dir / "transcriptions" / "valid"
 INVALID_TRANSCRIPTION_PATH = current_dir / "transcriptions" / "invalid"
 
+
 def load_invalid_transcription_from_file(name: str) -> str:
     """Load a transcription from the transcriptions/invalid folder."""
     file = open(os.path.join(INVALID_TRANSCRIPTION_PATH, name), encoding="utf-8")
