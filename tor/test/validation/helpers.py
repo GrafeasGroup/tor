@@ -1,11 +1,11 @@
 import os
 from typing import List
+from pathlib import Path
 
 
-VALID_TRANSCRIPTION_PATH = os.path.join("test", "validation", "transcriptions", "valid")
-INVALID_TRANSCRIPTION_PATH = os.path.join(
-    "test", "validation", "transcriptions", "invalid"
-)
+current_dir = Path(__file__).parent
+VALID_TRANSCRIPTION_PATH = current_dir / "transcriptions" / "valid"
+INVALID_TRANSCRIPTION_PATH = current_dir / "transcriptions" / "invalid"
 
 
 def load_invalid_transcription_from_file(name: str) -> str:

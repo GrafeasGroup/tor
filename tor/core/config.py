@@ -92,7 +92,9 @@ except OSError:
 
 if bugsnag and Config.bugsnag_api_key:
     bugsnag.configure(
-        api_key=Config.bugsnag_api_key, app_version=__version__, project_root=__root__,
+        api_key=Config.bugsnag_api_key,
+        app_version=__version__,
+        project_root=__root__,
     )
 
 

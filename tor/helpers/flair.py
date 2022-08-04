@@ -23,7 +23,7 @@ FLAIR_DATA = {
     250: {"class": "grafeas-purple", "name": "Purple"},
     100: {"class": "grafeas-teal", "name": "Teal"},
     50: {"class": "grafeas-green", "name": "Green"},
-    25: {"class": "grafeas-pink", "name": "Pink",},
+    25: {"class": "grafeas-pink", "name": "Pink"},
     1: {"class": "grafeas", "name": "Initiate"},
 }
 

@@ -3,7 +3,7 @@ from typing import List
 
 import pytest
 
-from test.validation.helpers import (
+from tor.test.validation.helpers import (
     load_all_valid_transcriptions,
     load_invalid_transcription_from_file,
     load_valid_transcription_from_file,
@@ -255,7 +255,10 @@ def test_check_for_fenced_code_block(test_input: str, should_match: bool) -> Non
         ("This is a line\n\nThis is another line", False),
         ("*Word*  \n_Word_", True),  # Line break after formatting characters
         ("Word    \nWord", True),  # Line break with more than two spaces
-        ("Word\n  \n---  \n\nWord", False),  # Spaces within paragraph line breaks (often happens when transcribing)
+        (
+            "Word\n  \n---  \n\nWord",
+            False,
+        ),  # Spaces within paragraph line breaks (often happens when transcribing)
         ("Word \nWord", False),  # Only one space at the end
     ],
 )
@@ -317,8 +320,8 @@ def test_check_for_unescaped_subreddit(test_input: str, should_match: bool) -> N
         ("\n     \n   #heading", True),
         ("\n\n\\#hashtag1 #hashtag2", False),
         ("\n\n*#hashtag1 #hashtag2*", False),
-        ("## test", False)
-    ]
+        ("## test", False),
+    ],
 )
 def test_check_for_unescaped_heading(test_input: str, should_match: bool) -> None:
     """Test if unescaped hashtags are detected."""
@@ -338,10 +341,13 @@ def test_check_for_unescaped_heading(test_input: str, should_match: bool) -> Non
         ("*Invalid Header*\n\n---\n\nBlah", True),
         ("*Image Transcription: Test*\n\n---\n\nBlah", False),
         ("Blah *Image Transcription: Test*", True),
-        ("**Image Transcription: Test**", False),  # There is a separate check for this, so it shouldn't be checked here
+        (
+            "**Image Transcription: Test**",
+            False,
+        ),  # There is a separate check for this, so it shouldn't be checked here
         ("Image Transcription: Test*", True),
-        ("    *Image Transcription: Test*", False)
-    ]
+        ("    *Image Transcription: Test*", False),
+    ],
 )
 def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
     """Test if invalid headers are detected."""
@@ -353,13 +359,19 @@ def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
 @pytest.mark.parametrize(
     "test_input,should_match",
     [
-        ("[lance]: https://en.wikipedia.org/wiki/Holy_Lance \"Holy Lance - Wikipedia\"", True),
+        (
+            '[lance]: https://en.wikipedia.org/wiki/Holy_Lance "Holy Lance - Wikipedia"',
+            True,
+        ),
         ("[*Redacted*]: Oh man i think i just ran out of pain", True),
-        ("something something something [*Redacted*]: Oh man i think i just ran out of pain", True),
+        (
+            "something something something [*Redacted*]: Oh man i think i just ran out of pain",
+            True,
+        ),
         ("[*Redacted*]:Oh man i think i just ran out of pain", True),
         (r"\[*Redacted*]: Oh man i think i just ran out of pain", False),
-        ("[*The tor bot happily smiles as the entire queue is cleared in CTQ*]", False)
-    ]
+        ("[*The tor bot happily smiles as the entire queue is cleared in CTQ*]", False),
+    ],
 )
 def test_check_for_reference_links(test_input: str, should_match: str) -> None:
     """Test if reference links are detected"""
@@ -399,10 +411,8 @@ def test_check_for_reference_links(test_input: str, should_match: str) -> None:
         ),
         (
             load_invalid_transcription_from_file("unescaped-heading.txt"),
-            [
-                FormattingIssue.UNESCAPED_HEADING
-            ]
-        )
+            [FormattingIssue.UNESCAPED_HEADING],
+        ),
     ],
 )
 def test_check_for_formatting_issues_invalid_transcriptions(
@@ -421,7 +431,7 @@ def test_check_for_formatting_issues_valid_transcription(transcription: str) -> 
 
 
 def test_april_fools():
-    target = datetime.datetime(2020, 4, 1, 12, 36) # midday on April 1
+    target = datetime.datetime(2020, 4, 1, 12, 36)  # midday on April 1
     assert is_april_fools(target)
 
 

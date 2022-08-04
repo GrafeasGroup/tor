@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tor"
-version = "4.2.5"
+version = "0.0.0"
 description = "A bot that handles moderating and scoring in /r/TranscribersOfReddit"
 authors = ["Grafeas Group <devs@grafeas.org>"]
 license = "MIT"
@@ -11,36 +11,39 @@ classifiers = [
 ]
 repository = "https://github.com/GrafeasGroup/tor"
 homepage = "https://github.com/GrafeasGroup/tor"
-exclude = ['test', 'test.*', '*.test.*', '*.test']
 include = ["commands.json", "tor/strings/*.yml"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-sh = "^1.12"
-bugsnag = "^3.6"
-requests = "^2.22"
+sh = "^1.14.3"
+bugsnag = "^4.2.1"
+requests = "^2.28.1"
 slackclient = "^1"
 PyYaml = "^5.1"
 blossom-wrapper = { git = "https://github.com/GrafeasGroup/blossom-wrapper.git", branch = "master" }
-python-dotenv = "^0.14.0"
-praw = "^7.1.0"
+python-dotenv = "^0.20.0"
+praw = "^7.6.0"
 toml = "^0.10.2"
-honeycomb-beeline = "^2.17.0"
+honeycomb-beeline = "^3.4.1"
+shiv = "^1.0.1"
+click = "^8.1.3"
 
 [tool.poetry.dev-dependencies]
-better-exceptions = "^0.2.2"
-pytest = "^5.1"
-pytest-cov = "^2.7"
-flake8 = "^3.7.9"
+better-exceptions = "^0.3.3"
+pytest = "^7.1.2"
+pytest-cov = "^3.0.0"
+flake8 = "^5.0.3"
 mypy = ">=0.800"
-black = "^19.10b0"
-types-toml = "^0.1"
-types-PyYAML = "^0.1"
-types-requests = "^0.1"
-types-redis = "^3.5"
+black = "^22.6.0"
+types-toml = "^0.10.8"
+types-PyYAML = "^6.0.11"
+types-requests = "^2.28.7"
+types-redis = "^4.3.13"
+poetry = "^1.1.14"
+poetry2setup = "^1.0.0"
 
-[tool.poetry.scripts]
-tor-moderator = "tor.cli.main:main"
+[tool.poetry.plugins."console_scripts"]
+"tor" = "tor.cli.main:main"
 
 [tool.poetry.extras]
 ci = ['pytest', 'pytest-cov']

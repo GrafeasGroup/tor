@@ -104,3 +104,7 @@ ENV/
 praw.ini
 *.port
 *.sw[op]
+
+# build artifacts
+tor.pyz
+setup.py

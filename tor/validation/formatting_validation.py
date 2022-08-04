@@ -166,11 +166,7 @@ def check_for_malformed_footer(transcription: str) -> Optional[FormattingIssue]:
     if is_april_fools(datetime.datetime.now()):
         pattern = FOOTER_PATTERN_APRIL_FOOLS
 
-    return (
-        None
-        if pattern.search(transcription)
-        else FormattingIssue.MALFORMED_FOOTER
-    )
+    return None if pattern.search(transcription) else FormattingIssue.MALFORMED_FOOTER
 
 
 def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]:
@@ -298,7 +294,7 @@ def check_for_formatting_issues(transcription: str) -> Set[FormattingIssue]:
             check_for_unescaped_subreddit(transcription),
             check_for_unescaped_heading(transcription),
             check_for_invalid_header(transcription),
-            check_for_reference_links(transcription)
+            check_for_reference_links(transcription),
         ]
         if issue is not None
     )

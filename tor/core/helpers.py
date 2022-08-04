@@ -197,7 +197,7 @@ def handle_rate_limit(exc: APIException) -> None:
     if not matches:
         log.error(f"Unable to parse rate limit message {exc.message!r}")
         return
-    delay = matches[0] * time_map[matches[1]]
+    delay = int(matches[0] * time_map[matches[1]])
     time.sleep(delay + 1)
 
 

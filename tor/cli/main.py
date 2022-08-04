@@ -1,12 +1,15 @@
-import argparse
 import atexit
-import os
-import time
 import logging
+import os
+import pathlib
+import sys
+import time
 
-from praw import Reddit
-from dotenv import load_dotenv
 import beeline
+import click
+from click.core import Context
+from dotenv import load_dotenv
+from praw import Reddit
 
 # The `import tor` lines is necessary because `tor.__SELF_NAME__` is
 # set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1
@@ -56,7 +59,10 @@ DEBUG_MODE = bool(os.getenv("DEBUG_MODE", ""))
 # Caravan Palace
 # Daft Punk
 # David Bowie
+# DIAMANTE
 # Dorothy
+# Flyleaf
+# Halestorm
 # Hiromi
 # Girl Talk
 # Green Day
@@ -71,6 +77,7 @@ DEBUG_MODE = bool(os.getenv("DEBUG_MODE", ""))
 # Rita Ora
 # The Beatles
 # The Killers
+# The Pretty Reckless
 # Two Door Cinema Club
 #
 #
@@ -81,29 +88,7 @@ log = logging.getLogger()
 load_dotenv()
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(allow_abbrev=False)
-    parser.add_argument("--version", action="version", version=__version__)
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        default=DEBUG_MODE,
-        help="Puts bot in dev-mode using non-prod credentials",
-    )
-    parser.add_argument(
-        "--noop",
-        action="store_true",
-        default=NOOP_MODE,
-        help=(
-            "Just run the daemon, but take no action (helpful for testing infrastructure"
-            " changes)"
-        ),
-    )
-
-    return parser.parse_args()
-
-
-def noop(cfg):
+def run_noop(cfg):
     pass
 
 
@@ -125,8 +110,35 @@ def run(cfg):
         time.sleep(15)
 
 
-def main():
-    opt = parse_arguments()
+@click.group(
+    context_settings=dict(help_option_names=["-h", "--help", "--halp"]),
+    invoke_without_command=True,
+)
+@click.pass_context
+@click.option(
+    "-d",
+    "--debug",
+    "debug",
+    is_flag=True,
+    default=DEBUG_MODE,
+    help="Puts bot in dev-mode using non-prod credentials",
+)
+@click.option(
+    "-n",
+    "--noop",
+    "noop",
+    is_flag=True,
+    default=NOOP_MODE,
+    help="Just run the daemon, but take no action (helpful for testing infrastructure changes)",
+)
+@click.version_option(version=__version__, prog_name=tor.__SELF_NAME__)
+def main(ctx: Context, debug: bool, noop: bool):
+    """Run ToR."""
+    if ctx.invoked_subcommand:
+        # If we asked for a specific command, don't run the bot. Instead, pass control
+        # directly to the subcommand.
+        return
+
     logging.basicConfig(
         level=logging.INFO,
         format="%(levelname)s | %(funcName)s | %(message)s",
@@ -147,7 +159,7 @@ def main():
     beeline.init(**args)
     atexit.register(beeline.close)
 
-    config.debug_mode = opt.debug
+    config.debug_mode = debug
 
     if config.debug_mode:
         bot_name = "debug"
@@ -170,10 +182,57 @@ def main():
     if tor.__SELF_NAME__ not in tor.__BOT_NAMES__:
         tor.__BOT_NAMES__.append(tor.__SELF_NAME__)
 
-    if opt.noop:
-        run_until_dead(noop)
+    if noop:
+        run_until_dead(run_noop)
     else:
         run_until_dead(run)
+
+
+@main.command()
+@click.option(
+    "-v",
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="Show Pytest output instead of running quietly.",
+)
+def selfcheck(verbose: bool) -> None:
+    """
+    Verify the binary passes all tests internally.
+
+    Add any other self-check related code here.
+    """
+    import pytest
+
+    import tor.test
+
+    # -x is 'exit immediately if a test fails'
+    # We need to get the path because the file is actually inside the extracted
+    # environment maintained by shiv, not physically inside the archive at the
+    # time of running.
+    args = ["-x", str(pathlib.Path(tor.test.__file__).parent)]
+    if not verbose:
+        args.append("-qq")
+    # pytest will return an exit code that we can check on the command line
+    sys.exit(pytest.main(args))
+
+
+BANNER = r"""
+___________   __________
+\__    ___/___\______   \
+  |    | /  _ \|       _/
+  |    |(  <_> )    |   \
+  |____| \____/|____|_  /
+                      \/
+"""
+
+
+@main.command()
+def shell() -> None:
+    """Create a Python REPL inside the environment."""
+    import code
+
+    code.interact(local=globals(), banner=BANNER)
 
 
 if __name__ == "__main__":
