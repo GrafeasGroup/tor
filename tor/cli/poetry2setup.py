@@ -1,3 +1,4 @@
+# type: ignore
 # https://github.com/abersheeran/poetry2setup/blob/master/poetry2setup.py
 # MIT License
 #
