@@ -10,7 +10,7 @@ import click
 from click.core import Context
 from dotenv import load_dotenv
 from praw import Reddit
-from shiv.bootstrap import current_zipfile
+from shiv.bootstrap import current_zipfile  # type: ignore
 
 # The `import tor` lines is necessary because `tor.__SELF_NAME__` is
 # set here. Reason: https://gist.github.com/TheLonelyGhost/9dbe810c42d8f2edcf3388a8b19519e1
@@ -88,6 +88,7 @@ DEBUG_MODE = bool(os.getenv("DEBUG_MODE", ""))
 log = logging.getLogger()
 
 with current_zipfile() as archive:
+    dotenv_path: str | None
     if archive:
         # if archive is none, we're not in the zipfile and are probably
         # in development mode right now.
