@@ -1,0 +1,34 @@
+name: Build tor.pyz and test
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10.x'
+    - name: Install Env
+      # shiv will download the dependencies it needs on its own
+      run: |
+        pip install --upgrade pip
+        pip install shiv
+        pip install poetry
+        pip install poetry2setup
+    - name: Add CURRENT_TIME env property
+      # the smart thing to do here would be to use the commit hash, but
+      # github releases are ALPHABETIZED, so a commit hash of `abcdef` will
+      # not be listed as the latest release if `defabc` came before. (╥﹏╥)
+      run: echo "CURRENT_TIME_VERSION=v$(date '+%s')" >> $GITHUB_ENV
+    - name: Build the sucker
+      run: |
+        sed -i -e "s/?????/${{ env.CURRENT_TIME_VERSION }}/g" tor/__init__.py
+        make build
+    - name: Remove source to make sure it doesn't interfere with the tests
+      run: rm -rf tor/
+    - name: Run selfcheck on compiled binary
+      run: ./build/tor.pyz selfcheck
