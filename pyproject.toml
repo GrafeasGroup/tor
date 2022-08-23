@@ -45,9 +45,6 @@ poetry2setup = "^1.0.0"
 [tool.poetry.plugins."console_scripts"]
 "tor" = "tor.cli.main:main"
 
-[tool.poetry.extras]
-ci = ['pytest', 'pytest-cov']
-
 [[tool.mypy.overrides]]
 module = [
     "praw",
