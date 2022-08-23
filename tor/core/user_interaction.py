@@ -138,8 +138,8 @@ def process_claim(
         message = coc_not_accepted.format(get_wiki_page("codeofconduct", cfg))
         cfg.blossom.create_user(username=username)
 
-    elif response.status == BlossomStatus.blacklisted:
-        message = i18n["responses"]["general"]["blacklisted"]
+    elif response.status == BlossomStatus.blocked:
+        message = i18n["responses"]["general"]["blocked"]
 
     elif response.status == BlossomStatus.already_claimed:
         claimed_by = response.data["username"]
@@ -289,8 +289,8 @@ def process_done(
         elif done_response.status == BlossomStatus.missing_prerequisite:
             message = done_messages["not_claimed_by_user"]
 
-        elif done_response.status == BlossomStatus.blacklisted:
-            message = i18n["responses"]["general"]["blacklisted"]
+        elif done_response.status == BlossomStatus.blocked:
+            message = i18n["responses"]["general"]["blocked"]
 
     return message, return_flair
 
@@ -331,8 +331,8 @@ def process_unclaim(
         message = unclaim_messages["claimed_other_user"]
     elif response.status == BlossomStatus.already_completed:
         message = unclaim_messages["post_already_completed"]
-    elif response.status == BlossomStatus.blacklisted:
-        message = i18n["responses"]["general"]["blacklisted"]
+    elif response.status == BlossomStatus.blocked:
+        message = i18n["responses"]["general"]["blocked"]
     else:
         message = unclaim_messages["still_unclaimed"]
     return message, return_flair

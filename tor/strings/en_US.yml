@@ -166,8 +166,8 @@ responses:
   general:
     getting_help: |
       ✅ Help is on the way! I have notified the mods and someone should be here to assist you soon.
-    blacklisted: |
-      ⛔ It appears that you are blacklisted. Please contact the moderators of r/TranscribersOfReddit if you do not know why this is the case.
+    blocked: |
+      ⛔ Sorry you can't transcribe at this time. Please message the mods through modmail.
     oops: |
       ⛔ Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!
     coc_not_accepted: |
