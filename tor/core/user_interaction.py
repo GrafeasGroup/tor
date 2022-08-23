@@ -1,7 +1,7 @@
 import logging
 import random
 import time
-from typing import Dict, Tuple
+from typing import Tuple
 
 from tor.core.config import (
     SLACK_COC_ACCEPTED_CHANNEL_ID,
@@ -48,9 +48,18 @@ MODCHAT_EMOTES = [
 ]
 
 
+def modchat_blocked_user_ping(username: str, blossom_submission: dict, cfg: Config) -> None:
+    user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
+    send_to_modchat(
+        f":no_entry_sign: Blocked user <{user_url}|u/{username}> is trying to transcribe."
+        f" <{blossom_submission['tor_url']}|Thread link>",
+        cfg,
+    )
+
+
 @beeline.traced(name="process_coc")
 def process_coc(
-    username: str, context: str, blossom_submission: Dict, cfg: Config
+    username: str, context: str, blossom_submission: dict, cfg: Config
 ) -> Tuple:
     """
     Process the acceptation of the CoC by the specified user.
@@ -93,7 +102,7 @@ def process_coc(
 
 @beeline.traced(name="process_claim")
 def process_claim(
-    username: str, blossom_submission: Dict, cfg: Config, first_time=False
+    username: str, blossom_submission: dict, cfg: Config, first_time=False
 ) -> Tuple:
     """
     Process a claim request.
@@ -138,8 +147,9 @@ def process_claim(
         message = coc_not_accepted.format(get_wiki_page("codeofconduct", cfg))
         cfg.blossom.create_user(username=username)
 
-    elif response.status == BlossomStatus.blacklisted:
-        message = i18n["responses"]["general"]["blacklisted"]
+    elif response.status == BlossomStatus.blocked:
+        message = i18n["responses"]["general"]["blocked"]
+        modchat_blocked_user_ping(username, blossom_submission, cfg)
 
     elif response.status == BlossomStatus.already_claimed:
         claimed_by = response.data["username"]
@@ -167,7 +177,7 @@ def process_claim(
 @beeline.traced(name="process_done")
 def process_done(
     user: Redditor,
-    blossom_submission: Dict,
+    blossom_submission: dict,
     comment: Comment,
     cfg: Config,
     override=False,
@@ -289,15 +299,16 @@ def process_done(
         elif done_response.status == BlossomStatus.missing_prerequisite:
             message = done_messages["not_claimed_by_user"]
 
-        elif done_response.status == BlossomStatus.blacklisted:
-            message = i18n["responses"]["general"]["blacklisted"]
+        elif done_response.status == BlossomStatus.blocked:
+            message = i18n["responses"]["general"]["blocked"]
+            modchat_blocked_user_ping(user.name, blossom_submission, cfg)
 
     return message, return_flair
 
 
 @beeline.traced(name="process_unclaim")
 def process_unclaim(
-    username: str, blossom_submission: Dict, submission: Submission, cfg: Config
+    username: str, blossom_submission: dict, submission: Submission, cfg: Config
 ) -> Tuple:
     """
     Process an unclaim request.
@@ -331,8 +342,9 @@ def process_unclaim(
         message = unclaim_messages["claimed_other_user"]
     elif response.status == BlossomStatus.already_completed:
         message = unclaim_messages["post_already_completed"]
-    elif response.status == BlossomStatus.blacklisted:
-        message = i18n["responses"]["general"]["blacklisted"]
+    elif response.status == BlossomStatus.blocked:
+        message = i18n["responses"]["general"]["blocked"]
+        modchat_blocked_user_ping(username, blossom_submission, cfg)
     else:
         message = unclaim_messages["still_unclaimed"]
     return message, return_flair

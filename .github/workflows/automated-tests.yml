@@ -20,7 +20,7 @@ jobs:
           pip install poetry
           hash -r
 
-          poetry install -v --extras ci
+          poetry install
       - run: poetry run mypy .
       - run: poetry run flake8 .
 
@@ -40,5 +40,5 @@ jobs:
           pip install poetry
           hash -r
 
-          poetry install -v --extras ci
+          poetry install
       - run: poetry run pytest --cov=tor
