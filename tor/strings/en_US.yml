@@ -167,7 +167,7 @@ responses:
     getting_help: |
       ✅ Help is on the way! I have notified the mods and someone should be here to assist you soon.
     blocked: |
-      ⛔ Sorry you can't transcribe at this time. Please message the mods through modmail.
+      ⛔ Sorry, you can't transcribe at this time. Please [message the mods](https://www.reddit.com/message/compose?to=%2Fr%2FTranscribersOfReddit&subject=Blocked%20from%20Transcribing&message=) through modmail.
     oops: |
       ⛔ Something appears to have gone wrong. Please message the moderators of r/TranscribersOfReddit to have them look at this. Thanks!
     coc_not_accepted: |
