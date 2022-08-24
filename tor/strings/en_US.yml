@@ -184,8 +184,7 @@ responses:
       [Hey, you're welcome!]({})
     transcript_on_tor_post: |
       ⚠️ Hi there! I might be wrong, but I think you just posted a transcription in reply to me.
-      The transcription should be made as a **top-level comment** on the post that you're working on transcribing.
-      For example, if the content is on r\/nicegirls, then the transcription should be commented as a reply to that submission on r\/nicegirls.
+      The transcription should be made as a **top-level comment** on the [post on r\/{sub_name}]({post_link}).
       After you've commented there, come back to me and reply with `done` and I can process it!
 
       Do you need assistance? Reply to me with `help` to summon a moderator!
