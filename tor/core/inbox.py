@@ -40,6 +40,11 @@ i18n = translation()
 log = logging.getLogger(__name__)
 
 
+def extract_sub_from_url(url: str) -> str:
+    """returns the sub name from the given url without "r/" at the start."""
+    return url.split("/")[4]
+
+
 @beeline.traced(name="forward_to_slack")
 def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
     username = str(item.author.name)
@@ -66,7 +71,12 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         r_body = reply.body.lower()  # cache that thing
 
         if "image transcription" in r_body or is_comment_transcription(reply, cfg):
-            message = i18n["responses"]["general"]["transcript_on_tor_post"]
+            post_link = reply.submission.url
+            sub_name = extract_sub_from_url(post_link)
+            message = i18n["responses"]["general"]["transcript_on_tor_post"].format(
+                sub_name=sub_name,
+                post_link=post_link,
+            )
         elif matches := [
             match.group()
             for match in [regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]
