@@ -71,8 +71,8 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         r_body = reply.body.lower()  # cache that thing
 
         if "image transcription" in r_body or is_comment_transcription(reply, cfg):
-            post_link = submission.url
-            sub_name = extract_sub_from_url(submission.url)
+            post_link = reply.submission.url
+            sub_name = extract_sub_from_url(post_link)
             message = i18n["responses"]["general"]["transcript_on_tor_post"].format(
                 sub_name=sub_name,
                 post_link=post_link,
