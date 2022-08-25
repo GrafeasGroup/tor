@@ -83,7 +83,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 post_link=post_link,
             )
             send_to_modchat(
-                message = i18n["mod"]["transcript_on_tor_post"].format(
+                i18n["mod"]["transcript_on_tor_post"].format(
                     user_url=user_url,
                     post_url=post_url,
                     tor_post=tor_post,
