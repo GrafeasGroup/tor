@@ -63,7 +63,7 @@ def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
 
 
 @beeline.traced(name="process_reply")
-def process_reply(reply: Comment, cfg: Config) -> None:
+def process_reply(reply: Comment, context: str, cfg: Config) -> None:
     try:
         log.debug(f"Received reply from {reply.author.name}: {reply.body}")
         message: Optional[str] = ""
