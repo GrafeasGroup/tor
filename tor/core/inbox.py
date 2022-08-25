@@ -72,6 +72,8 @@ def process_reply(reply: Comment, cfg: Config) -> None:
 
         if "image transcription" in r_body or is_comment_transcription(reply, cfg):
             post_link = reply.submission.url
+            submission = reply.submission
+            username = reply.author.name
             sub_name = extract_sub_from_url(post_link)
             user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
             post_url = i18n["urls"]["reddit_url"].format(context)
