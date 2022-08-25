@@ -76,7 +76,7 @@ def process_reply(reply: Comment, context: str, cfg: Config) -> None:
             username = reply.author.name
             sub_name = extract_sub_from_url(post_link)
             user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
-            post_url = i18n["urls"]["reddit_url"].format(context)
+            post_url = submission.url
             tor_post = submission.tor_url
             message = i18n["responses"]["general"]["transcript_on_tor_post"].format(
                 sub_name=sub_name,
