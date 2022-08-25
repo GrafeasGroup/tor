@@ -39,6 +39,14 @@ i18n = translation()
 
 log = logging.getLogger(__name__)
 
+THINK_EMOTES = [
+    ":thinking_party:",
+    ":think-rotate:",
+    ":monoclethink:",
+    ":eggplant-think:",
+    ":thinking-screensaver:"
+]
+
 
 def extract_sub_from_url(url: str) -> str:
     """returns the sub name from the given url without "r/" at the start."""
@@ -73,10 +81,21 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         if "image transcription" in r_body or is_comment_transcription(reply, cfg):
             post_link = reply.submission.url
             sub_name = extract_sub_from_url(post_link)
+            user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
+            post_url = i18n["urls"]["reddit_url"].format(context)
+            tor_post = submission.tor_url
+            emote = random.choice(THINK_EMOTES)
             message = i18n["responses"]["general"]["transcript_on_tor_post"].format(
                 sub_name=sub_name,
                 post_link=post_link,
             )
+            send_to_modchat(
+                f"<{user_url}|u/{username}> posted a "
+                f"<{post_url}|transcription> on "
+                f"<{tor_post}|ToR post> instead of posting it on "
+                f"<{post_link}|r/{sub_name}>. {emote}"
+                cfg,
+                )
         elif matches := [
             match.group()
             for match in [regex.search(reply.body) for regex in MOD_SUPPORT_PHRASES]
