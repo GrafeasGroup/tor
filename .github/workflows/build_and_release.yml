@@ -21,7 +21,7 @@ jobs:
         pip install --upgrade pip
         pip install shiv
         pip install poetry
-        pip install poetry2setup
+        pip install git+https://github.com/abersheeran/poetry2setup@master
     - name: Add CURRENT_TIME env property
       # the smart thing to do here would be to use the commit hash, but
       # github releases are ALPHABETIZED, so a commit hash of `abcdef` will
