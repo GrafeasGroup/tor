@@ -4,8 +4,7 @@ from typing import Optional
 
 import beeline
 from praw.exceptions import ClientException
-from praw.models import Comment, Message
-from praw.models.reddit.mixins import InboxableMixin
+from praw.models import Comment, Message, Submission
 
 from tor import __BOT_NAMES__
 from tor.core import (
@@ -46,7 +45,7 @@ def extract_sub_from_url(url: str) -> str:
 
 
 @beeline.traced(name="forward_to_slack")
-def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
+def forward_to_slack(item: Comment, cfg: Config) -> None:
     username = str(item.author.name)
 
     send_to_modchat(
@@ -71,11 +70,24 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         r_body = reply.body.lower()  # cache that thing
 
         if "image transcription" in r_body or is_comment_transcription(reply, cfg):
-            post_link = reply.submission.url
-            sub_name = extract_sub_from_url(post_link)
+            post_link: str = reply.submission.url
+            tor_submission: Submission = reply.submission
+            username: str = reply.author.name
+            sub_name: str = extract_sub_from_url(post_link)
+            user_url: str = i18n["urls"]["reddit_url"].format(f"/u/{username}")
+            linked_submission: Submission = cfg.r.submission(url=tor_submission.url)
             message = i18n["responses"]["general"]["transcript_on_tor_post"].format(
                 sub_name=sub_name,
                 post_link=post_link,
+            )
+            send_to_modchat(
+                i18n["mod"]["transcript_on_tor_post"].format(
+                    user_url=user_url,
+                    post_url=post_url,
+                    tor_post=tor_post,
+                    sub_name=sub_name,
+                    post_link=post_link
+                )
             )
         elif matches := [
             match.group()
@@ -184,7 +196,7 @@ def check_inbox(cfg: Config) -> None:
     :return: None.
     """
     # Sort inbox, then act on it
-    # Invert the inbox so we're processing oldest first!
+    # Invert the inbox so that we're processing the oldest first!
     for item in reversed(list(cfg.r.inbox.unread(limit=None))):
         # Very rarely we may actually get a message from Reddit itself.
         # In this case, there will be no author attribute.

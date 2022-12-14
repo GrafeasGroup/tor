@@ -17,6 +17,8 @@ mod:
   formatting_issues: |
     I detected formatting issues in the transcription by {author}: {issues}
     {link}
+  transcript_on_tor_post: |
+    Looks like {user_url} posted a [transcription]({post_url}) on [ToR Post]({tor_post}) instead of posting it on [r/{sub_name}]({post_link}). :facepalm:
 posts:
   discovered_submit_title: |
     {sub} | {type} | "{title}"
