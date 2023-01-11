@@ -365,8 +365,18 @@ def test_check_for_invalid_header(test_input: str, should_match: bool) -> None:
         ),
         ("[*Redacted*]: Oh man i think i just ran out of pain", True),
         (
-            "something something something [*Redacted*]: Oh man i think i just ran out of pain",
+            "   [*Redacted*]: Oh man i think i just ran out of pain",
             True,
+        ),
+        # Allowed in text
+        (
+            "something something something [*Redacted*]: Oh man i think i just ran out of pain",
+            False,
+        ),
+        # Allowed in code blocks
+        (
+            "    [item.monthName]: [item.firstDay, item.lastDay]",
+            False,
         ),
         ("[*Redacted*]:Oh man i think i just ran out of pain", True),
         (r"\[*Redacted*]: Oh man i think i just ran out of pain", False),
