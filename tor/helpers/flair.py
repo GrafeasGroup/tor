@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 i18n = translation()
 
 FLAIR_DATA = {
+    30000: {"class": "grafeas-garnet", "name": "Garnet"},
     20000: {"class": "grafeas-sapphire", "name": "Sapphire"},
     10000: {"class": "grafeas-jade", "name": "Jade"},
     5000: {"class": "grafeas-topaz", "name": "Topaz"},

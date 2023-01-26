@@ -19,7 +19,7 @@ i18n = translation()
         (1000, "grafeas-diamond"),
         (111, "grafeas-teal"),
         (1, "grafeas"),
-        (100000000, "grafeas-sapphire"),
+        (100000000, "grafeas-garnet"),
     ],
 )
 def test_get_flair_css(transcription_count: int, name: str) -> None:
