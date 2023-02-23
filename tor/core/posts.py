@@ -171,13 +171,17 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Optional[Dict
         if new_submission_response.status == BlossomStatus.ok:
             new_submission = new_submission_response.data
 
-            # this submission will have the wrong post times because we didn't know about
-            # it, so let's leave a marker that we can clean up later on Blossom's side.
-            cfg.blossom.patch(
-                f"submission/{new_submission['id']}/",
-                data={"redis_id": "incomplete"},
-            )
-            return new_submission
+            if new_submission is not None:
+                # this submission will have the wrong post times because we didn't know about
+                # it, so let's leave a marker that we can clean up later on Blossom's side.
+                cfg.blossom.patch(
+                    f"submission/{new_submission['id']}/",
+                    data={"redis_id": "incomplete"},
+                )
+                return new_submission
+            else:
+                logging.error(f"Failed to create missing submission {submission.url} (no data)")
+                return None
         else:
             logging.error(f"Failed to create missing submission {submission.url}")
             return None
