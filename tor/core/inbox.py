@@ -105,6 +105,11 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 return
 
             blossom_submission = get_blossom_submission(submission, cfg)
+
+            if blossom_submission is None:
+                log.error(f"Failed to get Blossom submission {submission}!")
+                return None
+
             if "i accept" in r_body:
                 message, flair = process_coc(
                     username, reply.context, blossom_submission, cfg
