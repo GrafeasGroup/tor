@@ -1,12 +1,13 @@
 from datetime import datetime, timedelta
 
 from praw import Reddit
+
 # from praw.exceptions import RedditAPIException
 
-r = Reddit('bot2')
+r = Reddit("bot2")
 
-UNCLAIMED = 'Unclaimed'
-IN_PROGRESS = 'In Progress'
+UNCLAIMED = "Unclaimed"
+IN_PROGRESS = "In Progress"
 
 
 def remove_old_crap(posts):
@@ -18,7 +19,7 @@ def remove_old_crap(posts):
                 item.mod.remove()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     current_time = datetime.now()
     for x in range(30):
         # I know for a fact that sometimes reddit will only show 4 posts on the page,
@@ -27,7 +28,9 @@ if __name__ == '__main__':
         submissions = list(r.subreddit("transcribersofreddit").hot(limit=None))
         submissions += list(r.subreddit("transcribersofreddit").new(limit=None))
         submissions += list(r.subreddit("transcribersofreddit").top(limit=None))
-        submissions += list(r.subreddit("transcribersofreddit").controversial(limit=None))
+        submissions += list(
+            r.subreddit("transcribersofreddit").controversial(limit=None)
+        )
         remove_old_crap(submissions)
 
         # try:

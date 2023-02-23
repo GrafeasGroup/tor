@@ -48,7 +48,9 @@ MODCHAT_EMOTES = [
 ]
 
 
-def modchat_blocked_user_ping(username: str, blossom_submission: dict, cfg: Config) -> None:
+def modchat_blocked_user_ping(
+    username: str, blossom_submission: dict, cfg: Config
+) -> None:
     user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
     send_to_modchat(
         f":no_entry_sign: Blocked user <{user_url}|u/{username}> is trying to transcribe."
