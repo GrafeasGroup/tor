@@ -1,8 +1,8 @@
 import logging
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 
 import beeline
-from blossom_wrapper import BlossomStatus
+from blossom_wrapper import BlossomStatus, BlossomResponse
 from praw.models import Submission
 
 from tor.core.config import Config
@@ -133,7 +133,7 @@ def create_blossom_submission(
     original_post: PostSummary,  # original submission
     tor_post: Submission,  # tor submission
     cfg: Config,
-) -> Dict:
+) -> BlossomResponse:
     if (content_url := str(original_post["url"])) is None:
         content_url = cfg.r.submission(url=tor_post.url).url
     tor_url = i18n["urls"]["reddit_url"].format(str(tor_post.permalink))
@@ -148,7 +148,7 @@ def create_blossom_submission(
     )
 
 
-def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
+def get_blossom_submission(submission: Submission, cfg: Config) -> Optional[Dict]:
     response = cfg.blossom.get_submission(url=submission.url)
     if response.status == BlossomStatus.ok:
         return response.data[0]
@@ -164,11 +164,20 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Dict:
         post_summary["title"] = linked_post.title
         post_summary["is_nsfw"] = linked_post.over_18
 
-        new_submission = create_blossom_submission(post_summary, submission, cfg)
-        # this submission will have the wrong post times because we didn't know about
-        # it, so let's leave a marker that we can clean up later on Blossom's side.
-        cfg.blossom.patch(
-            f"submission/{new_submission['id']}/",
-            data={"redis_id": "incomplete"},
+        new_submission_response = create_blossom_submission(
+            post_summary, submission, cfg
         )
-        return new_submission
+
+        if new_submission_response.status == BlossomStatus.ok:
+            new_submission = new_submission_response.data
+
+            # this submission will have the wrong post times because we didn't know about
+            # it, so let's leave a marker that we can clean up later on Blossom's side.
+            cfg.blossom.patch(
+                f"submission/{new_submission['id']}/",
+                data={"redis_id": "incomplete"},
+            )
+            return new_submission
+        else:
+            logging.error(f"Failed to create missing submission {submission.url}")
+            return None
