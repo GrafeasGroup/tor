@@ -242,7 +242,7 @@ def run_until_dead(func):
                     )
                     handle_rate_limit(e)
                 else:
-                    log.exception("Uncaught exception")
+                    log.error(f"Uncaught exception {e}", exc_info=e)
             except (RequestException, ServerError, Forbidden) as e:
                 log.warning(f"{e} - Issue communicating with Reddit. Sleeping for 60s!")
                 time.sleep(60)
