@@ -3,6 +3,7 @@ import os
 from typing import Dict, List, Union
 
 import bugsnag
+import pytz
 from blossom_wrapper import BlossomAPI
 from dotenv import load_dotenv
 from praw import Reddit
@@ -48,11 +49,11 @@ class Config(object):
     perform_header_check = True
     debug_mode = False
 
-    last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
-    last_set_meta_flair_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
+    last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1, tzinfo=pytz.UTC)
+    last_set_meta_flair_time = datetime.datetime(1970, 1, 1, 1, 1, 1, tzinfo=pytz.UTC)
 
     @cached_property
-    def blossom(self):
+    def blossom(self) -> BlossomAPI:
         return BlossomAPI(
             email=os.environ["BLOSSOM_EMAIL"],
             password=os.environ["BLOSSOM_PASSWORD"],
@@ -68,7 +69,7 @@ class Config(object):
             return self.r.subreddit("transcribersofreddit")
 
     @cached_property
-    def modchat(self):
+    def modchat(self) -> SlackClient:
         return SlackClient(os.getenv("SLACK_API_KEY", None))
 
     # Compatibility

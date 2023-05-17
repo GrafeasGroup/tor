@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List
 
 import beeline
+import pytz
 import requests
 
 from tor.core.config import Config
@@ -111,7 +112,7 @@ def threaded_check_submissions(cfg: Config) -> None:
         # looked for new posts. We'll try again later.
         return
 
-    cfg.last_post_scan_time = datetime.now()
+    cfg.last_post_scan_time = datetime.now(tz=pytz.UTC)
 
     subreddits = cfg.subreddits_to_check
 

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+import pytz
 from praw import Reddit
 
 # from praw.exceptions import RedditAPIException
@@ -10,17 +11,17 @@ UNCLAIMED = "Unclaimed"
 IN_PROGRESS = "In Progress"
 
 
-def remove_old_crap(posts):
+def remove_old_crap(posts) -> None:
     for item in posts:
         if item.link_flair_text == UNCLAIMED:
-            submission_time = datetime.fromtimestamp(item.created_utc)
+            submission_time = datetime.fromtimestamp(item.created_utc, tz=pytz.UTC)
             if submission_time < current_time - timedelta(days=1):
                 print(f"Removing {item.name}, posted on {str(submission_time)}")
                 item.mod.remove()
 
 
 if __name__ == "__main__":
-    current_time = datetime.now()
+    current_time = datetime.now(tz=pytz.UTC)
     for x in range(30):
         # I know for a fact that sometimes reddit will only show 4 posts on the page,
         # but each one of these options will only pull one of them. Just ask for all

@@ -98,12 +98,12 @@ with current_zipfile() as archive:
 load_dotenv(dotenv_path=dotenv_path)
 
 
-def run_noop(cfg):
+def run_noop(cfg) -> None:
     pass
 
 
 @beeline.traced(name="run")
-def run(cfg):
+def run(cfg) -> None:
     """Primary routine.
 
     :param cfg: Global config dict, supplied by tor_core.
@@ -141,7 +141,7 @@ def run(cfg):
     help="Just run the daemon, but take no action (helpful for testing infrastructure changes)",
 )
 @click.version_option(version=__version__, prog_name=tor.__SELF_NAME__)
-def main(ctx: Context, debug: bool, noop: bool):
+def main(ctx: Context, debug: bool, noop: bool) -> None:
     """Run ToR."""
     if ctx.invoked_subcommand:
         # If we asked for a specific command, don't run the bot. Instead, pass control

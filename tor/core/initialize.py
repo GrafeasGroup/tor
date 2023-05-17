@@ -11,7 +11,7 @@ log = logging.getLogger()
 
 
 @beeline.traced("configure_logging")
-def configure_logging(cfg: Config, log_name="transcribersofreddit.log") -> None:
+def configure_logging(cfg: Config, log_name: str = "transcribersofreddit.log") -> None:
     # Set formatting and logging level.
     logging.basicConfig(
         level=logging.INFO,

@@ -25,8 +25,11 @@ class User(object):
     pam.save()
     """
 
-    def __init__(self, username: str, redis_conn: StrictRedis, create_if_not_found=True) -> None:
+    def __init__(
+        self, username: str, redis_conn: StrictRedis, create_if_not_found: bool = True
+    ) -> None:
         """Create our own Redis connection if one is not passed in.
+
         We also assume that there is already a logging object created.
 
         :param username: String; the username we're looking for. No fuzzing

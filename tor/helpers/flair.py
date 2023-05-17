@@ -30,7 +30,7 @@ FLAIR_DATA = {
 
 
 def flair_post(post: Submission, flair_id: Optional[str]) -> None:
-    """Sets the requested flair on a given post.
+    """Set the requested flair on a given post.
 
     :param post: A Submission object on ToR.
     :param flair_id: String. The ID of the flair template to apply.
@@ -57,7 +57,7 @@ def _get_flair_css(transcription_count: int) -> str:
     return [FLAIR_DATA[i]["class"] for i in keys if i <= transcription_count][0]
 
 
-def check_promotion(count):
+def check_promotion(count: int) -> bool:
     return True if count in FLAIR_DATA.keys() else False
 
 

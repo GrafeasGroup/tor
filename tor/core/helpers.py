@@ -4,7 +4,7 @@ import re
 import signal
 import sys
 import time
-from typing import Dict, List
+from typing import Any, Callable, Dict, List
 
 import beeline
 from dotenv import load_dotenv
@@ -191,7 +191,7 @@ def handle_rate_limit(exc: APIException) -> None:
     time.sleep(delay + 1)
 
 
-def run_until_dead(func):
+def run_until_dead(func: Callable) -> None:
     """The official method that replaces all that ugly boilerplate required to
     start up a bot under the TranscribersOfReddit umbrella. This method handles
     communication issues with Reddit, timeouts, and handles CTRL+C and
@@ -203,10 +203,9 @@ def run_until_dead(func):
     :param exceptions: A tuple of exception classes to guard against. These are
         a set of PRAW connection errors (timeouts and general connection
         issues) but they can be overridden with a passed-in set.
-    :return: None.
     """
 
-    def double_ctrl_c_handler(*args, **kwargs) -> None:
+    def double_ctrl_c_handler(*args: Any, **kwargs: Any) -> None:
         if not tor.core.is_running:
             log.critical("User pressed CTRL+C twice!!! Killing!")
             sys.exit(1)

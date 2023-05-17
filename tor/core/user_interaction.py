@@ -93,7 +93,9 @@ def process_coc(username: str, context: str, blossom_submission: dict, cfg: Conf
 
 
 @beeline.traced(name="process_claim")
-def process_claim(username: str, blossom_submission: dict, cfg: Config, first_time=False) -> Tuple:
+def process_claim(
+    username: str, blossom_submission: dict, cfg: Config, first_time: bool = False
+) -> Tuple:
     """Process a claim request.
 
     This function sends a reply depending on the response from Blossom and
@@ -163,8 +165,8 @@ def process_done(
     blossom_submission: dict,
     comment: Comment,
     cfg: Config,
-    override=False,
-    alt_text_trigger=False,
+    override: bool = False,
+    alt_text_trigger: bool = False,
 ) -> Tuple:
     """Handles comments where the user claims to have completed a post.
 
