@@ -1,8 +1,6 @@
-import datetime
 import re
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Set
-
-import pytz
 
 from tor.strings import translation
 from tor.validation.formatting_issues import FormattingIssue
@@ -100,13 +98,13 @@ REFERENCE_LINK_PATTERN = re.compile(r"(?:^[ ]{0,3})\[.*\]:.*")
 INCORRECT_LINE_BREAK_PATTERN = re.compile(r"[\w*_:]([ ]{2,}|\\)\n[\w*_:]")
 
 
-def is_april_fools(now: datetime.datetime) -> bool:
-    april_fools = datetime.datetime(now.year, 4, 1, tzinfo=pytz.UTC)
-    margin_of_error = datetime.timedelta(days=1)
+def is_april_fools(now: datetime) -> bool:
+    april_fools = datetime(now.year, 4, 1, tzinfo=timezone.utc)
+    margin_of_error = timedelta(days=1)
 
     # March 31st, April 1st, or April 2nd
     begin = april_fools - margin_of_error
-    end = april_fools + margin_of_error + datetime.timedelta(days=1)
+    end = april_fools + margin_of_error + timedelta(days=1)
 
     return now >= begin and now <= end
 
@@ -166,7 +164,7 @@ def check_for_heading_with_dashes(transcription: str) -> Optional[FormattingIssu
 def check_for_malformed_footer(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription doesn't contain the correct footer."""
     pattern = FOOTER_PATTERN
-    if is_april_fools(datetime.datetime.now(tz=pytz.UTC)):
+    if is_april_fools(datetime.now(tz=timezone.utc)):
         pattern = FOOTER_PATTERN_APRIL_FOOLS
 
     return None if pattern.search(transcription) else FormattingIssue.MALFORMED_FOOTER

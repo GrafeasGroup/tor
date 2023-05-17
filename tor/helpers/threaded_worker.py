@@ -2,11 +2,10 @@ import logging
 import random
 import string
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List
 
 import beeline
-import pytz
 import requests
 
 from tor.core.config import Config
@@ -112,7 +111,7 @@ def threaded_check_submissions(cfg: Config) -> None:
         # looked for new posts. We'll try again later.
         return
 
-    cfg.last_post_scan_time = datetime.now(tz=pytz.UTC)
+    cfg.last_post_scan_time = datetime.now(tz=timezone.utc)
 
     subreddits = cfg.subreddits_to_check
 

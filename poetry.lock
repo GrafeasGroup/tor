@@ -1376,18 +1376,6 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
-name = "pytz"
-version = "2023.3"
-description = "World timezone definitions, modern and historical"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pytz-2023.3-py2.py3-none-any.whl", hash = "sha256:a151b3abb88eda1d4e34a9814df37de2a80e301e68ba0fd856fb9b46bfbbbffb"},
-    {file = "pytz-2023.3.tar.gz", hash = "sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588"},
-]
-
-[[package]]
 name = "pywin32-ctypes"
 version = "0.2.0"
 description = ""
@@ -2173,4 +2161,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "4cd943b56db9cf27dc5f74bfa409aedfb6f8f5412eeabba0c47b75a79676a1d2"
+content-hash = "688b04c006567435f76bcc0d12de349ea02fbf226dcdfb6f211403a7694f99ca"

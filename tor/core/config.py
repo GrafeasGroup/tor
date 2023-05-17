@@ -1,9 +1,8 @@
-import datetime
 import os
+from datetime import datetime, timezone
 from typing import Dict, List, Union
 
 import bugsnag
-import pytz
 from blossom_wrapper import BlossomAPI
 from dotenv import load_dotenv
 from praw import Reddit
@@ -49,8 +48,8 @@ class Config(object):
     perform_header_check = True
     debug_mode = False
 
-    last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1, tzinfo=pytz.UTC)
-    last_set_meta_flair_time = datetime.datetime(1970, 1, 1, 1, 1, 1, tzinfo=pytz.UTC)
+    last_post_scan_time = datetime(1970, 1, 1, 1, 1, 1, tzinfo=timezone.utc)
+    last_set_meta_flair_time = datetime(1970, 1, 1, 1, 1, 1, tzinfo=timezone.utc)
 
     @cached_property
     def blossom(self) -> BlossomAPI:
