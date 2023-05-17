@@ -34,7 +34,7 @@ class cached_property(object):
     # as expected because the lookup logic is replicated in __get__ for
     # manual invocation.
 
-    def __init__(self, func, name=None, doc=None):
+    def __init__(self, func, name=None, doc=None) -> None:
         self.__name__ = name or func.__name__
         self.__module__ = func.__module__
         self.__doc__ = doc or func.__doc__

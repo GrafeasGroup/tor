@@ -3,25 +3,23 @@ import random
 import time
 from typing import Tuple
 
-from tor.core.config import (
-    SLACK_COC_ACCEPTED_CHANNEL_ID,
-    SLACK_FORMATTING_ISSUE_CHANNEL_ID,
-)
-from tor.helpers.flair import check_promotion, generate_promotion_message
-
 import beeline
 from blossom_wrapper import BlossomStatus
 from praw.models import Comment, Message, Redditor, Submission
 
+from tor.core.config import (
+    SLACK_COC_ACCEPTED_CHANNEL_ID,
+    SLACK_FORMATTING_ISSUE_CHANNEL_ID,
+    Config,
+)
+from tor.core.helpers import get_wiki_page, remove_if_required, send_to_modchat
+from tor.helpers.flair import check_promotion, flair, generate_promotion_message, set_user_flair
+from tor.strings import translation
 from tor.validation.formatting_validation import (
     check_for_formatting_issues,
     get_formatting_issue_message,
 )
-from tor.core.config import Config
-from tor.core.helpers import get_wiki_page, remove_if_required, send_to_modchat
 from tor.validation.transcription_validation import get_transcription
-from tor.helpers.flair import flair, set_user_flair
-from tor.strings import translation
 
 i18n = translation()
 log = logging.getLogger(__name__)
@@ -48,9 +46,7 @@ MODCHAT_EMOTES = [
 ]
 
 
-def modchat_blocked_user_ping(
-    username: str, blossom_submission: dict, cfg: Config
-) -> None:
+def modchat_blocked_user_ping(username: str, blossom_submission: dict, cfg: Config) -> None:
     user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
     send_to_modchat(
         f":no_entry_sign: Blocked user <{user_url}|u/{username}> is trying to transcribe."
@@ -60,11 +56,8 @@ def modchat_blocked_user_ping(
 
 
 @beeline.traced(name="process_coc")
-def process_coc(
-    username: str, context: str, blossom_submission: dict, cfg: Config
-) -> Tuple:
-    """
-    Process the acceptation of the CoC by the specified user.
+def process_coc(username: str, context: str, blossom_submission: dict, cfg: Config) -> Tuple:
+    """Process the acceptation of the CoC by the specified user.
 
     :param username: The name of the user accepting the CoC
     :param context: The context of the reply, to use as a link
@@ -82,14 +75,11 @@ def process_coc(
             user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
             post_url = i18n["urls"]["reddit_url"].format(context)
             send_to_modchat(
-                f"<{user_url}|u/{username}> has just "
-                f"<{post_url}|accepted the CoC!> {emote}",
+                f"<{user_url}|u/{username}> has just " f"<{post_url}|accepted the CoC!> {emote}",
                 cfg,
                 channel=SLACK_COC_ACCEPTED_CHANNEL_ID,
             )
-        return process_claim(
-            username, blossom_submission, cfg, first_time=new_acceptance
-        )
+        return process_claim(username, blossom_submission, cfg, first_time=new_acceptance)
     elif user_response.status == BlossomStatus.not_found:
         cfg.blossom.create_user(username=username)
         return (
@@ -103,11 +93,8 @@ def process_coc(
 
 
 @beeline.traced(name="process_claim")
-def process_claim(
-    username: str, blossom_submission: dict, cfg: Config, first_time=False
-) -> Tuple:
-    """
-    Process a claim request.
+def process_claim(username: str, blossom_submission: dict, cfg: Config, first_time=False) -> Tuple:
+    """Process a claim request.
 
     This function sends a reply depending on the response from Blossom and
     creates an user when this is the first time a user uses the bot.
@@ -119,9 +106,7 @@ def process_claim(
     """
     coc_not_accepted = i18n["responses"]["general"]["coc_not_accepted"]
 
-    response = cfg.blossom.claim(
-        submission_id=blossom_submission["id"], username=username
-    )
+    response = cfg.blossom.claim(submission_id=blossom_submission["id"], username=username)
     return_flair = None
     if response.status == BlossomStatus.ok:
         # A random tip to append to the response
@@ -130,17 +115,13 @@ def process_claim(
         )
 
         message = (
-            i18n["responses"]["claim"][
-                "first_claim_success" if first_time else "success"
-            ]
+            i18n["responses"]["claim"]["first_claim_success" if first_time else "success"]
             + "\n\n"
             + random_tip
         )
 
         return_flair = flair.in_progress
-        log.info(
-            f'Claim on Submission {blossom_submission["tor_url"]} by {username} successful.'
-        )
+        log.info(f'Claim on Submission {blossom_submission["tor_url"]} by {username} successful.')
 
     elif response.status == BlossomStatus.coc_not_accepted:
         message = coc_not_accepted.format(get_wiki_page("codeofconduct", cfg))
@@ -185,8 +166,7 @@ def process_done(
     override=False,
     alt_text_trigger=False,
 ) -> Tuple:
-    """
-    Handles comments where the user claims to have completed a post.
+    """Handles comments where the user claims to have completed a post.
 
     This function sends a reply to the user depending on the responses received
     from Blossom.
@@ -236,9 +216,7 @@ def process_done(
         # When the user replies `done` quickly after posting the transcription,
         # it might not be available on Reddit yet. Wait a bit and try again.
         time.sleep(1)
-        transcription, is_visible = get_transcription(
-            blossom_submission["url"], user, cfg
-        )
+        transcription, is_visible = get_transcription(blossom_submission["url"], user, cfg)
 
     if transcription and not override:
         # Try to detect common formatting errors
@@ -282,8 +260,7 @@ def process_done(
             return_flair = flair.completed
             set_user_flair(user, comment, cfg)
             log.info(
-                f'Done on Submission {blossom_submission["tor_url"]} by {user.name}'
-                f" successful."
+                f'Done on Submission {blossom_submission["tor_url"]} by {user.name}' f" successful."
             )
             message = done_messages["completed_transcript"]
             transcription_count = blossom_user.data["gamma"] + 1
@@ -312,8 +289,7 @@ def process_done(
 def process_unclaim(
     username: str, blossom_submission: dict, submission: Submission, cfg: Config
 ) -> Tuple:
-    """
-    Process an unclaim request.
+    """Process an unclaim request.
 
     Note that this function also checks whether a post should be removed and
     does so when required.
@@ -323,9 +299,7 @@ def process_unclaim(
     :param submission: The relevant Submission in Reddit
     :param cfg: Config of tor
     """
-    response = cfg.blossom.unclaim(
-        submission_id=blossom_submission["id"], username=username
-    )
+    response = cfg.blossom.unclaim(submission_id=blossom_submission["id"], username=username)
     return_flair = None
     unclaim_messages = i18n["responses"]["unclaim"]
     if response.status == BlossomStatus.ok:
@@ -371,9 +345,7 @@ def process_message(message: Message, cfg: Config) -> None:
             f"Received DM from {username}. \n Subject: {message.subject}\n\nBody: {message.body}"
         )
     else:
-        send_to_modchat(
-            f"DM with no author -- " f"*{message.subject}*:\n{message.body}", cfg
-        )
+        send_to_modchat(f"DM with no author -- " f"*{message.subject}*:\n{message.body}", cfg)
         log.info(
             f"Received DM with no author. \n Subject: {message.subject}\n\nBody: {message.body}"
         )

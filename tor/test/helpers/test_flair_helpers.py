@@ -3,11 +3,10 @@ import pytest
 from tor.helpers.flair import (
     FLAIR_DATA,
     _get_flair_css,
-    generate_promotion_message,
     check_promotion,
+    generate_promotion_message,
 )
 from tor.strings import translation
-
 
 i18n = translation()
 

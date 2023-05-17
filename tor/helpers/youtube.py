@@ -19,8 +19,7 @@ def is_youtube_url(url: str) -> bool:
 
 
 def is_transcribable_youtube_video(url: str) -> bool:
-    """
-    We don't want to process channels or user accounts, so we'll filter
+    """We don't want to process channels or user accounts, so we'll filter
     those out here.
 
     :param url: the YouTube URL we need to check.

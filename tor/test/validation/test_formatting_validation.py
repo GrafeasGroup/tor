@@ -402,9 +402,7 @@ def test_check_for_reference_links(test_input: str, should_match: str) -> None:
             [FormattingIssue.FENCED_CODE_BLOCK],
         ),
         (
-            load_invalid_transcription_from_file(
-                "fenced-code-block_missing-separators.txt"
-            ),
+            load_invalid_transcription_from_file("fenced-code-block_missing-separators.txt"),
             [FormattingIssue.FENCED_CODE_BLOCK, FormattingIssue.MISSING_SEPARATORS],
         ),
         (

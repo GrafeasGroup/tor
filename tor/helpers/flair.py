@@ -30,8 +30,7 @@ FLAIR_DATA = {
 
 
 def flair_post(post: Submission, flair_id: Optional[str]) -> None:
-    """
-    Sets the requested flair on a given post.
+    """Sets the requested flair on a given post.
 
     :param post: A Submission object on ToR.
     :param flair_id: String. The ID of the flair template to apply.
@@ -40,8 +39,7 @@ def flair_post(post: Submission, flair_id: Optional[str]) -> None:
     """
     if not flair_id:
         log.error(
-            "Trying to flair post without providing a flair ID. "
-            "Did you set the .env variables?"
+            "Trying to flair post without providing a flair ID. " "Did you set the .env variables?"
         )
         return
 
@@ -90,8 +88,7 @@ def generate_promotion_message(count: int) -> str:
 
 
 def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
-    """
-    Set the flair from the comment's author according to their gamma and current flair
+    """Set the flair from the comment's author according to their gamma and current flair.
 
     This function uses Blossom to retrieve the up to date gamma. The current
     flair postfix is left intact in the process.
@@ -118,15 +115,13 @@ def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
 
 
 def set_meta_flair_on_other_posts(cfg: Config) -> None:
-    """
-    Loops through the 10 newest posts on ToR and sets the flair to
+    """Loops through the 10 newest posts on ToR and sets the flair to
     'Meta' for any post that is not authored by the bot or any of
     the moderators.
 
     :param cfg: the active config object.
     :return: None.
     """
-
     new_last_time = cfg.last_set_meta_flair_time
     for post in cfg.tor.new(limit=10):
         if str(post.author) in __BOT_NAMES__:

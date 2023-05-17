@@ -104,8 +104,7 @@ def run_noop(cfg):
 
 @beeline.traced(name="run")
 def run(cfg):
-    """
-    Primary routine.
+    """Primary routine.
 
     :param cfg: Global config dict, supplied by tor_core.
     :return: None.
@@ -207,8 +206,7 @@ def main(ctx: Context, debug: bool, noop: bool):
     help="Show Pytest output instead of running quietly.",
 )
 def selfcheck(verbose: bool) -> None:
-    """
-    Verify the binary passes all tests internally.
+    """Verify the binary passes all tests internally.
 
     Add any other self-check related code here.
     """

@@ -46,6 +46,9 @@ poetry = "^1.1.14"
 poetry2setup = { git = "https://github.com/abersheeran/poetry2setup", branch = "master" }
 ruff = "^0.0.267"
 
+[tool.black]
+line-length = 100
+
 [[tool.mypy.overrides]]
 module = [
     "praw",

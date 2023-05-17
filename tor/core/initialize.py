@@ -40,8 +40,7 @@ def populate_header(cfg: Config) -> None:
 
 @beeline.traced("populate_formatting")
 def populate_formatting(cfg: Config) -> None:
-    """
-    Grabs the contents of the three wiki pages that contain the
+    """Grabs the contents of the three wiki pages that contain the
     formatting examples and stores them in the cfg object.
 
     :return: None.
@@ -53,13 +52,11 @@ def populate_formatting(cfg: Config) -> None:
 
 @beeline.traced("populate_domain_lists")
 def populate_domain_lists(cfg: Config) -> None:
-    """
-    Loads the approved content domains into the config object from the
+    """Loads the approved content domains into the config object from the
     wiki page.
 
     :return: None.
     """
-
     domain_string = get_wiki_page("domains", cfg)
     domains = "".join(domain_string.splitlines()).split("---")
 
@@ -80,12 +77,10 @@ def populate_domain_lists(cfg: Config) -> None:
 
 @beeline.traced("populate_subreddit_lists")
 def populate_subreddit_lists(cfg: Config) -> None:
-    """
-    Gets the list of subreddits to monitor and loads it into memory.
+    """Gets the list of subreddits to monitor and loads it into memory.
 
     :return: None.
     """
-
     cfg.subreddits_to_check = get_wiki_page("subreddits", cfg).splitlines()
     cfg.subreddits_to_check = clean_list(cfg.subreddits_to_check)
     log.debug(f"Created list of subreddits from wiki: {cfg.subreddits_to_check}")
@@ -95,9 +90,7 @@ def populate_subreddit_lists(cfg: Config) -> None:
             sub, threshold = line.split(",")
             cfg.upvote_filter_subs[sub] = int(threshold)
 
-    log.debug(
-        f"Retrieved subreddits subject to the upvote filter: {cfg.upvote_filter_subs}"
-    )
+    log.debug(f"Retrieved subreddits subject to the upvote filter: {cfg.upvote_filter_subs}")
 
     cfg.subreddits_domain_filter_bypass = clean_list(
         get_wiki_page("subreddits/domain-filter-bypass", cfg).splitlines()
@@ -109,9 +102,7 @@ def populate_subreddit_lists(cfg: Config) -> None:
     cfg.no_link_header_subs = clean_list(
         get_wiki_page("subreddits/no-link-header", cfg).splitlines()
     )
-    log.debug(
-        f"Retrieved subreddits subject to the upvote filter: {cfg.no_link_header_subs}"
-    )
+    log.debug(f"Retrieved subreddits subject to the upvote filter: {cfg.no_link_header_subs}")
 
 
 @beeline.traced("populate_gifs")

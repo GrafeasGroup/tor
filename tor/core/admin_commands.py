@@ -14,8 +14,7 @@ from tor.core.user_interaction import process_done
 
 @beeline.traced(name="process_command")
 def process_command(reply, cfg):
-    """
-    This function processes any commands send to the bot via PM with a subject
+    """This function processes any commands send to the bot via PM with a subject
     that stars with a !. The basic flow is read JSON file, look for key with
     same subject, check if the caller is mod, or is in the list of allowed
     people, then reply with the results of pythonFunction.
@@ -28,7 +27,6 @@ def process_command(reply, cfg):
     :param cfg: the global config object
     :return: None
     """
-
     # Trim off the ! from the start of the string
     requested_command = reply.subject[1:]
     username = reply.author.name
@@ -47,9 +45,7 @@ def process_command(reply, cfg):
                     "\n\nMessage a dev to make your dream come true."
                 )
 
-            logging.warning(
-                f"Error, command: {requested_command} not found! (from {username})"
-            )
+            logging.warning(f"Error, command: {requested_command} not found! (from {username})")
 
             return
 
@@ -72,9 +68,7 @@ def process_command(reply, cfg):
             )
 
             reply.reply(
-                random.choice(commands["notAuthorizedResponses"]).format(
-                    random.choice(cfg.no_gifs)
-                )
+                random.choice(commands["notAuthorizedResponses"]).format(random.choice(cfg.no_gifs))
             )
 
             return
@@ -93,8 +87,7 @@ def is_moderator(username, cfg):
 
 @beeline.traced(name="process_override")
 def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, cfg):
-    """
-    This process is for moderators of ToR to force u/transcribersofreddit
+    """This process is for moderators of ToR to force u/transcribersofreddit
     to mark a post as complete and award flair when the bot refutes a
     `done` claim. The comment containing "!override" must be in response to
     the bot's comment saying that it cannot find the transcript.
@@ -104,7 +97,6 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
     :param parent_id: The ID of the parent comment of the override
     :param cfg: the global config object.
     """
-
     # TODO: turn this into a decorator
     # don't remove this check, it's not covered like other admin_commands
     # because it's used in reply to people, not as a PM
@@ -122,9 +114,7 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
             f"Starting validation override for post {grandparent.fullname}, "
             f"approved by {user.name}"
         )
-        return process_done(
-            grandparent.author, blossom_submission, grandparent, cfg, override=True
-        )
+        return process_done(grandparent.author, blossom_submission, grandparent, cfg, override=True)
     return "Cannot process - no target comment found.", None
 
 
@@ -137,11 +127,10 @@ def reload_config(reply, cfg):
 
 
 def ping(reply, cfg) -> str:
-    """
-    Replies to the !ping command, and is used as a keep alive check
+    """Replies to the !ping command, and is used as a keep alive check
     :param reply: Message object
     :param cfg: See reply param
-    :return: The ping string, which in turn is given to Reddit's reply.reply()
+    :return: The ping string, which in turn is given to Reddit's reply.reply().
     """
     logging.info(f"Received ping from {reply.author.name}. Pong!")
     return "Pong!"
@@ -158,9 +147,6 @@ def process_debug(user: Redditor, blossom_submission: Dict, cfg) -> Tuple[str, N
 
     # format for reddit by putting four spaces at the beginning of each line
     message = "\n".join(
-        [
-            "    {}".format(i)
-            for i in json.dumps(blossom_submission, indent=4).split("\n")
-        ]
+        ["    {}".format(i) for i in json.dumps(blossom_submission, indent=4).split("\n")]
     )
     return message, None

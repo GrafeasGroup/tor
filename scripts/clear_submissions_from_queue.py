@@ -28,9 +28,7 @@ if __name__ == "__main__":
         submissions = list(r.subreddit("transcribersofreddit").hot(limit=None))
         submissions += list(r.subreddit("transcribersofreddit").new(limit=None))
         submissions += list(r.subreddit("transcribersofreddit").top(limit=None))
-        submissions += list(
-            r.subreddit("transcribersofreddit").controversial(limit=None)
-        )
+        submissions += list(r.subreddit("transcribersofreddit").controversial(limit=None))
         remove_old_crap(submissions)
 
         # try:

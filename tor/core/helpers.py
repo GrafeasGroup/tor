@@ -1,26 +1,26 @@
 import logging
+import os
 import re
 import signal
 import sys
 import time
-from typing import List, Dict
-import os
+from typing import Dict, List
 
 import beeline
+from dotenv import load_dotenv
 from praw.exceptions import APIException
 from praw.models import Comment, Submission, Subreddit
-from prawcore.exceptions import RequestException, ServerError, Forbidden, NotFound
+from prawcore.exceptions import Forbidden, NotFound, RequestException, ServerError
 
 import tor.core
 from tor.core import __version__
 from tor.core.config import (
-    config,
-    Config,
-    SLACK_REMOVED_POST_CHANNEL_ID,
     SLACK_DEFAULT_CHANNEL_ID,
+    SLACK_REMOVED_POST_CHANNEL_ID,
+    Config,
+    config,
 )
 from tor.strings import translation
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -59,8 +59,7 @@ _pattern = re.compile(r"again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$", re.IGNO
 
 
 def _(message: str) -> str:
-    """
-    Message formatter. Returns the message and the disclaimer for the
+    """Message formatter. Returns the message and the disclaimer for the
     footer.
 
     :param message: string. The message to be displayed.
@@ -70,8 +69,7 @@ def _(message: str) -> str:
 
 
 def clean_list(items: List[str]) -> List[str]:
-    """
-    Takes a list and removes entries that are only newlines.
+    """Takes a list and removes entries that are only newlines.
 
     :param items: List.
     :return: List, sans newlines
@@ -80,11 +78,8 @@ def clean_list(items: List[str]) -> List[str]:
 
 
 @beeline.traced(name="send_to_modchat")
-def send_to_modchat(
-    message: str, cfg: Config, channel: str = SLACK_DEFAULT_CHANNEL_ID
-) -> None:
-    """
-    Sends a message to #general on ToR mod chat.
+def send_to_modchat(message: str, cfg: Config, channel: str = SLACK_DEFAULT_CHANNEL_ID) -> None:
+    """Sends a message to #general on ToR mod chat.
 
     :param message: String; the message that is to be encoded
     :param cfg: the global config dict.
@@ -100,8 +95,7 @@ def send_to_modchat(
 
 
 def is_our_subreddit(subreddit_name: str, cfg: Config) -> bool:
-    """
-    Compares given subreddit to the one we're operating out of
+    """Compares given subreddit to the one we're operating out of.
 
     :param subreddit_name: String; the questioned subreddit
     :param cfg: the global config object
@@ -115,8 +109,7 @@ def is_our_subreddit(subreddit_name: str, cfg: Config) -> bool:
 
 
 def clean_id(post_id: str) -> str:
-    """
-    Fixes the Reddit ID so that it can be used to get a new object.
+    """Fixes the Reddit ID so that it can be used to get a new object.
 
     By default, the Reddit ID is prefixed with something like `t1_` or
     `t3_`, but this doesn't always work for getting a new object. This
@@ -129,8 +122,7 @@ def clean_id(post_id: str) -> str:
 
 
 def get_parent_post_id(post: Comment, subreddit: Subreddit) -> Submission:
-    """
-    Takes any given comment object and returns the object of the
+    """Takes any given comment object and returns the object of the
     original post, no matter how far up the chain it is. This is
     a very time-intensive function because of how Reddit handles
     rate limiting and the fact that you can't just request the
@@ -149,8 +141,7 @@ def get_parent_post_id(post: Comment, subreddit: Subreddit) -> Submission:
 
 @beeline.traced(name="get_wiki_page")
 def get_wiki_page(pagename: str, cfg: Config) -> str:
-    """
-    Return the contents of a given wiki page.
+    """Return the contents of a given wiki page.
 
     :param pagename: String. The name of the page to be requested.
     :param cfg: Dict. Global config object.
@@ -170,8 +161,7 @@ def get_wiki_page(pagename: str, cfg: Config) -> str:
 
 
 def send_reddit_reply(repliable, message: str) -> None:
-    """
-    Wrapper function which catches Reddit's deleted comment exception.
+    """Wrapper function which catches Reddit's deleted comment exception.
 
     We've run into an issue where someone has commented and then deleted the
     comment between when the bot pulls mail and when it processes comments.
@@ -202,8 +192,7 @@ def handle_rate_limit(exc: APIException) -> None:
 
 
 def run_until_dead(func):
-    """
-    The official method that replaces all that ugly boilerplate required to
+    """The official method that replaces all that ugly boilerplate required to
     start up a bot under the TranscribersOfReddit umbrella. This method handles
     communication issues with Reddit, timeouts, and handles CTRL+C and
     unexpected crashes.
@@ -222,9 +211,7 @@ def run_until_dead(func):
             log.critical("User pressed CTRL+C twice!!! Killing!")
             sys.exit(1)
 
-        log.info(
-            "\rUser triggered command line shutdown. Will terminate after current loop."
-        )
+        log.info("\rUser triggered command line shutdown. Will terminate after current loop.")
         tor.core.is_running = False
 
     # handler for CTRL+C
@@ -256,8 +243,7 @@ def run_until_dead(func):
 
 
 def check_for_phrase(content: str, phraselist: List) -> bool:
-    """
-    See if a substring from the list is in the content.
+    """See if a substring from the list is in the content.
 
     This allows us to handle somewhat uncommon (but relied-upon) behavior like
     'done -- this is an automated action'.
@@ -306,9 +292,7 @@ def _nsfw_on_blossom(cfg: Config, b_submission: Dict) -> None:
 
 
 @beeline.traced(name="remove_if_required")
-def remove_if_required(
-    cfg: Config, r_submission: Submission, b_submission: Dict
-) -> bool:
+def remove_if_required(cfg: Config, r_submission: Submission, b_submission: Dict) -> bool:
     """Automatically handle the post if it has been unclaimed.
 
     We can handle the following scenarios automatically:

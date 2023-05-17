@@ -1,5 +1,4 @@
-"""
-This is a standalone addition which contains a non-thread-safe implementation
+"""This is a standalone addition which contains a non-thread-safe implementation
 of a dict user object that is stored in Redis. It can either take in an active
 Redis connection as an argument or create its own with some defaults.
 """
@@ -17,9 +16,8 @@ class UserDataNotFound(Exception):
 
 
 class User(object):
-    """
-    Usage:
-    from users import User
+    """Usage:
+    from users import User.
 
     pam = User('pam', redis_conn=config.redis)
     pam.update('age', 39)
@@ -27,11 +25,8 @@ class User(object):
     pam.save()
     """
 
-    def __init__(
-        self, username: str, redis_conn: StrictRedis, create_if_not_found=True
-    ):
-        """
-        Create our own Redis connection if one is not passed in.
+    def __init__(self, username: str, redis_conn: StrictRedis, create_if_not_found=True) -> None:
+        """Create our own Redis connection if one is not passed in.
         We also assume that there is already a logging object created.
 
         :param username: String; the username we're looking for. No fuzzing
@@ -58,9 +53,7 @@ class User(object):
         return self.user_data.get(key, default_return)
 
     def _load(self) -> UserData:
-        """
-        :return: Dict or None; the loaded information from Redis.
-        """
+        """:return: Dict or None; the loaded information from Redis."""
         result = self.redis.get(self.redis_key.format(self.username))
         if not result:
             if self.create_if_not_found:

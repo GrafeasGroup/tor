@@ -2,9 +2,9 @@ import datetime
 import re
 from typing import Optional, Set
 
+from tor.strings import translation
 from tor.validation.formatting_issues import FormattingIssue
 from tor.validation.helpers import format_as_sections
-from tor.strings import translation
 
 i18n = translation()
 
@@ -189,7 +189,7 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
 
 
 def check_for_incorrect_line_break(transcription: str) -> Optional[FormattingIssue]:
-    """Check if the transcription contains double-spaced or escaped line breaks"""
+    """Check if the transcription contains double-spaced or escaped line breaks."""
     return (
         FormattingIssue.INCORRECT_LINE_BREAK
         if INCORRECT_LINE_BREAK_PATTERN.search(transcription) is not None
@@ -229,7 +229,7 @@ def check_for_unescaped_subreddit(transcription: str) -> Optional[FormattingIssu
 
 def check_for_unescaped_heading(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription contains an unescaped hashtag. Actual backslash in example swapped for (backslash) to
-    avoid invalid escape sequence warning
+    avoid invalid escape sequence warning.
 
     Valid: (backslash)#Text
     Valid: # Test
@@ -254,10 +254,7 @@ def check_for_invalid_header(transcription: str) -> Optional[FormattingIssue]:
     return (
         FormattingIssue.INVALID_HEADER
         if not any(
-            [
-                re.search(r"^\s*\*+{}.*\*".format(i), header) is not None
-                for i in VALID_HEADERS
-            ]
+            [re.search(r"^\s*\*+{}.*\*".format(i), header) is not None for i in VALID_HEADERS]
         )
         else None
     )

@@ -9,8 +9,7 @@ def has_been_posted(post_url: str, cfg: Config) -> bool:
 
 
 def is_removed(post: Submission) -> bool:
-    """
-    Reddit does not allow non-mods to tell whether or not a post has been
+    """Reddit does not allow non-mods to tell whether or not a post has been
     removed, which understandably makes it a little difficult to figure out
     whether or not we should remove a post automatically. HOWEVER, as with
     pretty much everything else that Reddit does, they left enough detritus

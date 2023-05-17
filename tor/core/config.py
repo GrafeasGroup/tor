@@ -1,5 +1,6 @@
 import datetime
 import os
+from typing import Dict, List, Union
 
 import bugsnag
 from blossom_wrapper import BlossomAPI
@@ -8,11 +9,9 @@ from praw import Reddit
 from praw.models import Subreddit
 from praw.models.reddit.subreddit import ModeratorRelationship
 from slackclient import SlackClient
-from typing import Dict, List, Union
 
 from tor import __root__, __version__
 from tor.core import cached_property
-
 
 load_dotenv()
 
@@ -24,9 +23,8 @@ SLACK_FORMATTING_ISSUE_CHANNEL_ID = os.getenv("SLACK_FORMATTING_ISSUE_CHANNEL_ID
 
 
 class Config(object):
-    """
-    A singleton object for checking global configuration from
-    anywhere in the application
+    """A singleton object for checking global configuration from
+    anywhere in the application.
     """
 
     r: Reddit

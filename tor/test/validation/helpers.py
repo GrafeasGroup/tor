@@ -1,7 +1,6 @@
 import os
-from typing import List
 from pathlib import Path
-
+from typing import List
 
 current_dir = Path(__file__).parent
 VALID_TRANSCRIPTION_PATH = current_dir / "transcriptions" / "valid"
