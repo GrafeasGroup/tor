@@ -14,15 +14,15 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10.x'
-          architecture: 'x64'
-      - run: |
-          pip install --upgrade pip
-          pip install poetry
-          hash -r
-
-          poetry install
-      - run: poetry run mypy .
-      - run: poetry run flake8 .
+      - uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+      - name: Install Dependencies
+        run: poetry install
+      - name: Check types
+        run: poetry run mypy .
+      - name: Check lints
+        run: poetry run ruff .
 
   test:
     runs-on: ubuntu-latest
@@ -33,12 +33,9 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: '3.10.x'
-          architecture: 'x64'
-      - name: Install Poetry
-        run: |
-          pip install --upgrade pip
-          pip install poetry
-          hash -r
-
-          poetry install
+      - uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+      - name: Install Dependencies
+        run: poetry install
       - run: poetry run pytest --cov=tor
