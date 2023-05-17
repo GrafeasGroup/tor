@@ -35,7 +35,6 @@ pytest = "^7.1.2"
 [tool.poetry.group.dev.dependencies]
 better-exceptions = "^0.3.3"
 pytest-cov = "^3.0.0"
-flake8 = "^5.0.3"
 mypy = ">=0.800"
 black = "^22.6.0"
 types-toml = "^0.10.8"
