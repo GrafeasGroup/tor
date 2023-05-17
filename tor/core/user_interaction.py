@@ -56,7 +56,7 @@ def modchat_blocked_user_ping(username: str, blossom_submission: dict, cfg: Conf
 
 
 @beeline.traced(name="process_coc")
-def process_coc(username: str, context: str, blossom_submission: dict, cfg: Config) -> Tuple:
+def process_coc(username: str, context: str, blossom_submission: dict, cfg: Config) -> tuple:
     """Process the acceptation of the CoC by the specified user.
 
     :param username: The name of the user accepting the CoC
@@ -95,7 +95,7 @@ def process_coc(username: str, context: str, blossom_submission: dict, cfg: Conf
 @beeline.traced(name="process_claim")
 def process_claim(
     username: str, blossom_submission: dict, cfg: Config, first_time: bool = False
-) -> Tuple:
+) -> tuple:
     """Process a claim request.
 
     This function sends a reply depending on the response from Blossom and
@@ -167,7 +167,7 @@ def process_done(
     cfg: Config,
     override: bool = False,
     alt_text_trigger: bool = False,
-) -> Tuple:
+) -> tuple:
     """Handles comments where the user claims to have completed a post.
 
     This function sends a reply to the user depending on the responses received

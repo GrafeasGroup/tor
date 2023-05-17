@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import Any
 
 from praw import Reddit
 
@@ -10,7 +11,7 @@ UNCLAIMED = "Unclaimed"
 IN_PROGRESS = "In Progress"
 
 
-def remove_old_crap(posts) -> None:
+def remove_old_crap(posts: list[Any]) -> None:
     for item in posts:
         if item.link_flair_text == UNCLAIMED:
             submission_time = datetime.fromtimestamp(item.created_utc, tz=timezone.utc)
@@ -30,12 +31,3 @@ if __name__ == "__main__":
         submissions += list(r.subreddit("transcribersofreddit").top(limit=None))
         submissions += list(r.subreddit("transcribersofreddit").controversial(limit=None))
         remove_old_crap(submissions)
-
-        # try:
-        #     item.reply(
-        #         "This submission has been open for at least three days and is listed as in progress"
-        #         " -- it has been removed to make room for other submissions in the queue. Please contact"
-        #         " itsthejoker if there is an issue."
-        #     )
-        # except RedditAPIException:
-        #     pass

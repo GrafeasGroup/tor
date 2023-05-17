@@ -44,7 +44,9 @@ def test_from_moderator_false() -> None:
 @pytest.mark.xfail(reason="Unmaintained test")
 @patch("tor.core.user_interaction.process_done")
 @patch("tor_core.helpers.clean_id", return_value="1234")
-def test_process_override_not_moderator(mock_clean_id, mock_process_done) -> None:
+def test_process_override_not_moderator(
+    mock_clean_id: MagicMock, mock_process_done: MagicMock
+) -> None:
     # for use with anything that requires a reply object
 
     config = MagicMock()
@@ -63,7 +65,7 @@ def test_process_override_not_moderator(mock_clean_id, mock_process_done) -> Non
 @pytest.mark.skip(reason="Unfinished test implementation")
 @patch("tor.core.admin_commands.is_moderator", return_value=True)
 @patch("tor.core.user_interaction.process_done")
-def test_process_override_not_moderator2(mock_process_done) -> None:
+def test_process_override_not_moderator2(mock_process_done: MagicMock) -> None:
     # for use with anything that requires a reply object
 
     config = MagicMock()

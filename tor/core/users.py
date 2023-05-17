@@ -52,7 +52,7 @@ class User(object):
     def __repr__(self) -> str:
         return repr(self.user_data)
 
-    def get(self, key: str, default_return=None) -> Any:
+    def get(self, key: str, default_return: Any = None) -> Any:
         return self.user_data.get(key, default_return)
 
     def _load(self) -> UserData:

@@ -160,7 +160,7 @@ def get_wiki_page(pagename: str, cfg: Config) -> str:
         return ""
 
 
-def send_reddit_reply(repliable, message: str) -> None:
+def send_reddit_reply(repliable: Any, message: str) -> None:
     """Wrapper function which catches Reddit's deleted comment exception.
 
     We've run into an issue where someone has commented and then deleted the

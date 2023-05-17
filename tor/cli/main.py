@@ -4,6 +4,7 @@ import os
 import pathlib
 import sys
 import time
+from typing import Any
 
 import beeline
 import click
@@ -98,12 +99,12 @@ with current_zipfile() as archive:
 load_dotenv(dotenv_path=dotenv_path)
 
 
-def run_noop(cfg) -> None:
+def run_noop(cfg: Any) -> None:
     pass
 
 
 @beeline.traced(name="run")
-def run(cfg) -> None:
+def run(cfg: Any) -> None:
     """Primary routine.
 
     :param cfg: Global config dict, supplied by tor_core.

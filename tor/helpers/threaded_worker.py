@@ -92,7 +92,7 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
 
 
 def is_time_to_scan(cfg: Config) -> bool:
-    return datetime.now() > cfg.last_post_scan_time + timedelta(seconds=45)
+    return datetime.now(tz=timezone.utc) > cfg.last_post_scan_time + timedelta(seconds=45)
 
 
 @beeline.traced(name="threaded_check_submissions")
