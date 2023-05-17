@@ -2,7 +2,7 @@ import re
 
 __version__ = "0.6.0"
 
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 # CTRL+C handler variable
 is_running = True
@@ -36,7 +36,9 @@ class cached_property(object):
     # as expected because the lookup logic is replicated in __get__ for
     # manual invocation.
 
-    def __init__(self, func: Callable, name: str = None, doc: str = None) -> None:
+    def __init__(
+        self, func: Callable, name: Optional[str] = None, doc: Optional[str] = None
+    ) -> None:
         self.__name__ = name or func.__name__
         self.__module__ = func.__module__
         self.__doc__ = doc or func.__doc__
