@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 from typing import List
 
 import pytest
@@ -439,7 +439,8 @@ def test_check_for_formatting_issues_valid_transcription(transcription: str) -> 
 
 
 def test_april_fools():
-    target = datetime.datetime(2020, 4, 1, 12, 36)  # midday on April 1
+    # midday on April 1
+    target = datetime(2020, 4, 1, 12, 36, tzinfo=timezone.utc)
     assert is_april_fools(target)
 
 
