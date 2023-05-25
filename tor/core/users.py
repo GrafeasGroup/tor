@@ -18,16 +18,7 @@ class UserDataNotFound(Exception):
 
 
 class User(object):
-    """A user object.
-
-    Usage:
-    from users import User.
-
-    pam = User('pam', redis_conn=config.redis)
-    pam.update('age', 39)
-    pam.update('position', 'Office Administrator')
-    pam.save()
-    """
+    """A user object."""
 
     def __init__(
         self, username: str, redis_conn: StrictRedis, create_if_not_found: bool = True
