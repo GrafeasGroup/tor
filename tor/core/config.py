@@ -1,5 +1,6 @@
-import datetime
 import os
+from datetime import datetime, timezone
+from typing import Dict, List, Union
 
 import bugsnag
 from blossom_wrapper import BlossomAPI
@@ -8,11 +9,9 @@ from praw import Reddit
 from praw.models import Subreddit
 from praw.models.reddit.subreddit import ModeratorRelationship
 from slackclient import SlackClient
-from typing import Dict, List, Union
 
 from tor import __root__, __version__
 from tor.core import cached_property
-
 
 load_dotenv()
 
@@ -24,10 +23,7 @@ SLACK_FORMATTING_ISSUE_CHANNEL_ID = os.getenv("SLACK_FORMATTING_ISSUE_CHANNEL_ID
 
 
 class Config(object):
-    """
-    A singleton object for checking global configuration from
-    anywhere in the application
-    """
+    """A singleton object for checking global config from anywhere in the application."""
 
     r: Reddit
 
@@ -50,11 +46,12 @@ class Config(object):
     perform_header_check = True
     debug_mode = False
 
-    last_post_scan_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
-    last_set_meta_flair_time = datetime.datetime(1970, 1, 1, 1, 1, 1)
+    last_post_scan_time = datetime(1970, 1, 1, 1, 1, 1, tzinfo=timezone.utc)
+    last_set_meta_flair_time = datetime(1970, 1, 1, 1, 1, 1, tzinfo=timezone.utc)
 
     @cached_property
-    def blossom(self):
+    def blossom(self) -> BlossomAPI:
+        """Get the Blossom API object."""
         return BlossomAPI(
             email=os.environ["BLOSSOM_EMAIL"],
             password=os.environ["BLOSSOM_PASSWORD"],
@@ -64,13 +61,15 @@ class Config(object):
 
     @cached_property
     def tor(self) -> Subreddit:
+        """Get the r/TranscribersOfReddit subreddit object."""
         if self.debug_mode:
             return self.r.subreddit("ModsOfTor")
         else:
             return self.r.subreddit("transcribersofreddit")
 
     @cached_property
-    def modchat(self):
+    def modchat(self) -> SlackClient:
+        """Get the SLack client for the mod chat."""
         return SlackClient(os.getenv("SLACK_API_KEY", None))
 
     # Compatibility

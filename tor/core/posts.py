@@ -1,8 +1,8 @@
 import logging
-from typing import Dict, Union, Optional
+from typing import Dict, Optional, Union
 
 import beeline
-from blossom_wrapper import BlossomStatus, BlossomResponse
+from blossom_wrapper import BlossomResponse, BlossomStatus
 from praw.models import Submission
 
 from tor.core.config import Config
@@ -22,7 +22,8 @@ PostSummary = Dict[str, Union[str, int, bool, None]]
 
 @beeline.traced(name="process_post")
 def process_post(new_post: PostSummary, cfg: Config) -> None:
-    """
+    """Process the given Reddit post.
+
     After a valid post has been discovered, this handles the formatting
     and posting of those calls as workable jobs to ToR.
 
@@ -74,9 +75,7 @@ def process_post(new_post: PostSummary, cfg: Config) -> None:
 
 
 def has_enough_upvotes(post: PostSummary, cfg: Config) -> bool:
-    """
-    Check if the post meets the minimum threshold for karma
-    """
+    """Check if the post meets the minimum threshold for karma."""
     subreddit = str(post["subreddit"])
     upvotes = int(str(post["ups"]))
 
@@ -85,9 +84,7 @@ def has_enough_upvotes(post: PostSummary, cfg: Config) -> bool:
 
 
 def should_process_post(post: PostSummary, cfg: Config) -> bool:
-    """
-    Determine whether the provided post should be processed.
-    """
+    """Determine whether the provided post should be processed."""
     url = str(post["url"])
     return all(
         [
@@ -100,6 +97,7 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
 
 
 def truncate_title(title: str) -> str:
+    """Truncate the title of the submission to fit in Reddit's constraints."""
     max_length = 250  # This is probably the longest we ever want it
 
     if len(title) <= max_length:
@@ -134,6 +132,7 @@ def create_blossom_submission(
     tor_post: Submission,  # tor submission
     cfg: Config,
 ) -> BlossomResponse:
+    """Create a new submission object in Blossom."""
     if (content_url := str(original_post["url"])) is None:
         content_url = cfg.r.submission(url=tor_post.url).url
     tor_url = i18n["urls"]["reddit_url"].format(str(tor_post.permalink))
@@ -149,6 +148,7 @@ def create_blossom_submission(
 
 
 def get_blossom_submission(submission: Submission, cfg: Config) -> Optional[Dict]:
+    """Retrieve a submission object from Blossom."""
     response = cfg.blossom.get_submission(url=submission.url)
     if response.status == BlossomStatus.ok:
         return response.data[0]
@@ -164,9 +164,7 @@ def get_blossom_submission(submission: Submission, cfg: Config) -> Optional[Dict
         post_summary["title"] = linked_post.title
         post_summary["is_nsfw"] = linked_post.over_18
 
-        new_submission_response = create_blossom_submission(
-            post_summary, submission, cfg
-        )
+        new_submission_response = create_blossom_submission(post_summary, submission, cfg)
 
         if new_submission_response.status == BlossomStatus.ok:
             new_submission = new_submission_response.data

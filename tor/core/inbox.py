@@ -14,14 +14,14 @@ from tor.core import (
     MOD_SUPPORT_PHRASES,
     UNCLAIM_PHRASES,
 )
-from tor.core.admin_commands import process_command, process_override, process_debug
+from tor.core.admin_commands import process_command, process_debug, process_override
 from tor.core.config import Config
 from tor.core.helpers import (
     _,
+    check_for_phrase,
     is_our_subreddit,
     send_reddit_reply,
     send_to_modchat,
-    check_for_phrase,
 )
 from tor.core.posts import get_blossom_submission
 from tor.core.user_interaction import (
@@ -41,12 +41,13 @@ log = logging.getLogger(__name__)
 
 
 def extract_sub_from_url(url: str) -> str:
-    """returns the sub name from the given url without "r/" at the start."""
+    """Return the sub name from the given url without "r/" at the start."""
     return url.split("/")[4]
 
 
 @beeline.traced(name="forward_to_slack")
 def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
+    """Forward the given message to the mod Slack."""
     username = str(item.author.name)
 
     send_to_modchat(
@@ -64,6 +65,7 @@ def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
 
 @beeline.traced(name="process_reply")
 def process_reply(reply: Comment, cfg: Config) -> None:
+    """Process a reply to the bots messages and posts."""
     try:
         log.debug(f"Received reply from {reply.author.name}: {reply.body}")
         message: Optional[str] = ""
@@ -111,13 +113,9 @@ def process_reply(reply: Comment, cfg: Config) -> None:
                 return None
 
             if "i accept" in r_body:
-                message, flair = process_coc(
-                    username, reply.context, blossom_submission, cfg
-                )
+                message, flair = process_coc(username, reply.context, blossom_submission, cfg)
             elif check_for_phrase(r_body, UNCLAIM_PHRASES):
-                message, flair = process_unclaim(
-                    username, blossom_submission, submission, cfg
-                )
+                message, flair = process_unclaim(username, blossom_submission, submission, cfg)
             elif check_for_phrase(r_body, CLAIM_PHRASES):
                 message, flair = process_claim(username, blossom_submission, cfg)
             elif check_for_phrase(r_body, DONE_PHRASES):
@@ -150,17 +148,12 @@ def process_reply(reply: Comment, cfg: Config) -> None:
         # deletes their comment before the bot finished processing. It's
         # uncommon, but common enough that this is necessary.
         log.warning(e)
-        log.warning(
-            f"Unable to process comment {reply.submission.shortlink} "
-            f"by {reply.author}"
-        )
+        log.warning(f"Unable to process comment {reply.submission.shortlink} " f"by {reply.author}")
 
 
 @beeline.traced(name="process_mention")
 def process_mention(mention: Comment) -> None:
-    """
-    Handles username mentions and handles the formatting and posting of
-    those calls as workable jobs to ToR.
+    """Handle username mentions of the bot.
 
     :param mention: the Comment object containing the username mention.
     :return: None.
@@ -181,9 +174,9 @@ def process_mention(mention: Comment) -> None:
 
 @beeline.traced(name="check_inbox")
 def check_inbox(cfg: Config) -> None:
-    """
-    Goes through all the unread messages in the inbox. It deliberately
-    leaves mail which does not fit into either category so that it can
+    """Go through all the unread messages in the inbox.
+
+    It deliberately leaves mail which does not fit into either category so that it can
     be read manually at a later point.
 
     :return: None.
@@ -197,8 +190,7 @@ def check_inbox(cfg: Config) -> None:
 
         if author_name is None:
             send_to_modchat(
-                f"We received a message without an author -- "
-                f"*{item.subject}*:\n{item.body}",
+                f"We received a message without an author -- " f"*{item.subject}*:\n{item.body}",
                 cfg,
             )
         elif author_name == "transcribot":

@@ -1,10 +1,10 @@
-import datetime
 import re
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Set
 
+from tor.strings import translation
 from tor.validation.formatting_issues import FormattingIssue
 from tor.validation.helpers import format_as_sections
-from tor.strings import translation
 
 i18n = translation()
 
@@ -15,7 +15,8 @@ FOOTER_PATTERN = re.compile(
     r"we&#32;do&#32;it,&#32;click&#32;here!\]\(https://www\.reddit\.com/r/TranscribersOfReddit/wiki/index\)\s*$"
 )
 FOOTER_PATTERN_APRIL_FOOLS = re.compile(
-    r"\^\^I'm&#32;a&#32;(?:\w|&#32;)+&#32;"  # Allow replacing "human volunteer content transcriber" with whatever
+    # Allow replacing "human volunteer content transcriber" with whatever
+    r"\^\^I'm&#32;a&#32;(?:\w|&#32;)+&#32;"
     r"(?:for&#32;Reddit&#32;)?and&#32;you&#32;could&#32;be&#32;too!&#32;\[If&#32;you'd&#32;"
     r"like&#32;more&#32;information&#32;on&#32;what&#32;we&#32;do&#32;and&#32;why&#32;"
     r"we&#32;do&#32;it,&#32;click&#32;here!\]\(https://www\.reddit\.com/r/TranscribersOfReddit/wiki/index\)\s*$"
@@ -97,15 +98,16 @@ REFERENCE_LINK_PATTERN = re.compile(r"(?:^[ ]{0,3})\[.*\]:.*")
 INCORRECT_LINE_BREAK_PATTERN = re.compile(r"[\w*_:]([ ]{2,}|\\)\n[\w*_:]")
 
 
-def is_april_fools(now: datetime.datetime) -> bool:
-    april_fools = datetime.datetime(now.year, 4, 1)
-    margin_of_error = datetime.timedelta(days=1)
+def is_april_fools(now: datetime) -> bool:
+    """Determine if the given date is at (or around) April 1st."""
+    april_fools = datetime(now.year, 4, 1, tzinfo=timezone.utc)
+    margin_of_error = timedelta(days=1)
 
     # March 31st, April 1st, or April 2nd
     begin = april_fools - margin_of_error
-    end = april_fools + margin_of_error + datetime.timedelta(days=1)
+    end = april_fools + margin_of_error + timedelta(days=1)
 
-    return now >= begin and now <= end
+    return begin <= now <= end
 
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:
@@ -163,7 +165,7 @@ def check_for_heading_with_dashes(transcription: str) -> Optional[FormattingIssu
 def check_for_malformed_footer(transcription: str) -> Optional[FormattingIssue]:
     """Check if the transcription doesn't contain the correct footer."""
     pattern = FOOTER_PATTERN
-    if is_april_fools(datetime.datetime.now()):
+    if is_april_fools(datetime.now(tz=timezone.utc)):
         pattern = FOOTER_PATTERN_APRIL_FOOLS
 
     return None if pattern.search(transcription) else FormattingIssue.MALFORMED_FOOTER
@@ -189,7 +191,7 @@ def check_for_fenced_code_block(transcription: str) -> Optional[FormattingIssue]
 
 
 def check_for_incorrect_line_break(transcription: str) -> Optional[FormattingIssue]:
-    """Check if the transcription contains double-spaced or escaped line breaks"""
+    """Check if the transcription contains double-spaced or escaped line breaks."""
     return (
         FormattingIssue.INCORRECT_LINE_BREAK
         if INCORRECT_LINE_BREAK_PATTERN.search(transcription) is not None
@@ -198,12 +200,12 @@ def check_for_incorrect_line_break(transcription: str) -> Optional[FormattingIss
 
 
 def check_for_unescaped_username(transcription: str) -> Optional[FormattingIssue]:
-    """Check if the transcription contains an unescaped username.
+    r"""Check if the transcription contains an unescaped username.
 
     Examples: u/username and /u/username are not allowed.
-    Instead, u\\/username, \\/u/username or \\/u\\/username need to be used.
+    Instead, u\/username, \/u/username or \/u\/username need to be used.
 
-    Otherwise the user will get pinged.
+    Otherwise, the user will get pinged.
     """
     return (
         FormattingIssue.UNESCAPED_USERNAME
@@ -213,12 +215,12 @@ def check_for_unescaped_username(transcription: str) -> Optional[FormattingIssue
 
 
 def check_for_unescaped_subreddit(transcription: str) -> Optional[FormattingIssue]:
-    """Check if the transcription contains an unescaped subreddit name.
+    r"""Check if the transcription contains an unescaped subreddit name.
 
     Examples: r/subreddit and /r/subreddit are not allowed.
-    Instead, r\\/subreddit, \\/r/subreddit or \\/r\\/subreddit need to be used.
+    Instead, r\/subreddit, \/r/subreddit or \/r\/subreddit need to be used.
 
-    Otherwise the subreddit might get pinged.
+    Otherwise, the subreddit might get pinged.
     """
     return (
         FormattingIssue.UNESCAPED_SUBREDDIT
@@ -228,8 +230,10 @@ def check_for_unescaped_subreddit(transcription: str) -> Optional[FormattingIssu
 
 
 def check_for_unescaped_heading(transcription: str) -> Optional[FormattingIssue]:
-    """Check if the transcription contains an unescaped hashtag. Actual backslash in example swapped for (backslash) to
-    avoid invalid escape sequence warning
+    """Check if the transcription contains an unescaped hashtag.
+
+    Actual backslash in example swapped for (backslash) to
+    avoid invalid escape sequence warning.
 
     Valid: (backslash)#Text
     Valid: # Test
@@ -254,10 +258,7 @@ def check_for_invalid_header(transcription: str) -> Optional[FormattingIssue]:
     return (
         FormattingIssue.INVALID_HEADER
         if not any(
-            [
-                re.search(r"^\s*\*+{}.*\*".format(i), header) is not None
-                for i in VALID_HEADERS
-            ]
+            [re.search(r"^\s*\*+{}.*\*".format(i), header) is not None for i in VALID_HEADERS]
         )
         else None
     )

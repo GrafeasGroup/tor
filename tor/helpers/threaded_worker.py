@@ -2,14 +2,14 @@ import logging
 import random
 import string
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List
 
 import beeline
 import requests
 
 from tor.core.config import Config
-from tor.core.posts import process_post, PostSummary
+from tor.core.posts import PostSummary, process_post
 from tor.strings import translation
 
 log = logging.getLogger()
@@ -17,9 +17,9 @@ i18n = translation()
 
 
 def check_domain_filter(item: Dict, cfg: Config) -> bool:
-    """
-    Validate that a given post is actually one that we can (or should) work on
-    by checking the domain of the post against our filters.
+    """Validate that a given post is actually one that we can (or should) work on.
+
+    We check the domain of the post against our filters.
 
     :param item: a dict which has the post information in it.
     :param cfg: the config object.
@@ -39,8 +39,10 @@ def check_domain_filter(item: Dict, cfg: Config) -> bool:
 
 @beeline.traced_thread
 def get_subreddit_posts(sub: str) -> List[PostSummary]:
+    """Get new posts from the given subreddit."""
     def generate_user_agent() -> str:
-        """
+        """Generate a new Reddit user agent.
+
         Reddit routinely blocks / throttles common user agents. The easiest way
         to deal with that is to (nicely) generate a partially unique user-agent
         in an easy-to-follow pattern in case they decide that they do want to
@@ -94,14 +96,16 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
 
 
 def is_time_to_scan(cfg: Config) -> bool:
-    return datetime.now() > cfg.last_post_scan_time + timedelta(seconds=45)
+    """Determine if it is time to scan for new submissions."""
+    return datetime.now(tz=timezone.utc) > cfg.last_post_scan_time + timedelta(seconds=45)
 
 
 @beeline.traced(name="threaded_check_submissions")
 def threaded_check_submissions(cfg: Config) -> None:
-    """
+    """Check if there are new submissions, with multiple threads.
+
     Single threaded PRAW performance:
-    finished in 56.75446701049805s
+    finished in 56.75446701049805s.
 
     Single threaded json performance:
     finished in 16.70485234260559s
@@ -109,13 +113,12 @@ def threaded_check_submissions(cfg: Config) -> None:
     multi-threaded json performance:
     finished in 1.3632569313049316s
     """
-
     if not is_time_to_scan(cfg):
         # we're still within the defined time window from the last time we
         # looked for new posts. We'll try again later.
         return
 
-    cfg.last_post_scan_time = datetime.now()
+    cfg.last_post_scan_time = datetime.now(tz=timezone.utc)
 
     subreddits = cfg.subreddits_to_check
 
@@ -138,10 +141,7 @@ def threaded_check_submissions(cfg: Config) -> None:
     unseen_post_urls = cfg.blossom.post(
         "/submission/bulkcheck/",
         data={
-            "urls": [
-                i18n["urls"]["reddit_url"].format(post["permalink"])
-                for post in total_posts
-            ]
+            "urls": [i18n["urls"]["reddit_url"].format(post["permalink"]) for post in total_posts]
         },
     ).json()
     unseen_posts = [

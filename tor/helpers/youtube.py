@@ -6,6 +6,7 @@ i18n = translation()
 
 
 def is_youtube_url(url: str) -> bool:
+    """Determine if the given URL is from YouTube."""
     if url.startswith(("youtu", "www")):
         url = "http://" + url
 
@@ -19,7 +20,8 @@ def is_youtube_url(url: str) -> bool:
 
 
 def is_transcribable_youtube_video(url: str) -> bool:
-    """
+    """Determine if the given URL is a YouTube video that can be transcribed.
+
     We don't want to process channels or user accounts, so we'll filter
     those out here.
 

@@ -4,6 +4,7 @@ import os
 import pathlib
 import sys
 import time
+from typing import Any
 
 import beeline
 import click
@@ -98,14 +99,14 @@ with current_zipfile() as archive:
 load_dotenv(dotenv_path=dotenv_path)
 
 
-def run_noop(cfg):
+def run_noop(cfg: Any) -> None:
+    """Do nothing."""
     pass
 
 
 @beeline.traced(name="run")
-def run(cfg):
-    """
-    Primary routine.
+def run(cfg: Any) -> None:
+    """Primary routine.
 
     :param cfg: Global config dict, supplied by tor_core.
     :return: None.
@@ -142,7 +143,7 @@ def run(cfg):
     help="Just run the daemon, but take no action (helpful for testing infrastructure changes)",
 )
 @click.version_option(version=__version__, prog_name=tor.__SELF_NAME__)
-def main(ctx: Context, debug: bool, noop: bool):
+def main(ctx: Context, debug: bool, noop: bool) -> None:
     """Run ToR."""
     if ctx.invoked_subcommand:
         # If we asked for a specific command, don't run the bot. Instead, pass control
@@ -207,8 +208,7 @@ def main(ctx: Context, debug: bool, noop: bool):
     help="Show Pytest output instead of running quietly.",
 )
 def selfcheck(verbose: bool) -> None:
-    """
-    Verify the binary passes all tests internally.
+    """Verify the binary passes all tests internally.
 
     Add any other self-check related code here.
     """

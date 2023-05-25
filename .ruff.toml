@@ -1,0 +1,35 @@
+select = [
+    "E",  # pycodestyle (error)
+    "W",  # pycodestyle (warning)
+    "D",  # pydocstyle
+    "I",  # isort
+    "ANN",  # flake8-annotations
+    "DTZ",  # flake8-datetimez
+]
+ignore = [
+    "ANN101",  # missing-type-self
+    "ANN401",  # any-type
+    "D100",  # undocumented-public-module
+    "D101",  # undocumented-public-class
+    "D105",  # undocumented-magic-method
+    "D106",  # undocumented-public-nested-class
+    "D203",  # one-blank-line-before-class
+    "D213",  # multi-line-summary-second-line
+]
+
+exclude = [
+    "build",
+    "dist",
+    "blossom/bootstrap/*",
+    "*/migrations/*",
+    "docker/*",
+    "./local_settings.py",
+]
+
+line-length = 100  # Same as black
+
+[per-file-ignores]
+"test_*" = [
+    "D",  # Disable documentation lints for test files
+    "DTZ",  # Disable timezone lints for test files
+]
