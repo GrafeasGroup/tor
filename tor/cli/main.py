@@ -100,6 +100,7 @@ load_dotenv(dotenv_path=dotenv_path)
 
 
 def run_noop(cfg: Any) -> None:
+    """Do nothing."""
     pass
 
 

@@ -59,8 +59,7 @@ _pattern = re.compile(r"again in (?P<number>[0-9]+) (?P<unit>\w+)s?\.$", re.IGNO
 
 
 def _(message: str) -> str:
-    """Message formatter. Returns the message and the disclaimer for the
-    footer.
+    """Add the bot footer to the given message.
 
     :param message: string. The message to be displayed.
     :return: string. The original message plus the footer.
@@ -69,7 +68,7 @@ def _(message: str) -> str:
 
 
 def clean_list(items: List[str]) -> List[str]:
-    """Takes a list and removes entries that are only newlines.
+    """Take a list and remove entries that are only newlines.
 
     :param items: List.
     :return: List, sans newlines
@@ -79,7 +78,7 @@ def clean_list(items: List[str]) -> List[str]:
 
 @beeline.traced(name="send_to_modchat")
 def send_to_modchat(message: str, cfg: Config, channel: str = SLACK_DEFAULT_CHANNEL_ID) -> None:
-    """Sends a message to #general on ToR mod chat.
+    """Send a message to #general on ToR mod chat.
 
     :param message: String; the message that is to be encoded
     :param cfg: the global config dict.
@@ -95,7 +94,7 @@ def send_to_modchat(message: str, cfg: Config, channel: str = SLACK_DEFAULT_CHAN
 
 
 def is_our_subreddit(subreddit_name: str, cfg: Config) -> bool:
-    """Compares given subreddit to the one we're operating out of.
+    """Compare given subreddit to the one we're operating out of.
 
     :param subreddit_name: String; the questioned subreddit
     :param cfg: the global config object
@@ -109,7 +108,7 @@ def is_our_subreddit(subreddit_name: str, cfg: Config) -> bool:
 
 
 def clean_id(post_id: str) -> str:
-    """Fixes the Reddit ID so that it can be used to get a new object.
+    """Fix the Reddit ID so that it can be used to get a new object.
 
     By default, the Reddit ID is prefixed with something like `t1_` or
     `t3_`, but this doesn't always work for getting a new object. This
@@ -122,7 +121,9 @@ def clean_id(post_id: str) -> str:
 
 
 def get_parent_post_id(post: Comment, subreddit: Subreddit) -> Submission:
-    """Takes any given comment object and returns the object of the
+    """Get the ID of the parent post of the given post.
+
+    Takes any given comment object and returns the object of the
     original post, no matter how far up the chain it is. This is
     a very time-intensive function because of how Reddit handles
     rate limiting and the fact that you can't just request the
@@ -161,7 +162,7 @@ def get_wiki_page(pagename: str, cfg: Config) -> str:
 
 
 def send_reddit_reply(repliable: Any, message: str) -> None:
-    """Wrapper function which catches Reddit's deleted comment exception.
+    """Catch Reddit's deleted comment exception.
 
     We've run into an issue where someone has commented and then deleted the
     comment between when the bot pulls mail and when it processes comments.
@@ -178,6 +179,7 @@ def send_reddit_reply(repliable: Any, message: str) -> None:
 
 
 def handle_rate_limit(exc: APIException) -> None:
+    """Handle the Reddit rate limit."""
     time_map = {
         "second": 1,
         "minute": 60,
@@ -192,7 +194,9 @@ def handle_rate_limit(exc: APIException) -> None:
 
 
 def run_until_dead(func: Callable) -> None:
-    """The official method that replaces all that ugly boilerplate required to
+    """Run the given function until the bot gets killed.
+
+    The official method that replaces all that ugly boilerplate required to
     start up a bot under the TranscribersOfReddit umbrella. This method handles
     communication issues with Reddit, timeouts, and handles CTRL+C and
     unexpected crashes.

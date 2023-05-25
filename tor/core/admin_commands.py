@@ -14,8 +14,9 @@ from tor.core.user_interaction import process_done
 
 @beeline.traced(name="process_command")
 def process_command(reply: Any, cfg: Any) -> None:
-    """This function processes any commands send to the bot via PM with a subject
-    that stars with a !. The basic flow is read JSON file, look for key with
+    """Process commands send to the bot via PM with a subject that stars with a !.
+
+    The basic flow is read JSON file, look for key with
     same subject, check if the caller is mod, or is in the list of allowed
     people, then reply with the results of pythonFunction.
 
@@ -81,12 +82,15 @@ def process_command(reply: Any, cfg: Any) -> None:
 
 
 def is_moderator(username: str, cfg: Any) -> bool:
+    """Determine if the given user is a moderator on r/TranscribersOfReddit."""
     return username in cfg.tor_mods
 
 
 @beeline.traced(name="process_override")
 def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, cfg: Any) -> tuple:
-    """This process is for moderators of ToR to force u/transcribersofreddit
+    """Process the !override command.
+
+    This process is for moderators of ToR to force u/transcribersofreddit
     to mark a post as complete and award flair when the bot refutes a
     `done` claim. The comment containing "!override" must be in response to
     the bot's comment saying that it cannot find the transcript.
@@ -118,6 +122,7 @@ def process_override(user: Redditor, blossom_submission: Dict, parent_id: str, c
 
 
 def reload_config(reply: Any, cfg: Any) -> str:
+    """Reload the config object, e.g. to get the new subreddit list."""
     logging.info(f"Reloading configs at the request of {reply.author.name}")
     initialize(cfg)
     logging.info("Reload complete.")
@@ -126,7 +131,8 @@ def reload_config(reply: Any, cfg: Any) -> str:
 
 
 def ping(reply: Any, cfg: Any) -> str:
-    """Replies to the !ping command, and is used as a keep alive check
+    """Reply to the !ping command, which is used as a keep alive check.
+
     :param reply: Message object
     :param cfg: See reply param
     :return: The ping string, which in turn is given to Reddit's reply.reply().
@@ -137,6 +143,7 @@ def ping(reply: Any, cfg: Any) -> str:
 
 @beeline.traced(name="process_debug")
 def process_debug(user: Redditor, blossom_submission: Dict, cfg: Any) -> Tuple[str, None]:
+    """Process the debug command, which returns a json dump of the Blossom submission."""
     # TODO: turn this into a decorator
     # don't remove this check, it's not covered like other admin_commands
     # because it's used in reply to people, not as a PM

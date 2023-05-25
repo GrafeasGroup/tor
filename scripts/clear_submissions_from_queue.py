@@ -12,6 +12,7 @@ IN_PROGRESS = "In Progress"
 
 
 def remove_old_crap(posts: list[Any]) -> None:
+    """Remove old posts from the queue."""
     for item in posts:
         if item.link_flair_text == UNCLAIMED:
             submission_time = datetime.fromtimestamp(item.created_utc, tz=timezone.utc)

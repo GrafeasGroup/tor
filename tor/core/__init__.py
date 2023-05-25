@@ -1,3 +1,4 @@
+"""The core functionality of the bot."""
 import re
 
 __version__ = "0.6.0"
@@ -12,10 +13,11 @@ _missing = object()
 
 # @see https://stackoverflow.com/a/17487613/1236035
 class cached_property(object):
-    """A decorator that converts a function into a lazy property.  The
-    function wrapped is called the first time to retrieve the result
+    """A decorator that converts a function into a lazy property.
+
+    The function wrapped is called the first time to retrieve the result
     and then that calculated result is used the next time you access
-    the value::
+    the value:
 
         class Foo(object):
 
@@ -39,6 +41,7 @@ class cached_property(object):
     def __init__(
         self, func: Callable, name: Optional[str] = None, doc: Optional[str] = None
     ) -> None:
+        """Create a new cached property object."""
         self.__name__ = name or func.__name__
         self.__module__ = func.__module__
         self.__doc__ = doc or func.__doc__

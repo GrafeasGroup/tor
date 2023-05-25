@@ -22,7 +22,9 @@ PostSummary = Dict[str, Union[str, int, bool, None]]
 
 @beeline.traced(name="process_post")
 def process_post(new_post: PostSummary, cfg: Config) -> None:
-    """After a valid post has been discovered, this handles the formatting
+    """Process the given Reddit post.
+
+    After a valid post has been discovered, this handles the formatting
     and posting of those calls as workable jobs to ToR.
 
     :param new_post: Submission object that needs to be posted.
@@ -95,6 +97,7 @@ def should_process_post(post: PostSummary, cfg: Config) -> bool:
 
 
 def truncate_title(title: str) -> str:
+    """Truncate the title of the submission to fit in Reddit's constraints."""
     max_length = 250  # This is probably the longest we ever want it
 
     if len(title) <= max_length:
@@ -129,6 +132,7 @@ def create_blossom_submission(
     tor_post: Submission,  # tor submission
     cfg: Config,
 ) -> BlossomResponse:
+    """Create a new submission object in Blossom."""
     if (content_url := str(original_post["url"])) is None:
         content_url = cfg.r.submission(url=tor_post.url).url
     tor_url = i18n["urls"]["reddit_url"].format(str(tor_post.permalink))
@@ -144,6 +148,7 @@ def create_blossom_submission(
 
 
 def get_blossom_submission(submission: Submission, cfg: Config) -> Optional[Dict]:
+    """Retrieve a submission object from Blossom."""
     response = cfg.blossom.get_submission(url=submission.url)
     if response.status == BlossomStatus.ok:
         return response.data[0]

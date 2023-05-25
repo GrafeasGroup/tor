@@ -99,6 +99,7 @@ INCORRECT_LINE_BREAK_PATTERN = re.compile(r"[\w*_:]([ ]{2,}|\\)\n[\w*_:]")
 
 
 def is_april_fools(now: datetime) -> bool:
+    """Determine if the given date is at (or around) April 1st."""
     april_fools = datetime(now.year, 4, 1, tzinfo=timezone.utc)
     margin_of_error = timedelta(days=1)
 
@@ -106,7 +107,7 @@ def is_april_fools(now: datetime) -> bool:
     begin = april_fools - margin_of_error
     end = april_fools + margin_of_error + timedelta(days=1)
 
-    return now >= begin and now <= end
+    return begin <= now <= end
 
 
 def check_for_bold_header(transcription: str) -> Optional[FormattingIssue]:

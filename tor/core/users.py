@@ -1,4 +1,6 @@
-"""This is a standalone addition which contains a non-thread-safe implementation
+"""A cached user object.
+
+This is a standalone addition which contains a non-thread-safe implementation
 of a dict user object that is stored in Redis. It can either take in an active
 Redis connection as an argument or create its own with some defaults.
 """
@@ -16,7 +18,9 @@ class UserDataNotFound(Exception):
 
 
 class User(object):
-    """Usage:
+    """A user object.
+
+    Usage:
     from users import User.
 
     pam = User('pam', redis_conn=config.redis)
@@ -53,6 +57,7 @@ class User(object):
         return repr(self.user_data)
 
     def get(self, key: str, default_return: Any = None) -> Any:
+        """Get an item with the given key."""
         return self.user_data.get(key, default_return)
 
     def _load(self) -> UserData:
@@ -69,17 +74,21 @@ class User(object):
         return json.loads(result.decode())
 
     def save(self) -> None:
+        """Save the user to redis."""
         self.redis.set(self.redis_key.format(self.username), json.dumps(self.user_data))
 
     def update(self, key: str, value: Any) -> None:
+        """Update the value of the given key."""
         self.user_data[key] = value
 
     def list_update(self, key: str, value: Any) -> None:
+        """Update a list value for the given key."""
         if not self.user_data.get(key):
             self.user_data[key] = []
         self.user_data[key] += [value]
 
     def _create_default_user_data(self) -> UserData:
+        """Create a new user with the username."""
         self.user_data = {}
         self.user_data.update({"username": self.username})
         return self.user_data

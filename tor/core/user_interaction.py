@@ -47,6 +47,7 @@ MODCHAT_EMOTES = [
 
 
 def modchat_blocked_user_ping(username: str, blossom_submission: dict, cfg: Config) -> None:
+    """Ping the modchat if a blocked user tries to do something."""
     user_url = i18n["urls"]["reddit_url"].format(f"/u/{username}")
     send_to_modchat(
         f":no_entry_sign: Blocked user <{user_url}|u/{username}> is trying to transcribe."
@@ -168,7 +169,7 @@ def process_done(
     override: bool = False,
     alt_text_trigger: bool = False,
 ) -> tuple:
-    """Handles comments where the user claims to have completed a post.
+    """Handle comments where the user claims to have completed a post.
 
     This function sends a reply to the user depending on the responses received
     from Blossom.
@@ -330,6 +331,7 @@ def process_unclaim(
 
 @beeline.traced(name="process_message")
 def process_message(message: Message, cfg: Config) -> None:
+    """Process a message sent by a user."""
     dm_subject = i18n["responses"]["direct_message"]["dm_subject"]
     dm_body = i18n["responses"]["direct_message"]["dm_body"]
 

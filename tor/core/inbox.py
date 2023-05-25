@@ -41,12 +41,13 @@ log = logging.getLogger(__name__)
 
 
 def extract_sub_from_url(url: str) -> str:
-    """Returns the sub name from the given url without "r/" at the start."""
+    """Return the sub name from the given url without "r/" at the start."""
     return url.split("/")[4]
 
 
 @beeline.traced(name="forward_to_slack")
 def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
+    """Forward the given message to the mod Slack."""
     username = str(item.author.name)
 
     send_to_modchat(
@@ -64,6 +65,7 @@ def forward_to_slack(item: InboxableMixin, cfg: Config) -> None:
 
 @beeline.traced(name="process_reply")
 def process_reply(reply: Comment, cfg: Config) -> None:
+    """Process a reply to the bots messages and posts."""
     try:
         log.debug(f"Received reply from {reply.author.name}: {reply.body}")
         message: Optional[str] = ""
@@ -151,8 +153,7 @@ def process_reply(reply: Comment, cfg: Config) -> None:
 
 @beeline.traced(name="process_mention")
 def process_mention(mention: Comment) -> None:
-    """Handles username mentions and handles the formatting and posting of
-    those calls as workable jobs to ToR.
+    """Handle username mentions of the bot.
 
     :param mention: the Comment object containing the username mention.
     :return: None.
@@ -173,8 +174,9 @@ def process_mention(mention: Comment) -> None:
 
 @beeline.traced(name="check_inbox")
 def check_inbox(cfg: Config) -> None:
-    """Goes through all the unread messages in the inbox. It deliberately
-    leaves mail which does not fit into either category so that it can
+    """Go through all the unread messages in the inbox.
+
+    It deliberately leaves mail which does not fit into either category so that it can
     be read manually at a later point.
 
     :return: None.

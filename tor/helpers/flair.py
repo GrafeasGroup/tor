@@ -58,10 +58,18 @@ def _get_flair_css(transcription_count: int) -> str:
 
 
 def check_promotion(count: int) -> bool:
+    """Check if the user has reached the next rank.
+
+    :param count: The gamma of the user.
+    """
     return True if count in FLAIR_DATA.keys() else False
 
 
 def generate_promotion_message(count: int) -> str:
+    """Generate a message for when a user has reached the next rank.
+
+    :param count: The amount of gamma the user has.
+    """
     keys = list(FLAIR_DATA.keys())
     keys.sort()
     text = i18n["responses"]["done"]["promotion_text"]
@@ -115,7 +123,9 @@ def set_user_flair(user: Redditor, post: Comment, cfg: Config) -> None:
 
 
 def set_meta_flair_on_other_posts(cfg: Config) -> None:
-    """Loops through the 10 newest posts on ToR and sets the flair to
+    """Set the meta flair for non-queue posts on the sub.
+
+    Loops through the 10 newest posts on ToR and sets the flair to
     'Meta' for any post that is not authored by the bot or any of
     the moderators.
 

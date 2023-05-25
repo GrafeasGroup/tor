@@ -23,9 +23,7 @@ SLACK_FORMATTING_ISSUE_CHANNEL_ID = os.getenv("SLACK_FORMATTING_ISSUE_CHANNEL_ID
 
 
 class Config(object):
-    """A singleton object for checking global configuration from
-    anywhere in the application.
-    """
+    """A singleton object for checking global config from anywhere in the application."""
 
     r: Reddit
 
@@ -53,6 +51,7 @@ class Config(object):
 
     @cached_property
     def blossom(self) -> BlossomAPI:
+        """Get the Blossom API object."""
         return BlossomAPI(
             email=os.environ["BLOSSOM_EMAIL"],
             password=os.environ["BLOSSOM_PASSWORD"],
@@ -62,6 +61,7 @@ class Config(object):
 
     @cached_property
     def tor(self) -> Subreddit:
+        """Get the r/TranscribersOfReddit subreddit object."""
         if self.debug_mode:
             return self.r.subreddit("ModsOfTor")
         else:
@@ -69,6 +69,7 @@ class Config(object):
 
     @cached_property
     def modchat(self) -> SlackClient:
+        """Get the SLack client for the mod chat."""
         return SlackClient(os.getenv("SLACK_API_KEY", None))
 
     # Compatibility

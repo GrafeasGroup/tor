@@ -12,7 +12,7 @@ log = logging.getLogger()
 
 @beeline.traced("configure_logging")
 def configure_logging(cfg: Config, log_name: str = "transcribersofreddit.log") -> None:
-    # Set formatting and logging level.
+    """Set formatting and logging level."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)s | %(funcName)s | %(message)s",
@@ -35,13 +35,15 @@ def configure_logging(cfg: Config, log_name: str = "transcribersofreddit.log") -
 
 @beeline.traced("populate_header")
 def populate_header(cfg: Config) -> None:
+    """Get the transcription header format."""
     cfg.header = get_wiki_page("format/header", cfg)
 
 
 @beeline.traced("populate_formatting")
 def populate_formatting(cfg: Config) -> None:
-    """Grabs the contents of the three wiki pages that contain the
-    formatting examples and stores them in the cfg object.
+    """Grab the contents of the three wiki pages that contain the formatting examples.
+
+    They are stored in the cfg object.
 
     :return: None.
     """
@@ -52,8 +54,7 @@ def populate_formatting(cfg: Config) -> None:
 
 @beeline.traced("populate_domain_lists")
 def populate_domain_lists(cfg: Config) -> None:
-    """Loads the approved content domains into the config object from the
-    wiki page.
+    """Load the approved content domains into the config object from the wiki page.
 
     :return: None.
     """
@@ -77,7 +78,7 @@ def populate_domain_lists(cfg: Config) -> None:
 
 @beeline.traced("populate_subreddit_lists")
 def populate_subreddit_lists(cfg: Config) -> None:
-    """Gets the list of subreddits to monitor and loads it into memory.
+    """Get the list of subreddits to monitor and loads it into memory.
 
     :return: None.
     """
@@ -107,11 +108,13 @@ def populate_subreddit_lists(cfg: Config) -> None:
 
 @beeline.traced("populate_gifs")
 def populate_gifs(cfg: Config) -> None:
+    """Get GIFs that we can post."""
     cfg.no_gifs = get_wiki_page("usefulgifs/no", cfg).splitlines()
 
 
 @beeline.traced("initialize")
 def initialize(cfg: Config) -> None:
+    """Initialize the bot."""
     populate_domain_lists(cfg)
     log.debug("Domains loaded.")
     populate_subreddit_lists(cfg)

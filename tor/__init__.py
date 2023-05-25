@@ -1,3 +1,4 @@
+"""The u/transcribersofreddit bot."""
 import os
 
 __version__ = "?????"
