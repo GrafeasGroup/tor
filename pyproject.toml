@@ -17,7 +17,7 @@ include = ["commands.json", "tor/strings/*.yml"]
 python = "^3.9"
 sh = "^1.14.3"
 bugsnag = "^4.2.1"
-requests = "^2.28.1"
+requests = "^2.31.0"
 slackclient = "^1"
 PyYaml = "^5.1"
 blossom-wrapper = { git = "https://github.com/GrafeasGroup/blossom-wrapper.git", branch = "master" }
