@@ -66,4 +66,4 @@ MOD_SUPPORT_PHRASES = [
 
 CLAIM_PHRASES = ["claim", "dibs", "clai", "caim", "clam", "calim", "dib"]
 DONE_PHRASES = ["done", "deno", "doen", "dome", "doone"]
-UNCLAIM_PHRASES = ["unclaim", "cancel", "unclai"]
+UNCLAIM_PHRASES = ["unclaim", "cancel", "unclai", "claimn't", "undibs"]
