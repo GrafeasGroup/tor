@@ -15,6 +15,10 @@ from tor.strings import translation
 log = logging.getLogger()
 i18n = translation()
 
+# The time when no more posts should be pulled into the queue
+# 2023-07-01T00:00:00Z
+END_TIME = datetime(2023, 7, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
+
 
 def check_domain_filter(item: Dict, cfg: Config) -> bool:
     """Validate that a given post is actually one that we can (or should) work on.
@@ -97,7 +101,13 @@ def get_subreddit_posts(sub: str) -> List[PostSummary]:
 
 def is_time_to_scan(cfg: Config) -> bool:
     """Determine if it is time to scan for new submissions."""
-    return datetime.now(tz=timezone.utc) > cfg.last_post_scan_time + timedelta(seconds=45)
+    now = datetime.now(tz=timezone.utc)
+
+    # Don't put new posts into the queue when the sub is closed
+    if now >= END_TIME:
+        return False
+
+    return now > cfg.last_post_scan_time + timedelta(seconds=45)
 
 
 @beeline.traced(name="threaded_check_submissions")
